@@ -1,0 +1,1319 @@
+{% extends "draganddrop/common//base.html" %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar" >
+
+    <div class="top">
+        <div class="tate mr-4"></div>
+        <h1>アップロード</h1><i class="fas fa-globe fa-2x icon-globe"></i>
+    </div>
+
+    <div class="progressbar">
+        <div class="item active flex-fill">STEP1<br>情報入力</div>
+        <div class="item flex-fill">STEP2<br>ファイルを選択</div>
+        <div class="item flex-fill">STEP3<br>登録完了</div>
+    </div>
+
+</div>
+
+<div id="url_name" data-url_name="{{url_name}}"></div>
+
+
+<form action="" method="post" name="myform" id="postForm" enctype="multipart/form-data" data-ajax="false" novalidate>
+    {% csrf_token %}
+
+    <div class="box1_upload">
+        <!-----------------------------------タイトル DL回数-------------------------------------->
+        <div class="box2_upload">
+            <table class="table table-borderless">
+                <tr>
+                    <th>
+                        <h2 class="step1_upload_box_title">1 基本情報</h2>
+                    </th>
+                </tr>
+
+                <tr>
+                    <td class="step1_label_wrapper">
+                        <h2>タイトル</h2><span class="required_label def">必須</span>
+                    </td>
+                    <td>
+                        {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                            <div class="title_duplicate_error">
+                            {{ error }}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="step1-title-error" style="visibility:hidden"></div>
+                      {% endif %}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="step1_label_wrapper mb-1">
+                            <h2>DL回数</h2>
+                            <span class="required_label def">必須</span>
+                        </div>
+                        <h3>・DL可能回数を選択して下さい。</h3>
+                    </td>
+                    {% if plan == "free" %}
+                    <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
+                        {% render_field form.dl_limit|append_attr:"readonly:readonly" class="form-control dl_limit_readonly"%}
+                    </td>
+                    {% else %}
+                    <td>
+                        {% render_field form.dl_limit class="form-control dl_limit" %}
+                    </td>
+                    {% endif %}
+                </tr>
+
+            </table>
+        </div>
+        <!---box2_upload 閉じタグ--->
+
+
+        <!------------------------------------有効期限, メッセージ------------------------------->
+
+        <div class="box3_upload">
+            <table class="table table-borderless step1_table">
+
+                <tr>
+                    <td class="step1_label_wrapper">
+                        <h2>有効期限</h2><span class="required_label def">必須</span>
+                    </td>
+                    {% if plan == "free" %}
+                    <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
+                        <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div>
+                        <div class="mb-3 3d_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">３日間</div>
+                        <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                        <div class="mb-3 14d_btn btn btn-outline-primary end_date_btn_disabled my-btn-4 rounded-0">14日間</div>
+                        <div class="mb-3 1m_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">1ヶ月間</div>
+                        <div class="mb-3 mm_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">無期限</div>
+                    </td>
+                    {% else %}
+                    <td>
+                        <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date class="form-control" %}</div>
+                        <div class="mb-3 3d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">３日間</div>
+                        <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                        <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
+                        <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
+                        <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
+                    </td>
+                    {% endif %}
+                </tr>
+                
+                <tr>
+                    <td class="step1_label_wrapper">
+                        <h2>メッセージ</h2><span class="optional_label def">任意</span>
+                    </td>
+                    <td>
+                        {% render_field form.message class="form-control step1_upload_message" placeholder="メッセージを送信できます。" %}
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+        <!---step3_upload 閉じタグ--->
+
+        <!----------------------------------送信先---------------------------------------->
+
+        <div class="box4_upload">
+                <div style="text-align: left;">
+                    <div class="step1_label_wrapper mb-3">
+                        <h2 class="text-left step1_upload_box_title_2">2 送信先</h2>
+                        <span class="required_label def">必須</span>
+                        <h3>・送信先をアドレス帳から選択するか、メールアドレスを直接入力して下さい。</h3>
+                    </div>
+                </div>
+            
+                <table class="table table-borderless">
+                <tr>
+                    <td class="td_step1_upload_mail">
+                        <!---mail1-5--->
+                        <div>
+                            <div class="d-flex">
+                                <div>
+                                    <button type="button" id="address_book_modal_btn"
+                                    class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
+                                    data-target="#address_book_modal">アドレス帳</button>
+                                </div>
+                                <div class="ml-3">
+                                    <button type="button" id="group_book_modal_btn"
+                                    class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
+                                    data-target="#group_book_modal">グループ</button>
+                                </div>
+                            </div>
+                            <div id="step1_upload_error_message" style="visibility:hidden"></div>
+                            <div>
+                                {% render_field form.dest_user_mail1 class="form-control step1_mail step1_url_mail1" placeholder="1"%}
+                            </div>
+                            <div>
+                                {% render_field form.dest_user_mail2|append_attr:"readonly:readonly" class="form-control step1_mail row_2" placeholder="2"%}
+                            </div>
+                            <div>
+                                {% render_field form.dest_user_mail3|append_attr:"readonly:readonly" class="form-control step1_mail row_3" placeholder="3"%}
+                            </div>
+                            <div>
+                                {% render_field form.dest_user_mail4|append_attr:"readonly:readonly" class="form-control step1_mail row_4" placeholder="4"%}
+                            </div>
+
+                        </div>
+                    </td>
+
+
+                    <td>
+                        <!---mail6-8--->
+                        <div>
+                            {% render_field form.dest_user_mail5|append_attr:"readonly:readonly" class="form-control step1_mail step1_upload_mail6 row_5" placeholder="5"%}
+                        </div>
+                        <div>
+                            {% render_field form.dest_user_mail6|append_attr:"readonly:readonly" class="form-control step1_mail  row_6" placeholder="6"%}
+                        </div>
+                        <div>
+                            {% render_field form.dest_user_mail7|append_attr:"readonly:readonly" class="form-control step1_mail row_7" placeholder="7"%}
+                        </div>
+                        <div>
+                            {% render_field form.dest_user_mail8|append_attr:"readonly:readonly" class="form-control step1_mail row_8" placeholder="8"%}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+
+        </div>
+        <!---box4_upload閉じタグ--->
+
+        <!----------------------------送信先表示・全送信先確認ボタン-------------------------------------->
+        <div class="box5_upload">
+            <div class="box6_upload">
+                <h3>アドレス帳から選択された送信先上位10件まで表示されます。</h3>
+                <div>
+                    <div id="all_dest_user_lists"></div>
+                </div>
+            </div>
+
+            <div>
+                <a class="triangle step1_url_confirm_btn" data-toggle="modal" data-target="#confirm_modal"
+                    style="display:none">全送信先確認</a>
+            </div>
+        </div>
+
+    </div>
+    <!---box1_upload 閉じタグ--->
+
+    <!----------バーボタン---------->
+    <div>
+        <div class="d-flex flex-row justify-content-center mt-3 bottom_bar">
+
+            <div class="ml-1 mr-1">
+                <button type="button" class="cancel btn-cancel" data-toggle="modal" id="cancel_btn"
+                    data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+            </div>
+
+            <div class="ml-2 mr-1">
+                <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
+                    data-target="#send_data_modal" disabled>次へ
+                    <i class="fa-solid fa-angle-right ml-2"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="hidden_box_for_dest_user" data-dest_user="{{pk_list}}"></div>
+    <div id="hidden_box_for_dest_user_group" data-dest_user_group="{{group_list}}"></div>
+
+
+</form>
+
+<!--アドレス帳モーダル-->
+
+<div class="modal fade" id="address_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content center-modal address_lists_modal">
+            <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+                <span class="big_modal_title">アドレス帳</span>
+                <i class="fas fa-address-book fa-2x icon-address-book mr-3"></i>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body address_lists_modal_body">
+                <p>送り先を選択してください。</p>
+                <table class="table" id="address_book_list_table" style="table-layout: fixed;">
+                    <thead> 
+                        <tr>
+                            <th class="checkbox_step1"><label><input type="checkbox" id="all_address_list"
+                                        name="all_address_list_ids"></label></th>
+                            <th class="company_name">法人名</th>
+                            <th class="department_name">部署名</th>
+                            <th class="full_name">氏名</th>
+                            <th class="mail">メールアドレス</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="address_boxes">
+                        {%for address_list in address_lists%}
+                        <tr>
+                            <td><input type="checkbox" name="address_list_ids" value="{{address_list.id}}"
+                                id="address_list_data" data-company_name="{{address_list.company_name}}"
+                                data-name="{{address_list.last_name}} {{address_list.first_name}}">
+                                
+                            </td>
+                            
+                            <td>
+                                {% if address_list.legal_or_individual == 1 %}
+                                    {% if address_list.legal_person_posi == 1 %}
+                                        {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                                    {% else %}
+                                        {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                                    {% endif %}
+                                {% else %}
+                                    {% if address_list.trade_name == null %}
+                                        ー
+                                    {% else %}
+                                        {{address_list.trade_name}}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if address_list.department_name == null %}
+                                    　ー　
+                                {% else %}
+                                    {{address_list.department_name}}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{address_list.last_name}} {{address_list.first_name}}
+
+                            </td>
+
+                            <td>
+                                {{address_list.email}}
+                            </td>
+                        </tr>
+
+                        {%endfor%}
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer address_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn rounded-0"
+                    data-dismiss="modal" id="dest_user_select_button">選択</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">閉じる</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--グループ一覧モーダル-->
+
+<div class="modal fade" id="group_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content center-modal address_lists_modal">
+            <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+                <span class="big_modal_title">グループ</span>
+                <i class="fa-solid fa-users icon_users"></i>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body address_lists_modal_body">
+                <p>送り先を選択してください。</p>
+                <table class="table" id="group_book_list_table" style="table-layout: fixed;">
+                    <thead> 
+                        <tr>
+                            <th class="checkbox_step1"><label><input type="checkbox" id="all_group_list"
+                                        name="all_group_list_ids"></label></th>
+                            <th class="group_name">グループ名</th>
+                            <th class="group_members">会社名 氏名</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="group_boxes">
+                        {% for group_list in group_lists %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="group_list_ids" 
+                                value="{{group_list.id}}" id="group_list_data" data-group_name="{{group_list.group_name}}">
+                            </td>
+                            
+                            <td>
+                                {{group_list.group_name}}
+                            </td>
+
+                            <td>
+                                {% for address in group_list.address.all|slice:":5" %}
+                                    {% if address.company_name %}
+                                        {{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
+                                    {% elif address.trade_name %}
+                                        {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
+                                    {% else %}
+                                        {{address.last_name}}{{address.first_name}}<br />
+                                    {% endif %}
+                                {% endfor %}
+                              
+                                {%with group_number=group_list.address.all.count%}
+                                    {% if group_number >= 6 %}
+                                        <div class="rest_dest_user_count">あと{{group_number|add:"-5"}}名</div>
+                                        <div class="triangle dest_user_all_modal" data-toggle="modal"
+                                            data-target="#view_all_member_modal{{group_list.id}}">もっと見る
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer address_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn rounded-0"
+                    data-dismiss="modal" id="dest_user_group_select_button">選択</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">閉じる</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!----------------------------------もっと見るモーダル-------------------------------------->
+{% for group_list in group_lists %}
+
+<div class="modal fade" id="view_all_member_modal{{group_list.id}}" tabindex="-1" role="dialog"
+  aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role=" document">
+    <div class="modal-content center-modal dest_user_confirm_modal">
+        <div class="modal-header default_modal_header">
+            <span class="modal-title home_modal_title">グループメンバー<i class="fa-solid fa-users ml-2"></i></span>
+        </div>
+
+      <div class="modal-body">
+        <div>
+          {% for address in group_list.address.all %}
+            {% if address.company_name %}
+            {{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
+          {% elif address.trade_name %}
+            {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
+          {% else %}
+            {{address.last_name}}{{address.first_name}}<br />
+          {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer all_send_user_confirm_modal_footer">
+        <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">閉じる</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+<!--もっと見るモーダル閉じタグ-->
+
+
+<!--全送信先確認モーダル-->
+<div class="modal fade" id="confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal dest_user_confirm_modal">
+            <div class="modal-header default_modal_header">
+                <span class="modal-title home_modal_title">全送信先
+                    <i class="fas fa-address-book ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                <div id="step1_dest_user_number" class="dest_user_lists"></div>
+            </div>
+            <div class="modal-footer all_send_user_confirm_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">閉じる</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+// -----------------
+// Data table設定
+// -----------------
+
+//アドレス帳
+$(document).ready(function () {
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json"
+        }
+    });
+    var table = $('#address_book_list_table').DataTable({
+        lengthMenu: [10, 20, 30, 40],
+        order: [
+            [1, 'desc']
+        ],
+        columnDefs: [{
+            "targets": [0],
+            "orderable": false
+        }, ]
+    });
+
+});
+
+//グループ一覧
+$(document).ready(function () {
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json"
+        }
+    });
+    var table = $('#group_book_list_table').DataTable({
+        lengthMenu: [5, 10, 15, 20],
+        order: [
+            [1, 'desc']
+        ],
+        columnDefs: [{
+            "targets": [0],
+            "orderable": false
+        }, ]
+    });
+
+});
+
+// ---------------------------------------
+//  アドレス帳モーダル 動作制御
+// ---------------------------------------
+
+$(function () {
+
+// 全選択ボタンがクリックされた時
+$("#all_address_list").on('click', function () {
+    $("input[name='address_list_ids']").prop('checked', this.checked);
+});
+
+// 「全選択」以外のチェックボックスがクリックされた時
+$("input[name='address_list_ids']").on('click shown.bs.modal', function () {
+    if ($('#address_book_list_table :checked').length == $('#address_book_list_table :input').length) {
+        // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+        $('#all_address_list').prop('checked', true);
+    } else {
+        // 1つでもチェックが入っていたら、「全選択」 = checked
+        $('#all_address_list').prop('checked', false);
+    }
+});
+
+// チェックしたグループをリストに追加する
+$("input[name='address_list_ids']").on('change', function () {
+    var address_checked_list = [];
+    $('#address_book_modal input[name = address_list_ids]:checked').each(function () {
+        address_checked_list.push($(this).val()); // 配列に値を追加
+    });
+});
+
+});
+
+//モーダル内ページを変更した時全選択checkboxの状態を判断する。
+$(function () {
+    var table = $('#address_book_list_table').DataTable();
+
+    table.on('page.dt', function () {
+        var info = table.page.info();
+        var info_page = table.$('input, checkbox');
+        var table_data = table.data();
+        //処理を遅らせる
+        setTimeout(function () {
+            var all_user = $("input[name='address_list_ids']")
+            var all_checked_user = $("input[name='address_list_ids']:checked")
+            $("#all_address_list").prop('checked', (all_user.length == all_checked_user
+                .length));
+        }, 10);
+    });
+})
+
+// アドレス帳モーダルを開いた時、チェックしたユーザーをリストに追加する。
+$(function () {
+    $("#address_book_modal_btn").on('click', function () {
+        var address_list = [];
+        $('#address_book_modal input[name = address_list_ids]:checked').each(function () {
+            address_list.push($(this).val()); // 配列に値を追加
+        });
+    });
+});
+
+// モーダルを開いた時
+$("#address_book_modal").on('shown.bs.modal', function () {
+    if ($("input[name='address_list_ids']:checked").length == $("input[name='address_list_ids']").length) {
+        // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+        $('#all_address_list').prop('checked', true);
+    } else {
+        // 1つでもチェックが入っていたら、「全選択」 = checked
+        $('#all_address_list').prop('checked', false);
+    }
+});
+
+// ---------------------------------------
+//  グループモーダル 動作制御
+// ---------------------------------------
+
+$(function () {
+
+// 全選択ボタンがクリックされた時
+$("#all_group_list").on('click', function () {
+    $("input[name='group_list_ids']").prop('checked', this.checked);
+});
+
+// 「全選択」以外のチェックボックスがクリックされた時
+$("input[name='group_list_ids']").on('click', function () {
+    if ($('#group_book_list_table :checked').length == $('#group_book_list_table :input').length) {
+        // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+        $('#all_group_list').prop('checked', true);
+    } else {
+        // 1つでもチェックが入っていたら、「全選択」 = checked
+        $('#all_group_list').prop('checked', false);
+    }
+});
+
+
+// チェックしたグループをリストに追加する
+$("input[name='group_list_ids']").on('change', function () {
+    var group_checked_list = [];
+    $('#group_book_modal input[name = group_list_ids]:checked').each(function () {
+        group_checked_list.push($(this).val()); // 配列に値を追加
+    });
+});
+
+});
+
+//モーダル内ページを変更した時全選択checkboxの状態を判断する。
+$(function () {
+var table = $('#group_book_list_table').DataTable();
+
+table.on('page.dt', function () {
+    var info = table.page.info();
+    var info_page = table.$('input, checkbox');
+    var table_data = table.data();
+    //処理を遅らせる
+    setTimeout(function () {
+        var all_user = $("input[name='group_list_ids']")
+        var all_checked_user = $("input[name='group_list_ids']:checked")
+        $("#all_group_list").prop('checked', (all_user.length == all_checked_user
+            .length));
+    }, 10);
+});
+})
+
+// グループモーダルを開いた時、チェックしたユーザーをリストに追加する。
+$(function () {
+$("#group_book_modal_btn").on('click', function () {
+    var group_checked_list = [];
+    $('#group_book_modal input[name = group_list_ids]:checked').each(function () {
+        group_checked_list.push($(this).val()); // 配列に値を追加
+    });
+});
+});
+
+// モーダルを開いた時
+$("#group_book_modal").on('shown.bs.modal', function () {
+    if ($("input[name='group_list_ids']:checked").length == $("input[name='group_list_ids']").length) {
+        // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+        $('#all_group_list').prop('checked', true);
+    } else {
+        // 1つでもチェックが入っていたら、「全選択」 = checked
+        $('#all_group_list').prop('checked', false);
+    }
+});
+
+
+// ------------------------------------------
+// 全送信先確認モーダル
+// ------------------------------------------
+$('#confirm_modal').on('show.bs.modal', function () {
+
+    //変数mail_listsを初期化する処理。
+    var mail_lists = [];
+
+    //mail_listに1-8のメールを格納する。
+    var mail_address = {};
+    var dest_user_mail1 = $('#id_dest_user_mail1').val()
+    var dest_user_mail2 = $('#id_dest_user_mail2').val()
+    var dest_user_mail3 = $('#id_dest_user_mail3').val()
+    var dest_user_mail4 = $('#id_dest_user_mail4').val()
+    var dest_user_mail5 = $('#id_dest_user_mail5').val()
+    var dest_user_mail6 = $('#id_dest_user_mail6').val()
+    var dest_user_mail7 = $('#id_dest_user_mail7').val()
+    var dest_user_mail8 = $('#id_dest_user_mail8').val()
+
+    if (dest_user_mail1) {mail_lists.push(dest_user_mail1)} 
+    if (dest_user_mail2) {mail_lists.push(dest_user_mail2)} 
+    if (dest_user_mail3) {mail_lists.push(dest_user_mail3)} 
+    if (dest_user_mail4) {mail_lists.push(dest_user_mail4)} 
+    if (dest_user_mail5) {mail_lists.push(dest_user_mail5)} 
+    if (dest_user_mail6) {mail_lists.push(dest_user_mail6)} 
+    if (dest_user_mail7) {mail_lists.push(dest_user_mail7)} 
+    if (dest_user_mail8) {mail_lists.push(dest_user_mail8)}
+
+    // 初期化
+    var all_mail_address = '';
+
+    // 初期化
+    var checked_user = '';
+
+    // アドレス帳から選択した宛先をchecked_userに追加
+    for (user_list in user_lists) {
+        if (user_lists[user_list]['company_name'] == "None"){
+        checked_user += '<div>' + user_lists[user_list]['name'] + '</div>'
+        }else {
+            checked_user += '<div>' + user_lists[user_list]['company_name'] + ' ' + user_lists[
+            user_list]['name'] + '</div>'
+        }
+    }
+    // 選択したグループをchecked_userに追加
+    for (var group_list in group_lists) {
+            checked_user += '<div>' + group_lists[group_list]['group_name'] + '</div>'
+        }
+    // 入力したメールアドレスをchecked_userに追加
+    for (mail_list of mail_lists) {
+        checked_user += '<div>' + mail_list + '</div>'
+    }
+    $('#confirm_modal .dest_user_lists').html(checked_user);
+});
+
+// ------------------------------------------
+// URLがstep1の場合デフォルトで7日後を表示させる。
+// ------------------------------------------
+var url_name = $('#url_name').data("url_name")
+
+if (url_name == "step1") {
+    end_date = $('#id_end_date').val()
+
+    if (!end_date) {
+        var date = new Date();
+        date.setDate(date.getDate() + 6)
+        var year_str = date.getFullYear();
+        var month_str = date.getMonth() + 1;
+        var day_str = date.getDate();
+
+        month_str = ('0' + month_str).slice(-2);
+        day_str = ('0' + day_str).slice(-2);
+
+        a_7d_day_str = 'YYYY/MM/DD hh:mm:ss ';
+        a_7d_day_str = a_7d_day_str.replace(/YYYY/g, year_str);
+        a_7d_day_str = a_7d_day_str.replace(/MM/g, month_str);
+        a_7d_day_str = a_7d_day_str.replace(/DD/g, day_str);
+        a_7d_day_str = a_7d_day_str.replace(/hh/g, '23');
+        a_7d_day_str = a_7d_day_str.replace(/mm/g, '59');
+        a_7d_day_str = a_7d_day_str.replace(/ss/g, '59');
+
+        $('#id_end_date').val(a_7d_day_str)
+    }
+}
+
+// ------------------------------------------
+// 次へボタンの制御
+// ------------------------------------------
+
+$("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_mail").on('input dp.change click keyup', function () { 
+    // 送信先の合計を取得
+    all_dest_user_length = "";
+    all_dest_user_length = user_lists.length + group_lists.length;
+    var count = $('.help-inline:visible').length + $('.dest_user_duplicate_error').length;
+
+    if (!$("#id_title").val() == '' && (!$("#id_dest_user_mail1").val() == '') && (!$("#id_end_date").val() == '' ) && count == 0) { 
+        $("#next_btn").prop('disabled', false); 
+    }else if (!$("#id_title").val() == '' && all_dest_user_length >= 1 && (!$("#id_end_date").val() == '') && count == 0) { 
+        $("#next_btn").prop('disabled', false); 
+    } else {
+        $("#next_btn").prop('disabled', true); 
+    }
+});
+    
+// ------------------------------------------
+// メールアドレス入力フォームを有効にさせる処理
+// ------------------------------------------
+
+// 1行目
+$("#id_dest_user_mail1, #id_dest_user_mail2 ").on('input', function () { //id_dest_user_mail1に入力されたら動く処理
+    if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) {  //id_dest_user_mail1か2に値が入っていた場合
+        $('.row_2').attr('readonly', false); //2行目の入力フォームを編集可能にする
+        $(".step1_url_confirm_btn").css("display", "block"); //全送信先確認モーダルを表示させる     
+    
+    }else if ($("#id_dest_user_mail1").val() == ''&& user_lists.length >= 11) { ////id_dest_user_mail1は空だがアドレス帳選択ユーザーが11名以上選択された場合
+        $('.row_2').attr('readonly', true); //2行目の入力フォームを編集不可にする
+        $(".step1_url_confirm_btn").css("display", "block"); //全送信先確認モーダルを表示させる     
+    
+    } else {
+        $('.row_2').attr('readonly', true);
+        $(".step1_url_confirm_btn").css("display", "none") 
+
+    }
+});
+
+if (!$("#id_dest_user_mail1").val() == '' || (!$("#id_dest_user_mail2").val() == '')) {
+    $('.row_2').attr('readonly', false); 
+    $(".step1_url_confirm_btn").css("display", "block") 
+
+}else {
+    $('.row_2').attr('readonly', true); 
+    $(".step1_url_confirm_btn").css("display", "none") 
+}
+
+// 2行目
+$("#id_dest_user_mail2, #id_dest_user_mail3 ").on('input', function () {
+    if (!$("#id_dest_user_mail2").val() == ''|| (!$("#id_dest_user_mail3").val() == '')) {
+        $('.row_3').attr('readonly', false);
+    } else {
+        $('.row_3').attr('readonly', true);
+    }
+});
+
+if (!$("#id_dest_user_mail2").val() == '') {
+    $('.row_3').attr('readonly', false);
+} else {
+    $('.row_3').attr('readonly', true);
+}
+
+
+// 3行目
+$("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
+    if (!$("#id_dest_user_mail3").val() == ''|| (!$("#id_dest_user_mail4").val() == '')) {
+        $('.row_4').attr('readonly', false);
+    } else {
+        $('.row_4').attr('readonly', true);
+    }
+});
+
+
+if (!$("#id_dest_user_mail3").val() == '') {
+    $('.row_4').attr('readonly', false);
+} else {
+    $('.row_4').attr('readonly', true);
+}
+
+// 4行目
+$("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
+    if (!$("#id_dest_user_mail4").val() == ''|| (!$("#id_dest_user_mail5").val() == '')) {
+        $('.row_5').attr('readonly', false);
+    } else {
+        $('.row_5').attr('readonly', true);
+    }
+});
+
+
+if (!$("#id_dest_user_mail4").val() == '') {
+    $('.row_5').attr('readonly', false);
+} else {
+    $('.row_5').attr('readonly', true);
+}
+
+// 5行目
+$("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
+    if (!$("#id_dest_user_mail5").val() == ''|| (!$("#id_dest_user_mail6").val() == '')) {
+        $('.row_6').attr('readonly', false);
+    } else {
+        $('.row_6').attr('readonly', true);
+    }
+});
+
+
+if (!$("#id_dest_user_mail5").val() == '') {
+    $('.row_6').attr('readonly', false);
+} else {
+    $('.row_6').attr('readonly', true);
+}
+
+// 6行目
+$("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
+    if (!$("#id_dest_user_mail6").val() == ''|| (!$("#id_dest_user_mail7").val() == '')) {
+        $('.row_7').attr('readonly', false);
+    } else {
+        $('.row_7').attr('readonly', true);
+    }
+});
+
+
+if (!$("#id_dest_user_mail6").val() == '') {
+    $('.row_7').attr('readonly', false);
+} else {
+    $('.row_7').attr('readonly', true);
+}
+
+// 7行目
+$("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
+    if (!$("#id_dest_user_mail7").val() == ''|| (!$("#id_dest_user_mail8").val() == '')) {
+        $('.row_8').attr('readonly', false);
+    } else {
+        $('.row_8').attr('readonly', true);
+    }
+});
+
+
+if (!$("#id_dest_user_mail7").val() == '') {
+    $('.row_8').attr('readonly', false);
+} else {
+    $('.row_8').attr('readonly', true);
+}
+
+// -----------------
+// validate
+// -----------------
+
+$(function () {
+
+    $('#postForm').validate({
+        errorClass: 'help-inline',
+        validClass: 'success',
+        highlight: function (element, errorClass, validClass) {
+            $(element).parents("div.control-group").addClass("error");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).parents(".error").removeClass("error");
+        },
+
+
+        rules: {
+            title: {
+                required: true,
+                maxlength: 20,
+            },
+            dest_user_mail1: {
+                email: true,
+                CustomValidateEmail: true,
+
+            },
+        },
+        messages: {
+            title: {
+                required: 'タイトルを入力してください。',
+                maxlength: 'タイトルは20字以内でご入力ください。',
+            },
+            dest_user_mail1: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail2: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail3: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail4: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail5: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail6: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail7: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail8: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail9: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+            dest_user_mail10: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+
+            },
+        },
+
+        //エラーメッセージの表示場所を設定
+        errorPlacement: function (err, elem) {
+            if (elem.attr('name')=='title') {
+                $('.title_duplicate_error').remove();
+                err.insertAfter(elem);
+            }else {
+                err.insertAfter(elem); // default error placement.
+            }
+        }
+    });
+
+    $.validator.addMethod(
+        "CustomValidateEmail",
+        function (val, elem) {
+            reg = new RegExp(/^[A-Za-z0-9]*@ybb.com/);
+            return this.optional(elem) || !reg.test(val);
+        },
+    );
+});
+
+//直接入力バリデーション
+
+$(document).ready(function() {
+  $('.step1_mail').on('input', function() {
+    var inputValue = $(this).val();
+    var inputId = $(this).attr('id');
+    if (checkDuplicate(inputId, inputValue)) {
+        $(this).addClass('duplicate');
+        $('#' + inputId).after('<div class=dest_user_duplicate_error>既に入力済みのアドレスです。</div>');
+    } else {
+      $(this).removeClass('duplicate');
+      $('#' + inputId).next('.dest_user_duplicate_error').remove();
+      if ($('.duplicate').length === 0) {
+        $('.dest_user_duplicate_error').remove();
+      }
+    }
+  });
+});
+
+function checkDuplicate(inputId, value) {
+  var duplicate = false;
+  $('.step1_mail').not('#' + inputId).each(function() {
+    var value_length = value.length
+      if (value_length >= 1 && $(this).val() === value) {
+      duplicate = true;
+    } 
+  });
+  return duplicate;
+}
+
+
+// --------------------------------------
+// ページのリロード時に確認ダイアログが表示される
+// --------------------------------------
+$(function () {
+    $(window).on('beforeunload', function (event) {
+        event.preventDefault();
+        return '作成中のデータは全て削除されます。よろしいですか？';
+    });
+    $('#next_btn').on('click', function (e, data) {
+        $(window).off('beforeunload');
+    });
+    $('#cancel_btn').on('click', function (e, data) {
+        $(window).off('beforeunload');
+    });
+});
+
+// ------------------------------------------------------------------
+// もっと見るモーダルを処理する前にグループ一覧モーダルのz-indexをマイナスにする。
+// ------------------------------------------------------------------
+$("#group_book_modal").on("show.bs.modal", function (event) {
+    const $currentModal = $(event.currentTarget);
+    var zIndex = 1040 + 10 * $(".modal:visible").length;
+    $currentModal.css("z-index", zIndex);
+    setTimeout(function () {
+    $(".modal-backdrop")
+        .not(".modal-stack")
+        .css("z-index", zIndex - 1)
+        .addClass("modal-stack");
+    }, 0);
+});
+
+// -----------------------------------------
+// アドレス帳とグループから選択したユーザーを取得
+// -----------------------------------------
+var user_lists = [];
+var group_lists = [];
+
+function getCheckedUser() {
+    // 配列の中身をリセット
+    user_lists.splice(0)
+    // 全てのユーザー情報を取得
+    var all_user = $("#address_book_list_table").DataTable().$('input, checkbox')
+    // check済みのユーザーをfor文で回し必要な情報を取り出す
+    console.log("user_lists", user_lists)
+    for (var i = 0; i < all_user.length; i++) {
+        if ($(all_user[i]).prop("checked")) {
+            var user = {};
+            user.id = $(all_user[i]).val();
+            user.company_name = $(all_user[i]).data('company_name');
+            user.name = $(all_user[i]).data("name");
+            // まとめたユーザー情報をuser_listsに配列として追加
+            user_lists.push(user)
+            // 配列の中身をlocalStorageに保存
+            localStorage.removeItem('user_lists');
+            localStorage.setItem("user_lists", JSON.stringify(user_lists));
+        }
+    };
+    if (user_lists.length === 0) {
+    user_lists = [];
+    localStorage.setItem("user_lists", JSON.stringify(user_lists));
+}
+    
+    // フロント側に選択したユーザー情報を渡すためHTML形式に修正
+    var html = ''
+    for (var i = 0; i < user_lists.length; i++) {
+        html += '<input type="checkbox" name="dest_user" id="id_dest_user_' + i + '" value="' +
+            user_lists[i]["id"] + '" checked>'
+    }
+    // HTMLをフロント側にappend
+    $('#hidden_box_for_dest_user').empty()
+    $('#hidden_box_for_dest_user').append(html)
+}
+
+function getCheckedGroup() {
+    // 配列の中身をリセット
+    group_lists.splice(0)
+    
+    var all_group = $("#group_book_list_table").DataTable().$('input, checkbox')
+
+    for (var i = 0; i < all_group.length; i++) {
+        if ($(all_group[i]).prop("checked")) {
+            
+            var group = {};
+            group.id = $(all_group[i]).val();
+            group.group_name = $(all_group[i]).data('group_name');
+            
+            group_lists.push(group)
+            localStorage.removeItem('group_lists');
+            localStorage.setItem("group_lists", JSON.stringify(group_lists));
+
+        }
+    };
+    if (group_lists.length === 0) {
+    group_lists = [];
+    localStorage.setItem("group_lists", JSON.stringify(group_lists));
+}
+
+    var html = ''
+    for (var i = 0; i < group_lists.length; i++) {
+        html += '<input class="" type="checkbox" name="dest_user_group" id="id_dest_user_group' + i + '" value="' +
+            group_lists[i]["id"] + '" checked>'
+    }
+
+    $('#hidden_box_for_dest_user_group').empty()
+    $('#hidden_box_for_dest_user_group').append(html)
+}
+
+// -----------------------------------------
+// Boxに送信先を表示させる処理
+// -----------------------------------------
+function showDestUserAtBox() {
+    //文字列として変数の追加と初期化
+    var checked_user = '';
+    var checked_user_for_top10 = '';
+    
+    // ulタグ追加
+    checked_user += '<ul class="ml-1" style="list-style-position: inside;">'
+
+    // user_listsとgroup_listsをそれぞれfor文で回し、会社名、氏名、グループ名を取得して変数checked_userに追加する。
+    for (var user_list in user_lists) {
+        if (user_lists[user_list]['company_name'] == "None"){
+            checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+            + user_lists[user_list]['name'] + '>' + user_lists[user_list]['name'].substr(0, 14) + '<br>' + '</li>'
+        }else {
+            checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + user_lists[user_list][
+                'company_name'
+            ] + ' ' + user_lists[user_list]['name'] + '>' + user_lists[user_list]['company_name'].substr(0,
+                14) + ' ' +
+            user_lists[user_list]['name'].substr(0, 9) + '<br>' + '</li>'
+        }
+    }
+
+    for (var group_list in group_lists) {
+            checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+            + group_lists[group_list]['group_name'] + '>' + group_lists[group_list]['group_name'] + '<br>' + '</li>'
+        }
+
+    // ulタグ閉じ
+    checked_user += '</ul>'
+
+    // アドレス帳からのユーザーもグループも両方1名以上選択された時、上位10件を配列に追加してfor文で回す。
+    if (group_lists.length >= 1 || user_lists.length >= 1) {
+        var all_user_lists = '';
+        all_user_lists = user_lists.concat(group_lists);
+
+        user_lists_top10 = all_user_lists.slice(0, 10);
+
+        for (var user_list in user_lists_top10) {
+
+            // 個人ユーザー
+            if (user_lists_top10[user_list]['company_name'] == "None") {
+                checked_user_for_top10 += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+                + user_lists_top10[user_list]['name'] + '>' + user_lists_top10[user_list]['name'].substr(0, 14) + '<br>' + '</li>'
+            // グループ
+            } else if ( user_lists_top10[user_list].hasOwnProperty('group_name') ) {
+                checked_user_for_top10 += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+            + user_lists_top10[user_list]['group_name'] + '>' + user_lists_top10[user_list]['group_name'] + '<br>' + '</li>'
+            // 法人ユーザー
+            } else {
+                checked_user_for_top10 += '<li class=""type="disc" data-toggle="tooltip" title=' + user_lists_top10[user_list][
+                'company_name'] + ' ' + user_lists_top10[user_list]['name'] + '>' + user_lists_top10[user_list]['company_name'] + ' ' +
+                user_lists_top10[user_list]['name'] + '<br>' + '</li>'
+            }
+        }
+    }
+    
+    // //htmlを一度リセットする。
+    $("#all_dest_user_lists ul").children().remove();
+    
+    // 送信先の合計を取得
+    all_dest_user_length = user_lists.length + group_lists.length
+    // 合計の数ごとにboxの表示件数と全送信先モーダルの表示を制御
+    if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && $("#id_dest_user_mail1").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っていない時
+        $("#all_dest_user_lists").html(checked_user);
+        $(".step1_url_confirm_btn").css("display", "none"); //全送信先確認モーダルを表示させない
+        
+    }else if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && !$("#id_dest_user_mail1").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っている時
+        $("#all_dest_user_lists").html(checked_user);
+        $(".step1_url_confirm_btn").css("display", "block");//全送信先確認モーダルを表示させる
+
+        //10以下の場合
+    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 10 && $("#id_dest_user_mail1").val() == '') {
+        $("#all_dest_user_lists").html(checked_user);
+        $(".step1_url_confirm_btn").css("display", "none");
+        
+    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 10 && !$("#id_dest_user_mail1").val() == '') {
+        $("#all_dest_user_lists").html(checked_user);
+        $(".step1_url_confirm_btn").css("display", "block");
+
+        //10以上
+    } else if (all_dest_user_length >= 1 && all_dest_user_length >= 10) {
+        $("#all_dest_user_lists").html(checked_user_for_top10);
+        $(".step1_url_confirm_btn").css("display", "block");
+
+        //送信先が0の場合全送信先確認モーダルを非表示にする。
+    } else if (all_dest_user_length == 0 && $("#id_dest_user_mail1").val() == '') {
+        $(".step1_url_confirm_btn").css("display", "none");
+    }
+}; 
+
+// ----------------------------------------------
+// 選択したユーザーをアドレス帳とグループでcheckをつける
+// ----------------------------------------------
+
+function userSetCheck() {
+
+    dest_users_pk_list = $('#hidden_box_for_dest_user').data("dest_user")
+    if (dest_users_pk_list.length == 0) {
+        if (localStorage.getItem("user_lists") !== null) {
+            var userObj = localStorage.getItem('user_lists');
+            user_lists = JSON.parse(userObj); 
+            var dest_users_pk_list = user_lists.map(function(obj){
+                return parseInt(obj.id)
+            })
+        }
+    }
+
+    if (dest_users_pk_list.length > 0) {
+    $("#address_book_modal input[name='address_list_ids']").each(function () {
+            var value = $(this).val();
+            var result = dest_users_pk_list.indexOf(Number(value))
+            if (result !== -1) {
+                $(this).prop('checked', true)
+                if (!$("#id_title").val() == '') {
+                    $("#next_btn").prop('disabled', false); 
+                }
+            } else {
+                $(this).prop('checked', false)
+            }
+        });
+    } 
+}
+
+function groupSetCheck() {
+
+    dest_user_groups_pk_list = $('#hidden_box_for_dest_user_group').data("dest_user_group")
+    if (dest_user_groups_pk_list.length == 0) {
+        if(localStorage.getItem("group_lists") !== null) {
+            var groupObj = localStorage.getItem('group_lists');
+            group_lists = JSON.parse(groupObj); 
+            var dest_user_groups_pk_list = group_lists.map(function(obj){
+                return parseInt(obj.id)
+            })
+        }
+    }
+
+    if (dest_user_groups_pk_list.length > 0) {
+    $("#group_book_modal input[name='group_list_ids']").each(function () {
+        var value = $(this).val();
+        var result = dest_user_groups_pk_list.indexOf(Number(value))
+
+        if (result !== -1) {
+            $(this).prop('checked', true)
+            if (!$("#id_title").val() == '') {
+                $("#next_btn").prop('disabled', false); 
+            }
+        } else {
+            $(this).prop('checked', false)
+        }
+    });
+    }
+}
+
+// --------------
+// 動作のトリガー
+// --------------
+
+// アドレス帳とグループ選択ボタンをクリックした時
+$('#dest_user_select_button, #dest_user_group_select_button').on('click', function () {
+    getCheckedUser();
+    getCheckedGroup();
+    showDestUserAtBox();
+    userSetCheck();
+    groupSetCheck();
+});
+
+
+// 編集画面
+$(function () {
+    var dest_users_pk_list = $('#hidden_box_for_dest_user').data("dest_user")
+    var dest_user_groups_pk_list = $('#hidden_box_for_dest_user_group').data("dest_user_group")
+    var total_pk_list = dest_users_pk_list + dest_user_groups_pk_list
+    if (total_pk_list.length > 0) {
+        userSetCheck();
+        groupSetCheck();
+        showDestUserAtBox();
+        getCheckedUser();
+        getCheckedGroup();
+    }
+});
+
+// 他画面から戻った時とタイトルエラーが出力された時
+$(function () {
+    if(localStorage.getItem("user_lists") !== null || localStorage.getItem("group_lists") !== null) {
+        user_lists = JSON.parse(localStorage.getItem('user_lists'));
+        group_lists = JSON.parse(localStorage.getItem('group_lists'));
+        if(user_lists === null) {
+            user_lists = [];
+        }
+        if(group_lists === null) {
+            group_lists = [];
+        }
+        if (user_lists.length + group_lists.length >= 1) {
+            showDestUserAtBox();
+            userSetCheck();
+            groupSetCheck();
+            getCheckedUser();
+            getCheckedGroup();
+        }
+    }
+});
+
+</script>
+
+
+{% endblock %}

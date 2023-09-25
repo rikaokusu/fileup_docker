@@ -1,0 +1,131 @@
+{% extends "common/base.html" %}
+
+{% block title %}会社情報{% endblock title %}
+
+{% block breadcrumbtitle %}
+
+  <span>
+    会社情報
+  </span>
+
+  {% comment %} <a class="help_icon" href="{% url 'help:company' %}" target="_blank"><i class="fas fa-question-circle"></i></a> {% endcomment %}
+
+{% endblock breadcrumbtitle %}
+
+{% block content %}
+
+
+<div class="container company_profile">
+
+  {% if current_user.company %}
+    <a href="{% url 'accounts:update_companyprofile' user.company.id %}" class="btn btn-primary btn-sm">会社情報変更</a>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card border-0 mt-0">
+            <div class="card-body company_profile_body">
+                <table class="table table-bordered">
+                  <tbody>
+                    <h6>会社情報</h6>
+                        <tr>
+                          <th scope="row" class="tr_head">法人格</th>
+                          <td>{{ user.company.get_pic_legal_personality_display }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">会社名</th>
+                          <td>{{ user.company.pic_company_name }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">所属名</th>
+                          <td>{{ user.company.pic_dept_name|default:"設定なし" }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">担当者名</th>
+                          <td>{{ user.company.pic_full_name }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">郵便番号</th>
+                          <td>{{ user.company.pic_post_code }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">都道府県</th>
+                          <td>{{ user.company.get_pic_prefectures_display }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">住所</th>
+                          <td>{{ user.company.pic_address }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">電話番号</th>
+                          <td>{{ user.company.pic_tel_number }}</td>
+                        </tr>
+                  </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-6">
+      <div class="card border-0 mt-0">
+            <div class="card-body company_profile_body">
+                <table class="table table-bordered">
+                  <tbody>
+                          <h6>請求先情報</h6>
+                        <tr>
+                          <th scope="row" class="tr_head">法人格</th>
+                          <td>{{ user.company.get_invoice_legal_personality_display }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">会社名</th>
+                          <td>{{ user.company.invoice_company_name }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">所属名</th>
+                          <td>{{ user.company.invoice_dept_name|default:"設定なし" }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">担当者名</th>
+                          <td>{{ user.company.invoice_full_name }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">郵便番号</th>
+                          <td>{{ user.company.invoice_post_code }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">都道府県</th>
+                          <td>{{ user.company.get_invoice_prefectures_display }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">住所</th>
+                          <td>{{ user.company.invoice_address }}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row" class="tr_head">電話番号</th>
+                          <td>{{ user.company.invoice_tel_number }}</td>
+                        </tr>
+                        <!-- </tr> -->
+                      </tbody>
+                </table>
+                <!-- /.table-responsive -->
+
+            </div>
+            <!-- /.card-body -->
+
+      </div>
+      <!-- /.card -->
+
+    </div>
+    <!-- /.col -->
+
+  </div>
+  <!-- /.row -->
+
+</div>
+
+
+
+
+{% endblock %}

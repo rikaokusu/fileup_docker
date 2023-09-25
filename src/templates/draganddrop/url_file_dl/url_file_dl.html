@@ -1,0 +1,198 @@
+{% extends "draganddrop/common/base.html" %}
+{% load is_past_due %}
+{% load url_dl_count %}
+{% load url_dl_file_count %}
+
+{% block content %}
+
+{% if deleted_url_upload_manage %}
+<p class="non_display_message">ゴミ箱フォルダにあるため表示できません。</p>
+<div class="url_close_btn_wrap" data-toggle="tooltip" title="ページを閉じる" data-placement="top">
+		<button  value="close" class="expired_page_close_btn" id="url_dl_close_btn">閉じる
+		<i class="far fa-window-close"></i></button>
+</div>
+{% else %}
+{% for url_dest_user_data in url_upload_manage_for_dest_users %}
+
+<div class="url_dl_page_wrapper">
+	
+	<h1><a href="#"><img src="../../../static/img/FileUP_Logo_Blue.svg" alt="FileUPロゴ"></a></h1>
+	<h3 class="url_dl_page_title">ダウンロード画面</h3>
+
+	<table>
+		<div>
+			<tr class="url_dl_table_title">
+				<th>タイトル</th>
+				<th>受信ファイル</th>
+				<th>保存期限</th>
+			</tr>
+		</div>
+		<tr class="url_dl_table">
+			<td class="url_dl_title">
+				<span class="file_title" data-toggle="tooltip" data-placement="right"
+				title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title| truncatechars:12}}</span>
+			</td>
+			<td class="url_dl_file">
+				{%for file in url_upload_manage.file.all%}
+				{% if url_dest_user_data.url_download_table.all|url_dl_count:file.id >= url_dest_user_data.url_upload_manage.dl_limit %}
+				<span class="past_file file_name" data-toggle="tooltip" data-url_downloadtable_id="{{ urldownloadtable.id }}"
+					data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i></span><br>
+				<hr class="file_name_border">
+				{% else %}
+				<a href="{{ file.upload.url }}" id="{{ file.id }}" class="file_name urldownloadtable" download="{{ file.name }}"
+					data-toggle="tooltip" data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
+					title="{{ file.name }}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i>
+					
+					{% if extention == ".pptx" or extention == ".docx" or extention == ".xlsx" or extention == ".doc" or extention == ".xls" or extention == ".ppt" %}
+					<a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.pdffilemodel.upload.url }}"></a>
+			
+					{% elif extention == ".pdf" %}
+					<a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"></a>
+			
+					{% elif extention == ".jpg" or extention == ".png" or extention == ".gif" %}
+					<a class="iframe" href="{{ file.upload.url }}"></a>
+			
+					{% elif extention == ".txt" %}
+					<a class="iframe" href="{{ file.pdffilemodel.upload.url }}"></a>
+			
+					{%endif%}
+					<br>
+				</a>
+				<hr class="file_name_border">
+
+				{%endif%}
+				{% endfor %}
+				<!----------------- Zipファイル ----------------->
+				<div>
+					{% if url_dest_user_data.url_download_table.all|url_dl_file_count:url_dest_user_data.url_upload_manage.dl_limit == 0 %}
+					<span class="my-btn" data-toggle="tooltip" title="DL回数制限を超えたためダウンロードできません" data-placement="right">
+					<button><input type="button" class="zip_dl_disable_btn" value="一括ダウンロード"></button>
+					</span>
+
+					{% else %}
+					<span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="right">
+						{% comment %} <button><input type="button" class="zip_dl_btn url_zip_download" value="一括ダウンロード"
+							data-url_downloadtable_id="{{ url_dest_user_data.id }}"
+							onclick="window.location.href='{% url 'draganddrop:url_file_download_zip' url_dest_user_data.id %}'"></button> {% endcomment %}
+
+						<button><input type="button" class="zip_dl_btn" value="一括ダウンロード"
+							data-url_downloadtable_id="{{ url_dest_user_data.id }}"
+							onclick="window.location.href='{% url 'draganddrop:url_file_download_zip' url_dest_user_data.id %}'"></button>
+					</span>
+					{% endif %}
+				</div>
+
+			</td>
+			<td class="url_dl_end_date">
+				<p>
+					{{url_dest_user_data.url_upload_manage.end_date|date:'Y/m/d' }}
+					{{url_dest_user_data.url_upload_manage.end_date | date:'H:i'}}
+				</p>
+			</td>
+		</tr>
+	</table>
+	
+	<!----------------- メッセージ ----------------->
+		{% if url_dest_user_data.url_upload_manage.message %}
+		<div class="url_dl_message">
+			<h3>メッセージ</h3>
+			<p>{{url_dest_user_data.url_upload_manage.message}}</p>
+		</div>
+		{% endif %}
+
+
+{% endfor %}
+{%endif%}
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+	///////////////
+	//ファイルダウンロード時にダウンロード管理テーブルを更新する処理 URL ver
+	///////////////
+	$('.urldownloadtable').on('click', function () {
+
+		var is_type = "single"
+		//id属性を取得
+		var file_id = $(this).attr('id');
+		console.log(file_id)
+
+		var url_downloadtable_id = $(this).data('url_downloadtable_id');
+
+		// 送信データとして保存
+		var data = {
+			'file_id': file_id,
+			'url_downloadtable_id': url_downloadtable_id,
+			'is_type': is_type
+		};
+
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'draganddrop:url_file_download_status' %}",
+			data: data,
+			dataType: 'json',
+			success: function (data) {
+				if (data.status == 'ok') {
+					window.location.reload();
+				} else {
+					window.location.reload();
+				}
+			}
+		});
+	});
+
+
+	///////////////
+	//Zipファイルダウンロード時にダウンロード管理テーブルを更新する処理 URL ver
+	///////////////
+	$('.url_zip_download').on('click', function () {
+
+		var is_type = "multiple"
+		var file_id = $(this).attr('id');
+		var url_downloadtable_id = $(this).data('url_downloadtable_id');
+
+		// 送信データとして保存
+		var data = {
+			'url_downloadtable_id': url_downloadtable_id,
+			'is_type': is_type
+		};
+
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'draganddrop:url_file_download_status' %}",
+			data: data,
+			dataType: 'json',
+			success: function (data) {
+				if (data.status == 'ok') {
+					window.location.reload();
+
+				} else {
+					window.location.reload();
+
+				}
+			}
+		});
+	});
+
+//閉じるボタン
+
+let closebutton = document.getElementById('url_dl_close_btn');
+				closebutton.addEventListener('click', () => {
+    close();
+});
+
+
+
+	
+</script>
+{% endblock %}

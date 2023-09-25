@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+{% load i18n static %}
+{% load render_bundle from webpack_loader %}
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>{% block title %}{% endblock %}</title>
+
+  {% render_bundle 'main' %}
+
+  {% block extra_css %}
+
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"> -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.0/min/dropzone.min.css">
+
+
+
+
+  <!-- <style>
+    @font-face {
+      font-family: 'Font Awesome 5 Free';
+      src: url('{% static 'fonts/fa-solid-900.woff2' %}');
+      src: local('{% static 'fonts/fa-solid-900.woff2' %}');
+    }
+  </style> -->
+
+  {% endblock %}
+
+{% block extrahead %}{% endblock %}
+</head>
+
+<body id="page-top" class="">
+
+
+  {% if url_name != "task_create" %}
+  {% if url_name != "task_comment_create" %}
+  {% if url_name != "commnet_reply_create" %}
+  {% if url_name != "tasklist_info" %}
+  {% if url_name != "tasklist_print" %}
+
+
+
+      <nav class="navbar navbar-expand navbar-dark static-top">
+
+
+        <!-- 言語選択メニュー -->
+        <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        <!-- <div class="d-none d-md-inline-block form-inline mr-5 ml-0"> -->
+          <p class="lang-text mr-md-0">{{ current_user.company.pic_company_name}} {{ current_user.display_name}}</p>
+          <p class="lang-text mr-md-0">{{ current_user.email}}</p>
+        </div>
+
+
+        <!-- ユーザーアカウントのトグルメニュー -->
+        <ul class="navbar-nav mr-md-1">
+          <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-user-circle fa-fw"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+              {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
+              <a class="dropdown-item" href="{% url 'task:login' %}">ログイン</a>
+              {% else %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item logout_dropdown_item" href="{% url 'task:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>
+              {% endif %}
+            </div>
+          </li>
+        </ul>
+
+      </nav>
+
+  {% endif %}
+  {% endif %}
+  {% endif %}
+  {% endif %}
+  {% endif %}
+
+
+  <div id="wrapper">
+    <div id="content-wrapper">
+
+      <div class="container-fluid">
+
+        {% block content %}
+          {{ content }}
+        {% endblock %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up font_size"></i>
+  </a>
+
+  <!-- ログアウト用Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">ログアウトしますか？</div>
+        <div class="modal-footer">
+          <a class="btn btn-primary btn-sm" href="{% url 'task:logout' %}" onfocus="this.blur();">ログアウト</a>
+          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal" onfocus="this.blur();">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- <JavaScript 多言語化用 -->
+  <script src="{% url 'javascript-catalog' %}"></script>
+
+  <!-- 日付のカレンダー表示 -->
+  {{ form.media }} <!-- 左の設定でdatetimepickerに関連するJS等が読み込まれる -->
+
+  <!-- 郵便番号から都道府県の自動入力 -->
+  <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.0/min/dropzone.min.js" charset="UTF-8"></script>
+
+  <!-- TinyMCE -->
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js"></script>
+  <!-- <script>tinymce.init({selector:'textarea'});</script> -->
+
+  <script src="{% static 'task/js/task.js' %}"></script>
+
+  <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+</script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

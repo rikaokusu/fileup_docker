@@ -1,0 +1,56 @@
+
+{% load index %}
+{% load get_item %}
+
+{% for group, options, index in widget.optgroups %}
+
+    {% for option in options %}
+
+        <!-- 未契約のサービスを表示 -->
+        {% if service_contract_count_list|index:index == 0 %}
+
+        <div class="form-check check_row">
+            <input class="form-check-input" type="{{ option.type }}" name="{{ option.name }}"
+                   id="{{ option.attrs.id }}" value="{{ option.value }}" data-row_index="{{ option.index }}" data-service_name="{{ option.label }}" {% if option.attrs.checked %}checked{% endif %} disabled>
+
+            <div class="square size_xxs service-c{{ option.index }}">
+              <div class="letter_one_service_s">{{ service_initial_name_list|index:index }}</div>
+            </div>
+
+            <label class="form-check-label service_checkbox_label" for="{{ option.attrs.id }}">
+              {{ option.label }}
+            </label>
+
+            <span>(未契約)</span>
+
+        </div>
+
+        <!-- 契約済みのサービズを表示する -->
+        {% else %}
+
+        <div class="form-check check_row">
+            <input class="form-check-input" type="{{ option.type }}" name="{{ option.name }}"
+                   id="{{ option.attrs.id }}" value="{{ option.value }}" data-row_index="{{ option.index }}" data-service_name="{{ option.label }}" {% if option.attrs.checked %}checked{% endif %} {% if option.attrs.required %}required{% endif %} >
+
+            <div class="square size_xxs service-c{{ option.index }}">
+              <div class="letter_one_service_s">{{ service_initial_name_list|index:index }}</div>
+            </div>
+
+            <label class="form-check-label service_checkbox_label" for="{{ option.attrs.id }}">
+              {{ option.label }}
+            </label>
+
+
+        <div id='plan_list'>
+
+          </div>
+
+        </div>
+
+
+        {% endif %}
+
+    {% endfor %}
+
+
+{% endfor %}

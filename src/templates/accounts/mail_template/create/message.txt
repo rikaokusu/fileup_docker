@@ -1,0 +1,11 @@
+{{ user.username }} 様 管理者により◎◎サービスのアカウントが作成されました。
+
+下記URLより仮パスワードでサイトにログインの上、パスワードの設定をお願いします。
+
+ユーザー名：{{ user.username }}
+仮パスワード：{{ password }}
+
+URL
+{{ protocol}}://{{ domain }}{% url 'accounts:user_create_complete' token %}
+
+ほにゃらら

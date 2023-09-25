@@ -1,0 +1,97 @@
+
+{% load index %}
+{% load get_item %}
+{% for group, options, index in widget.optgroups %}
+
+    {% for option in options %}
+
+        <!-- 未契約のサービスは非表示 -->
+        {% if service_contract_count_list|index:index == 0 %}
+
+        <!-- 契約済みのサービズを表示する -->
+        {% else %}
+
+        <div class="form-check check_row">
+            <input class="form-check-input" type="{{ option.type }}" name="{{ option.name }}"
+                  id="{{ option.attrs.id }}" value="{{ option.value }}" {% if option.attrs.checked %}checked{% endif %}>
+
+            <div class="square size_xxs service-c{{ option.index }}">
+              {% comment %} <div class="letter_one_service_s">{{ service_initial_name_list|index:index }}</div> {% endcomment %}
+              <div class="letter_one_service_s">{{ service_initial_name_list }}</div>
+            </div>
+
+            <label class="form-check-label service_checkbox_label" for="{{ option.attrs.id }}">
+              {{ option.label }}
+            </label>
+
+            {{ service_contract_user_count_list }}
+
+            {% comment %} <span>(契約ユーザー数　<span id="contracted_user_count{{ option.value }}">{{ service_contracted_user_count_list|get_item:option.label }}</span>/<span id="contract_user_count{{ option.value }}">{{ service_contract_user_count_dict|get_item:option.label }}</span> ) {% endcomment %}
+        </div>
+
+
+        {% endif %}
+
+    {% endfor %}
+
+
+{% endfor %}
+
+{% block extra_js %}
+<script>
+
+$(function(){
+
+  // チェックボックスのON/OFFの処理
+  $('input[name="service"]').change(function(){
+    var checked = $(this).val()
+
+    // チェックしたときの処理
+    if ( $(this).is(':checked') ){
+
+      // 現在の利用ユーザー数を取得
+      var contracted_user_count = $('#contracted_user_count' + checked).text()
+
+      // 数値に変換
+      contracted_user_num = Number(contracted_user_count)
+
+      // 1加算
+      $('#contracted_user_count' + checked).text(contracted_user_num + 1)
+
+    // チェックが外されたときの処理
+    } else {
+      // 現在の利用ユーザー数を取得
+      var contracted_user_count = $('#contracted_user_count' + checked).text()
+
+      // 数値に変換
+      contracted_user_num = Number(contracted_user_count)
+
+      // 1減算
+      $('#contracted_user_count' + checked).text(contracted_user_num - 1)
+    }
+  });
+
+  $('input[name="service"]').each(function(){
+    var checked = $(this).val()
+    var id = $(this).attr('id')
+    console.log(id)
+    var contracted_user_count = $('#contracted_user_count' + checked).text()
+    var contract_user_count = $('#contract_user_count' + checked).text()
+
+    console.log(contracted_user_count)
+    console.log(contract_user_count)
+
+    if ( contracted_user_count == contract_user_count ) {
+      console.log('一致')
+      console.log(id)
+      $('#'+id).prop('disabled', true);
+
+      $('#contract_user_count' + checked).append('<span class="upper_text"> 上限に達しています</span> ')
+
+    }
+  });
+
+});
+
+</script>
+{% endblock %}

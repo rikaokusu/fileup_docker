@@ -2,44 +2,30 @@ from unittest.mock import DEFAULT
 from .base import *
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'file')
+# FULL_MEDIA_ROOT = os.path.join(MEDIA_ROOT, 'file')
+# ALLOWED_HOSTS = []
 
 ALLOWED_HOSTS = ['*']
 
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'training',
-    #     'USER': 'yuitech',
-    #     'PASSWORD': 'password',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '3316',
-    # },
-
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'training',
+        'NAME': 'fileup',
         'USER': 'yuitech',
-        'PASSWORD':'password',
-        'HOST':'127.0.0.1',
-        'PORT': '3307',# DBeaverで接続設定するときに被らないport番号を設定
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '3315',
     },
     'user': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'portal',
-        # 'NAME': 'CLportal_db',
         'USER': 'yuitech',
         'PASSWORD': 'password',
         'HOST': '127.0.0.1',
-        # 'PORT': '3315',
-        'PORT': '3313',# DBeaverで接続設定するときに被らないport番号を設定
+        'PORT': '3313',
     }
-
 }
 
 # 利用するRouter, manage.pyから見ての相対パス
@@ -47,6 +33,7 @@ DATABASE_ROUTERS = [
     'routers.AuthRouter',
 ]
 
+# アプリケーションごとの接続先DBのマッピング
 DATABASE_APPS_MAPPING = {
     # defaultには管理系のTable
     'admin'              : 'user',
@@ -58,30 +45,16 @@ DATABASE_APPS_MAPPING = {
     # 'django_celery_beat' : 'default',
     # userにはユーザー系処理
     'accounts'          : 'user',
-    'bulk'              : 'user',
+    'contracts'         : 'user',
     # defaultには契約関連のTable
-    'training'         : 'default',
+    'draganddrop'         : 'default',
+
 }
+# LOGIN_URL = 'register:login'
+# LOGIN_REDIRECT_URL = 'register:top'
 
-# アプリケーションごとの接続先DBのマッピング
-# DATABASE_APPS_MAPPING = {
-#     # defaultには管理系のTable
-#     'admin'              : 'default',
-#     'auth'               : 'default',
-#     'contenttypes'       : 'default',
-#     'sessions'           : 'default',
-#     'messages'           : 'default',
-#     'staticfiles'        : 'default',
-#     'django_celery_beat' : 'default',
-#     # userにはユーザー系処理
-#     'accounts'          : 'user',
-#     'bulk'              : 'user',
-#     # defaultには契約関連のTable
-#     'contracts'         : 'default',
-# }
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+#メールをコンソールに表示する
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 STATIC_URL = '/static/'
 

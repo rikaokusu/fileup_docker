@@ -1,0 +1,215 @@
+{% extends "common/base.html" %}
+
+{% load i18n static %}
+{% load widget_tweaks %}
+
+{% block title %}ユーザー情報追加登録{% endblock title %}
+
+{% block breadcrumbtitle %}ユーザー情報追加登録{% endblock breadcrumbtitle %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<!-- ステップ -->
+<ul class="cp_stepflow02">
+  <li class="completed"><span class="bubble text">1</span><span>会社情報の登録</span></li>
+  <li class="completed"><span class="bubble text">2</span><span>仮登録の完了</span></li>
+  <li class="active"><span class="bubble text">3</span><span>ユーザー情報の追加登録</span></li>
+  <li><span class="bubble text">4</span><span>本番登録完了</span></li>
+</ul>
+
+
+<div class="container registration_user">
+  <div class="card card-register border-0 mx-auto mt-5">
+    <h6 class="card-header border-0">本番登録完了</h6>
+    <div class="card-body">
+      <p class="card-text">
+        本登録が完了しました。<br>
+        下記に必要な項目を記入して次へをクリックしてください。<br>
+      </p>
+    </div>
+  </div>
+
+
+  <div class="card card-register border-0 mx-auto mt-5">
+    <h6 class="card-header border-0">ユーザー情報追加登録</h6>
+    <div class="card-body registration_user_body">
+      <form action="{% url 'accounts:user_registration_addinfo' user.id %}" method="post" enctype="multipart/form-data" validate data-validate>
+        {% csrf_token %}
+
+        <!-- messages.succes や messages.errorにて利用 -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        <!-- Form全体のバリデーション時のエラーを表示 -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <table class="table table-sm table-bordered">
+          <tbody>
+            <tr>
+              <th class="tr_head">
+                <div class="required_box">
+                  <div class="label require_label">姓</div>
+                </div>
+              </th>
+
+              <th>
+                <!-- 入力フィールド -->
+                {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                    {% if form.last_name.errors %}<!-- エラー時の表示 -->
+                      {% render_field form.last_name class="form-control is-invalid" placeholder=form.last_name.label %}
+
+                      {% for error in form.last_name.errors %}
+                        <div class="invalid-feedback">
+                          {{ error }}
+                        </div>
+                      {% endfor %}
+
+                    {% else %}<!-- 正常時の表示 -->
+                      {% render_field form.last_name class="form-control is-valid" placeholder=form.last_name.label %}
+                    {% endif %}
+
+                {% else %}<!-- 初期表示 -->
+                  {% render_field form.last_name class="form-control" placeholder=form.last_name.label %}
+                {% endif %}
+              </th>
+
+            </tr>
+            <tr>
+              <th class="tr_head">
+                <div class="required_box">
+                  <div class="label require_label">名</div>
+                </div>
+              </th>
+
+              <th>
+                <!-- 入力フィールド -->
+                {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                    {% if form.first_name.errors %}<!-- エラー時の表示 -->
+                      {% render_field form.first_name class="form-control is-invalid" placeholder=form.first_name.label %}
+
+                      {% for error in form.first_name.errors %}
+                        <div class="invalid-feedback">
+                          {{ error }}
+                        </div>
+                      {% endfor %}
+
+                    {% else %}<!-- 正常時の表示 -->
+                      {% render_field form.first_name class="form-control is-valid" placeholder=form.first_name.label %}
+                    {% endif %}
+
+                {% else %}<!-- 初期表示 -->
+                  {% render_field form.first_name class="form-control" placeholder=form.first_name.label %}
+                {% endif %}
+              </th>
+            </tr>
+
+            <tr>
+              <th class="tr_head">
+                <div class="option_box">
+                  <div class="label option_label">ふりがな(姓)</div>
+                </div>
+              </th>
+
+              <th>
+                <!-- 入力フィールド -->
+                {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                    {% if form.p_last_name.errors %}<!-- エラー時の表示 -->
+                      {% render_field form.p_last_name class="form-control is-invalid" placeholder=form.p_last_name.label id="pLast_name" %}
+
+                      {% for error in form.p_last_name.errors %}
+                        <div class="invalid-feedback">
+                          {{ error }}
+                        </div>
+                      {% endfor %}
+
+                    {% else %}<!-- 正常時の表示 -->
+                      {% render_field form.p_last_name class="form-control is-valid" placeholder=form.p_last_name.label id="pLast_name" %}
+                    {% endif %}
+
+                {% else %}<!-- 初期表示 -->
+                  {% render_field form.p_last_name class="form-control" placeholder=form.p_last_name.label id="pLast_name" %}
+                {% endif %}
+
+
+              </th>
+
+            </tr>
+
+            <tr>
+              <th class="tr_head">
+                <div class="option_box">
+                  <div class="label option_label">ふりがな(名)</div>
+                </div>
+              </th>
+
+              <th>
+                <!-- 入力フィールド -->
+                {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                    {% if form.p_first_name.errors %}<!-- エラー時の表示 -->
+                      {% render_field form.p_first_name class="form-control is-invalid" placeholder=form.p_first_name.label id="pFirst_name" %}
+
+                      {% for error in form.p_first_name.errors %}
+                        <div class="invalid-feedback">
+                          {{ error }}
+                        </div>
+                      {% endfor %}
+
+                    {% else %}<!-- 正常時の表示 -->
+                      {% render_field form.p_first_name class="form-control is-valid" placeholder=form.p_first_name.label id="pFirst_name" %}
+                    {% endif %}
+
+                {% else %}<!-- 初期表示 -->
+                  {% render_field form.p_first_name class="form-control" placeholder=form.p_first_name.label id="pFirst_name" %}
+                {% endif %}
+
+              </th>
+
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary btn-block" onfocus="this.blur();">次へ</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+
+<script>
+$(function(){
+
+    // 戻るボタンで戻った時に値が入ったらボタンを有効化
+    $('form[data-validate]').each(function(){
+      $(this).find(':submit').prop('disabled', !this.checkValidity());
+    });
+
+    // 値が入ったらボタンを有効化
+    $('form[data-validate]').on('input', function () {
+      $(this).find(':submit').prop('disabled', !this.checkValidity());
+    });
+
+});
+
+</script>
+
+
+{% endblock %}

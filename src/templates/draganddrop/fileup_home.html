@@ -1,0 +1,2600 @@
+{% extends "draganddrop/common/base.html" %}
+{% load is_past_due %}
+{% load dl_file_count %}
+{% load url_dl_file_count %}
+{% load dl_count %}
+{% load url_dl_count %}
+{% load get_extention %}
+{% load get_group_download_status %}
+{% load url_get_group_download_status %}
+{% load get_download_status %}
+{% load url_get_download_status %}
+{% load get_direct_users %}
+{% load url_get_direct_users %}
+{% load get_display_name %}
+{% load mathfilters %}
+
+
+{% block content %}
+
+<div class="box2 d-flex justify-content-center">
+    {% if plan == "free" and number_of_company_upload_manage >= 5 %}
+    <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+        class="fas fa-globe fa-1x icon-home" ></i></button>
+    {% elif plan == "free" and total_data_usage >= 3221225472 %}
+    <button data-toggle="tooltip" title="アップロード制限サイズを超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+        class="fas fa-globe fa-1x icon-home" ></i></button>
+    {% else %}
+    <a class="btn uploadbtn rounded-0" href="{% url 'draganddrop:step1' %}" role="button">アップロード<i
+        class="fas fa-globe fa-1x icon-home"></i></a>
+    {% endif %}
+    {% if plan == "free" %}
+    <button data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">URL共有<i
+            class="fas fa-link fa-1x icon-home" ></i></button>
+    {% else %}
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_url_upload' %}" role="button" style="background-color=gray:">URL共有<i
+        class="fas fa-link fa-1x icon-home" ></i></a>
+    {% endif %}
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:address_list' %}" role="button">アドレス帳<i
+        class="fas fa-address-book fa-1x icon-address-book-home"></i></a>
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:resource_management' %}" role="button">会社管理画面</a>
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:personal_resource_management' %}" role="button">個人管理画面</a>
+                
+</div>
+
+<p class="box"></p>
+
+<!-------------------------------------------------------受信データ ------------------------------------------------------->
+<div class="box1-1 zhushin_table">
+
+    <div class="box1-3 d-flex bd-highlight mb-3">
+        <div class="mr-auto p-2 bd-highlight zyushin-title-bar">
+            <h2 class="m-0 zyushin-title">受信データ</h2>
+        </div>
+
+        <!-----------------一括削除ボタン ----------------->
+        <div class="del-btn p-2 bd-highlight">
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-outline-danger rounded-0" data-toggle="modal"
+                data-target="#multi_deleted_modal" id="multi_delete_button" disabled>一括削除</button>
+        </div>
+
+        <!-----------------ゴミ箱ボタン ----------------->
+        <div class="del-btn p-2 bd-highlight" id="deleted_button" data-value="{{upload_manage_for_dest_users_deleted.pk}}"
+            data-del_name="{{upload_manage_for_dest_users_deleted.title}}" data-toggle="modal"
+            data-target="#deleted_modal" tabindex="-1" role="dialog">
+            {% if upload_manage_for_dest_users_deleted.count > 0 %}
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-outline-danger rounded-0">ゴミ箱表示</button>
+            {% elif url_upload_manage_for_dest_users_deleted.count > 0 %}
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-outline-danger rounded-0">ゴミ箱表示</button>
+            {% else %}
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-outline-danger disabled_trush_btn rounded-0"
+                disabled>ゴミ箱表示</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table download_table" id="download_table">
+        <thead>
+            <tr>
+                <th class="checkBox"><label><input type="checkbox" name="all_check_dest_user" id="all"></label></th>
+                <th class="fileTitle">タイトル</th>
+                <th class="fileData">受信データ</th>
+                <th class="dateWidth">受信日</th>
+                <th class="dateWidth">保存期限</th>
+                <th class="createdUser">送信者</th>
+                <th class="zipDlIcon"></th>
+                <th class="homeIcon"></th>
+                <th class="deleteIcon"></th>
+            </tr>
+        </thead>
+
+        <tbody id="boxes">
+
+            <!-------------------------受信テーブル 通常アップロード---------------------------------->
+            {% if upload_manage_for_dest_users %}
+
+            {% for dest_user_data in upload_manage_for_dest_users %}
+
+            <tr {% if dest_user_data.upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif dest_user_data.upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                <!-- チェックボックス -->
+                <td>
+                    <input type="checkbox" name="dest_user_ids" value="{{dest_user_data.id}}" id="dest_data" class="dest_data">
+                </td>
+
+                <!-- タイトル -->
+                <td>
+                    {% if dest_user_data.upload_manage.file_del_flag == 1 %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                    <p class="file_del_tag">ファイル削除済み</p>
+                    {% elif  dest_user_data.upload_manage.end_date|is_past_due %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                    title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                    <p class="expired_tag">期限切れ</p>
+                    {% else %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
+                    {% endif %}
+                </td>
+
+                <!-- 受信データ -->
+                <td>
+                    {%for file in dest_user_data.upload_manage.file.all%}
+                    {% if dest_user_data.upload_manage.end_date|is_past_due %}
+                    <span class="past_file" data-toggle="tooltip" data-downloadtable_id="{{ downloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br>
+                    
+                    {% elif dest_user_data.upload_manage.file_del_flag == 1 %}
+                    <del class="past_file" data-toggle="tooltip" data-downloadtable_id="{{ downloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+
+                    {% elif dest_user_data.downloadtable.all|dl_count:file.id >= dest_user_data.upload_manage.dl_limit %}
+                    <span class="past_file" data-toggle="tooltip" data-downloadtable_id="{{ downloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br>
+                    {% else %}
+
+                    {%with extention=file.name|get_extention%}
+                    <a href="{{ file.upload.url }}" id="{{ file.id }}" class="downloadtable" download="{{ file.name }}"
+                        data-toggle="tooltip" data-downloadtable_id="{{ dest_user_data.id }}" 
+                        data-placement="right" data-target="#dl_file_complete_message"
+                        title="{{ file.name }}">{{ file.name | truncatechars:16 }}
+                        
+                        {% if extention == ".pdf" %}
+                        <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                class="fas fa-search"></i></a>
+
+                        {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" %}
+                        <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+
+                        {% elif extention == ".txt" %}
+                        <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+
+                        {%endif%}
+                    </a>
+                    <br>
+
+                    {%endwith%}
+                    {% endif %}
+                    {% endfor %}
+
+                </td>
+
+                <!-- 受信日 -->
+                <td>
+                    {{dest_user_data.upload_manage.created_date | date:'Y/m/d'}}
+                    {{dest_user_data.upload_manage.created_date | date:'H:i'}}
+                </td>
+
+                <!-- 保存期限 -->
+                <td>
+                    {{dest_user_data.upload_manage.end_date|date:'Y/m/d' }}
+                    {{dest_user_data.upload_manage.end_date | date:'H:i'}}
+                </td>
+
+                <!-- 送信者 -->
+                <td>
+                    {{dest_user_data.upload_manage.created_user.email}}
+                </td>
+
+                <!-- 一括ダウンロードボタン -->
+                <td class="zipDlIcon">
+
+                    {% if dest_user_data.upload_manage.end_date|is_past_due %}
+                    <span data-toggle="tooltip" title="期限切れのためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></i></span>
+                    
+                    {% elif dest_user_data.upload_manage.file_del_flag == 1 %}
+                    <span data-toggle="tooltip" title="ファイルが削除されました。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></i></span>
+
+                    {% elif dest_user_data.downloadtable.all|dl_file_count:dest_user_data.upload_manage.dl_limit  == 0 %}
+                    <span data-toggle="tooltip" title="DL回数制限を超えたためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button>
+                    </span>
+
+                    {% else %}
+                    <span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="top">
+                        <a button type="button" class="menu_btn_color menu_btn zip_download"
+                            data-downloadtable_id="{{ dest_user_data.id }}"
+                            onclick="window.location.href='{% url 'draganddrop:file_download_zip' dest_user_data.id %}'">
+                            <button class="fas_button_download"></button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </td>
+
+                <!-- メッセージボタン -->
+                <td class="homeIcon">
+                    {% if dest_user_data.upload_manage.message %}
+                    <span data-toggle="tooltip" title="メッセージ" data-placement="top">
+                        <button class="fas_button_message"
+                        data-value="{{dest_user_data.pk}}"
+                        data-dl_message="{{dest_user_data.upload_manage.message}}"
+                        data-target="#dl_message_modal"
+                        data-toggle="modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="メッセージはありません。" data-placement="top">
+                        <button class="fas_button_message" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% endif %}
+                </td>
+                
+                <!-- 削除(ゴミ箱)ボタン -->
+                <td class="deleteIcon">
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete"
+                        data-value="{{dest_user_data.pk}}"
+                        data-del_name="{{dest_user_data.upload_manage.title}}"
+                        data-target="#dl_del_task_modal"
+                        data-toggle="modal"></button>
+                    </span>
+                </td>
+            </tr>
+
+            {%endfor%}
+            {% endif %}
+
+            <!------- メッセージモーダル 受信用 ------->
+            <div class="modal fade" id="dl_message_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header message_modal_header">
+                            <span class="modal-title home_modal_title">メッセージ<i class="fa-solid fa-comment-dots ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <p class="dl_message"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!------- 削除モーダル 受信用 ------->
+            <div class="modal fade" id="dl_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                        </div>
+                        <div class="modal-body del-file-name-text">
+                            <p>選択したファイルを削除します</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="dl_del_task_modal_btn" type="button" class="del_task_button btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                                data-dismiss="modal">削除</button>
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-------------------------通常アップロード 閉じ---------------------------------->
+
+
+
+            <!-------------------------受信テーブル URL共有---------------------------------->
+            {% if url_upload_manage_for_dest_users %}
+
+            {% for url_dest_user_data in url_upload_manage_for_dest_users %}
+            <tr {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_dest_user_data.url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+
+                <!-- チェックボックス -->
+                <td>
+                    <input type="checkbox" name="url_dest_user_ids" value="{{url_dest_user_data.id}}" id="url_dest_data" class="url_dest_data">
+                </td>
+
+                <!-- タイトル -->
+                <td>
+                    {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="file_del_tag">ファイル削除済み</p>
+                    {% elif  url_dest_user_data.url_upload_manage.end_date|is_past_due %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="expired_tag">期限切れ</p>
+                    {% else %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
+                    <a href="{{url_dest_user_data.url_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
+                    <span class="material-icons copy_button" data-url="{{url_dest_user_data.url_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                    {% endif %}
+                </td>
+
+
+                <!-- 受信データ -->
+                <td>
+                    {%for file in url_dest_user_data.url_upload_manage.file.all%}
+                    {% if url_dest_user_data.url_upload_manage.end_date|is_past_due %}
+                    <span class="past_file" data-toggle="tooltip" data-url_downloadtable_id="{{ urldownloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br>
+
+                    {% elif url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
+                    <del class="past_file" data-toggle="tooltip" data-url_downloadtable_id="{{ urldownloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+
+                    {% elif url_dest_user_data.url_download_table.all|url_dl_count:file.id >= url_dest_user_data.url_upload_manage.dl_limit %}
+                    <span class="past_file" data-toggle="tooltip" data-url_downloadtable_id="{{ urldownloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br>
+
+                    {% else %}
+
+                    {%with extention=file.name|get_extention%}
+                    <a href="{{ file.upload.url }}" id="{{ file.id }}" class="urldownloadtable"
+                        download="{{ file.name }}" data-toggle="tooltip"
+                        data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
+                        title="{{ file.name }}">{{ file.name | truncatechars:16 }}
+
+                        {% if extention == ".pdf" %}
+                        <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                class="fas fa-search"></i></a>
+
+                        {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
+                        <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+
+                        {% elif extention == ".txt" %}
+                        <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+
+                        {%endif%}
+                    </a>
+                    <br>
+
+                    {%endwith%}
+                    {% endif %}
+                    {% endfor %}
+
+                </td>
+
+                <!-- 受信日 -->
+                <td>
+                    {{url_dest_user_data.url_upload_manage.created_date | date:'Y/m/d'}}
+                    {{url_dest_user_data.url_upload_manage.created_date | date:'H:i'}}
+                </td>
+
+                <!-- 保存期限 -->
+                <td>
+                    {{url_dest_user_data.url_upload_manage.end_date|date:'Y/m/d' }}
+                    {{url_dest_user_data.url_upload_manage.end_date | date:'H:i'}}
+                </td>
+
+                <!-- 送信者 -->
+                <td>
+                    {{url_dest_user_data.url_upload_manage.created_user.email}}
+                </td>
+
+                <!-- 一括ダウンロードボタン url-->
+                <td class="zipDlIcon">
+                    {% if url_dest_user_data.url_upload_manage.end_date|is_past_due %}
+                    <span data-toggle="tooltip" title="期限切れのためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button></span>
+
+                    <!-- zipファイルDL回数制限制御 url-->
+                    {% elif url_dest_user_data.url_download_table.all|url_dl_file_count:url_dest_user_data.url_upload_manage.dl_limit == 0 %}
+                    <span data-toggle="tooltip" title="DL回数制限を超えたためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button></span>
+                        
+                    {% elif url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
+                    <span data-toggle="tooltip" title="ファイルが削除されました。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button></span>
+    
+
+                    {% else %}
+                    <span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="top">
+                        <a button type="button" class="menu_btn_color menu_btn url_zip_download"
+                            data-downloadtable_id="{{ url_dest_user_data.id }}"
+                            onclick="window.location.href='{% url 'draganddrop:url_file_download_zip' url_dest_user_data.id %}'">
+                            <button class="fas_button_download"></button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </td>
+
+                <!-- メッセージボタン -->
+                <td class="homeIcon">
+                    {% if url_dest_user_data.url_upload_manage.message %}
+                    <span data-toggle="tooltip" title="メッセージ" data-placement="top">
+                        <button class="fas_button_message"
+                        data-value="{{url_dest_user_data.pk}}"
+                        data-dl_message="{{url_dest_user_data.url_upload_manage.message}}"
+                        data-target="#dl_message_modal"
+                        data-toggle="modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="メッセージはありません。" data-placement="top">
+                        <button class="fas_button_message" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% endif %}
+                </td>
+                
+                <!-- 削除(ゴミ箱)ボタン -->
+                <td class="deleteIcon">
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete" 
+                        data-value="{{url_dest_user_data.pk}}"
+                        data-url_del_name="{{url_dest_user_data.url_upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#url_dl_del_task_modal"></button>
+                    </span>
+                </td>
+            </tr>
+
+            {%endfor%}
+            {% endif %}
+            
+            <!------- メッセージモーダル URL受信用 ------->
+            <div class="modal fade" id="dl_url_message_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header message_modal_header">
+                            <span class="modal-title home_modal_title">メッセージ<i class="fa-solid fa-comment-dots ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <p class="url_dl_message"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-------- 削除モーダル URL受信用 ------->
+            <div class="modal fade" id="url_dl_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                        </div>
+                        <div class="modal-body url-del-file-name-text">
+                            <p>選択したファイルを削除します</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="url_dl_del_task_modal_btn" type="button"
+                                class="del_task_button btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-------------------------URL共有 閉じ---------------------------------->
+
+        </tbody>
+    </table>
+</div>
+
+<!-------------------------------------------------------送信データ ------------------------------------------------------->
+<div class="box1-2 soushin_table">
+
+    <div class="box1-3 d-flex bd-highlight mb-3">
+        <div class="mr-auto p-2 bd-highlight send-title-bar">
+            <h2 class="m-0 send-title">送信データ</h2>
+        </div>
+
+        <!-----------------一括削除ボタン ----------------->
+        <div class="del-btn p-2 bd-highlight">
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-outline-danger rounded-0" data-toggle="modal"
+                data-target="#upload_manage_delete_modal" id="upload_manage_delete_button" disabled>一括削除</button>
+        </div>
+    </div>
+
+    <table class="table send_table" id="send_table">
+        <thead>
+            <tr>
+                <th class="checkBox"><label><input type="checkbox" name="all_check_upload_manage" id="all_send"></label></th>
+                <th class="fileTitle">タイトル</th>
+                <th class="fileData">送信データ</th>
+                <th class="dateWidth">送信日</th>
+                <th class="sendUser">送信先</th>
+                <th class="dlCheck">DL状況</th>
+                <th class="dlLimit">DL回数</th>
+                <th class="duplicateIcon"></th>
+                <th class="updateIcon"></th>
+                <th class="homeIcon"></th>
+                <th class="deleteIcon"></th>
+            </tr>
+        </thead>
+
+        <tbody class="modal-open" id="send_boxes">
+
+
+            <!-------------------------送信テーブル 通常アップロード---------------------------------->
+            {% if upload_manages %}
+            {% for upload_manage in upload_manages %}
+
+            <tr {% if upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+
+                <!-- チェックボックス -->
+                <td>
+                    <input type="checkbox" name="upload_manage_ids" value="{{upload_manage.id}}" id="upload_data" class="upload_data">
+                </td>
+
+                <!-- タイトル -->
+                <td>
+                    {% if upload_manage.file_del_flag == 1 %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span><br>
+                    <p class="file_del_tag">ファイル削除済み</p>
+                    {% elif  upload_manage.end_date|is_past_due %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                    title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span><br>
+                    <p class="expired_tag">期限切れ</p>
+                    {% else %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span>
+                    {% endif %}
+                </td>
+
+                <!-- 送信データ -->
+                <td>
+                    {% if upload_manage.file_del_flag == 0 %}
+                        {%for file in upload_manage.file.all%}
+                        <span data-toggle="tooltip" data-placement="right"
+                            title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></span>
+                        {% endfor %}
+                    {% else %}
+                        {%for file in upload_manage.file.all%}
+                        <del data-toggle="tooltip" data-placement="right"
+                            title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+
+                <!-- 送信日 -->
+                <td>
+                    {{upload_manage.created_date | date:'Y/m/d'}}
+                    {{upload_manage.created_date | date:'H:i'}}
+                </td>
+
+
+                <!-------------------------送信先---------------------------------->
+                <td>
+                    {% with dest_user_all=upload_manage|get_direct_users %}
+                        <!---個人ユーザーが6件以上の場合--->
+                        {% if dest_user_all.count >= 6 %}
+                            {% for user in dest_user_all|slice:":5" %}
+                                <div class="d-flex">
+                                    <div class="w_20">{{ forloop.counter}}.</div> 
+                                    <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                </div>
+                            {% endfor %}
+                        <!---個人ユーザーが6件以下場合--->
+                        {% else %}
+                            {% for user in dest_user_all %}
+                                <div class="d-flex">
+                                    <div class="w_20">{{ forloop.counter}}.</div> 
+                                    <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                    <!--グループ-->
+                    {%with  dest_user_group_all=upload_manage.dest_user_group.all%}
+                        {%with diff_number=5|sub:dest_user_all.count%}
+                            {% if diff_number >= 0 %}
+                                {% for group in dest_user_group_all|slice:diff_number%}
+                                    <div class="d-flex">
+                                        <div class="w_20">{{ forloop.counter|add:dest_user_all.count }}.</div> 
+                                        <div><i class="fas fa-users fa-fw fa-1x" {% if group|get_group_download_status:upload_manage %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{group}}<br></div>
+                                    </div>                                
+                                {% endfor %}
+                            {% endif %}
+                        {%endwith%}
+                    
+                    <!--もっと見るモーダルを出力するための条件分岐-->
+                    {% with all_dest_user=dest_user_all.count|add:dest_user_group_all.count %}
+                        {%if all_dest_user >= 6%}
+                            <div class="d-flex">
+                                <div class="rest_dest_user_count">あと{{all_dest_user|add:"-5"}}件</div>
+                                <div class="triangle dest_user_all_modal ml-2 mb-1" data-toggle="modal"
+                                data-target="#view_all_dest_user_modal{{upload_manage.id}}">もっと見る</div>
+                            </div>
+                        {%endif%}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </td>
+
+                <!-- DL状況 -->
+                <td class="text-center">
+                    {% if upload_manage.is_downloaded == 1 %}
+                    <i class="fas fa-check fa-lg icon-check"></i><br>
+                    {% else %}
+                    <i class="fas fa-check fa-lg icon-check" style="display: none;"></i><br>
+                    {% endif%}
+                </td>
+
+                <!-- DL回数 -->
+                <td class="text-center">
+                    {% if upload_manage.dl_limit == 99 %}
+                    無期限
+                    {% else %}
+                    {{upload_manage.dl_limit}}回
+                    {% endif %}
+                </td>
+
+                <!-- 複製ボタン -->
+                <td class="updateIcon">
+                    <span data-toggle="tooltip" title="データの複製" data-placement="top">
+                        <a href="{% url 'draganddrop:duplicate_step1' upload_manage.pk %}">
+                            <button class="fas_button_duplicate" ></button>
+                        </a>
+                    </span>
+                </td>
+
+                <!-- 変更ボタン -->
+                <td class="updateIcon">
+                    {% if upload_manage.file_del_flag == 1 %}
+                    <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                        <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="データの編集" data-placement="top">
+                        <a href="{% url 'draganddrop:step1_update' upload_manage.pk %}">
+                            <button class="fas_button_edit" ></button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </td>
+
+                <!-- メッセージボタン -->
+                <td class="homeIcon">
+                    {% if upload_manage.message %}
+                    <span data-toggle="tooltip" title="メッセージ" data-placement="top">
+                        <button class="fas_button_message"
+                        data-value="{{upload_manage.pk}}"
+                        data-send_message="{{upload_manage.message}}"
+                        data-target="#send_message_modal"
+                        data-toggle="modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="メッセージはありません。" data-placement="top">
+                        <button class="fas_button_message" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% endif %}
+                </td>
+                
+                <!-- 削除ボタン -->
+                <td class="deleteIcon">
+                    {% if upload_manage.file_del_flag == 0 %}
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete"
+                        data-value="{{upload_manage.pk}}"
+                        data-send_del_name="{{upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#del_task_modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete"
+                        data-value="{{upload_manage.pk}}"
+                        data-send_del_name="{{upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#file_deleted_task_modal"></button>
+                    </span>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+            {% endif %}
+
+            <!------- メッセージモーダル 送信用 ------->
+            <div class="modal fade" id="send_message_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header message_modal_header">
+                            <span class="modal-title home_modal_title">メッセージ<i class="fa-solid fa-comment-dots ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <p class="send_message"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!------- 削除モーダル 送信用 ------->
+            <div class="modal fade" id="del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="send-del-file-name-text"></div>
+                            <div class="d-flex">
+                                <input type="checkbox" name="checked_del_file" class="mr-2">
+                                <div>ファイルのみ削除</div>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="del_task_modal_btn" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                                data-dismiss="modal">削除</button>
+                            <button type="button" onfocus="this.blur();"
+                                class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!------- ファイル削除済み 削除モーダル 送信用 ------->
+            <div class="modal fade" id="file_deleted_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="send-del-file-name-text"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="file_deleted_task_modal_btn" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                                data-dismiss="modal">削除</button>
+                            <button type="button" onfocus="this.blur();"
+                                class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-------------------------送信テーブル URL共有---------------------------------->
+            {% if url_upload_manages %}
+
+            {% for url_upload_manage in url_upload_manages %}
+            <tr {% if url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+
+                <!-- チェックボックス -->
+                <td>
+                    <input type="checkbox" name="url_upload_manage_ids" value="{{url_upload_manage.id}}"
+                        id="url_upload_data" class="url_upload_data">
+                </td>
+
+                <!-- タイトル -->
+                <td>
+                    {% if url_upload_manage.file_del_flag == 1 %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="file_del_tag">ファイル削除済み</p>
+                    {% elif  url_upload_manage.end_date|is_past_due %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="expired_tag">期限切れ</p>
+                    {% else %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
+                    <a href="{{url_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
+                    <span class="material-icons copy_button" data-url="{{url_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                    {% endif %}
+                </td>
+
+                <!-- 送信データ -->
+                <td>
+                    {% if url_upload_manage.file_del_flag == 0 %}
+                        {%for file in url_upload_manage.file.all%}
+                        <span data-toggle="tooltip" data-placement="right" title="{{file.name}}">
+                            {{ file.name | truncatechars:16 }}<br>
+                        </span>
+                        {% endfor %}
+                    {% else %}
+                        {%for file in url_upload_manage.file.all%}
+                        <del data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+
+                <!-- 送信日 -->
+                <td>
+                    {{url_upload_manage.created_date | date:'Y/m/d'}}
+                    {{url_upload_manage.created_date | date:'H:i'}}
+                </td>
+
+                <!-- 送信先 -->
+                <td>
+                    {% with dest_user_all=url_upload_manage|url_get_direct_users %}
+                        <!---個人ユーザーが6件以上の場合--->
+                        {% if dest_user_all.count >= 6 %}
+                            {% for user in dest_user_all|slice:":5" %}
+                                <div class="d-flex">
+                                    <div class="w_20">{{ forloop.counter}}.</div> 
+                                    <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                </div>
+                            {% endfor %}
+                        <!---個人ユーザーが6件以下場合--->
+                        {% else %}
+                            {% for user in dest_user_all %}
+                                <div class="d-flex">
+                                    <div class="w_20">{{ forloop.counter}}.</div> 
+                                    <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                    <!--グループ-->
+                    {%with  dest_user_group_all=url_upload_manage.dest_user_group.all%}
+                        {%with diff_number=5|sub:dest_user_all.count%}
+                            {% if diff_number >= 0 %}
+                                {% for group in dest_user_group_all|slice:diff_number%}
+                                    <div class="d-flex">
+                                        <div class="w_20">{{ forloop.counter|add:dest_user_all.count }}.</div> 
+                                        <div><i class="fas fa-users fa-fw fa-1x" {% if group|url_get_group_download_status:url_upload_manage %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{group}}<br></div>                                
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {%endwith%}
+                    
+                    <!--もっと見るモーダルを出力するための条件分岐-->
+                    {% with all_dest_user=dest_user_all.count|add:dest_user_group_all.count %}
+                        {%if all_dest_user >= 6%}
+                            <div class="d-flex">
+                                <div class="rest_dest_user_count">あと{{all_dest_user|add:"-5"}}件</div>
+                                <div class="triangle dest_user_all_modal ml-2 mb-1" data-toggle="modal"
+                                data-target="#url_view_all_dest_user_modal{{url_upload_manage.id}}">もっと見る</div>
+                            </div>
+                        {%endif%}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </td>
+
+                <!-- DL状況 -->
+                <td class="text-center">
+                    {% if url_upload_manage.is_downloaded %}
+                    <i class="fas fa-check fa-lg icon-check"></i><br>
+                    {% endif %}
+                </td>
+
+                <!-- DL回数 -->
+                <td class="text-center">
+                    {% if url_upload_manage.dl_limit == 99 %}
+                    無期限
+                    {% else %}
+                    {{url_upload_manage.dl_limit}}回
+                    {% endif %}
+                </td>
+
+                <!-- 複製ボタン -->
+                <td class="updateIcon">
+                    <span data-toggle="tooltip" title="データの複製" data-placement="top">
+                        <a href="{% url 'draganddrop:url_duplicate_step1' url_upload_manage.pk %}">
+                            <button class="fas_button_duplicate" ></button>
+                        </a>
+                    </span>
+                </td>
+
+                <!-- 変更ボタン -->
+                <td class="updateIcon">
+                    {% if url_upload_manage.file_del_flag == 1 %}
+                    <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                            <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="データの編集" data-placement="top">
+                        <a href="{% url 'draganddrop:step1_url_update' url_upload_manage.pk %}">
+                            <button class="fas_button_edit" ></button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </td>
+                
+                <!-- メッセージボタン -->
+                <td class="homeIcon">
+                    {% if url_upload_manage.message %}
+                    <span data-toggle="tooltip" title="メッセージ" data-placement="top">
+                        <button class="fas_button_message"
+                        data-value="{{url_upload_manage.pk}}"
+                        data-url_send_message="{{url_upload_manage.message}}"
+                        data-target="#url_send_message_modal"
+                        data-toggle="modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="メッセージはありません。" data-placement="top">
+                        <button class="fas_button_message" style="background-color: #C0C0C0;"></button>
+                    </span>
+                    {% endif %}
+                </td>
+                
+                <!-- 削除ボタン -->
+                <td class="deleteIcon">
+                    {% if url_upload_manage.file_del_flag == 0 %}
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete"
+                        data-value="{{url_upload_manage.pk}}"
+                        data-url_send_del_name="{{url_upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#url_del_task_modal"></button>
+                    </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete"
+                        data-value="{{url_upload_manage.pk}}"
+                        data-url_send_del_name="{{url_upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#file_deleted_url_task_modal"></button>
+                    </span>
+                    {% endif %}
+                </td>
+            
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+            
+            <!------- メッセージモーダル URL送信用 ------->
+            <div class="modal fade" id="url_send_message_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header message_modal_header">
+                            <span class="modal-title home_modal_title">メッセージ<i class="fa-solid fa-comment-dots ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <p class="url_send_message"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!------- 削除モーダル 送信 URL用 ------->
+            <div class="modal fade" id="url_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="url-send-del-file-name-text"></div>
+                            <div class="d-flex">
+                                <input type="checkbox" name="checked_url_del_file" class="mr-2">
+                                <div>ファイルのみ削除</div>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="url_del_task_modal_btn" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                                data-dismiss="modal">削除</button>
+                            <button type="button" onfocus="this.blur();"
+                                class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!------- ファイル削除済み 削除モーダル 送信 URL用 ------->
+            <div class="modal fade" id="file_deleted_url_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="url-send-del-file-name-text"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="file_deleted_url_task_modal_btn" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                                data-dismiss="modal">削除</button>
+                            <button type="button" onfocus="this.blur();"
+                                class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </tbody>
+    </table>
+</div>
+
+<!----------------------------------もっと見るモーダル-------------------------------------->
+
+{% for upload_manage in upload_manages %}
+
+<div class="modal fade" id="view_all_dest_user_modal{{upload_manage.id}}" tabindex="-1" role="dialog"
+    aria-labelledby="label1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role=" document">
+        <div class="modal-content center-modal dest_user_confirm_modal">
+            <div class="modal-header default_modal_header">
+                <span class="modal-title home_modal_title">全送信先<i class="fas fa-address-book ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                <div>
+                    {% with dest_user_all=upload_manage|get_direct_users %}
+                    {%with  dest_user_group_all=upload_manage.dest_user_group.all%}
+                        {% for user in dest_user_all %}
+                            <div class="d-flex">
+                                <div class="w_25">{{ forloop.counter}}.</div> 
+                                <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                            </div>
+                        {% endfor %}
+                        {% for group in dest_user_group_all %}
+                            <div class="d-flex">
+                                <div class="w_25">{{ forloop.counter|add:dest_user_all.count }}.</div> 
+                                <div><i class="fas fa-users fa-fw fa-1x" {% if group|get_group_download_status:upload_manage %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{group}}<br></div>                                
+                            </div>
+                        {% endfor %}
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <div class="modal-footer all_send_user_confirm_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!--もっと見るモーダル閉じタグ-->
+
+<!----------------------------------URL共有 もっと見るモーダル-------------------------------------->
+
+{% for url_upload_manage in url_upload_manages %}
+
+<div class="modal fade" id="url_view_all_dest_user_modal{{url_upload_manage.id}}" tabindex="-1" role="dialog"
+    aria-labelledby="label1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role=" document">
+        <div class="modal-content center-modal dest_user_confirm_modal">
+            
+            <div class="modal-header default_modal_header">
+                <span class="modal-title home_modal_title">全送信先<i class="fas fa-address-book ml-1"></i></span>
+            </div>
+
+            <div class="modal-body">
+                <div>
+                    {% with dest_user_all=url_upload_manage|get_direct_users %}
+                    {%with  dest_user_group_all=url_upload_manage.dest_user_group.all%}
+                        {% for user in dest_user_all %}
+                            <div class="d-flex">
+                                <div class="w_25">{{ forloop.counter}}.</div> 
+                                <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                            </div>
+                        {% endfor %}
+                        {% for group in dest_user_group_all %}
+                            <div class="d-flex">
+                                <div class="w_25">{{ forloop.counter|add:dest_user_all.count }}.</div> 
+                                <div><i class="fas fa-users fa-fw fa-1x" {% if group|url_get_group_download_status:url_upload_manage %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{group}}<br></div>                                
+                            </div>
+                        {% endfor %}
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <div class="modal-footer all_send_user_confirm_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!--もっと見るモーダル閉じタグ-->
+
+<!--Home 一括削除用受信モーダル -->
+<div class="modal fade" id="multi_deleted_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                選択ファイルを削除します
+            </div>
+            <div class="modal-footer">
+                <button id="multi_del_task_modal_btn" type="button"
+                    class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Home 一括削除用送信モーダル -->
+<div class="modal fade" id="upload_manage_delete_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                <div> 選択したデータを削除します</div>
+                <div class="d-flex">
+                    <input type="checkbox" name="checked_multi_del_file" class="mr-2">
+                    <div>ファイルのみ削除</div>
+               </div>
+            </div>
+            <div class="modal-footer">
+                <button id="upload_manage_delete_modal_btn" type="button"
+                    class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ゴミ箱モーダル-->
+<div class="modal fade" id="deleted_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content center-modal deleted_modal" >
+
+            <div class="modal-header deleted_lists_modal_header d-flex justify-content-center">
+                <span class="deleted_lists_modal_title">ゴミ箱</span>
+                <i class="fas fa-trash-alt fa-2x icon_delete_box"></i>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body modal-body-text del_task deleted_modal_body">
+                <table class="table" id="deleted_table">
+                    <thead>
+                        <tr>
+                            <th class="checkBox"><label><input type="checkbox" name="all_dest_user_deleted_modal_ids" id="deleted_modal_ids"></label></th>
+                            <th class="fileTitle">タイトル</th>
+                            <th class="fileData">受信データ</th>
+                            <th class="createdUser">送信者</th>
+                            <th class="trushModalDateWidth">受信日</th>
+                            <th class="deleteIcon"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="deleted_boxes">
+                        <!--アップロード用-->
+                        {% if upload_manage_for_dest_users_deleted %}
+                        {% for deleted_list in upload_manage_for_dest_users_deleted %}
+                        <tr {% if deleted_list.upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif deleted_list.upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                            <!--チェックボックス-->
+
+                            <td>
+                                <input type="checkbox" name="deleted_ids" value="{{deleted_list.id}}"><br>
+                            </td>
+
+                            <!--タイトル-->
+                            <td>
+                                {% if deleted_list.upload_manage.file_del_flag == 1 %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                    title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span><br>
+                                <p class="file_del_tag">ファイル削除済み</p>
+                                {% elif  deleted_list.upload_manage.end_date|is_past_due %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span><br>
+                                <p class="expired_tag">期限切れ</p>
+                                {% else %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                    title="{{deleted_list.upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span>
+                                {% endif %}
+                            </td>
+            
+                            <!--受信データ-->
+                            <td>
+                                {%for file in deleted_list.upload_manage.file.all%}
+                                {% if deleted_list.upload_manage.file_del_flag == 1 %}
+                                <del class="past_file" data-toggle="tooltip" 
+                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+                                {%else%}
+                                <a data-toggle="tooltip" data-placement="right"
+                                    title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></a>
+                                {%endif%}
+                                {% endfor %}
+                            </td>
+
+                            <!--送信者-->
+                            <td>
+                                <span data-toggle="tooltip" data-placement="right"
+                                    title="{{deleted_list.upload_manage.created_user}}">
+                                    {{deleted_list.upload_manage.created_user.email}}<br>
+                                </span>
+                            </td>
+
+                            <!--受信日-->
+                            <td>
+                                {{deleted_list.upload_manage.created_date | date:'Y/m/d H:i'}}
+                            </td>
+
+                            <!--削除ボタン-->
+                            <td>
+                                <button type="button" class="fas_button_delete"
+                                    data-toggle="modal" data-value="{{deleted_list.pk}}"
+                                    data-trash_del_name="{{deleted_list.upload_manage.title}}"
+                                    data-target="#upload_manage_delete"></button>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+
+
+                        <!--URL共有用-->
+                        {% if url_upload_manage_for_dest_users_deleted %}
+                        {% for url_deleted_list in url_upload_manage_for_dest_users_deleted %}
+                        <tr {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_deleted_list.url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {%endif%}>
+
+                            <!--チェックボックス-->
+                            <td>
+                                <input type="checkbox" name="url_deleted_ids" value="{{url_deleted_list.id}}"><br>
+                            </td>
+
+
+                            <!--タイトル-->
+                            <td>
+                                {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                    title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
+                                <p class="file_del_tag">ファイル削除済み</p>
+                                {% elif  url_deleted_list.url_upload_manage.end_date|is_past_due %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
+                                <p class="expired_tag">期限切れ</p>
+                                {% else %}
+                                <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                    title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
+                                {% endif %}
+                            </td>
+
+                            <!--受信データ-->
+                            <td>
+                                {%for file in url_deleted_list.url_upload_manage.file.all%}
+                                {%if url_deleted_list.url_upload_manage.file_del_flag == 1%}
+                                <del class="past_file" data-toggle="tooltip" 
+                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+                                {%else%}
+                                <a data-toggle="tooltip" data-placement="right" title="{{file.name}}">
+                                    {{ file.name | truncatechars:16 }}<br>
+                                </a>
+                                {%endif%}
+                                {% endfor %}
+                            </td>
+
+                            <!--送信者-->
+                            <td>
+                                <span data-toggle="tooltip" data-placement="right"
+                                    title="{{url_deleted_list.url_upload_manage.created_user}}">
+                                    {{url_deleted_list.url_upload_manage.created_user.email}}<br>
+                                </span>
+                            </td>
+
+                            <!--受診日-->
+                            <td>
+                                {{url_deleted_list.url_upload_manage.created_date | date:'Y/m/d H:i'}}<br>
+                            </td>
+
+                            <!--削除ボタン-->
+                            <td>
+                                <button type="button" class="fas_button_delete"
+                                    data-toggle="modal" data-value="{{url_deleted_list.pk}}"
+                                    data-url_trash_del_name="{{url_deleted_list.url_upload_manage.title}}"
+                                    data-target="#url_upload_manage_delete"></button><br>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="modal-footer deleted_lists_modal_footer">
+                <table>
+                    <tr>
+                        <td>
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn rounded-0"
+                                data-toggle="modal" data-target="#restore" id="trash_box_restore_button"
+                                disabled>復元</button>
+                        </td>
+
+                        <td>
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 delete_btn ml-2 delete_btn rounded-0"
+                                data-toggle="modal" data-target="#bulk_del" id="trash_box_delete_button"
+                                disabled>一括削除</button>
+                        </td>
+
+                        <td>
+                            <button type="button" onfocus="this.blur();"
+                                class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0"
+                                data-dismiss="modal">キャンセル</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 復元用モーダル -->
+
+<div class="modal fade" id="restore" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header default_modal_header">
+                <span class="modal-title home_modal_title">復元<i class="fa-solid fa-trash-can-arrow-up ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                選択ファイルを復元します
+            </div>
+            <div class="modal-footer">
+                <button id="restore_task_btn" type="button" class="btn btn_size blue_btn rounded-0"
+                    data-dismiss="modal">復元</button>
+                <button type="button" class="btn btn_size btn-secondary rounded-0" data-dismiss="modal">キャンセル</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ゴミ箱内一括削除用モーダル -->
+
+<div class="modal fade" id="bulk_del" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                選択ファイルを削除します
+            </div>
+            <div class="modal-footer">
+                <button id="dl_all_del_task_modal_btn" type="button"
+                    class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 単数削除用モーダル -->
+
+<div class="modal fade" id="upload_manage_delete" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body trash_del_file_name_text">
+                <p>選択ファイルをゴミ箱から削除します</p><br>
+            </div>
+            <div class="modal-footer">
+                <button id="trash_delete" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                    data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 単数削除URL共有用モーダル -->
+
+<div class="modal fade" id="url_upload_manage_delete" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body trash_url_del_file_name_text">
+                <p>選択ファイルをゴミ箱から削除します</p>
+            </div>
+            <div class="modal-footer">
+                <button id="url_trash_delete" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+                    data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!---ゴミ箱モーダル 閉じ--->
+
+
+<!---汎用トーストメッセージ--->
+<div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+    <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+        <div class="toast-body">
+            <div>
+                メッセージを動的に変更
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+//////////// //////////
+//URLのコピー
+///////////////////////
+
+$(function () {
+    $('.copy_button').on('click', function () {
+        // コピーする文章の取得(データ属性を使って特定のデータを取得する。)
+        let text = $(this).data("url")
+
+        // テキストエリアの作成
+        let $textarea = $('<textarea></textarea>');
+        // テキストエリアに文章を挿入
+        $textarea.text(text);
+        //テキストエリアを挿入
+        $(this).append($textarea);
+        //テキストエリアを選択
+        $textarea.select();
+        // コピー
+        document.execCommand('copy');
+        // テキストエリアの削除
+        $textarea.remove();
+        // アラート文の表示
+        //$(this).parent().appned().html('<div class="msg">リンクをコピーしました!</div>');
+        $('<div class="msg">リンクをコピーしました!</div>').appendTo($(this).parent());
+
+        setTimeout(function () {
+            $('.msg').remove();
+        }, 2000);
+    });
+});
+
+//////////// //////////
+//全選択ボタン
+///////////////////////
+
+//checkbox全選択 受信
+
+$(function () {
+    // 「全選択」する
+    $('#all').on('click', function () {
+        $("input[name='dest_user_ids'], input[name='url_dest_user_ids']").prop('checked', this
+            .checked);
+    });
+
+    // 「全選択」以外のチェックボックスがクリックされたら、
+    $("input[name='dest_user_ids'], input[name='url_dest_user_ids']").on('click', function () {
+        if ($('#boxes :checked').length == $('#boxes input[type="checkbox"]').length) {
+            // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+            $('#all').prop('checked', true);
+
+        } else {
+            // 1つでもチェックが入っていたら、「全選択」 = checked
+            $('#all').prop('checked', false);
+        }
+    });
+});
+
+
+//checkbox全選択 送信
+
+
+$(function () {
+    // 「全選択」する
+    $('#all_send').on('click', function () {
+        $("input[name='upload_manage_ids'], input[name='url_upload_manage_ids']").prop('checked',
+            this.checked);
+    });
+
+    // 「全選択」以外のチェックボックスがクリックされたら、
+    $("input[name='upload_manage_ids'], input[name='url_upload_manage_ids']").on('click', function () {
+        if ($('#send_boxes :checked').length == $('#send_boxes input[type="checkbox"]').length) {
+            // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+            $('#all_send').prop('checked', true);
+        } else {
+            // 1つでもチェックが入っていたら、「全選択」 = checked
+            $('#all_send').prop('checked', false);
+        }
+    });
+});
+
+
+//一括削除button活性 非活性  受信 全選択時
+
+$("#all").change(function () {
+    var checks = [];
+    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked")
+        .each(function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#multi_delete_button').prop("disabled", false);
+    } else {
+        $('#multi_delete_button').prop("disabled", true);
+    }
+
+});
+
+//button活性 非活性  受信 個別択時
+
+$("#download_table [name='dest_user_ids'], #download_table [name='url_dest_user_ids']").change(function () {
+    var checks = [];
+    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked")
+        .each(function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#multi_delete_button').prop("disabled", false);
+    } else {
+        $('#multi_delete_button').prop("disabled", true);
+    }
+});
+
+//button活性 非活性  送信 全選択時
+
+$("#all_send").change(function () {
+    var checks = [];
+    $("#send_table [name='upload_manage_ids']:checked, #send_table [name='url_upload_manage_ids']:checked")
+        .each(function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#upload_manage_delete_button').prop("disabled", false);
+    } else {
+        $('#upload_manage_delete_button').prop("disabled", true);
+    }
+});
+
+
+//一括削除button活性 非活性  送信 個別選択時
+
+$("#send_table [name='upload_manage_ids'], #send_table [name='url_upload_manage_ids']").change(function () {
+    var checks = [];
+    $("#send_table [name='upload_manage_ids']:checked, #send_table [name='url_upload_manage_ids']:checked")
+        .each(function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#upload_manage_delete_button').prop("disabled", false);
+    } else {
+        $('#upload_manage_delete_button').prop("disabled", true);
+    }
+});
+
+//checkbox全選択 ゴミ箱モーダル内
+
+$(function () {
+    // 「全選択」する
+    $('#deleted_modal_ids').on('click', function () {
+        $("input[name='deleted_ids'], input[name='url_deleted_ids']").prop('checked', this
+            .checked);
+    });
+
+    // 「全選択」以外のチェックボックスがクリックされたら、
+    $("input[name='deleted_ids'], input[name='url_deleted_ids']").on('click', function () {
+        if ($('#deleted_boxes :checked').length == $('#deleted_boxes input[type="checkbox"]').length) {
+            // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+            $('#deleted_modal_ids').prop('checked', true);
+
+        } else {
+            // 1つでもチェックが入っていたら、「全選択」 = checked
+            $('#deleted_modal_ids').prop('checked', false);
+        }
+    });
+});
+
+
+//button活性 非活性  ゴミ箱モーダル内 全選択時
+
+$("#deleted_modal_ids").change(function () {
+    var checks = [];
+    $("#deleted_modal [name='deleted_ids']:checked, #deleted_modal [name='url_deleted_ids']:checked")
+        .each(function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#trash_box_restore_button').prop("disabled", false);
+        $('#trash_box_delete_button').prop("disabled", false);
+    } else {
+        $('#trash_box_restore_button').prop("disabled", true);
+        $('#trash_box_delete_button').prop("disabled", true);
+    }
+});
+
+
+//ゴミ箱モーダル内 button 活性・非活性
+//復元ボタン
+$("#deleted_table [name='deleted_ids'], #deleted_table [name='url_deleted_ids']").change(function () {
+    var checks = [];
+    $("#deleted_table [name='deleted_ids']:checked, #deleted_table [name='url_deleted_ids']:checked").each(
+        function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#trash_box_restore_button').prop("disabled", false);
+    } else {
+        $('#trash_box_restore_button').prop("disabled", true);
+    }
+});
+
+//一括削除ボタン
+$("#deleted_table [name='deleted_ids'], #deleted_table [name='url_deleted_ids']").change(function () {
+    var checks = [];
+    $("#deleted_table [name='deleted_ids']:checked, #deleted_table [name='url_deleted_ids']:checked").each(
+        function () {
+            checks.push(this.value);
+        });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#trash_box_delete_button').prop("disabled", false);
+    } else {
+        $('#trash_box_delete_button').prop("disabled", true);
+    }
+});
+
+//モーダルを閉じた時モーダル内をリセット
+$('#deleted_modal').on('hidden.bs.modal', function (event) {
+    var checks = [];
+    $("#deleted_table [name='deleted_ids']:checked, #deleted_table [name='url_deleted_ids']:checked").each(
+        function () {
+            checks.push(this.value);
+            if (checks.length > 0) {
+                $("#deleted_table [name='deleted_ids']:checked, #deleted_table [name='url_deleted_ids']:checked, #deleted_table [name='all_dest_user_deleted_modal_ids']:checked").prop('checked', false)
+            } 
+    });
+})
+
+//受信テーブル
+//datatables 
+$(document).ready(function () {
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json"
+        }
+    });
+    var table = $('#download_table').DataTable({
+        lengthMenu: [5, 10, 15, 20],
+        order: [
+            [3, 'desc']
+        ],
+        columnDefs: [{
+                "targets": [0, 6, 7, 8],
+                "orderable": false
+            },
+        ]
+    });
+});
+
+
+//送信テーブル
+
+$(document).ready(function () {
+    $('#send_table').DataTable({
+        lengthMenu: [5, 10, 15, 20],
+        order: [
+            [3, 'desc']
+        ],
+        columnDefs: [{
+                "targets": [0, 5, 6, 7, 8, 9, 10],
+                "orderable": false
+            },
+            ]
+    });
+});
+
+//ゴミ箱モーダル
+
+$(document).ready(function () {
+    $('#deleted_table').DataTable({
+        lengthMenu: [5, 10, 15, 20],
+        order: [
+            [3, 'desc']
+        ],
+        columnDefs: [{
+                "targets": [0, 5],
+                "orderable": false
+            },
+            ]
+    });
+});
+
+$(document).ready(function () {
+    $(".iframe").colorbox({
+        iframe: true,
+        width: "85%",
+        height: "80%"
+    });
+});
+
+$(function() {
+    $(".image").colorbox({
+        width:"85%",
+        height:"80%",
+        opacity: 0.7
+    });
+});
+
+// ---------------------------------
+// 全選択ボタン次ページでも動作させる処理
+// ---------------------------------
+
+//受信テーブルver
+$(function (){
+    var table = $('#download_table').DataTable();
+    table.on( 'page.dt', function () {
+        var info = table.page.info();
+        var info_page = table.$('input, checkbox');
+        var table_data = table.data();
+        //処理を遅らせる
+        setTimeout(function(){
+        var all_user = $("#download_table input[class='dest_data']")  //全ユーザー数
+        var all_url_user = $("#download_table input[class='url_dest_data']")
+        var total_all_user = all_user.length + all_url_user.length
+
+        var all_checked_user = $("#download_table input[class='dest_data']:checked") //チェック済みユーザー数
+        var all_url_checked_user = $("#download_table input[class='url_dest_data']:checked")
+        var total_all_checked_user = all_checked_user.length + all_url_checked_user.length
+
+       $("#download_table #all").prop('checked', (total_all_user == total_all_checked_user));
+        // 一括削除ボタンチェックされている場合は有効、チェックされていない場合は無効化
+        if (total_all_checked_user > 0) {
+            $('#multi_delete_button').prop("disabled", false);
+        } else {
+            $('#multi_delete_button').prop("disabled", true);
+        }
+        },10);
+    });
+})
+
+//送信テーブルver
+$(function (){
+    var table = $('#send_table').DataTable();
+    table.on( 'page.dt', function () {
+        var info = table.page.info();
+        var info_page = table.$('input, checkbox');
+        var table_data = table.data();
+        //処理を遅らせる
+        setTimeout(function(){
+        var all_user = $("#send_table input[class='upload_data']")  //全ユーザー数
+        var all_url_user = $("#send_table input[class='url_upload_data']")
+        var total_all_user = all_user.length + all_url_user.length
+        
+        var all_checked_user = $("#send_table input[class='upload_data']:checked") //チェック済みユーザー数
+        var all_url_checked_user = $("#send_table input[class='url_upload_data']:checked") 
+        var total_all_checked_user = all_checked_user.length + all_url_checked_user.length
+        
+        $("#send_table #all_send").prop('checked', (total_all_user == total_all_checked_user));
+        // 一括削除ボタンチェックされている場合は有効、チェックされていない場合は無効化
+        if (total_all_checked_user > 0) {
+            $('#upload_manage_delete_button').prop("disabled", false);
+        } else {
+            $('#upload_manage_delete_button').prop("disabled", true);
+        }
+        },10);
+    });
+})
+
+
+///////////////
+//ファイルダウンロード時にダウンロード管理テーブルを更新する処理
+///////////////
+$('.downloadtable').on('click', function () {
+
+    var is_type = "single"
+    //id属性を取得
+    var file_id = $(this).attr('id');
+
+    var downloadtable_id = $(this).data('downloadtable_id');
+
+    // 送信データとして保存
+    var data = {
+        'file_id': file_id,
+        'downloadtable_id': downloadtable_id,
+        'is_type': is_type
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'draganddrop:filedownloadstatus' %}",
+        data: data,
+        dataType: 'json',
+        success: function (data) {
+            if (data.status == 'ok') {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ダウンロードが成功しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1500);
+            } else {
+                window.location.href = "./";
+            }
+        }
+    });
+});
+
+///////////////
+//ファイルダウンロード時にダウンロード管理テーブルを更新する処理 URL ver
+///////////////
+$('.urldownloadtable').on('click', function () {
+
+    var is_type = "single"
+    //id属性を取得
+    var file_id = $(this).attr('id');
+    var url_downloadtable_id = $(this).data('url_downloadtable_id');
+
+    // 送信データとして保存
+    var data = {
+        'file_id': file_id,
+        'url_downloadtable_id': url_downloadtable_id,
+        'is_type': is_type
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'draganddrop:url_file_download_status' %}",
+        data: data,
+        dataType: 'json',
+        success: function (data) {
+            if (data.status == 'ok') {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ダウンロードが成功しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1500);
+            } else {
+                window.location.href = "./";
+            }
+        }
+    });
+});
+
+
+///////////////
+//Zipファイルダウンロード時にダウンロード管理テーブルを更新する処理
+///////////////
+$('.zip_download').on('click', function () {
+
+    var is_type = "multiple"
+    var file_id = $(this).attr('id');
+    var downloadtable_id = $(this).data('downloadtable_id');
+
+    // 送信データとして保存
+    var data = {
+        'downloadtable_id': downloadtable_id,
+        'is_type': is_type
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'draganddrop:filedownloadstatus' %}",
+        data: data,
+        dataType: 'json',
+        success: function (data) {
+            console.log("ステータス", data.status)
+
+            if (data.status == 'ok') {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ダウンロードが成功しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1500);
+            } else {
+                window.location.href = "./";
+
+            }
+        }
+    });
+});
+
+///////////////
+//Zipファイルダウンロード時にダウンロード管理テーブルを更新する処理 URL ver
+///////////////
+$('.url_zip_download').on('click', function () {
+
+    var is_type = "multiple"
+    var file_id = $(this).attr('id');
+    var url_downloadtable_id = $(this).data('downloadtable_id');
+
+    // 送信データとして保存
+    var data = {
+        'url_downloadtable_id': url_downloadtable_id,
+        'is_type': is_type
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'draganddrop:url_file_download_status' %}",
+        data: data,
+        dataType: 'json',
+        success: function (data) {
+            if (data.status == 'ok') {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ダウンロードが成功しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1500);
+            } else {
+                window.location.href = "./";
+
+            }
+        }
+    });
+});
+
+// 単数削除モーダル 送信データ用
+var send_delete_id = ""
+var send_delete_name = ""
+
+$('#del_task_modal, #file_deleted_task_modal').off('show.bs.modal');
+$('#del_task_modal , #file_deleted_task_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var send_delete_id = button.data('value')
+    var send_delete_name = button.data('send_del_name')
+    var modal = $(this);
+    modal.find('.send-del-file-name-text').text(send_delete_name + " " + "を削除します");
+
+    // ここでdeleteid を配列に変更する
+    var vals = []
+    vals.push(send_delete_id)
+    
+    var data = {
+        'send_delete_id': vals,
+        'send_delete_name': send_delete_name
+    };
+
+    // 削除ボタンを押下した場合、Ajaxで送信
+    // 送信データ用（DBデータも削除）
+    $('#del_task_modal_btn, #file_deleted_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#del_task_modal_btn, #file_deleted_task_modal_btn').on('click', function () {
+        if($('[name="checked_del_file"]').prop('checked')){
+            $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:file_delete" %}',
+                data: {
+                    'send_delete_id': vals,
+                    'send_delete_name': send_delete_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ファイル削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+                }
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:delete" %}',
+                data: {
+                    'send_delete_id': vals,
+                    'send_delete_name': send_delete_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+                }
+            });
+        }
+    });
+});
+
+///////////////
+//送信テーブルURL共有用のファイル削除処理
+///////////////
+// 単数削除モーダル 送信データ URL用
+var url_send_delete_id = ""
+var url_send_delete_name = ""
+$('#url_del_task_modal, #file_deleted_url_task_modal').off('show.bs.modal');
+$('#url_del_task_modal, #file_deleted_url_task_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var url_send_delete_id = button.data('value')
+    var url_send_delete_name = button.data('url_send_del_name')
+    var modal = $(this);
+    modal.find('.url-send-del-file-name-text').text(url_send_delete_name + " " + "を削除します");
+
+    // ここでdeleteid を配列に変更する
+    var vals = []
+    vals.push(url_send_delete_id)
+
+
+    // 削除ボタンを押下した場合、Ajaxで送信
+    // 送信データ用（DBデータも削除）
+    $('#url_del_task_modal_btn, #file_deleted_url_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#url_del_task_modal_btn, #file_deleted_url_task_modal_btn').on('click', function () {
+        if($('[name="checked_url_del_file"]').prop('checked')){
+            $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:url_file_delete" %}',
+                data: {
+                    'url_send_delete_id': vals,
+                    'url_send_delete_name': url_send_delete_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ファイルを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+                }
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:url_delete" %}',
+                data: {
+                    'url_send_delete_id': vals,
+                    'url_send_delete_name': url_send_delete_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ファイルを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+                }
+            });
+
+        }
+    });
+});
+
+//単数削除モーダル 受信データ用
+
+var delete_id = ""
+var delete_name = ""
+
+$('#dl_del_task_modal').off('show.bs.modal');
+$('#dl_del_task_modal').on('show.bs.modal', function (event) {
+
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var delete_id = button.data('value')
+    var delete_name = button.data('del_name')
+
+    var modal = $(this);
+    modal.find('.del-file-name-text').text(delete_name + "　" + "を削除します");
+
+    $('#dl_del_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#dl_del_task_modal_btn').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:downloadtabledelete" %}',
+            data: {
+                'delete_id': delete_id,
+                'delete_name': delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+            }
+        });
+    });
+});
+
+
+//単数削除モーダル 受信データ URL用
+
+var url_delete_id = ""
+var url_delete_name = ""
+
+$('#url_dl_del_task_modal').off('show.bs.modal');
+$('#url_dl_del_task_modal').on('show.bs.modal', function (event) {
+
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var url_delete_id = button.data('value')
+    var url_delete_name = button.data('url_del_name')
+
+    var modal = $(this);
+    modal.find('.url-del-file-name-text').text(url_delete_name + "　" + "を削除します");
+
+    $('#url_dl_del_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#url_dl_del_task_modal_btn').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:urldownloadtabledelete" %}',
+            data: {
+                'url_delete_id': url_delete_id,
+                'url_delete_name': url_delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+
+            }
+        });
+    });
+
+});
+
+//一括削除モーダル 受信データ用
+
+// 削除ボタンをクリックした時の処理
+$('#multi_del_task_modal_btn').on('click', function () {
+    console.log("cccc")
+
+    var vals = [];
+    //テンプレートのnameを指定してvalueの値を取得
+    // 取得した値をeachで回してlist型の値を作る
+
+    $('input[name = dest_user_ids]:checked').each(function () {
+        vals.push($(this).val());
+    });
+
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:multi_dl_delete" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            'dest_user_ids': vals
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+        }
+    });
+});
+
+//一括削除モーダル 受信データ URL用
+
+// 削除ボタンをクリックした時の処理
+$('#multi_del_task_modal_btn').on('click', function () {
+
+    var vals = [];
+    //テンプレートのnameを指定してvalueの値を取得
+    // 取得した値をeachで回してlist型の値を作る
+
+    $('input[name = url_dest_user_ids]:checked').each(function () {
+        vals.push($(this).val());
+
+    });
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:multi_dl_delete" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            'url_dest_user_ids': vals
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+        }
+    });
+});
+
+//一括削除モーダル 送信データ用
+
+// 削除ボタンをクリックした時の処理
+$('#upload_manage_delete_modal_btn').on('click', function () {
+    if($('[name="checked_multi_del_file"]').prop('checked')){
+        var vals = [];
+        //テンプレートのnameを指定してvalueの値を取得
+        // 取得した値をeachで回してlist型の値を作る
+        $('input[name = upload_manage_ids]:checked, input[name = url_upload_manage_ids]:checked')
+            .each(function () {
+                vals.push($(this).val());
+            });
+
+        $.ajax({
+            type: "POST",
+            //views.pyとurls.pyで定義したURLのnameを指定
+            url: '{% url "draganddrop:send_table_file_multi_delete" %}',
+            //サーバーに送るための値を設定する。
+            // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+            data: {
+                upload_manage_delete_ids: vals
+            },
+
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ファイルを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+            }
+        });
+
+    } else {
+        var vals = [];
+        //テンプレートのnameを指定してvalueの値を取得
+        // 取得した値をeachで回してlist型の値を作る
+        $('input[name = upload_manage_ids]:checked, input[name = url_upload_manage_ids]:checked')
+            .each(function () {
+                vals.push($(this).val());
+            });
+
+        $.ajax({
+            type: "POST",
+
+            //views.pyとurls.pyで定義したURLのnameを指定
+            url: '{% url "draganddrop:send_table_multi_delete" %}',
+            //サーバーに送るための値を設定する。
+            // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+            data: {
+                upload_manage_delete_ids: vals
+            },
+
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ファイルを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+            }
+        });
+        }
+    });
+
+///////////////
+//共通モーダルレイヤー設定
+///////////////
+
+//ゴミ箱モーダルを処理する前にCSSのz-indexをマイナスにする。
+
+$('#deleted_modal').on('show.bs.modal', function (event) {
+
+    const $currentModal = $(event.currentTarget);
+    var zIndex = 1040 + (10 * $('.modal:visible').length);
+    $currentModal.css('z-index', zIndex);
+    setTimeout(function () {
+        $('.modal-backdrop')
+            .not('.modal-stack')
+            .css('z-index', zIndex - 1)
+            .addClass('modal-stack');
+    }, 0);
+});
+
+///////////////
+//復元処理
+///////////////
+// 復元ボタンをクリックした時の処理
+$('#restore_task_btn').on('click', function () {
+
+    var vals = [];
+
+    //テンプレートのnameを指定してvalueの値を取得
+    $('input[name = deleted_ids]:checked, input[name = url_deleted_ids]:checked').each(
+        function () {
+            // 取得した値をeachで回してlist型の値を作る
+            vals.push($(this).val());
+        });
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:restore" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            deleted_ids: vals
+        },
+        //dataType: 'json',
+        success: function (data) {
+            window.location.href = '{% url "draganddrop:home" %}';
+        }
+    });
+
+});
+
+
+///////////////
+//複数削除処理
+///////////////
+// 削除ボタンをクリックした時の処理
+$('#dl_all_del_task_modal_btn').on('click', function () {
+
+    var vals = [];
+    //テンプレートのnameを指定してvalueの値を取得
+    // 取得した値をeachで回してlist型の値を作る
+
+    $('input[name = deleted_ids]:checked, input[name = url_deleted_ids]:checked').each(
+        function () {
+            vals.push($(this).val());
+        });
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:multidelete" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            deleted_ids: vals
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+        }
+    });
+});
+
+///////////////
+//単数削除処理
+///////////////
+
+var delete_id = ""
+var delete_name = ""
+
+$('#upload_manage_delete').off('show.bs.modal');
+$('#upload_manage_delete').on('show.bs.modal', function (event) {
+
+    var button = $(event.relatedTarget)
+    var delete_id = button.data('value')
+    var delete_name = button.data('trash_del_name')
+
+
+    var modal = $(this);
+    modal.find('.trash_del_file_name_text').text(delete_name + "　" + "をゴミ箱から削除します");
+
+    $('#trash_delete').off('click');
+    $('#trash_delete').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:trashdelete" %}',
+            data: {
+                'delete_id': delete_id,
+                'delete_name': delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+            }
+        });
+    });
+});
+
+
+////////////////////
+//URL共有単数削除処理
+////////////////////
+
+var url_delete_id = ""
+var url_delete_name = ""
+
+$('#url_upload_manage_delete').off('show.bs.modal');
+$('#url_upload_manage_delete').on('show.bs.modal', function (event) {
+
+    var button = $(event.relatedTarget)
+    var url_delete_id = button.data('value')
+    var url_delete_name = button.data('url_trash_del_name')
+
+    var modal = $(this);
+    modal.find('.trash_url_del_file_name_text').text(url_delete_name + "　" + "をゴミ箱から削除します");
+
+    $('#url_trash_delete').off('click');
+    $('#url_trash_delete').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:urltrashdelete" %}',
+            data: {
+                'url_delete_id': url_delete_id,
+                'url_delete_name': url_delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+            }
+        });
+    });
+});
+
+///////////////
+//セッションクリア
+///////////////
+$(document).ready(function () {
+    sessionStorage.clear();
+});
+
+////////////////////
+//メッセージモーダル
+////////////////////
+
+//受信用
+var dl_message_id = ""
+var dl_message = ""
+
+$('#dl_message_modal').off('show.bs.modal');
+$('#dl_message_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var dl_message_id = button.data('value')
+    var dl_message = button.data('dl_message')
+    var modal = $(this);
+    modal.find('.dl_message').text(dl_message);
+});
+
+//URL共有 受信用
+var url_dl_message_id = ""
+var url_dl_message = ""
+
+$('#dl_url_message_modal').off('show.bs.modal');
+$('#dl_url_message_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var url_dl_message_id = button.data('value')
+    var url_dl_message = button.data('url_dl_message')
+    var modal = $(this);
+    modal.find('.url_dl_message').text(url_dl_message);
+});
+
+//送信用
+var send_message_id = ""
+var send_message = ""
+
+$('#send_message_modal').off('show.bs.modal');
+$('#send_message_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var send_message_id = button.data('value')
+    var send_message = button.data('send_message')
+    var modal = $(this);
+    modal.find('.send_message').text(send_message);
+});
+
+//URL共有 送信用
+var url_send_message_id = ""
+var url_send_message = ""
+
+$('#url_send_message_modal').off('show.bs.modal');
+$('#url_send_message_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var url_send_message_id = button.data('value')
+    var url_send_message = button.data('url_send_message')
+    var modal = $(this);
+    modal.find('.url_send_message').text(url_send_message);
+});
+
+</script>
+{% endblock %}

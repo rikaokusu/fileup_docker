@@ -1,0 +1,118 @@
+.box_1{
+font-size:15px;
+font-weight:bold;
+padding:15px;
+margin:10px 0px;
+line-height: 1;
+width: 200px;
+list-style: none;
+text-align: left;
+
+}
+
+
+.box_1{
+    position:relative;
+    color: #fff;
+    background-color:#000080;
+
+}
+.box_1:before{
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    top:0;
+    right: 0;
+    border-top: 25px solid #fFF;
+    border-right: 25px solid #fff;
+    border-left: 25px solid transparent;
+    border-bottom:25px solid #FFF;
+}
+
+.stepbox_1 > li.active {
+    font-size:15px;
+    line-height: 2； 　
+
+}
+
+.boxtext {
+    color: #fff;
+    opacity: 1;
+}
+
+.stepbox_1 > li.active {
+    position:relative;
+    color: #fff;
+    opacity: 1;
+} 
+
+/* form-nav */
+
+.progressbar {
+    display: flex;
+    flex-wrap: wrap;
+}
+.progressbar .item {
+        position: relative;
+        width: 220px;
+        text-align: center;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 0;
+        line-height: 1;
+        background: #F5F5F5;
+        color: #999999;
+}
+.progressbar .item:not(:last-child)::before,
+.progressbar .item:not(:last-child)::after {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        bottom: 0;
+        left: 100%;
+        content: '';
+        border: 37px solid transparent;
+        border-left: 20px solid #F5F5F5;
+        margin: auto;
+
+}
+.progressbar .item:not(:last-child)::before {
+        margin-left: 1px;
+        border-left-color: #FFF
+}
+
+@media screen and (max-width: 767px) {
+.progressbar .item {
+        font-size: 11px;
+        line-height: 1.5;
+        padding: 10px 0;
+}
+.progressbar .item:not(:last-child)::before,
+.progressbar .item:not(:last-child)::after {
+    border-width: 25px;
+    border-left-width: 12px;
+}
+} */
+
+  /* active */
+
+.progressbar .item.active {
+        z-index: 1;
+        background: #000080;
+        color: #FFF;
+}
+.progressbar .item.active:not(:last-child)::after {
+        border-left-color: #000080;
+}
+.progressbar .item.active:not(:last-child)::before {
+        border-left: none;
+}
+
+  /* 装飾 */
+
+body{
+    margin: 40px;
+}

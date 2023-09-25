@@ -1,0 +1,129 @@
+{% extends "draganddrop/common/base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+
+    <div class="url_dl_page_wrapper">
+
+        <h1><a href="#"><img src="../../../static/img/FileUP_Logo_Blue.svg" alt="FileUPロゴ"></a></h1>
+        <form action="" method="post">
+        
+        {% if url_name == "url_file_download_auth_mail" %}
+        <div>
+            {% csrf_token %}
+            <h3>本人認証を行います</h3>
+            <div>
+                {% render_field form.email class="form_auth" id="form_auth_mail" placeholder="メールアドレス" %}
+                <div class="auth_error_message">
+                    {%if messages%}
+                    {%for message in messages%}
+                        {{message}}
+                    {%endfor%}
+                    {%endif%}
+                </div>
+            </div>
+            <button><input type="submit" class="auth_btn" id="auth_button" value="認証する" disabled></button>
+        </div>
+
+        <div class="login_link">
+            <a href="{% url 'accounts:login' %}"
+            rel="noopener noreferrer">FileUPアカウントお持ちの方はこちら</a>
+            <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i>
+        </div>
+        
+        {% elif url_name == "url_file_download_auth_pass" %}
+        <div>
+            {% csrf_token %}
+            <h3>本人認証を行います</h3>
+            <div>
+                {% render_field form.email class="form_auth" id="form_auth_pass_mail" placeholder="メールアドレス" %}
+            </div>
+            <div>
+                {% render_field form.password class="form_auth" id="form_auth_pass" placeholder="パスワード" %}
+                <div class="auth_error_message">
+                    {%if messages%}
+                    {%for message in messages%}
+                        {{message}}
+                    {%endfor%}
+                    {%endif%}
+                </div>
+            </div>
+            <button><input type="submit" class="auth_btn" id="auth_button_pass" value="認証する" disabled></button>
+            
+        </div>
+
+        <div class="login_link">
+            <a href="{% url 'accounts:login' %}"
+            rel="noopener noreferrer">FileUPアカウントお持ちの方はこちら</a>
+            <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i>
+        </div>
+        
+        {% else %}
+        <p class="unable_download_message">期限切れかファイルが削除されているためダウンロードできません。</p>
+        <div class="url_close_btn_wrap" data-toggle="tooltip" title="ページを閉じる" data-placement="top">
+            <button  value="close" class="expired_page_close_btn" id="url_dl_close_btn">閉じる
+            <i class="far fa-window-close"></i></button>
+        </div>
+    
+        {% endif %}
+
+        </form>
+    </div>
+
+    
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+// -----------------------------------------
+//フォーム入力による認証ボタン制御 メールアドレスver
+// -----------------------------------------
+
+$(function () {
+    $("#form_auth_mail").on('input', function () { //メールアドレスフォームに入力されたら動く処理
+        if ($("#form_auth_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$'))
+        {$("#auth_button").prop('disabled', false); //認証ボタンを有効にさせる。
+        } else { 
+            $("#auth_button").prop('disabled', true); //認証ボタンを無効にさせる。
+        }
+    });
+});
+
+// -----------------------------------------
+//フォーム入力による認証ボタン制御 パスワードver
+// -----------------------------------------
+
+$(function () {
+    $("#form_auth_pass").on('input', function () { //パスワードフォームに入力されたら動く処理
+        if ($("#form_auth_pass_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$')
+        && !$("#form_auth_pass").val() =="")
+            {$("#auth_button_pass").prop('disabled', false); //認証ボタンを有効にさせる。
+        } else { 
+            $("#auth_button_pass").prop('disabled', true); //認証ボタンを無効にさせる。
+        }
+    });
+});
+
+$(function () {
+    $("#form_auth_pass_mail").on('input', function () { //メールアドレスフォームに入力されたら動く処理
+        if ($("#form_auth_pass_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$')
+        && !$("#form_auth_pass").val() =="")
+            {$("#auth_button_pass").prop('disabled', false); //認証ボタンを有効にさせる。
+        } else { 
+            $("#auth_button_pass").prop('disabled', true); //認証ボタンを無効にさせる。
+        }
+    });
+});
+
+//閉じるボタン
+
+let closebutton = document.getElementById('url_dl_close_btn');
+				closebutton.addEventListener('click', () => {
+    close();
+});
+
+
+</script>
+{% endblock %}

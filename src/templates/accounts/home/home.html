@@ -1,6 +1,7 @@
 {% extends "common/base.html" %}
 
 {% load i18n static %}
+{% load check_date %}
 
 
 {% block title %}HOME{% endblock title %}
@@ -29,6 +30,50 @@
 
                   <span class="card-title">{{service.name}}</span>
 
+                  {% comment %} 契約済みかどうか判断 {% endcomment %}
+                  {% if service.contract_set.all %}
+
+                    {% for contract in service.contract_set.all %}
+
+                      {% comment %} 契約日付をチェック {% endcomment %}
+                      {% if contract.contract_end_date.date|check_date %}
+
+                        {% comment %} 利用中リボンを表示 {% endcomment %}
+                        <div class="ribbon17-content">
+                          <span class="ribbon17">ご利用中</span>
+                        </div>
+
+                      {% else %}
+
+                        {% comment %} 解約済みか判断 {% endcomment %}
+                        {% if contract.status == "3" %}
+
+                          {% comment %} 解約済みリボンを表示 {% endcomment %}
+                          <div class="ribbon17-content">
+                            <span class="ribbon17">解約済み</span>
+                          </div>
+
+                        {% else %}
+
+                          {% comment %} 試用終了リボンを表示 {% endcomment %}
+                          <div class="ribbon17-content">
+                            <span class="ribbon17">試用終了</span>
+                          </div>
+
+                        {% endif %}
+
+                      {% endif %}
+
+                    {% endfor %}
+
+                  {% else %}
+
+                    {% comment %} 申込ボタンを表示 {% endcomment %}
+                    <div class="button_grp">
+                      <button type="button" class="my-btn my-btn-bluepurple-1 my-btn-w8" data-toggle="modal" data-target="#trialModal" data-whatever='["{{service.name}}","{{service.id}}"]' onfocus="this.blur();">試用</button>
+                    </div>
+
+                  {% endif %}
 
                 </div>
               </div>
@@ -212,7 +257,7 @@
 
         $.ajax({
           type: "POST",
-          {% comment %} url: "{% url 'contracts:trial_contract_reg' %}", {% endcomment %}
+          url: "{% url 'contracts:trial_contract_reg' %}",
           data: data,
           dataType: 'json',
           success: function (data) {

@@ -1,0 +1,2786 @@
+    @charset "utf-8";
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        overflow-y: scroll;
+    }
+
+    h1,
+    h2,
+    h3 {
+        color: #005392;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: small;
+    }
+
+    .address_title {
+        color: #FFF !important;
+        display: inline;
+        position: absolute;
+    }
+
+    .top {
+        display: inline-flex;
+        width: 25%;
+    }
+
+    .top h1 {
+        margin-top: 20px;
+    }
+
+    .container {
+        width: 1336px;
+        max-width: 1366px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-bottom: 16px;
+    }
+
+    .file_title {
+        color: black;
+    }
+
+    button {
+        border: none;
+    }
+    .error_message {
+        color: red;
+        list-style: none;
+    }
+
+    .error {
+        color: red;
+        font-size: 16px;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    .address_sign_up {
+        background-color: #005392;
+        color: #FFF;
+        font-size: 18px;
+        height: 4rem;
+    }
+
+    footer {
+        background-color: #005392;
+    }
+
+    .block-txt {
+        color: #005392 !important;
+    }
+
+    label {
+        margin-bottom: 0% !important;
+    }
+
+/*---------------
+color
+----------------*/
+.gray1 {
+    color: #C5C0C0;
+}
+
+/*---------------
+width
+----------------*/
+.w_20 {
+    width: 20px;
+}
+
+.w_25 {
+    width: 25px;
+}
+
+/*---------------
+common class
+----------------*/
+.top_bar {
+    width: 1336px;
+}
+
+.bottom_bar {
+    width: 1336px;
+}
+.confirm_modal {
+    width: 1140px;
+    height: 690px;
+    overflow-x: auto;
+}
+.confirm_modal_body {
+    display: flex;
+    align-items: center;
+    width: 1138px;
+}
+.confirm_modal_table {
+    border-collapse: collapse;
+}
+.confirm_modal_table h2 {
+    margin: 4px;
+}
+.confirm_modal_table th,
+.confirm_modal_table td {
+    border: 1px solid #beb9b9
+}
+.confirm_modal_table td {
+    vertical-align: middle;
+}
+.confirm_modal_update_button{
+    vertical-align: middle !important;
+    width: 220px;
+    text-align: center !important;
+}
+.confirm_modal_dest_user {
+    height: 145px;
+}
+.confirm_modal_file_name {
+    height: 120px;
+}
+.dest_user_confirm_modal {
+    width: 500px;
+    overflow-x: auto;
+}
+.vertical_align_top {
+    vertical-align: top !important;
+}
+.step1_label_wrapper {
+    display: flex;
+    align-items: center;
+}
+.required_label {
+    width: 37px;
+    height: 20px;
+    padding: 3px;
+    background: #307db8;
+    /* background: #005392; */
+    color: #fff;
+    border-radius: 3px;
+    margin-left: 4px;
+    text-align: center;
+    }
+
+    .optional_label {
+    width: 37px;
+    height: 20px;
+    padding: 3px;
+    background: #bbbbbb;
+    /* background: #005392; */
+    color: #fff;
+    border-radius: 3px;
+    margin-left: 4px;
+    text-align: center;
+    }
+    
+.del_modal_header {
+    background-color:#F2F5F6 ;
+}
+
+.default_modal_header {
+    color: white;
+    background-color: #005392;
+}
+
+.delete_modal_header {
+    color: white;
+    background-color: #C53A53;
+}
+
+.message_modal_header {
+    color: white;
+    background-color: #F57F29;
+}
+
+.home_modal_title {
+    font-size: 20px;
+    font-weight: bold;
+}
+    /*---------------
+    icon
+----------------*/
+
+    .icon-home {
+        padding-left: 10px;
+        color: #fff;
+        padding-top: 5px;
+        font-size: 40px;
+    }
+
+    .icon-address-book {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 5px;
+        font-size: 48px;
+    }
+    .icon-address-book-home {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 1px;
+        font-size: 47px;
+    }
+
+    .icon_delete_box {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 5px;
+        font-size: 46px;
+    }
+    
+    .icon_users {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 8px;
+        font-size: 36px;
+    }
+
+    .icon-users-alt2 {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 5px;
+    }
+
+    .icon-users-alt3 {
+        padding-left: 15px;
+        color: #fff;
+    }
+
+    .icon-edit {
+        /* padding-left: 10px; */
+        color: #008080;
+    }
+
+    .icon-users-alt {
+        color: #005392
+    }
+
+    .icon-del {
+        color: #FF0000;
+    }
+
+    .icon-check {
+        color: #4169E1;
+        /* padding-left: 25px; */
+    }
+
+    .icon-square {
+        color: black;
+        /* padding-left: 20px; */
+    }
+
+    .icon-circle {
+        color: black;
+        /* padding-left: 25px; */
+    }
+
+    .icon_past_due_DL {
+        background-color:#C0C0C0 ;
+    }
+
+    .icon-DL {
+        color: #005392
+    }
+
+    .icon-del_2 {
+        color: #005392
+    }
+
+    .icon-globe {
+        margin-top: 23px;
+        margin-left: 2px;
+        color: #005392
+    }
+
+    .icon-link {
+        margin-top: 23px;
+        margin-left: 2px;
+        color: #005392
+    }
+
+    .icon-info {
+        color: black;
+        margin-left: 2px;
+        padding-top: 5px;
+    }
+
+    /*---------------
+    btn
+----------------*/
+
+    .btn-primary {
+        color: #fff;
+        background-color: #005392;
+        border-color: #005392;
+    }
+
+    .btn:hover,
+    .btn:focus,
+    .btn:active,
+    .btn-outline-danger {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .btn-default {
+        width: 300px;
+        height: 60px;
+        border-radius: 2px;
+        background-color: #005392;
+        color: #fff;
+        border: 1px solid #005392;
+    }
+     button[type="submit"] :disabled {
+         background-color: red;
+     }
+    .btn_size {
+        width: 105px;
+        height: 40px;
+    }
+    .return_top_btn {
+        display: block;
+        width: 300px;
+        height: 60px;
+        border-radius: 2px;
+        background-color: #005392;
+        color: #fff;
+        border: 1px solid #005392;
+        text-align: center;
+        padding: 17px 0;
+    }
+    .return_top_btn:hover{
+        color: #ced4da;
+    }
+    .btn-cancel {
+        width: 300px;
+        height: 60px;
+        border-radius: 2px;
+        background-color: #bbbbbb;
+        color: #fff;
+        border: 1px solid #bbbbbb;
+    }
+
+    .btn-flat-border {
+        display: inline-block;
+        padding: 0.3em 1em;
+        text-decoration: none;
+        color: #005392;
+        border: solid 2px #005392;
+        border-radius: 7px;
+        transition: .4s;
+    }
+
+    .btn-flat-border,
+    .btn_home:hover,
+    .btn_home:active,
+    .btn_home:focus {
+        background: #005392 !important;
+        border-color: #005392 !important;
+        color: white !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .send_data_btn2 {
+        padding: 2px 5px;
+        color: #FFF;
+        background-color: #005392;
+        border: solid 2px #005392;
+    }
+
+    .uploadbtn {
+        background-color: #005392;
+        color: #FFF !important;
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+        width: 30%;
+        display: flex;
+        justify-content: center;
+    }
+    .uploadbtn_disabled {
+        background-color: #005392;
+        color: #FFF !important;
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+        width: 30%;
+        display: flex;
+        justify-content: center;
+        opacity: 0.3;
+    }
+
+    .my-btn {
+        display: inline-block;
+        border-radius: .4rem;
+        -webkit-transition: .4s;
+        transition: .4s;
+        font-size: 1rem;
+        white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        border-style: hidden;
+    }
+
+    .my-btn:hover {
+        opacity: 0.5;
+        text-decoration: none;
+    }
+
+    .my-btn:disabled {
+        opacity: 0.1;
+        pointer-events: none;
+    }
+
+    a.my-btn.disabled,
+    fieldset:disabled a.my-btn {
+        pointer-events: none;
+    }
+
+    .my-btn.disabled,
+    .my-btn:disabled {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    /* ボタンを押した時に表示される枠を削除 */
+
+    a.active.focus,
+    a.active:focus,
+    a.focus,
+    a:active.focus,
+    a:active:focus,
+    a:focus,
+    a:hover,
+    button.active.focus,
+    button.active:focus,
+    button.focus,
+    button:active.focus,
+    button:active:focus,
+    button:focus,
+    .btn.active.focus,
+    .btn.active:focus,
+    .btn.focus,
+    .btn:active.focus,
+    .btn:active:focus,
+    .btn:focus {
+        outline: 0;
+        outline-color: transparent;
+        outline-width: 0;
+        outline-style: none;
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+        text-decoration: none;
+    }
+
+    .bar_button {
+        position: fixed;
+        background-color: none;
+        height: 64px;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /*非活性時のボタンデザイン*/
+
+    #multi_delete_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+        ;
+    }
+
+    #upload_manage_delete_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+        ;
+    }
+
+    #trush_box_restore_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+        ;
+    }
+
+    #trush_box_delete_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+        ;
+    }
+
+    #address_multi_delete_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+    }
+    
+    #group_multi_delete_button[disabled] {
+        color: #6c757d;
+        background-color: #fff;
+        outline: #dee2e6;
+        border-color: #dee2e6;
+    }
+
+    .disabled_trush_btn,
+    .disabled_trush_btn:hover {
+        color: #6c757d !important;
+        background-color: #fff;
+        outline: #dee2e6 !important;
+        border-color: #dee2e6;
+        box-shadow: none !important;
+    }
+
+    .execute_btn {
+        color: #fff !important;
+    }
+
+    .end_date_outline_btn {
+        padding: .375rem .5rem;
+        font-size: 0.8rem;
+    }
+    .end_date_btn_disabled {
+        padding: .375rem .5rem;
+        font-size: 0.8rem;
+        pointer-events:none;
+        opacity: 0.3
+    }
+
+    .my-btn-w3 {
+        width: 3rem;
+    }
+
+    .my-btn-w4 {
+        width: 4rem;
+    }
+
+    .my-btn-w5 {
+        width: 5rem;
+    }
+
+    .my-btn-w6 {
+        width: 6rem;
+    }
+
+    .my-btn-w7 {
+        width: 7rem;
+    }
+
+    .my-btn-w8 {
+        width: 8rem;
+    }
+
+    .my-btn-w9 {
+        width: 9rem;
+    }
+
+    .my-btn-w10 {
+        width: 10rem;
+    }
+
+    .my-btn-w11 {
+        width: 11rem;
+    }
+
+    .my-btn-w12 {
+        width: 12rem;
+    }
+
+    .my-btn-w13 {
+        width: 13rem;
+    }
+
+    .my-btn-w25 {
+        width: 25rem;
+    }
+
+    .my-btn-w38 {
+        width: 38rem;
+    }
+
+    .my-btn-w8 {
+        width: 8rem;
+    }
+
+    .my-btn-w9 {
+        width: 9rem;
+    }
+
+    .my-btn-w10 {
+        width: 10rem;
+    }
+
+    .my-btn-w11 {
+        width: 11rem;
+    }
+
+    .my-btn-w12 {
+        width: 12rem;
+    }
+
+    .my-btn-w13 {
+        width: 13rem;
+    }
+
+    .my-btn-w25 {
+        width: 25rem;
+    }
+
+    .my-btn-w38 {
+        width: 38rem;
+    }
+
+    .my-btn-h2 {
+        height: 20px;
+    }
+
+    .my-btn-h3 {
+        height: 30px;
+    }
+
+    .my-btn-h4 {
+        height: 40px;
+    }
+
+    .my-btn-h5 {
+        height: 50px;
+    }
+
+    .btn_home {
+        color: #005392;
+        border-color: #005392;
+    }
+
+    .copy_button {
+        cursor: pointer;
+    }
+
+    .update_btn {
+        color: #fff;
+        background-color: #005392;
+        border-color: #005392;
+        opacity: 0.9;
+        font-weight: bold;
+    }
+    .update_btn:hover {
+        opacity: 1;
+        color: #fff;
+    }
+
+    button:disabled {
+        opacity: 0.3;
+    }
+
+    .delete_btn {
+        color: #fff;
+        background-color: #C53A53;
+        border-color: #C53A53;
+    }
+    .delete_btn:hover {
+        color: white;
+        background-color: #C53A53;
+    }
+    
+    .blue_btn {
+        color: #fff;
+        background-color: #005392;
+        border-color: #005392;
+    }
+    .blue_btn:hover {
+        color: white;
+        background-color: #005392;
+
+    }
+
+    /*---------------
+    prpgressbar
+----------------*/
+
+    .progressbar {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100% !important;
+    }
+
+    .progressbar .item {
+        position: relative;
+        /* width: 460px; */
+        text-align: center;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 0;
+        line-height: 1.5;
+        background: #F5F5F5;
+        color: #999999;
+        /* margin-top: 10px; */
+        /* margin:3em 0; */
+    }
+
+    .progressbar .item:not(:last-child)::before,
+    .progressbar .item:not(:last-child)::after {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        bottom: 0;
+        left: 100%;
+        content: '';
+        border: 37px solid transparent;
+        border-left: 20px solid #F5F5F5;
+        margin: auto;
+    }
+
+    .progressbar .item:not(:last-child)::before {
+        margin-left: 1px;
+        border-left-color: #F5F5F5;
+    }
+
+    @media screen and (max-width: 767px) {
+        .progressbar .item {
+            font-size: 11px;
+            line-height: 1.4;
+            padding: 10px 0;
+        }
+
+        .progressbar .item:not(:last-child)::before,
+        .progressbar .item:not(:last-child)::after {
+            border-width: 25px;
+            border-left-width: 12px;
+        }
+    }
+
+    /* active */
+
+    .progressbar .item.active {
+        z-index: 1;
+        background: #005392;
+        color: #FFF;
+        clear: left;
+    }
+
+    .progressbar .item.active:not(:last-child)::after {
+        border-left-color: #005392;
+    }
+
+    .progressbar .item.active:not(:last-child)::before {
+        border-left: none;
+    }
+
+    /*---------------
+    box
+----------------*/
+
+    .box1-1 {
+        border: solid 3px #005392;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        width: 1340px;
+    }
+
+    .box1-2 {
+        border: solid 3px #008080;
+        padding-bottom: 10px;
+        width: 1340px;
+    }
+
+    .box1 {
+        width: 1340px;
+        height: 600px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin: 0 0;
+        font-weight: bold;
+        border: solid 2px #D9D9D9;
+    }
+
+    .box2 {
+        padding: 1em 1em;
+        margin: 0 0;
+        border: solid 1px #FFF;
+        width: 1340px;
+    }
+
+    .box3 {
+        /* padding: 1em 1em; */
+        margin: 0 0;
+        border: solid 1px #FFF;
+    }
+
+    p.box {
+        border-bottom: 2px solid #D9D9D9;
+        margin: 0px 0px 16px 0px;
+        width: 1340px;
+    }
+
+    .box_progressbar {
+        width: 100%;
+    }
+
+    .box3-1 {
+        width: 100%;
+        margin: 0 0;
+        border: solid 1px #FFF;
+    }
+    .modal_box2 {
+        padding: 1em 1em;
+        margin: 0 0;
+        border: solid 1px #FFF;
+        width: 1122px;
+    }
+
+    /*---------------
+    table
+----------------*/
+
+    .tableAll {
+        color: #005392;
+        width: 100%;
+        font-size: 20px;
+    }
+
+    .tableA {
+        color: #005392;
+        border: solid#fff;
+        border-bottom-color: black;
+        border-bottom-width: 3px;
+        width: 30%;
+        height: 50px;
+        text-align: center;
+    }
+
+    .tableB {
+        color: black;
+        border: solid#fff;
+        border-bottom-color: black;
+        border-bottom-width: 3px;
+        width: 70%;
+        height: 50px;
+        text-align: center;
+        font-weight: 300;
+    }
+
+    .tate {
+        border-left: 5px solid #005392;
+        pointer-events: none;
+    }
+
+    .download_table,
+    .send_table {
+        width: 100%;
+    }
+
+
+
+    .send_table>td:nth-last-of-type(5) {
+        background-color: burlywood;
+    }
+
+    /*---------------
+    past_files
+----------------*/
+
+    .past_file {
+        color: #C0C0C0;
+    }
+    .file_title {
+        pointer-events: auto;
+    }
+
+/*---------------
+    modal
+----------------*/
+
+.dest_user_all_modal {
+    cursor: pointer;
+    background: linear-gradient(transparent 92%, #005392 60%);
+}
+    /*---------------
+    dropzone
+----------------*/
+
+    .dropzone {
+        padding: 50px 0px;
+        ;
+    }
+
+    .dropzone_box {
+        width: 380px;
+        height: 562px;
+        margin: 0px 10px 0px 10px;
+        border: solid 2px #D9D9D9;
+
+    }
+
+    /*ファイル名の幅 */
+    /*---------------
+    datatable
+----------------*/
+
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #bbbbbb;
+        border-color: #bbbbbb;
+    }
+
+    .paginate_button:hover {
+        opacity: 0.6;
+    }
+    .paginate_button.btn.active.focus {
+        outline-color: #fff;
+    }
+    /*---------------
+    Form
+----------------*/
+
+    .th_w {
+        width: 235px;
+    }
+
+    .required_box {
+        width: 100%;
+        display: -webkit-inline-box;
+        position: relative;
+    }
+
+    .option_box {
+        width: 100%;
+        display: -webkit-inline-box;
+        position: relative;
+    }
+
+    .required_box::after {
+        color: #ffffff;
+        font-size: 0.5rem;
+        position: absolute;
+        right: 0px;
+        background-color: red;
+        border-radius: 3px;
+        padding: 2px 3px;
+        white-space: nowrap;
+        margin-left: 10px;
+        content: "必須";
+        margin-top: 5px;
+    }
+
+    .option_box::after {
+        color: #ffffff;
+        font-size: 0.5rem;
+        position: absolute;
+        right: 0px;
+        background-color: #A5A5A5;
+        border-radius: 3px;
+        padding: 3px;
+        white-space: nowrap;
+        margin-left: 10px;
+        content: "任意";
+        margin-top: 5px;
+    }
+
+    .address_sign_up_list {
+        color: #005392;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .address_last_name {
+        display: flex;
+        width: 50%;
+    }
+
+    .address_first_name {
+        display: flex;
+        width: 50%;
+    }
+
+    .form_full_name {
+        display: inline-block;
+    }
+
+    .alert-success {
+        background-color: #dde6f0;
+        color: #0073a8;
+        border: #0073a8 solid2px;
+        font-size: 1rem;
+    }
+
+    ​ .alert-success::before {
+        width: 1rem;
+        text-align: center;
+        vertical-align: 0;
+        margin-right: 3px;
+        border: 0;
+        font-weight: 900;
+        content: '\f058';
+        font-family: 'Font Awesome 5 Free';
+    }
+
+    ​​​​​​​​ .alert-danger {
+        background-color: #f85a5a; 
+        color: #f85a5a;
+        border: #f85a5a solid 1px;
+        font-size: 1rem;
+        width: 1336px;
+    } 
+
+    .alert-danger::before {
+        width: 1rem;
+        text-align: center;
+        vertical-align: 0;
+        margin-right: 3px;
+        border: 0;
+        font-weight: 900;
+        content: '\f071';
+        font-family: 'Font Awesome 5 Free'; 
+    }
+
+    .is-error {
+        color: red;
+        font-size: small;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .disp {
+        display: table-row;
+    }
+
+    .title_address_lists {
+        color: #FFF !important;
+    }
+
+    .address_lists_header {
+        width: 100%;
+        height: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .address_lists_modal_header {
+        background-color: #005392 !important;
+        width: 1138px;
+        margin-bottom: 1rem;
+        color: #FFF;
+    }
+    .address_lists_modal {
+        width: 1140px;
+        overflow-x: auto;
+    }
+    .address_lists_modal_body {
+        width: 1140px;
+    }
+    .cross {
+        color: #FFF !important;
+    }
+
+    .address_modal_footer {
+        width: 1138px;
+        margin-top: 1rem;
+        color: black;
+    }
+
+    .address_list_table .col-md-5 {
+        /* background-color: #005392 !important; */
+        color: black !important;
+        margin-top: 2rem;
+    }
+
+    .address_list_table .col-md-7 {
+        /* background-color: #005392 !important; */
+        color: black !important;
+        margin-top: 2rem;
+    }
+
+
+    .table_tabs {
+        margin-bottom: 16px;
+    }
+
+    .sign_up_btn {
+        width: 171px;
+        color:#005392;
+        background-color: #ffffff;
+        border-color:#005392;
+    }
+
+    .step1_dest_user_select_btn {
+        background-color: #bbbbbb !important;
+        width: 166px;
+        border-color: #bbbbbb !important;
+    }
+
+    .sign_up_delete_btn {
+        color:#dc3545;
+        background-color: #ffffff;
+        border-color:#dc3545;
+    }
+
+    .sign_up_delete_btn:hover {
+        color:#FFFFFF;
+        background-color: #dc3545;
+        border-color:#dc3545;
+    }
+
+
+    .big_modal_title {
+        font-size: x-large;
+        font-weight: bold;
+        margin-top: 9px;
+    }
+
+    #address_book_list_table,
+    #group_book_list_table,
+    #update_address_book_list_table {
+        width: 100% !important;
+    }
+
+    .checkbox_step1 {
+        width: 10px;
+    }
+
+    .company_name {
+        width: 150px !important;
+    }
+    
+    .group_name {
+        width: 100px !important;
+    }
+    
+    .group_members {
+        width: 150px !important;
+    }
+
+    .full_name {
+        width: 100px !important;
+    }
+
+    .mail {
+        width: 100px !important;
+    }
+
+    #hidden_box_for_dest_user {
+        display: none;
+    }
+
+    #hidden_box_for_dest_user_group {
+        display: none;
+    }
+
+    /*---------------
+    home
+----------------*/
+
+    .box1-3 {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .zyushin-title {
+        color: white;
+        line-height: 40px;
+    }
+
+    .zyushin-title-bar {
+        position: relative;
+        background-color: #005392;
+        width: 60%;
+    }
+
+    .zyushin-title-bar:after {
+        position: absolute;
+        content: "";
+        right: -60px;
+        bottom: 0px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 58px 0 0 60px;
+        border-color: transparent transparent transparent #005392;
+    }
+
+    .send-title {
+        color: white;
+        line-height: 40px;
+    }
+
+    .send-title-bar {
+        position: relative;
+        background-color: #008080;
+        width: 60%;
+    }
+
+    .send-title:after {
+        position: absolute;
+        content: "";
+        right: -60px;
+        bottom: 0px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 58px 0 0 60px;
+        border-color: transparent transparent transparent #008080;
+    }
+
+    .send_table tr:nth-last-of-type(1){
+        border-top: 1px solid;
+}
+
+
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:active {
+        background: none;
+        color: black!important;
+}
+
+.user_dl_status {
+    display: flex;
+    align-items: center;
+}
+
+.file_del_tag {
+    width: 88px;
+    height: 18px;
+    border-radius: 4px;
+    font-size: 8px;
+    background-color:#C53A53;
+    color: white;
+    text-align: center;
+    margin: 0 0 3px 0;
+    padding: 2px;
+}
+.expired_tag {
+    width: 89px;
+    height: 19px;
+    border-radius: 4px;
+    font-size: 8px;
+    background-color:#008080;
+    color: white;
+    text-align: center;
+    margin: 0 0 3px 0;
+    padding: 2px;
+}
+ /*-------------------------
+    step1
+-------------------------*/
+
+    .box1_upload {
+        width: 1336px;
+        height: 650px;
+        padding: 10px 10px;
+        margin: 0 0;
+        font-weight: bold;
+        border: solid 2px #D9D9D9;
+    }
+
+    .box1_upload:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+
+    .box2_upload,
+    .box3_upload {
+        border: none;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        float: left;
+        border-color: #999999;
+        height: 35%
+    }
+
+    .box2_upload,
+    .box3_upload {
+        border-bottom: dotted;
+        border-color: #999999;
+    }
+
+    .box2_upload {
+        width: 52%;
+    }
+
+    .box3_upload {
+        padding-left: 10px;
+        width: 48%;
+    }
+
+    .box4_upload {
+        height: 65%;
+        padding: 10px 10px;
+        border: none;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        width: 60%;
+        float: left;
+    }
+
+    .box5_upload {
+        padding: 20px 10px 0px 10px;
+        border: none;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        /* clear: both; */
+        height: 65%;
+        width: 40%;
+        float: left;
+    }
+
+    .box6_upload {
+        padding: 10px 10px;
+        border: solid 2px #D9D9D9;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        width: 100%;
+        height: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+    }
+    .form_title {
+        width: 380px;
+    }
+
+    .end_date_btn {
+        width: 27%;
+    }
+
+    .end_date_bar {
+        width: 28%;
+    }
+
+    #output {
+        font-size: 1rem;
+        font-weight: 400;
+        color: black;
+        text-decoration: underline;
+    }
+
+    .step1_table {
+        margin-top: 20px;
+    }
+
+    .table #address_boxes td,
+    .table #address_boxes th,
+    .table #group_boxes td,
+    .table #group_boxes th,
+    .table #update_address_boxes td,
+    .table #update_address_boxes th {
+        padding: .6rem !important;
+    }  
+
+    .mb1 {
+        margin-bottom: 1rem;
+    }
+
+    .step1_upload_box_title {
+        border-bottom: solid 2px #999999;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+    .step1_upload_box_title_2 {
+        border-bottom: solid 2px #999999;
+    }
+
+    .step1_upload_title {
+        width: 80%;
+        margin-right: 240px;
+    }
+
+    .dl_limit {
+        width: 80%;
+        margin-right: 240px;
+        
+    }
+    .dl_limit_readonly {
+        width: 80%;
+        margin-right: 240px;
+        pointer-events: none;
+    }
+
+    .step1_upload_dl {
+        width: 80%;
+        margin-right: 240px;
+    }
+
+    .step1_upload_date {
+        width: 85%;
+    }
+
+    .step1_upload_message {
+        width: 85%;
+    }
+    
+    .step1_upload_mail6 {
+        margin-top: 89px !important;
+    }
+
+    .empty-cell {
+        visibility: hidden;
+    }
+
+    input[aria-invalid="true"] {
+        border-color: red;
+    }
+
+    #step1_upload_error_message {
+        margin-left: -8px;
+        padding-top: 10px;
+        height: 25px;
+        font-size: 12px;
+    }
+
+    .td_step1_upload_mail>.error {
+        font-size: 16px !important;
+    }
+
+    .step1-title-error {
+        margin-top: 7px;
+        font-size: 12px;
+        height: 35px;
+    }
+    .url-step1-title-error {
+        margin-top: 7px;
+        font-size: 12px;
+        height: 35px;
+    }
+
+    .triangle {
+        position: relative;
+        display: inline-block;
+        padding-left: 12px;
+        color: #005392 !important;
+        text-decoration: none;
+    }
+
+    .triangle:before {
+        content: '';
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 6px 0 6px 8px;
+        border-color: transparent transparent transparent #005392;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        margin-top: -6px;
+    }
+
+    .help-inline {
+        font-size: 13px;
+        color: red;
+        position: absolute;
+        margin-top: 3px;
+    }
+    
+    .dest_user_duplicate_error {
+        font-size: 13px;
+        color: red;
+        position: absolute;
+        margin-top: 3px;
+    }
+
+    .title_duplicate_error {
+        font-size: 13px;
+        color: red;
+        margin: 3px 0px 35px 0px;
+    }
+    /* 全送信先モーダル内ナンバリング */
+    #step1_dest_user_number { counter-reset: step1_dest_user_number }
+    #step1_dest_user_number > div { counter-increment: step1_dest_user_number }
+    #step1_dest_user_number > div::before { content: counter( step1_dest_user_number ) "." }
+    /*---------------
+    step2
+----------------*/
+
+    .table-striped {
+        margin-top: 10px;
+        margin-right: 20px;
+        margin-bottom: 0rem;
+    }
+
+    .box1_step2 {
+        position: relative;
+        padding-bottom: 0px !important;
+    }
+
+    .progress {
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+    }
+
+    .btn-primary.disabled,
+    .btn-primary:disabled {
+        color: #fff;
+        background-color: gray;
+        border-color: gray;
+    }
+
+    .btn.disabled,
+    .btn:disabled {
+        opacity: 0.2;
+    }
+
+    .preview_file_btn {
+        display: inline-block;
+    }
+
+    .preview_file_btn .btn:disabled {
+        pointer-events: none;
+    }
+
+    .byte-total {
+        font-weight: bold !important;
+        color: #212529 !important;
+        text-align: right;
+        margin-right: 20px;
+        margin-top: 20px;
+    }
+
+    .step3_dest_user_confirm_btn {
+        font-size: medium;
+        color: #005392 !important;
+        background: linear-gradient(transparent 90%, #005392 60%);
+        cursor: pointer !important;
+        /* display: none; */
+    }
+    .vertical_middle {
+        vertical-align: middle !important;
+    }
+    .confirm_modal_header {
+        background-color: #005392 !important;
+        width: 1138px;
+        margin-bottom: 1rem;
+        color: #FFF;
+    }
+    .confirm_modal_footer {
+        width: 1138px;
+        margin-top: 1rem;
+        color: black;
+        border-top: none;
+    }
+    .all_send_user_confirm_modal_header {
+        background-color: #005392 !important;
+        width: 498px;
+        margin-bottom: 1rem;
+        color: #FFF;
+    }
+    .all_send_user_confirm_modal_footer {
+        width: 498px;
+        margin-top: 1rem;
+        color: black;
+    }
+    .dest_user_list_wrap {
+        display: flex;
+    }
+.upload_file_information_wrap {
+    width: 933px;
+    height: 0;
+    display: flex;
+    justify-content: end;
+    position: relative;
+    top: 520px;
+
+}
+    
+.upload_file_layout {
+    display: flex;
+    height: 100px;
+    align-items: center;
+}
+.upload_file_right_side_layout {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 250px;
+}
+.dropzone_btn_size {
+    font-size: 12px;
+    padding: 7px;
+    border-radius: 0.25rem;
+    width: 52px;
+    font-weight: bold;
+}
+
+.files-reached {
+    pointer-events: none;
+    cursor: default;
+    /* color: #FFFFFF;
+    background-color:#807c7c; */
+    opacity: 0.3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.alert_message {
+background-color: #ffe5e2; 
+color: #f85a5a;
+border: #f85a5a solid 1px;
+font-size: 1rem;
+width: 1336px;
+margin-top: 15px;
+}   
+
+.alert_message::before {
+width: 1rem;
+text-align: center;
+vertical-align: 0;
+margin-right: 3px;
+border: 0;
+font-weight: 900;
+content: '\f071';
+font-family: 'Font Awesome 5 Free'; 
+}
+
+
+    /*--------------------
+    step1_url_upload
+---------------------*/
+
+    .box1_url {
+        width: 1336px;
+        height: 650px;
+        padding: 10px 10px;
+        margin: 0 0;
+        font-weight: bold;
+        border: solid 2px #D9D9D9;
+    }
+
+    .box1_url:after {
+        content: "";
+        display: block;
+        clear: both;
+    }
+
+    .box11,
+    .box12 {
+        border-bottom: none;
+        border-top: none;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        float: left;
+        border-color: #999999;
+        padding-bottom: 5px;
+        width: 50%;
+        height: 45%
+    }
+
+    .box11 {
+        border-left: none;
+        border-right: none;
+        border-color: #999999;
+    }
+
+    .box12 {
+        border: dotted;
+        border-top: none;
+        border-bottom: none;
+        border-right: none;
+        border-color: #999999;
+    }
+
+    .box13 {
+        padding: 0px;
+        border: none;
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 100px;
+        font-weight: bold;
+        font-size: 0px;
+        /* clear: both; */
+        height: 10px;
+        width: 100%;
+        float: left;
+    }
+
+    .box14 {
+        padding: 10px 10px;
+        border: none;
+        border-top: dotted;
+        border-color: #999999;
+        box-sizing: border-box;
+        text-align: center;
+        /* line-height: 100px; */
+        font-weight: bold;
+        font-size: 5px;
+        clear: both;
+        height: 55%;
+        width: 60%;
+        float: left;
+    }
+
+    .box15 {
+        padding: 20px 10px 0px 10px;
+        border: none;
+        border-top: dotted;
+        border-color: #999999;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        /* clear: both; */
+        height: 55%;
+        width: 40%;
+        float: left;
+    }
+
+    .box16 {
+        padding: 10px 10px;
+        border: solid 2px #999999;
+        box-sizing: border-box;
+        text-align: center;
+        font-weight: bold;
+        font-size: 5px;
+        width: 100%;
+        height: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 3px;
+    }
+
+    .url-password {
+        vertical-align: middle !important;
+    }
+
+    /* TODO:COMMONに移動 */
+    td, th {
+        border-collapse: collapse !important;
+        border-spacing: 0 !important;
+        text-align: left !important;
+        padding: 0px 10px !important;
+        margin: 0% !important;
+    }
+
+    .step1_url_end_date_bar,
+    .step1_url_end_date_btn {
+        width: 59%;
+    }
+
+    .step1_url_title {
+        width: 100%;
+    }
+
+    .step1_url_ninsho_mail {
+        margin-bottom: 10px;
+    }
+    
+    .step1_mail {
+        margin-top: 26px;
+        margin-left: -10px;
+        width: 340px;
+    }
+
+    .step1_url_mail {
+        margin-top: 22px;
+        margin-left: -10px;
+        width: 340px;
+    }
+
+    input[aria-invalid="true"].step1_url_mail {
+        margin-bottom: 0px;
+    }
+
+    .step1_url_mail6 {
+        margin-top: 60px;
+    }
+
+    .text-left {
+        text-align: left !important;
+    }
+
+    .step1_url_box_title {
+        border-bottom: solid 2px #999999;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    .step1_url_box_title_2 {
+        border-bottom: solid 2px #999999;
+    }
+
+    .inline-block_parent {
+        /* margin-top: -33px; */
+        margin-left: -222px;
+        padding: 0;
+        /* ulタグのデフォルトCSSを打ち消し */
+        list-style: none;
+        /* ulタグのデフォルトCSSを打ち消し */
+    }
+
+    .h2 {
+        font-size: 20px;
+        color: #005392;
+        font-weight: bold;
+        display: inline-block;
+        /* インラインブロック要素にする */
+    }
+
+    .h3 {
+        color: #005392;
+        font-weight: bold;
+        font-size: small;
+        display: inline-block;
+        /* インラインブロック要素にする */
+        margin-left: 8px;
+    }
+
+    .step1_url_sign_btn {
+        /* margin-top: -145px; */
+        margin-left: -10px;
+    }
+
+    .step1_url_confirm_btn {
+        font-size: medium;
+        color: #005392 !important;
+        margin-left: 390px;
+        background: linear-gradient(transparent 90%, #005392 60%);
+        cursor: default;
+        /* display: none; */
+    }
+
+    #output-step1-url {
+        font-size: medium;
+        font-weight: 400;
+        text-align: left;
+        line-height: 30px;
+        margin: 0px 0px 0px 35px;
+    }
+
+    #output-step1-url,
+    ul {
+        margin-bottom: 0px !important;
+    }
+
+    #all_dest_user_lists {
+        font-size: medium;
+        font-weight: 400;
+        text-align: left;
+        line-height: 30px;
+        margin: 0px 0px 0px 35px;
+    }
+
+    #all_dest_user_lists,
+    ul {
+        margin-bottom: 0px !important;
+    }
+
+    #output-last5-user {
+        font-size: medium;
+        font-weight: 400;
+        text-align: left;
+        line-height: 30px;
+        margin: 0px 0px 0px 35px;
+    }
+
+    #step1-url-title-error {
+        margin-top: 6px;
+        font-size: 12px;
+        height: 30px;
+    }
+
+    /* 全送信先モーダル内ナンバリング */
+    #step1_url_user_number { counter-reset: step1_url_user_number }
+    #step1_url_user_number > div { counter-increment: step1_url_user_number }
+    #step1_url_user_number > div::before { content: counter( step1_url_user_number ) "." }
+    
+    /*--------------------
+    group_list
+    ---------------------*/
+
+    .text-group {
+        font-size: 25px;
+        color: #005392;
+        font-weight: bold;
+    }
+
+    .text-group-wrapper {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        margin: 0 0 20px 16px;
+    }
+
+    .group-name-form {
+        width: 410px;
+        height: 35px;
+        margin-left: 10px;
+        font-size: medium;
+    }
+
+    .group_name_error_msg {
+        position: absolute;
+        top: 50px;
+        left: 163px;
+        margin: 2px;
+        font-size: medium;
+    }
+    .group_address_error_msg {
+        position: absolute;
+        top: 93px;
+        left: 31px;
+        font-size: medium;
+    }    
+    .group_modal_warning_noteice{
+        display: flex;
+        margin: 0 0 20px 16px;
+    }
+    .member_td>.triangle {
+        position: relative;
+        display: inline-block;
+        padding-left: 12px;
+        color: #FFF !important;
+        text-decoration: none;
+    }
+
+    .member_td>.triangle:before {
+        content: '';
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 6px 0 6px 8px;
+        border-color: transparent transparent transparent #FFF;
+        position: absolute;
+        left: 0;
+        margin: -6px 1px 0px 2px;
+    }
+
+
+    .group-confirm-title {
+        font-size: x-large;
+        font-weight: bold;
+        /* padding-top: 15px;
+        padding-left: 4px; */
+    }
+
+    .group_member_confirm_btn {
+        font-size: large;
+        color: #FFF !important;
+        background: linear-gradient(transparent 90%, #FFF 60%);
+        cursor: default;
+        display: none;
+
+    }
+    .member_td {
+        position: relative;
+        display: flex;
+    }
+
+    .member_td:hover .group_member_confirm_btn {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: #bbbbbb;
+        color: #fff;
+    }
+
+    .member_td::before {
+        /* ボタンと同じサイズの白い半透明の疑似要素beforeを作成し、非表示にしておく */
+        display: none;
+        content: "";
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #FFF;
+        opacity: 0.5;
+        border: solid;
+    }
+
+    .member_td:hover::before {
+        /* マウスホバー時に先程作成したbeforeを表示させる */
+        display: block;
+    }
+
+
+    .rest_address_count {
+        margin-left: auto;
+        margin-top: auto;
+    }
+
+    /* --- タブ（ラジオボタン）のエリア ------------------------ */
+    #tabArea {
+        line-height: 1;
+        /* 1行の高さ          */
+        letter-spacing: 0;
+        /* 文字間             */
+        text-align: left;
+        /* 文字位置は左     */
+    }
+
+    /* --- ラジオボタン ---------------------------------------- */
+    #tabArea input[type="radio"] {
+        display: none;
+        /* ラジオボタン非表示 */
+    }
+
+    /* --- ラジオボタン直後のlabel ----------------------------- */
+    #tabArea input[type="radio"]+label {
+        display: inline-block;
+        position: relative;
+        padding: 8px 10px;
+        /* labelの余白 */
+        font-size: 16pt;
+        /* タブの文字サイズ   */
+        font-weight: bold;
+        /* タブは太文字       */
+        border: 3px solid #999;
+        /* 未選択タブのの枠線 */
+        border-bottom: none;
+        /* 下罫線は消す       */
+        border-radius: 0px 0px 0 0;
+        /* タブの上左右角丸   */
+        margin: 0 0px;
+        /* タブ間隔           */
+        background: #fff;
+        /* 未選択タブの背景色 */
+        color: #666;
+        /* 未選択タブの文字色 */
+    }
+
+    /* --- 選択されたラジオボタン直後のlabel ------------------- */
+    #tabArea input[type="radio"]:checked+label {
+        border-color: #005392;
+        /* 選択タブの枠線     */
+        color: #005392;
+        /* 選択タブの文字色   */
+        cursor: default;
+        /* デフォルトカーソル */
+        z-index: 2;
+        /* 重なりを最前面へ   */
+    }
+
+    /* --- 未選択ラジオボタン直後のlabelにマウスが乗った ------- */
+    #tabArea input[type="radio"]:not(:checked)+label:hover {
+        background: #b4cee2;
+        /* カーソルタブの背景 */
+        cursor: pointer;
+        /* リンクカーソル     */
+    }
+
+    /* --- タブ下の本体エリア ---------------------------------- */
+    .tabBody {
+        position: relative;
+        border: 3px solid #005392;
+        /* 本体の枠線         */
+        background: #fff;
+        /* 本体の背景色       */
+        margin-top: -3px;
+        /* タブと罫線分重ねる */
+        z-index: 1;
+        /* 未選択タブより全面 */
+        padding-bottom: 12px;
+    }
+
+    .unchecked {
+        color: #666;
+    }
+
+
+    /*--------------------
+    table th padding設定
+    ---------------------*/
+    #address_book_list_table th,
+    #group_book_list_table th,
+    #update_address_book_list_table th,
+    #download_table th,
+    #send_table th,
+    #address_list_table th,
+    #group_list_table th,
+    #deleted_table th {
+        padding: 10px 10px !important;
+
+    }
+
+    /*--------------------
+    table td 上下中央設定
+    ---------------------*/
+
+
+    #address_book_list_table td,
+    #group_book_list_table td,
+    #update_address_book_list_table td,
+    #download_table td,
+    #send_table td,
+    #address_list_table td,
+    #group_list_table td,
+    #deleted_table td {
+        vertical-align: middle !important;
+    }
+
+
+body.modal-open {
+    overflow: visible;
+    position: absolute;
+    width: 100%;
+    height:100%;
+}
+
+/*---------------------------------
+
+ for Dropzone previews
+
+---------------------------------*/
+
+html,
+body {
+    height: 100%;
+}
+
+#actions {
+    margin: 2em 0;
+}
+
+.expiration_start_date,
+.expiration_end_date {
+    font-size: 1rem;
+    margin-right: 10px
+}
+
+.step2 btn,
+.btn-sm {
+    padding: .1rem .4rem;
+    font-size: 0.8rem;
+    border-color: #808080;
+}
+
+
+/* Mimic table appearance */
+
+div.table {
+    display: table;
+    table-layout: fixed;
+}
+
+div.table .file-row {
+    display: table-row;
+}
+
+div.table .file-row>div {
+    display: table-cell;
+    border-top: 1px solid #ddd;
+    padding: 0px 8px;
+    vertical-align: middle;
+}
+
+div.table .file-row>.icon_colum {
+    width: 30px;
+}
+
+.icon_colum>.icon {
+    font-size: 1.5rem;
+    margin: auto;
+}
+
+.icon_colum>.xls {
+    color: #3A7C19;
+}
+
+.icon_colum>.doc {
+    color: #2B569A;
+}
+
+.icon_colum>.ppt {
+    color: #D24627;
+}
+
+.icon_colum>.csv {
+    color: #3A7C19;
+}
+
+.icon_colum>.pdf {
+    color: #EA412C;
+}
+
+div.table .file-row>.size_colum {
+    width: 90px;
+    text-align: right;
+}
+
+div.table .file-row>.progress_colum {
+    width: 190px;
+}
+
+div.table .file-row>.button_colum {
+    width: 100px;
+}
+
+div.table .preview-text {
+    margin: auto;
+}
+
+div.table .preview-button {
+    text-align: right;
+}
+
+div.table .preview-button .btn-secondary.disabled,
+.btn-secondary:disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.preview-button.disabled {
+    color: gray;
+    opacity: 0.2;
+}
+
+div.table .preview-button .btn {
+    font-size: 0.7rem;
+    padding: 1px 2px;
+}
+
+div.table .file-row:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+
+/* The total progress gets shown by event listeners */
+
+#total-progress {
+    opacity: 0;
+    -webkit-transition: opacity 0.3s linear;
+    transition: opacity 0.3s linear;
+}
+
+
+/* Hide the progress bar when finished */
+
+#previews .file-row.dz-success .progress {
+    opacity: 0;
+    -webkit-transition: opacity 0.3s linear;
+    transition: opacity 0.3s linear;
+}
+
+
+/* Hide the delete button initially */
+
+#previews .file-row .delete {
+    display: none;
+}
+
+
+/* Hide the start and cancel buttons and show the delete button */
+
+#previews .file-row.dz-success .start,
+#previews .file-row.dz-success .cancel {
+    display: none;
+}
+
+#previews .file-row.dz-success .delete {
+    display: block;
+}
+
+.home {
+    font-size: 1rem;
+}
+
+.Top {
+    font-size: 20px;
+}
+
+.textdecoration_linethrough {
+    text-decoration: line-through;
+}
+
+
+    /* 処理中のまち */
+    #loading-view {
+        /* 領域の位置やサイズに関する設定 */
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        /* 背景関連の設定 */
+        /*background-color: #f5f5f5;*/
+        background-color: white;
+        filter: alpha(opacity=0.85);
+        -moz-opacity: 0.85;
+        -khtml-opacity: 0.85;
+        opacity: 0.55;
+        /* opacity: 100; */
+        background-image: url("/static/load.gif");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+/*---------------------------------
+
+table width 
+
+---------------------------------*/
+
+.checkBox {
+    width: 10px;
+}
+.fileTitle{
+    width: 235px !important;
+}
+.fileData{
+    width: 280px;
+}
+.dateWidth {
+    width: 135px;
+}
+.trushModalDateWidth {
+    width: 130px;
+}
+.createdUser {
+    width: 190px;
+}
+.zipDlIcon{
+    width: 8px;
+    padding: 0 !important;
+}
+.dlCheck {
+    width: 50px;
+    font-size: 15px;
+}
+.dlLimit{
+    width: 55px;
+}
+.deleteIcon {
+    width: 8px;
+    padding: 0 !important;
+}
+.updateIcon {
+    width: 8px;
+    padding: 0 !important;
+}
+.duplicateIcon {
+    width: 8px;
+    padding: 0 !important;
+}
+.sendUsers {
+    width: 275px;
+}
+.groupName {
+    width: 450px;
+}
+.addressDepartmentName {
+    width: 120px;
+}
+.addressFullName {
+    width: 165px;
+}
+.department_name {
+    width: 60px !important;
+}
+.homeIcon {
+    width: 8px;
+    padding: 0 !important;
+}
+/* 複製 */
+
+.fas_button_duplicate{
+    border: none;
+    width: 29px;
+    height: 29px;
+    border-radius: 25px;
+    background: #4169E1;
+    color: #fff;
+    cursor: pointer;
+    margin: 8px 8px 8px 0px;
+}
+
+.fas_button_duplicate:before{
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f0c5';
+    font-size: 18px;
+}
+
+   /* 編集 */
+
+.fas_button_edit{
+    border: none;
+    width: 29px;
+    height: 29px;
+    border-radius: 25px;
+    background: #87c040;
+    color: #fff;
+    cursor: pointer;
+    margin: 8px 8px 8px 0px;
+    }
+    
+.fas_button_edit:before{
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f044';
+    font-size: 18px;
+    }
+    
+    /* メッセージ */
+    
+    .fas_button_message{
+        border: none;
+        width: 29px;
+        height: 29px;
+        border-radius: 25px;
+        background: #F57F29;
+        color: #fff;
+        cursor: pointer;
+        margin: 8px 8px 8px 0px;
+    }
+    
+    .fas_button_message:before{
+        width: 50px;
+        text-align: center;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: '\f4ad';
+        font-size: 18px;
+    }
+        
+    /* 削除 */
+    
+.fas_button_delete{
+    border: none;
+    width: 29px;
+    height: 29px;
+    border-radius: 25px;
+    background: red;
+    color: #fff;
+    cursor: pointer;
+    margin: 8px 2px 8px 0px;
+}
+
+.fas_button_delete:before{
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f2ed';
+    font-size: 18px;
+}
+.fas_button_download{
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 25px;
+    background:#005392;
+    color: #fff;
+    cursor: pointer;
+    margin: 8px 8px 8px 0px;
+    }
+    
+.fas_button_download:before{
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f019';
+    font-size: 18px;
+    }
+.past_due_download {
+    background-color: #C0C0C0;
+}        
+
+
+/*---------------------------------
+
+ home ゴミ箱モーダル 
+
+---------------------------------*/
+
+.deleted_modal {
+    width: 1140px;
+    overflow-x: auto;
+}
+
+.deleted_lists_modal_header {
+    background-color: #C53A53 !important;
+    width: 1140px;
+    margin-bottom: 1rem;
+    color: #FFF;
+    }
+.deleted_lists_modal_title {
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 9px;
+}
+.deleted_modal_body {
+    width: 1140px;
+}
+.deleted_lists_modal_footer {
+    width: 1140px;
+}
+/*---------------------------------
+DatePicker 
+---------------------------------*/
+
+
+.data_picker_table td {
+    text-align: center !important;
+}
+
+.data_picker_table th {
+    text-align: center !important;
+}
+.ui-datepicker {
+    width: 267px !important;
+}
+
+/*---------------------------------
+アドレス帳 ユーザー新規登録 
+---------------------------------*/
+.address_sign_up_modal_header {
+    background-color: #005392 !important;
+    width: 750px;
+    margin-bottom: 1rem;
+    color: #FFF;
+    }
+
+.address_sign_up_modal {
+    width: 750px;
+    overflow-x: auto;
+}
+.address_sign_up_modal_body {
+    width: 750px;
+}
+.address_sign_up_modal_footer {
+    width: 750px;
+}
+.address_sign_up_confirm_modal_header {
+    background-color: #005392 !important;
+    width: 600px;
+    margin-bottom: 1rem;
+    color: #FFF;
+}
+.address_sign_up_confirm_modal {
+    width: 600px;
+    overflow-x: auto;
+    position: absolute;
+    left: 10%;
+}
+.address_sign_up_confirm_modal_body {
+    width: 600px;
+}
+.address_sign_up_confirm_modal_footer {
+    width: 597px;
+    color: black;
+}
+
+
+/*---------------------------------
+トーストメッセージ 
+---------------------------------*/
+.toast-body{
+    width: fit-content;
+    display: flex;
+}
+
+.toast_body_address{
+    width: 350px;
+    display: flex;
+}
+
+.alert_success {
+    background-color: #dde6f0;
+    color: #0073a8;
+    border: #0073a8 solid 2px;
+    font-size: 1rem;
+} 
+
+.alert_success::before {
+    vertical-align: 0;
+    margin-right: 8px;
+    border: 0;
+    font-weight: 900;
+    content: '\f058';
+    font-family: 'Font Awesome 5 Free';
+} 
+ 
+.alert_danger {
+    background-color: #ffe5e2;
+    color: #f85a5a;
+    border: #f85a5a solid 2px;
+    font-size: 1rem;
+}
+
+.alert_danger::before {
+    width: 2rem;
+    text-align: center;
+    vertical-align: 0;
+    margin-right: 3px;
+    border: 0;
+    font-weight: 900;
+    content: '\f071';
+    font-family: 'Font Awesome 5 Free';
+} 
+
+/*---------------------------------
+管理画面
+---------------------------------*/
+
+.box1_resource_management {
+    width: 1336px;
+    height: 400px;
+    padding: 10px 10px;
+    margin: 0 0;
+    font-weight: bold;
+    border: solid 2px #D9D9D9;
+    box-shadow: 0px 8px 5px #D9D9D9;
+    display: flex;
+}
+
+.box2_resource_management {
+    width: 1336px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.box3_resource_management {
+    width: 340px;
+    height: 180px;
+    padding: 10px 10px;
+    border: solid 2px #D9D9D9;
+    box-shadow: 0px 8px 5px #D9D9D9;
+    text-align: center;
+}
+
+.disk_capacity_box {
+    width: 385px;
+    height: 380px;
+    text-align: center;
+    padding: 35px;
+}
+
+.amount_used {
+    width:318px;
+    display: flex;
+    justify-content: center;    
+    align-items: center;
+    padding: 0px 100px;
+    margin:50px 0px 80px 0px;
+    /* background: linear-gradient(to bottom, #99ccff, #0059b3); */
+}
+
+.number_of_disk_capacity {
+    font-size: 90px;
+    color: #005392;
+}
+.disk_capacity_box_unit {
+    font-size: 50px;
+    color: #005392;
+    position: relative;
+    top: 15px;
+    font-weight: 300;
+}
+.pie_chart_box {
+    width: 455px;
+    height: 380px;
+}
+.contract_info_box {
+    width: 310px;
+    height: 380px;
+    padding: 20px 30px 20px 30px;
+    font-size: 25px;
+    margin-left: 100px;
+}
+.contract_info_box div{
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+.contract_info_box p {
+    text-align: left;
+    font-weight: normal;
+    font-size: 20px;
+}
+.myChart_container {
+    position: relative;
+    width: 380px;
+    height: 330px;
+    left: 60px;
+    bottom: 6px;
+}
+.amount_of_space {
+    font-size: 25px;
+    font-weight: normal;
+}
+.box3_resource_management_value {
+    font-size: 70px;
+    color: #005392;
+    position: relative;
+    top: 5px;
+    margin-right: 3px;
+}
+.box3_resource_management_unit {
+    width: 46px;
+    font-weight: 200;
+    font-size: 30px;
+    position: relative;
+    top: 43px;
+}
+
+/*---------------------------------
+ユーザー管理画面
+---------------------------------*/
+
+.personal_resource_management_box {
+    width: 1336px;
+    display: flex;
+    justify-content: space-between;
+    margin: 150px 0;
+}

@@ -1,0 +1,9 @@
+{% extends "common/base.html" %}
+
+
+{% block content %}
+
+                    <script type=text/javascript>toastr.error('{{ message }}')</script>
+                    <script type=text/javascript>toastr.error('変更中のセッションが残っています。セッションを破棄して新たに変更しますか？<button type="button" id="okBtn" class="btn btn-primary">Close me</button>');</script>
+
+{% endblock %}

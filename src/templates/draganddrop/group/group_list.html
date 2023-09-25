@@ -1,0 +1,1190 @@
+{% extends "draganddrop/common//base.html" %}
+{% load widget_tweaks %}
+{% load get_download_status%}
+{% block content %}
+
+<div class="top"></div>
+
+<div id="tabArea">
+
+  <input type="radio" name="tab" id="tab1" onclick="tabClick(1)">
+  <label for="tab1">
+    <a href="{% url 'draganddrop:address_list' %}" role="button" style="color:#666;">ユーザー
+      <i class="fas fa-user fa-fw fa-lg" style="color:#666666;"></i></a>
+
+  </label>
+
+  <input type="radio" name="tab" id="tab2" onclick="tabClick(2)" checked>
+  <label for="tab2">グループ
+    <i class="fas fa-users fa-fw fa-lg" style="color:#005392;"></i></label>
+
+
+  <div class="tabBody">
+    <p>
+      <div class="group_list_table">
+        <header class="address_lists_header d-flex">
+          <div class="mr-auto p-2 bd-highlight title_address_lists">
+            <h2 class="title_address_lists mr-auto">グループ一覧</h2>
+          </div>
+          <button type="button" class="btn my-btn-w9 my-btn-h4 mr-2 rounded-0 blue_btn sign_up_btn"
+            data-toggle="modal" data-target="#sign_up_group_modal">
+            グループ登録
+          </button>
+          <button type="button" class="btn my-btn-w9 my-btn-h4 rounded-0 mr-2 sign_up_delete_btn" 
+          data-toggle="modal" data-target="#group_multi_delete_modal" id="group_multi_delete_button" disabled>
+            一括削除
+          </button>
+        </header>
+        <table class="table" id="group_list_table">
+          <thead>
+            <tr>
+              <th class="checkBox">
+                <label><input type="checkbox" id="all_group_list" name="all_group_list_ids" /></label>
+              </th>
+              <th class="groupName">グループ名</th>
+              <th>会社名 氏名</th>
+              <th class="updateIcon"></th>
+              <th class="deleteIcon"></th>
+            </tr>
+          </thead>
+
+          <tbody id="group_list_boxes">
+            {% for groups_list in groups_lists %}
+
+            <tr>
+              <td>
+                <input type="checkbox" name="group_list_ids" value="{{groups_list.id}}" id="group_list_data" />
+              </td>
+
+
+              <td><span data-toggle="tooltip" data-placement="right"
+                title="{{groups_list}}">{{groups_list | truncatechars:26}}</span>
+              </td>
+              
+              <!--メンバー-->
+              <td>
+                {% for address in groups_list.address.all|slice:":5" %}
+                  {% if address.company_name %}
+                    {{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
+                  {% elif address.trade_name %}
+                    {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
+                  {% else %}
+                    {{address.last_name}}{{address.first_name}}<br />
+                  {% endif %}
+                {% endfor %}
+                
+                {%with group_number=groups_list.address.all.count%}
+                  {% if group_number >= 6 %}
+                    <div class="rest_dest_user_count">あと{{group_number|add:"-5"}}名</div>
+                    <div class="triangle dest_user_all_modal" data-toggle="modal"
+                      data-target="#view_all_member_modal{{groups_list.id}}">もっと見る
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </td>
+
+                <!-- 変更ボタン -->
+                <td class="updateIcon">
+                  <span data-toggle="tooltip" title="ファイルの編集" data-placement="top">
+                      <button class="fas_button_edit" 
+                      data-group_list_id="{{groups_list.id}}"
+                      data-group_list_name="{{groups_list.name}}"
+                      data-target="#update_sign_up_group_modal"
+                      data-toggle="modal"></button>
+                  </span>
+              </td>
+              <!-- 削除ボタン -->
+              <td class="deleteIcon">
+                <span data-toggle="tooltip" title="ファイルの削除" data-placement="top">
+                    <button class="fas_button_delete"
+                    data-delete_id="{{groups_list.id}}"
+                    data-delete_name="{{groups_list.group_name}}"
+                    data-target="#group_del_modal"
+                    data-toggle="modal"></button>
+                </span>
+            </td>
+          </tr>
+
+
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      </p>
+  </div>
+  <p id="tabNo"></p>
+</div>
+
+
+
+
+{% for groups_list in groups_lists %}
+
+<!----------------------------------もっと見るモーダル-------------------------------------->
+
+<div class="modal fade" id="view_all_member_modal{{groups_list.id}}" tabindex="-1" role="dialog"
+  aria-labelledby="" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role=" document">
+    <div class="modal-content center-modal dest_user_confirm_modal">
+      
+      <div class="modal-header default_modal_header">
+        <span class="modal-title home_modal_title">グループメンバー<i class="fa-solid fa-users ml-2"></i></span>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          {% for address in groups_list.address.all %}
+            {% if address.company_name %}
+            {{ forloop.counter}}.{{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
+          {% elif address.trade_name %}
+          {{ forloop.counter}}.{{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
+          {% else %}
+          {{ forloop.counter}}.{{address.last_name}}{{address.first_name}}<br />
+          {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer all_send_user_confirm_modal_footer">
+        <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">閉じる</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!--もっと見るモーダル閉じタグ-->
+
+{% endfor %}
+
+<!--戻るボタン-->
+<div class="d-flex flex-row justify-content-center">
+  <a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fa-solid fa-angle-left mr-2"></i>トップ画面に戻る</a>
+</div>
+
+<!----------------------------------グループ登録モーダル-------------------------------------->
+<form action="" method="post" id="group_list_form">
+  {% csrf_token %}
+
+  <div class="modal fade" id="sign_up_group_modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-content center-modal">
+        
+        <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+          <span class="big_modal_title">グループ新規登録</span>
+          <i class="fa-solid fa-users icon_users"></i>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body address_lists_modal_body">
+          <div class="text-group-wrapper">
+            <div class="text-group">グループ名</div>
+            <div>
+              {% render_field form.group_name class="group-name-form" placeholder="グループ名"%}
+            </div>
+          </div>
+          <div class="group_modal_warning_noteice">
+            <div>
+              グループに登録するユーザーを以下のリストから選択してください。
+            </div>
+            <i class="fas fa-sm fa-info-circle icon-info" data-toggle="tooltip" title="ユーザーはアドレス帳から登録可能です。"></i>
+          </div>
+          <table class="table" id="address_book_list_table" style="table-layout: fixed">
+            <thead>
+              <tr>
+                <th class="checkbox_step1">
+                  <label><input type="checkbox" name="checkbox_for_all_group_user" id="checkbox_for_all_group_user"></label>
+                </th>
+                <th class="company_name">法人名</th>
+                <th class="department_name">部署名</th>
+                <th class="full_name">氏名</th>
+                <th class="mail">メールアドレス</th>
+              </tr>
+            </thead>
+
+            <tbody id="address_boxes">
+              {%for address_list in address_lists%}
+
+              <tr>
+                <td>
+                  <input type="checkbox" name="address" value="{{address_list.id}}"
+                    id="address_list_data" data-company_name="{{address_list.company_name}}"
+                    data-name="{{address_list.last_name}} {{address_list.first_name}}" />
+                </td>
+
+                <td>
+                  {% if address_list.legal_or_individual == 1 %}
+                      {% if address_list.legal_person_posi == 1 %}
+                          {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                      {% else %}
+                          {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                      {% endif %}
+                  {% else %}
+                      {% if address_list.trade_name == null %}
+                          ー
+                      {% else %}
+                          {{address_list.trade_name}}
+                      {% endif %}
+                  {% endif %}
+              </td>
+              
+              <td>
+                {% if address_list.department_name == null %}
+                    　ー　
+                {% else %}
+                    {{address_list.department_name}}
+                {% endif %}
+              </td>
+
+
+                <td>{{address_list.last_name}} {{address_list.first_name}}</td>
+
+                <td>{{address_list.email}}</td>
+              </tr>
+
+              {%endfor%}
+            </tbody>
+          </table>
+
+        </div>
+        <div class="modal-footer address_modal_footer">
+          <button type="button" class="
+            btn
+            my-btn-w7 my-btn-h4
+            blue_btn
+            rounded-0
+            dest_user_select_btn" 
+            data-toggle="modal" data-target="#group_confirm_modal" id="group_confirm_button" disabled>
+            確認
+          </button>
+          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--グループ登録モーダル　閉じ-->
+
+  <!---------------------------------------------確認モーダル------------------------------------------------------>
+
+  <div class="modal fade" id="group_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="dialog">
+      <div class="modal-content" style="width: 150%">
+        
+        <header class="address_sign_up">
+          <div class="modal-header default_modal_header">
+            <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+        </div>
+      </header>
+
+        <div class="modal-body">
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <th class="th_w">
+                  <div class="address_sign_up_list">グループ名</div>
+                </th>
+                <td id="group_name"></td>
+              </tr>
+
+              <tr>
+                <th>
+                  <div class="address_sign_up_list">会社名 氏名</div>
+                </th>
+                <td id="group_members"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="modal-footer">
+            <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn ml-2 rounded-0" id="group_send_data">
+              登録
+            </button>
+            <button type="button" onfocus="this.blur();" class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0"
+              data-dismiss="modal">
+              キャンセル
+            </button>
+            <div id="input_hidden_box" data-dest_user="{{pk_list}}"></div>
+          </div>
+        </div>
+      </div>
+      <!--modal-content-->
+    </div>
+    <!--modal-dialog-->
+  </div>
+  <!---確認モーダル　閉じ--->
+</form>
+
+
+<!----------------------------------編集用 グループ登録モーダル-------------------------------------->
+<form action="" method="post" id="group_list_update_form">
+  {% csrf_token %}
+
+  <div class="modal fade" id="update_sign_up_group_modal" tabindex="-1" role="dialog" aria-labelledby=""
+    aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-content center-modal">
+        
+        <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+          <span class="big_modal_title">グループ編集画面</span>
+          <i class="fa-solid fa-users icon_users"></i>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+  
+        <div class="modal-body">
+          <div class="text-group-wrapper">
+            <div class="text-group">グループ名</div>
+            <div>
+              {% render_field form.group_name class="group-name-form" placeholder="グループ名"%}
+            </div>
+          </div>
+          <div class="group_modal_warning_noteice">
+            <div>
+              グループに登録するユーザーを以下のリストから選択してください。
+            </div>
+            <i class="fas fa-sm fa-info-circle icon-info" data-toggle="tooltip" title="ユーザーはアドレス帳から登録可能です。"></i>
+          </div>
+
+          <table class="table" id="update_address_book_list_table" style="table-layout: fixed">
+            <thead>
+              <tr>
+                <th class="checkbox_step1">
+                  <label><input type="checkbox" id="checkbox_for_all_update_group_user" name="checkbox_for_all_update_group_user"></label>
+                </th>
+                <th class="company_name">法人名</th>
+                <th class="department_name">部署名</th>
+                <th class="full_name">氏名</th>
+                <th class="mail">メールアドレス</th>
+              </tr>
+            </thead>
+
+            <tbody id="update_address_boxes">
+              {%for address_list in address_lists%}
+
+              <tr>
+                <td>
+                    <input type="checkbox" name="address" value="{{address_list.id}}"
+                    data-company_name="{{address_list.company_name}}"
+                    data-name="{{address_list.last_name}} {{address_list.first_name}}" />
+                </td>
+
+                <td>
+                  {% if address_list.legal_or_individual == 1 %}
+                      {% if address_list.legal_person_posi == 1 %}
+                          {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                      {% else %}
+                          {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                      {% endif %}
+                  {% else %}
+                      {% if address_list.trade_name == null %}
+                          ー
+                      {% else %}
+                          {{address_list.trade_name}}
+                      {% endif %}
+                  {% endif %}
+              </td>
+              
+                <td>
+                  {% if address_list.department_name == null %}
+                      　ー　
+                  {% else %}
+                      {{address_list.department_name}}
+                  {% endif %}
+              </td>
+
+                <td>{{address_list.last_name}} {{address_list.first_name}}</td>
+
+                <td>{{address_list.email}}</td>
+              </tr>
+
+              {%endfor%}
+            </tbody>
+          </table>
+          <input type="radio" name="is_update" value="true" checked style="display:none;">
+
+        </div>
+        <div class="modal-footer address_modal_footer">
+          <button type="button" class="
+            btn
+            my-btn-w7 my-btn-h4
+            blue_btn
+            rounded-0
+            update_dest_user_select_btn
+          " data-toggle="modal" data-target="#update_group_confirm_button" disabled>
+            確認
+          </button>
+          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">
+            閉じる
+          </button>
+
+    
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--編集用 グループ登録モーダル閉じ-->
+
+  <!---------------------------------------------編集用 確認モーダル------------------------------------------------------>
+
+  <div class="modal fade" id="update_group_confirm_button" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="dialog">
+      <div class="modal-content" style="width: 150%">
+        
+        <header class="address_sign_up">
+          <div class="modal-header default_modal_header">
+            <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+        </div>
+      </header>
+
+        <div class="modal-body">
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <th class="th_w">
+                  <div class="address_sign_up_list">グループ名</div>
+                </th>
+                <td id="update_group_name"></td>
+              </tr>
+
+              <tr>
+                <th>
+                  <div class="address_sign_up_list">会社名 氏名</div>
+                </th>
+                <td id="update_group_members"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="modal-footer">
+            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" id="update_group_send_data">
+              登録
+            </button>
+            <button type="button" onfocus="this.blur();" class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0"
+              data-dismiss="modal">
+              キャンセル
+            </button>
+          </div>
+        </div>
+      </div>
+      <!--modal-content-->
+    </div>
+    <!--modal-dialog-->
+  </div>
+  <!---編集用 確認モーダル 閉じ--->
+</form>
+
+
+  <!------------------------------------------ 削除モーダル 個別 ------------------------------------------>
+
+  <div class="modal fade" id="group_del_modal" tabindex="-1" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content center-modal">
+        
+        <div class="modal-header delete_modal_header">
+          <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+      </div>
+  
+        <div class="modal-body">
+          <p class="modal-body-text">選択したグループを削除しますか?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="del_group_modal_btn" type="button" class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+            data-dismiss="modal">
+            削除
+          </button>
+          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">
+            キャンセル
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-------------------------------------------- 一括削除用モーダル ----------------------------------------------->
+  <div class="modal fade" id="group_multi_delete_modal" tabindex="-1" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content center-modal">
+        <div class="modal-header delete_modal_header">
+          <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+      </div>
+    <div class="modal-body">選択したグループを削除しますか?</div>
+        <div class="modal-footer">
+          <button id="group_multi_delete_modal_btn" type="button"
+            class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">
+            削除
+          </button>
+          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0" data-dismiss="modal">
+            キャンセル
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!---汎用トーストメッセージ--->
+<div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+  <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+      <div class="toast-body">
+          <div>
+              メッセージを動的に変更
+          </div>
+      </div>
+  </div>
+</div>
+
+  {% endblock %}
+
+  {% block extra_js %}
+
+  <script>
+    // -----------------
+    // Data table
+    // -----------------
+
+    $(document).ready(function () {
+      $.extend($.fn.dataTable.defaults, {
+        language: {
+          url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json",
+        },
+      });
+      var table = $("#group_list_table").DataTable({
+        lengthMenu: [5, 10, 15, 20],
+        order: [
+          [1, "desc"]
+        ],
+        columnDefs: [{
+            targets: [0, 3, 4],
+            orderable: false
+          },
+        ],
+      });
+    });
+
+    $(document).ready(function () {
+      $.extend($.fn.dataTable.defaults, {
+        language: {
+          url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json",
+        },
+      });
+      var table = $("#address_book_list_table").DataTable({
+        lengthMenu: [10, 20, 30, 40],
+        order: [
+          [1, "desc"]
+        ],
+        columnDefs: [{
+          targets: [0],
+          orderable: false,
+        }, ],
+      });
+    });
+
+    $(document).ready(function () {
+      $.extend($.fn.dataTable.defaults, {
+        language: {
+          url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json",
+        },
+      });
+      var table = $("#update_address_book_list_table").DataTable({
+        displayStart:0,
+        lengthMenu: [10, 20, 30, 40],
+        order: [
+          [1, "desc"]
+        ],
+        columnDefs: [{
+          targets: [0],
+          orderable: false,
+        }, ],
+      });
+    });
+
+
+// ---------------------------------------
+// checkbox全選択
+// ---------------------------------------
+
+    //グループ一覧
+    $(function () {
+      // 「全選択」する
+      $("#all_group_list").on("click", function () {
+        $("input[name='group_list_ids']").prop("checked", this.checked);
+      });
+
+      // 「全選択」以外のチェックボックスがクリックされたら、
+      $("input[name='group_list_ids']").on("click", function () {
+        if (
+          $("#group_list_boxes input:checkbox:checked").length == $("#group_list_boxes input:checkbox").length
+        ) {
+          // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+          $("#all_group_list").prop("checked", true);
+        } else {
+          // 1つでもチェックが入っていたら、「全選択」 = checked
+          $("#all_group_list").prop("checked", false);
+        }
+      });
+
+    });
+    
+    //グループ登録モーダル内
+    $(function () {
+      // 「全選択」する
+      $('#checkbox_for_all_group_user').on('click', function () {
+        $("input[name='address']").prop('checked', this.checked);
+      });
+
+    });
+    
+    //モーダル内ページを変更した時全選択checkboxの状態を判断する。
+    $(function () {
+        var table = $('#address_book_list_table').DataTable();
+
+        table.on('page.dt', function () {
+            var info = table.page.info();
+            var info_page = table.$('input, checkbox');
+            var table_data = table.data();
+            //処理を遅らせる
+            setTimeout(function () {
+                var all_user = $("input[name='address']")
+                var all_checked_user = $("input[name='address']:checked")
+                $("#checkbox_for_all_group_user").prop('checked', (all_user.length == all_checked_user
+                    .length));
+            }, 10);
+        });
+    })
+
+    //グループ編集モーダル内
+    $(function () {
+      // 「全選択」する
+      $('#checkbox_for_all_update_group_user').on('click', function () {
+        $("input[name='address']").prop('checked', this.checked);
+      });
+
+    });
+
+    //モーダル内ページを変更した時全選択checkboxの状態を判断する。
+    $(function () {
+        var table = $('#update_address_book_list_table').DataTable();
+        table.on('page.dt', function () {
+            var info = table.page.info();
+            var info_page = table.$('input, checkbox');
+            var table_data = table.data();
+            //処理を遅らせる
+            setTimeout(function () {
+                var all_user = $("#update_address_book_list_table input[name='address']")
+                var all_checked_user = $("#update_address_book_list_table input[name='address']:checked")
+                $("#checkbox_for_all_update_group_user").prop('checked', (all_user.length == all_checked_user
+                    .length));
+            }, 10);
+        });
+    })
+
+    //グループ登録 確認モーダルを処理する前にCSSのz-indexをマイナスにする。
+    $("#sign_up_group_modal").on("show.bs.modal", function (event) {
+      const $currentModal = $(event.currentTarget);
+      var zIndex = 1040 + 10 * $(".modal:visible").length;
+      $currentModal.css("z-index", zIndex);
+      setTimeout(function () {
+        $(".modal-backdrop")
+          .not(".modal-stack")
+          .css("z-index", zIndex - 1)
+          .addClass("modal-stack");
+      }, 0);
+    });
+
+
+    //編集用 グループ登録 確認モーダルを処理する前にCSSのz-indexをマイナスにする。
+
+    $("#update_sign_up_group_modal").on("show.bs.modal", function (event) {
+      const $currentModal = $(event.currentTarget);
+      var zIndex = 1040 + 10 * $(".modal:visible").length;
+      $currentModal.css("z-index", zIndex);
+      setTimeout(function () {
+        $(".modal-backdrop")
+          .not(".modal-stack")
+          .css("z-index", zIndex - 1)
+          .addClass("modal-stack");
+      }, 0);
+    });
+
+
+
+    //button活性 非活性  一括削除 全選択時
+
+    $("#all_group_list").change(function () {
+      var checks = [];
+      $("#group_list_table [name='all_group_list_ids']:checked").each(function () {
+        checks.push(this.value);
+      });
+
+      // チェックされている場合は有効、チェックされていない場合は無効化
+      if (checks.length > 0) {
+        $("#group_multi_delete_button").prop("disabled", false);
+      } else {
+        $("#group_multi_delete_button").prop("disabled", true);
+      }
+    });
+
+    //button活性 非活性  一括削除 個別択時
+
+    $("#group_list_table [name='group_list_ids']").change(function () {
+      var checks = [];
+      $("#group_list_table [name='group_list_ids']:checked").each(function () {
+        checks.push(this.value);
+      });
+
+      // チェックされている場合は有効、チェックされていない場合は無効化
+      if (checks.length > 0) {
+        $("#group_multi_delete_button").prop("disabled", false);
+      } else {
+        $("#group_multi_delete_button").prop("disabled", true);
+      }
+    });
+
+
+    // -------------------------------------
+    //  確認画面
+    // -------------------------------------
+
+      
+      $("#group_confirm_modal").on("show.bs.modal", function (event) { 
+      
+      var user_lists = [];
+      var address_list = [];
+      //テンプレートのnameを指定してvalueの値を取得
+      // 取得した値をeachで回してlist型の値を作る
+
+      user_lists.splice(0)
+      //グループ名
+      var group_name = $("#id_group_name").val()
+      $('#group_name').text(group_name)
+
+
+      var all_user = $("#address_book_list_table").DataTable().$('input, checkbox')
+      for (var i = 0; i < all_user.length; i++) {
+        if ($(all_user[i]).prop("checked")) {
+
+                var user = {};
+                user.id = $(all_user[i]).val();
+                user.company_name = $(all_user[i]).data('company_name');
+
+                user.name = $(all_user[i]).data("name");
+
+                //pushでuser_lists配列にオブジェクトuserを追加
+                //pushは配列が持つメソッド
+                user_lists.push(user)
+            }
+        };
+
+      //ここの処理でuser_listsをつかって確認画面へ表示する処理
+      // //アドレス帳から選択したユーザーを取得する。
+      
+      var checked_user = '';
+
+      for (user_list in user_lists) {
+        if (user_lists[user_list]['company_name'] == "None"){
+                checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+                + user_lists[user_list]['name'] + '>' + user_lists[user_list]['name'].substr(0, 14) + '<br>' + '</li>'
+                }else {
+                checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + user_lists[user_list][
+                    'company_name'
+                ] + ' ' + user_lists[user_list]['name'] + '>' + user_lists[user_list]['company_name'].substr(0,
+                    14) + ' ' +
+                user_lists[user_list]['name'].substr(0, 9) + '<br>' + '</li>'
+                }
+      }
+
+      $("#group_members").html(checked_user)
+
+      $('#group_send_data').off('click')
+      $('#group_send_data').on('click', function () {
+        $('#group_confirm_modal').hide();
+        $('#sign_up_group_modal').hide();
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+
+        for (user_list in user_lists) {
+          address_list.push(user_lists[user_list]['id'])
+          }
+
+            $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:group_create" %}',
+                data: {
+                    'address_list': address_list,
+                    'group_name': group_name,
+
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                        var toast = $(this);
+                        toast.find('.toast-body').addClass('alert-success');
+                        toast.find('.toast-body').text("グループを登録しました");
+                        });
+                        $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                        setTimeout(function(){
+                            window.location.href = "./";},1*1000);
+                }
+          });
+        });
+      });
+
+
+    // -----------------
+    // 編集
+    // -----------------
+
+  // モーダルが表示されたときにサーバーから取得した値を表示する
+  $('#update_sign_up_group_modal').on('show.bs.modal', function (event) {
+    var table = $('#update_address_book_list_table').DataTable();
+    table.page(0).draw( 'page' );
+    // 確認ボタン有効
+      $(".update_dest_user_select_btn").prop('disabled', false);
+      //モーダルを開いたボタンを取得
+      var button = $(event.relatedTarget);
+      group_list_id = button.data('group_list_id')
+      $('input[name=is_update]').val(group_list_id)
+      var address_list= '';
+
+      // ボタン押下時,サーバとのAjax通信を開始
+
+      $.when(
+        $.ajax({
+        type: 'GET',
+
+        url: '/get_group_update_address_modal/' + group_list_id, // 通信先のURL
+        dataType: 'json',
+      })
+        .done(function (data) {
+          $('input[name="address"]').prop("checked", false); //チェックを外す
+
+          // グループ名を表示させる。
+          $('#update_sign_up_group_modal #id_group_name').val(data.group_name);
+          list = []
+          address_lists = data.address
+
+          //編集モーダルでページを跨いだチェック済みのユーザにチェックをつける
+        
+          var all_check_list = $("#update_address_book_list_table").DataTable().$('input, checkbox')
+          all_check_list.each(function () {
+             var value = $(this).val();
+             var result = address_lists.indexOf(Number(value))
+            
+            if (result !== -1) {
+              $(this).prop('checked', true)
+            } else {
+              $(this).prop('checked', false)
+            }
+          })
+
+          // error message表示判定
+          var table = $("#update_address_book_list_table").DataTable();
+          var checked_values = table.$("input:checked");
+          if(checked_values.length >= 1){
+            $('.group_address_error_msg').remove();
+          }
+        })
+      );
+    });    
+
+    // -------------------------------------
+    //  編集 確認画面
+    // -------------------------------------
+    var user_lists = [];
+
+    // 配列の中身をリセット
+    user_lists.splice(0)
+    
+    $("#update_group_confirm_button").on("show.bs.modal", function (event) {
+      //グループ名
+      var update_group_name = $("#update_sign_up_group_modal #id_group_name").val()
+      $('#update_group_name').text(update_group_name)
+      
+      var all_user = $("#update_address_book_list_table").DataTable().$('input, checkbox')
+
+      for (var i = 0; i < all_user.length; i++) {
+          if ($(all_user[i]).prop("checked")) {
+
+              var user = {};
+              user.id = $(all_user[i]).val();
+              user.company_name = $(all_user[i]).data('company_name');
+
+              user.name = $(all_user[i]).data("name");
+
+              //pushでuser_lists配列にオブジェクトuserを追加
+              //pushは配列が持つメソッド
+              user_lists.push(user)
+          }
+      };
+
+      //ここの処理でuser_listsをつかって確認画面へ表示する処理
+      // //アドレス帳から選択したユーザーを取得する。
+      
+      var checked_user = '';
+
+      for (user_list in user_lists) {
+        if (user_lists[user_list]['company_name'] == "None"){
+                checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + ' ' 
+                + user_lists[user_list]['name'] + '>' + user_lists[user_list]['name'].substr(0, 14) + '<br>' + '</li>'
+                }else {
+                checked_user += '<li class=""type="disc" data-toggle="tooltip" title=' + user_lists[user_list][
+                    'company_name'
+                ] + ' ' + user_lists[user_list]['name'] + '>' + user_lists[user_list]['company_name'].substr(0,
+                    14) + ' ' +
+                user_lists[user_list]['name'].substr(0, 9) + '<br>' + '</li>'
+                }
+      }
+      $("#update_group_members").html(checked_user)
+
+      $('#update_group_send_data').on('click', function () {
+        $('#update_group_confirm_button').hide();
+        $('#update_sign_up_group_modal').hide();
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+
+            address_list = []
+            for (user_list in user_lists) {
+            address_list.push(user_lists[user_list]['id'])}
+            
+            $.ajax({
+                 type: "POST",
+                 url: '{% url "draganddrop:group_update" %}',
+                 data: {
+                    'address_list': address_list,
+                    'update_group_name': update_group_name,
+                    'group_list_id': group_list_id,
+
+                 },
+                dataType: 'json',
+                 success: function (data) {
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                        var toast = $(this);
+                        toast.find('.toast-body').addClass('alert-success');
+                        toast.find('.toast-body').text("グループを更新しました");
+                        });
+                        $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                        setTimeout(function(){
+                            window.location.href = "./";},1*1000);
+                 }
+            });
+      });
+    });
+
+    // -----------------
+    // 個別削除
+    // -----------------
+
+    var delete_id = ""
+    var delete_name = ""
+
+    $('#group_del_modal').off('show.bs.modal');
+    $('#group_del_modal').on('show.bs.modal', function (event) {
+
+        // 行のIDを取得
+        var button = $(event.relatedTarget)
+        var delete_id = button.data('delete_id')
+        console.log('ccc', delete_id)
+        var delete_name = button.data('delete_name')
+
+        var modal = $(this);
+        modal.find('.modal-body-text').text(delete_name + "を削除しますか？");
+
+        $('#del_group_modal_btn').off('click'); //onイベントの重複イベントを削除
+        $('#del_group_modal_btn').on('click', function () {
+
+          $.ajax({
+                type: "POST",
+                url: '{% url "draganddrop:group_delete" %}',
+                data: {
+                    'group_delete_id': delete_id,
+                    'group_delete_name': delete_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                  $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("グループを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+                }
+            });
+        });
+    });
+
+    // -----------------
+    // 複数削除
+    // -----------------
+
+    //削除ボタンをクリックした時の処理
+    $('#group_multi_delete_modal_btn').off('show.bs.modal');
+    $('#group_multi_delete_modal_btn').on('click', function () {
+
+
+        var vals = [];
+        //テンプレートのnameを指定してvalueの値を取得
+        // 取得した値をeachで回してlist型の値を作る
+
+        console.log("aaa",$('input[name="group_list_ids"]:checked'))
+        $('input[name="group_list_ids"]:checked').each(function () {
+            vals.push($(this).val());
+
+        });
+        $.ajax({
+            type: "POST",
+
+            //views.pyとurls.pyで定義したURLのnameを指定
+            url: '{% url "draganddrop:group_multi_delete" %}',
+
+            //サーバーに送るための値を設定する。
+            // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+            data: {
+                'group_delete_ids': vals
+            },
+            dataType: 'json',
+            success: function (data) {
+              $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("グループを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+            }
+        });
+    });
+
+    // ---------------------
+    // validate
+    // ---------------------
+    //新規登録モーダル
+    $(function () {
+        var new_valid = {
+
+            errorElement: "div", // labelがdivにかわる
+            errorClass: "is-error",
+            rules: {
+              group_name: {
+                  required: true,
+                  maxlength: 25,
+                  remote: {
+                    type:"post",
+                    async:false,
+                    url:"{% url 'draganddrop:group_name_validation' %}",
+                  }
+                },
+              },
+              messages: {
+                group_name: {
+                    required: 'グループ名を記入してください',
+                    maxlength: '25文字以内で記入してください',
+                    remote:"既に登録されているグループ名です。"
+                },
+              },
+            //エラーメッセージの表示場所を設定
+            errorPlacement: function (err, elem) {
+              if (elem.attr("name") == "group_name") {
+                elem.parent().parent().append(err.addClass("group_name_error_msg"))
+            } 
+            // else if (elem.attr("name") == "address") {
+            //   $('.group_modal_warning_noteice').append(err.addClass("group_address_error_msg"))
+            // }
+          }
+         }
+
+        // 確認ボタン制御
+        $(function(){
+          $("#sign_up_group_modal input[name='group_name'], #sign_up_group_modal input[name='address'], #sign_up_group_modal input[name='checkbox_for_all_group_user']").on('input dp.change click', function () { 
+            var table = $("#address_book_list_table").DataTable();
+            var checked_values = table.$("input:checked");
+            if (!$("#sign_up_group_modal input[name='group_name']").val() == '' && checked_values.length >= 1) {
+              $(".dest_user_select_btn").prop('disabled', false);
+            }else{
+              $(".dest_user_select_btn").prop('disabled', true);
+            }
+          });
+        });
+
+        // ボタンが押されたらヴァリデーションを実行する
+        $(".dest_user_select_btn").on('click', function (event) {
+        new_form_validator = $('#group_list_form').validate(new_valid);
+        //失敗で戻る（実際のヴァリデーションが動くトリガーになっている部分）
+        if ((!$("#group_list_form").valid())) {
+          return false;
+        };
+      });
+    });
+
+    //編集モーダル
+  $(function () {
+
+      var update_valid = {
+
+        errorElement: "div", // labelがdivにかわる
+        errorClass: "is-error",
+        rules: {
+          group_name: {
+                required: true,
+                maxlength: 25
+            },
+          // address: {
+          //       required: true,
+          //   },
+          },
+          messages: {
+            group_name: {
+                required: 'グループ名を記入してください',
+                maxlength: '25文字以内で記入してください'
+            },
+            // address: {
+            //         required: 'ユーザーを一人以上選択してください',
+            //     },
+          },
+            //エラーメッセージの表示場所を設定
+            errorPlacement: function (err, elem) {
+              if (elem.attr("name") == "group_name") {
+                elem.parent().parent().append(err.addClass("group_name_error_msg"))
+            } 
+            // else if (elem.attr("name") == "address") {
+            //   $('.group_modal_warning_noteice').append(err.addClass("group_address_error_msg"))
+            // }
+          }
+        }
+
+        // 確認ボタン制御
+        $(function(){
+          $("#update_sign_up_group_modal input[name='group_name'], #update_sign_up_group_modal input[name='address'], #update_sign_up_group_modal input[name='checkbox_for_all_update_group_user']").on('input dp.change click', function () { 
+            var table = $("#update_address_book_list_table").DataTable();
+            var checked_values = table.$("input:checked");
+            
+            if (!$("#update_sign_up_group_modal input[name='group_name']").val() == '' && checked_values.length >= 1) {
+              $(".update_dest_user_select_btn").prop('disabled', false);
+            }else{
+              $(".update_dest_user_select_btn").prop('disabled', true);
+            }
+          });
+        });
+
+        // ボタンが押されたらヴァリデーションを実行する
+        $(".update_dest_user_select_btn").on('click', function (event) {
+          update_form_validator = $('#group_list_update_form').validate(update_valid);
+          //失敗で戻る（実際のヴァリデーションが動くトリガーになっている部分）
+          if ((!$("#group_list_update_form").valid())) {
+            $(".update_dest_user_select_btn").prop('disabled', true);
+
+          return false;
+        };
+      });
+    });
+
+    </script>
+
+  {% endblock %}

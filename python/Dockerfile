@@ -11,4 +11,6 @@ WORKDIR /code
 # ADD ./src/training/requirements.txt /code/
 ADD ./src/requirements.txt /code/
 RUN pip install -r requirements.txt
+# RUN sodo apt-get install zlib1g-dev
+RUN apt-get install -y zlib1g-dev
 ADD . /code/

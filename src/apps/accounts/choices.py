@@ -89,28 +89,21 @@ CORPCLASS_CHOICES = (
     ('2', '個人')
 )
 
-# """
-# ミドルネームの選択
-# """
-# MIDDLE_CHOICES = (
-#     ('1','有効'),
-#     ('2','無効')
-# )
-
-
-# """
-# SMTP通信タイプ
-# """
-# SMTP_CONNECTION_CHOICES = (
-#     ('1','なし'),
-#     ('2','STARTTLS'),
-#     ('3','SSL/TLS')
-# )
-
 """
-有効/無効選択
+ミドルネームの選択
 """
-SETTING_CHOICES = (
+MIDDLE_CHOICES = (
     ('1','有効'),
     ('2','無効')
 )
+
+
+"""
+SMTP通信タイプ
+"""
+SMTP_CONNECTION_CHOICES = (
+    ('1','なし'),
+    ('2','STARTTLS'),
+    ('3','SSL/TLS')
+)
+

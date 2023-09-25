@@ -1,0 +1,31 @@
+{% extends "common/base.html" %}
+
+{% load i18n static %}
+
+{% block title %}ユーザー作成完了{% endblock title %}
+
+{% block breadcrumbtitle %}
+
+  <span>
+    ユーザー作成完了
+  </span>
+
+{% endblock breadcrumbtitle %}
+
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card card-register border-0 mt-0">
+    <div class="card-body">
+      <p>
+        ユーザー作成が完了しました。<br />
+        作成したユーザーにリンクを送信しています。
+      </p>
+      <a href="{% url 'accounts:user' %}">ユーザー管理へ戻る</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

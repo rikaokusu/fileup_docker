@@ -1,9 +1,6 @@
 <!DOCTYPE html> {% load i18n static %}
 {% load render_bundle from webpack_loader %}
 {% load i18n static %}
-{% load gen_color_num %}
-{% load get_first_char %}
-{% load get_co_admin_user %}
 
 <head>
 
@@ -13,404 +10,99 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>{% block title %}まなもあ{% endblock %}</title>
+  <title>{% block title %}{% endblock %}</title>
 
   {% render_bundle 'main' %}
 
-  {% comment %} <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet"> C:\Users\user\Dropbox\08.開発\training_pj\static\training\css\colorbox.css{% endcomment %}
-    {% comment %} <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet"> {% endcomment %}
-    <!----- Colorbox ------>
-    <link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
-    <link rel="stylesheet" href="{% static 'common/css/icon.css' %}">
-    {% comment %} <link rel="stylesheet" href="https://cdn.bootcss.com/jquery.colorbox/1.4.33/example1/colorbox.min.css" /> {% endcomment %}
-
-  <style>
-    .scroll-to-top {
-      /* bottom: 90px; */
-      bottom: 25px;
-    }
-
-    html,body {
-      overflow: auto;
-      {% comment %} width: 1700px; {% endcomment %}
-      width: 1707px;
-      height: 800px;
-    }
-
-    {% comment %} .container {
-        width: 1140px;
-        height: 1130px;
-
-        max-width: 1140px;
-        max-height: 1130px;
-
-        min-width: 1140px;
-        min-height: 1130px;
-    } {% endcomment %}
-
-    .container, .container-lg, .container-md, .container-sm {
-      max-width: none;
-      max-height: none;
-
-      min-width: none;
-      min-height: none;
-    }
-
-    {% comment %} .container {
-      max-width: 100%;
-      min-width: 100%;
-    } {% endcomment %}
-
-
-    /* 処理中のまち */
-    #loading-view {
-        /* 領域の位置やサイズに関する設定 */
-        width: 100%;
-        height: 100%;
-        z-index: 100;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        /* 背景関連の設定 */
-        /*background-color: #f5f5f5;*/
-        background-color: white;
-        filter: alpha(opacity=0.85);
-        -moz-opacity: 0.85;
-        -khtml-opacity: 0.85;
-        opacity: 0.55;
-        /*opacity: 100;*/
-        background-image: url("/static/common/img/load.gif");
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }
-
-
-
-
-
-  </style>
+  <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
 
   <script>
-
-    //Test結果をPOST時に使用(test_form.html)
-    function check(){
-        if(window.confirm('送信してよろしいですか？')){ // 確認ダイアログを表示
-
-            return true; // 「OK」時は送信を実行
-
-        }
-        else{ // 「キャンセル」時の処理
-
-            window.alert('キャンセルされました'); // 警告ダイアログを表示
-            return false; // 送信を中止
-
-        }
-
-    }
-
+      //Toastr用の設定。(下に記載した場合は反映サれなかったためヘッダ内に記載)
+      toastr.options = {
+      "debug": false,
+      "timeOut": "0",
+      "newestOnTop": false,
+      "closeButton": true,
+      "progressBar": true,
+      "extendedTimeOut": "0",
+      "positionClass": "toast-top-center",
+      // "onCloseClick" : function() {
+      //   console.log('close button clicked');
+      //   console.log($(this))
+      //   var id = $("#okBtn").data('message_id')
+      //   console.log(id);
+      // }
+    };
   </script>
-
-
-
-
 
 
 </head>
 
 <body id="page-top">
 
+    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-  {% if url_name != "login" %}
-  {% if url_name != "test" %}
-  {% if url_name != "movie" %}
-  {% if url_name != "questionnaire" %}
-  {% if url_name != "test_done" %}
-  {% if url_name != "test_confirm" %}
-  {% if url_name != "questionnaire_done" %}
-  {% if url_name != "questionnaire_confirm" %}
-  {% if url_name != "not_ie" %}
-  {% if url_name != "test_parts_create_help" %}
+    <a class="navbar-brand mr-1" href="{% url 'accounts:home' %}">Yuitech</a>
 
-  {% if not session_url_name %}
-
-
-
-
-
-  <nav class="navbar navbar-expand static-top py-0" style="background-color:#294a6a;">
-
-
-    <!--ナビゲーションロゴ色変更-->
-    <svg width="100.00" height="100.00" viewBox="0.00 0.00 100.00 100.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width:40px; height:40px;" class="mr-2">
-      <g stroke-linecap="round" id="CL_logo1">
-      <path d="M74.39,92.57 C74.39,92.57 25.96,92.68 25.96,92.68 C25.96,92.68 1.65,49.89 1.65,49.89 C1.65,49.89 25.76,6.97 25.76,6.97 C25.76,6.97 74.19,6.86 74.19,6.86 C74.19,6.86 98.50,49.65 98.50,49.65 C98.50,49.65 74.39,92.57 74.39,92.57 Z" fill="#808080" stroke="rgb(128, 128, 128)" stroke-width="1.00" stroke-opacity="1.00" stroke-linejoin="miter"/>
-      <path d="M49.52,65.71 C47.87,67.61 45.90,69.09 43.61,70.17 C41.31,71.25 38.81,71.79 36.10,71.79 C33.39,71.79 30.89,71.26 28.59,70.20 C26.32,69.14 24.34,67.65 22.65,65.74 C20.97,63.80 19.66,61.54 18.73,58.95 C17.80,56.34 17.33,53.50 17.33,50.43 C17.33,47.35 17.80,44.51 18.73,41.92 C19.66,39.31 20.97,37.04 22.65,35.13 C24.34,33.21 26.32,31.72 28.59,30.67 C30.89,29.61 33.39,29.08 36.10,29.08 C38.79,29.08 41.29,29.62 43.58,30.69 C45.88,31.75 47.85,33.23 49.50,35.13 C49.50,35.13 46.54,38.55 46.54,38.55 C45.26,36.93 43.72,35.66 41.92,34.74 C40.13,33.81 38.16,33.35 36.03,33.35 C33.96,33.35 32.05,33.78 30.30,34.64 C28.55,35.47 27.03,36.67 25.73,38.22 C24.45,39.75 23.45,41.56 22.72,43.64 C22.02,45.72 21.66,47.99 21.66,50.43 C21.66,52.90 22.02,55.17 22.72,57.25 C23.45,59.31 24.45,61.12 25.73,62.67 C27.03,64.20 28.55,65.40 30.30,66.26 C32.05,67.10 33.96,67.52 36.03,67.52 C38.16,67.52 40.13,67.06 41.92,66.15 C43.72,65.22 45.26,63.94 46.54,62.31 C46.54,62.31 49.52,65.71 49.52,65.71 Z" fill="#fff" stroke="rgb(255, 255, 255)" stroke-width="1.00" stroke-opacity="1.00" stroke-linejoin="miter"/>
-      <path d="M79.32,71.40 C79.32,71.40 56.32,71.40 56.32,71.40 C56.32,71.40 56.32,30.10 56.32,30.10 C56.32,30.10 60.72,30.10 60.72,30.10 C60.72,30.10 60.72,67.10 60.72,67.10 C60.72,67.10 79.32,67.10 79.32,67.10 C79.32,67.10 79.32,71.40 79.32,71.40 Z" fill="#fff" stroke="rgb(255, 255, 255)" stroke-width="1.00" stroke-opacity="1.00" stroke-linejoin="miter"/>
-      </g>
-      </svg>
-    <a class="navbar-brand mt-1 ml-1 py-0" href="{% url 'training:training' %}" style="color:#fff; font-size:1.5rem;">
-      <img src="{% static 'common/img/manamoa1.svg' %}" alt="まなもあ" style="height:45px;" class="">
-    </a>
+    <!-- <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+      <i class="fas fa-cogs"></i>
+    </button> -->
 
     <!-- Navbar -->
-    {% if current_user.is_authenticated and current_user.is_active %}
 
-
-      <!-- 問い合わせ(メール)アイコン -->
-      {% comment %} <div class="d-none d-md-inline-block form-inline mr-0 ml-auto"> {% endcomment %}
-      {% comment %} <div class="d-md-inline-block form-inline mr-0 ml-auto">
-        <a href="{% url 'accounts:contact' %}" style="color:#294a6a; font-size:1.5rem;">
-          <img src="{% static 'common/img/contact_tr.svg' %}" alt="お問い合わせ" style="width:40px; height:40px;" class="mr-2">
-        </a>
-      </div> {% endcomment %}
-
-      <!-- Infoアイコン -->
-      {% comment %} <div class="d-none d-md-inline-block form-inline mr-0 mr-md-3 my-2 my-md-0 "> {% endcomment %}
-      <div class="d-md-inline-block form-inline md-3 my-2 my-md-0 ml-auto">
-        <a href="#" class="position-relative info_icon mr-2" style="color:#294a6a;">
-              {% if non_read_count == 0 %}
-                {% comment %} <i class="fas fa-info-circle fa-3x info_icon"></i> {% endcomment %}
-                <img class="info_icon" src="{% static 'common/img/info_tr.svg' %}">
-              {% else %}
-                {% comment %} <i class="fas fa-info-circle fa-3x info_icon"></i><span class="badge">{{non_read_count}}</span> {% endcomment %}
-                <img class="info_icon" src="{% static 'common/img/info_tr.svg' %}"><span class="badge">{{non_read_count}}</span>
-              {% endif %}
-            </a>
+    <!-- Infoアイコン -->
+    <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0 ">
+      <div class="separator">
+        <i class="fas fa-info-circle fa-2x info_icon"></i>
       </div>
+    </div>
 
+    <!-- 会社名とメアド -->
+    <div class="d-none d-md-inline-block form-inline ml-2 mr-0 mr-md-3 my-2 my-md-0">
+      <p class="lang-text ml-md-0">{{ current_user.company.pic_company_name}}</p>
+      <p class="lang-text ml-md-0">{{ current_user.email}}</p>
+    </div>
 
-      <!-- 会社名とメアド -->
-      <div class="card p-1 my-1" style="width: 13rem;">
-        {% comment %} <div class="row"> {% endcomment %}
-        <div class="d-flex">
-          {% comment %} <div class="col-sm-9 pr-0 pl-1"> {% endcomment %}
-          <div class="ml-auto pr-0 pl-1">
-            <p class="lang-text" style="color:#53361c;">{{ current_user.company.pic_company_name}}</p>
-            <p class="lang-text" style="color:#53361c;">{{ current_user.email}}</p>
-          </div>
-          <!-- ユーザーアカウントのトグルメニュー -->
-          {% comment %} <div class="col-sm-3 pl-1"> {% endcomment %}
-          <div class="pl-1">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item dropdown no-arrow">
-
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {% comment %} <i class="fas fa-user-circle fa-fw"></i> {% endcomment %}
-
-                  {% if current_user.small %}
-                    <img src="{{ current_user.small.url }}" class="user_icon_small">
-                  {% else %}
-
-                    {% comment %} <div class="maru size_s c{{current_user.color_num|gen_color_num}} ml-1">
-                      <div class="letter_two_company_s">{{current_user.company.pic_company_name|get_first_char}}</div>
-                      <div class="letter_two_personal_s">{{current_user.display_name|get_first_char}}</div>
-                    </div> {% endcomment %}
-                  {% endif %}
-
-                </a>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                  {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
-                  {% comment %} {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff and not current_user.is_rogical_deleted %} {% endcomment %}
-                    <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
-                  {% else %}
-                    <!-- <div class="dropdown-divider"></div> -->
-                    <div class="dropdown-menu"></div>
-                      {% if current_user.is_authenticated and current_user.is_active and is_app_admin %}
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:user_management' %}">管理者権限設定</a> {% endcomment %}
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:co_admin_management' %}">共同管理者権限設定</a> {% endcomment %}
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:guest_user_management' %}">ゲストユーザー設定</a> {% endcomment %}
-                        <a class="dropdown-item" href="{% url 'training:app_admin' %}">受講ステータス</a>
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:resource_management' %}">リソース状況</a> {% endcomment %}
-                        <a class="dropdown-item" href="{% url 'training:training_management' %}">トレーニング設定</a>
-                        {% endif %}
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:training_history' %}">受講履歴</a> {% endcomment %}
-
-                        {% if current_user|get_co_admin_user %}
-                          <a class="dropdown-item" href="{% url 'training:training_management' %}">トレーニング設定</a>
-                        {% endif %}
-
-                        {% comment %} <a class="dropdown-item" href="{% url 'training:training_management' %}">トレーニング設定</a> {% endcomment %}
-                        <a class="dropdown-item base-d-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>
-                  {% endif %}
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-
-    {% elif current_guest_user.is_active %}
-
-      <!-- 問い合わせ(メール)アイコン -->
-      {% comment %} <div class="d-none d-md-inline-block form-inline mr-0 ml-auto"> {% endcomment %}
-      {% comment %} <div class="d-md-inline-block form-inline mr-0 ml-auto">
-        <a href="{% url 'accounts:contact' %}" style="color:#294a6a; font-size:1.5rem;">
-          <img src="{% static 'common/img/contact_tr.svg' %}" alt="お問い合わせ" style="width:40px; height:40px;" class="mr-2">
+    <!-- ユーザーアカウントのトグルメニュー -->
+    <ul class="navbar-nav ml-auto ml-md-0">
+      <li class="nav-item dropdown no-arrow">
+        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-user-circle fa-fw"></i>
         </a>
-      </div> {% endcomment %}
-
-      <!-- Infoアイコン -->
-      {% comment %} <div class="d-none d-md-inline-block form-inline mr-0 mr-md-3 my-2 my-md-0 "> {% endcomment %}
-      <div class="d-md-inline-block form-inline md-3 my-2 my-md-0 ml-auto">
-        <a href="#" class="position-relative info_icon mr-2" style="color:#294a6a;">
-          {% if non_read_count == 0 %}
-            <img class="info_icon" src="{% static 'common/img/info_tr.svg' %}">
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+          {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
+          <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
           {% else %}
-            <img class="info_icon" src="{% static 'common/img/info_tr.svg' %}"><span class="badge">{{non_read_count}}</span>
+          <!-- <div class="dropdown-divider"></div> -->
+          {% comment %} <a class="dropdown-item" href="{% url 'manager:userprofile' %}">ユーザープロファイル</a> {% endcomment %}
+          {% comment %} <a class="dropdown-item" href="{% url 'manager:password_change' %}">パスワード変更</a> {% endcomment %}
+          {% comment %} <a class="dropdown-item" href="{% url 'manager:language_setting' %}">言語設定</a> {% endcomment %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>
           {% endif %}
-        </a>
-      </div>
-
-      <!-- 会社名とメアド -->
-      <div class="card p-1 my-1" style="width: 13rem;">
-        <div class="row">
-          <div class="col-sm-9 pr-0 pl-1">
-            <p class="lang-text" style="color:#53361c;">{{ current_guest_user.company_name }}</p>
-            <p class="lang-text" style="color:#53361c;">{{ current_guest_user.email}}</p>
-          </div>
-          <!-- ユーザーアカウントのトグルメニュー -->
-          <div class="col-sm-3 pl-1">
-            <ul class="navbar-nav ml-auto ">
-              <li class="nav-item dropdown no-arrow">
-
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fas fa-user-circle fa-fw"></i>
-
-                  {% if current_guest_user.small %}
-                    {% comment %} <img src="" class="user_icon_small"> {% endcomment %}
-                    <img src="{{ current_user.small.url }}" class="user_icon_small">
-                  {% else %}
-
-                    <div class="maru size_s c{{current_guest_user.color_num|gen_color_num}} ml-1">
-                    {% comment %} <div class="maru size_s ml-1"> {% endcomment %}
-                      <div class="letter_two_company_s">{{current_guest_user.company_name|get_first_char}}</div>
-                      <div class="letter_two_personal_s">{{current_guest_user.guest_user_name|get_first_char}}</div>
-                    </div>
-                  {% endif %}
-                </a>
-
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                  <!-- <div class="dropdown-divider"></div> -->
-                  <div class="dropdown-menu"></div>
-                    {% comment %} <a class="dropdown-item" href="{% url 'training:training_history' %}">受講履歴</a> {% endcomment %}
-                    <a class="dropdown-item base-d-item" href="{% url 'accounts:guest_user_logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
-      </div>
-
-    {% endif %}
-
+      </li>
+    </ul>
   </nav>
 
 
-    {% comment %} <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-      <a class="navbar-brand mr-1 menu_title_size" href="{% url 'training:training' %}">オンライン学習支援システム</a>
-
-
-
-      <!-- Navbar C:\Users\user\Dropbox\08.開発\training_pj\static\training\img\fjalla_one_icons\fjalla_one_black_re.png-->
-
-      <!-- Infoアイコン -->
-      <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0 ">
-        <div class="separator">
-          <a href="#" class="btn btn-link">
-            {% if non_read_count == 0 %}
-              <i class="fas fa-info-circle fa-2x info_icon"></i>
-            {% else %}
-              <i class="fas fa-info-circle fa-2x info_icon"></i><span class="badge">{{non_read_count}}</span>
-            {% endif %}
-          </a>
-        </div>
-      </div>
-
-
-
-
-      <!-- 会社名とメアド -->
-      <div class="d-none d-md-inline-block form-inline nav_heder ml-2 mr-0 mr-md-3 my-2 my-md-0">
-        <p class="lang-text ml-md-0">{{ current_user.company.pic_dept_name}}</p>
-        <p class="lang-text ml-md-0">{{ current_user.email}}</p>
-      </div>
-
-      <!-- ユーザーアカウントのトグルメニュー -->
-      <ul class="navbar-nav ml-auto ml-md-0">
-
-        <li class="nav-item dropdown no-arrow">
-
-          <!-- 管理者アイコン -->
-          {% if current_user.is_authenticated and current_user.is_active and is_app_admin %}
-
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-user-cog" title="管理者モード"></i>
-            </a>
-
-          {% endif %}
-
-          <!-- 一般ユーザーアイコン -->
-          {% if not is_app_admin %}
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-user-circle fa-fw" title="一般ユーザーモード"></i>
-            </a>
-
-          {% endif %}
-
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-
-            {% if current_user.is_authenticated and current_user.is_active and is_app_admin %}
-            <!-- <div class="dropdown-divider"></div> -->
-            <a class="dropdown-item" href="{% url 'training:app_admin' %}">管理ページ</a>
-            <a class="dropdown-item" href="{% url 'training:training_management' %}">トレーニング管理</a>
-
-            {% endif %}
-
-            {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
-              <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
-            {% else %}
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>
-            {% endif %}
-          </div>
-        </li>
-      </ul>
-    </nav> {% endcomment %}
-
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
-  {% endif %}
 
   <div id="wrapper">
 
-      {% comment %} {% if  current_user.is_authenticated and current_user.is_active and current_user.is_staff %} {% endcomment %}
-        {% comment %} {% include 'common/slidemenu.html' %} {% endcomment %}
-      {% comment %} {% endif %}<!-- 認証済みで有効かどうかの判断--> {% endcomment %}
+      {% if  current_user.is_authenticated and current_user.is_active and current_user.is_staff %}
+        {% include 'common/slidemenu.html' %}
+      {% endif %}<!-- 認証済みで有効かどうかの判断-->
 
-    {% if url_name == "movie" %}
-    <div id="content-wrapper m-0 p-0">
-    {% else %}
     <div id="content-wrapper">
-    {% endif %}
 
       <div class="container-fluid">
 
         {% if  current_user.is_authenticated and current_user.is_active and current_user.is_staff %}
         <!-- Breadcrumbs-->
-        {% comment %} <ol class="breadcrumb">
+        <ol class="breadcrumb">
           {% block breadcrumbtitle %}{% endblock %}
-        </ol> {% endcomment %}
+        </ol>
         {% endif %}<!-- 認証済みで有効かどうかの判断-->
 
         <!-- 画面全体に対してサーバサイドからエラーメッセージを表示するための領域 -->
@@ -425,7 +117,7 @@
 
 
 
-        {% comment %} {% if messages %}
+        {% if messages %}
             {% for message in messages %}
                 {% if message.tags == 'alert alert-success'%}
                     <script type=text/javascript>toastr.success('{{ message|safe }}')</script>
@@ -440,7 +132,7 @@
                     <script type=text/javascript>toastr.error('{{ message|safe }}')</script>
                 {% endif %}
             {% endfor %}
-        {% endif %} {% endcomment %}
+        {% endif %}
 
 
 
@@ -450,7 +142,7 @@
 
 
         {% block content %}
-          {{ content }}
+        {{ content }}
         {% endblock %}
 
       </div>
@@ -462,176 +154,80 @@
     <i class="fas fa-angle-up font_size"></i>
   </a>
 
-
   <!-- ログアウト用Modal-->
-  <div class="modal fade" id="logoutModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel">
-    <div class="modal-dialog modal-dialog-centered modal-lg  modal-dialog-centered" role="document">
-        <div class="modal-content">
-
-        {% comment %} <ul class="tab clearfix info_tab">
-            <li class="active">お知らせ</li>
-        </ul> {% endcomment %}
-
-            <div class="modal-header border-bottom-0">
-                <i class="fas fa-info-circle title_icon"></i>
-                <div class="modal-title post-title" id="exampleModalLabel">ログアウト</div>
-                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div><!-- /.modal-header -->
-
-            <div class="modal-body">ログアウトしますか？</div>
-
-
-            <div class="modal-footer justify-content-rigiht border-0">
-              <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a>
-              <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal" onfocus="this.blur();">キャンセル</button>
-          </div><!-- /.modal-footer -->
-
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">ログアウトしますか？</div>
+        <div class="modal-footer">
+          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a>
+          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal" onfocus="this.blur();">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 <!-- お知らせモーダル用 -->
-<div class="modal fade" id="info_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel">
-  <div class="modal-dialog modal-dialog-centered modal-lg  modal-dialog-centered" role="document">
-      <div class="modal-content">
+<div class="modal fade" id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      {% comment %} <div class="modal-body">
+        <p>更新を開始します。プランの変更有無を選択してください。</p>
+      </div> {% endcomment %}
 
-          <div class="modal-header border-bottom-0">
-              <i class="fas fa-info-circle title_icon"></i>
-              <div class="modal-title post-title" id="exampleModalLabel">お知らせ</div>
-              <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-              <span aria-hidden="true">&times;</span>
-              </button>
-          </div><!-- /.modal-header -->
+      <ul class="tab clearfix info_tab">
+        <li class="active">全て表示</li>
+        <li>お知らせ</li>
+        <li>メンテナンス</li>
+
+      </ul>
+
+      <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
+      <div class="area">
+        <ul class="show">
+          {% for all in all_informations %}
+          <li><a href="#"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category"><span>{{ all.category }}</span></b><span class="newsList-title">{{ all.title }}</span></a></li>
+          {% empty %}
+            <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
+          {% endfor %}
+        </ul>
+        <ul>
+          {% for notice in notice_informations %}
+          <li><a href="#"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category"><span>{{ notice.category }}</span></b><span class="newsList-title">{{ notice.title }}</span></a></li>
+          {% empty %}
+            <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
+          {% endfor %}
+        </ul>
+        <ul>
+          {% for mainte in maintenance_informations %}
+          <li><a href="#"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category"><span>{{ mainte.category }}</span></b><span class="newsList-title">{{ mainte.title }}</span></a></li>
+          {% empty %}
+            <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
+          {% endfor %}
+        </ul>
+      </div>
 
 
-          <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
-          <div class="area">
-              <ul class="show">
-              {% for all in all_informations %}
-              <li><a href="#"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d H:i' }}</time><b class="newsList-category"><span>{{ all.category }}</span></b><span class="newsList-title">{{ all.title }}</span></a></li>
-              {% empty %}
-                  <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
-              {% endfor %}
-              </ul>
-              <ul>
-              {% for notice in notice_informations %}
-              <li><a href="#"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d H:i' }}</time><b class="newsList-category"><span>{{ notice.category }}</span></b><span class="newsList-title">{{ notice.title }}</span></a></li>
-              {% empty %}
-                  <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
-              {% endfor %}
-              </ul>
-              <ul>
-              {% for mainte in maintenance_informations %}
-              <li><a href="#"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d H:i' }}</time><b class="newsList-category"><span>{{ mainte.category }}</span></b><span class="newsList-title">{{ mainte.title }}</span></a></li>
-              {% empty %}
-                  <li><a href="#"><span class="newsList-empty">お知らせはありません</span></a></li>
-              {% endfor %}
-              </ul>
-          </div>
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-secondary btn-sm my-btn-w8" data-dismiss="modal" onfocus="this.blur();">閉じる</button>
 
-
-          <div class="modal-footer justify-content-rigiht border-0">
-              <button class="my-btn my-btn-gray-2 my-btn-w8" data-dismiss="modal" onfocus="this.blur();">閉じる</button>
-
-          </div><!-- /.modal-footer -->
-
-      </div><!-- /.modal-content -->
+      </div><!-- /.modal-footer -->
+    </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 
 
 
-
   <!-- 日付のカレンダー表示 -->
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"></script> -->
-  {% comment %} {{ form.media }} <!-- 左の設定でdatetimepickerに関連するJS等が読み込まれる --> {% endcomment %}
-
-  <link rel="stylesheet" href="{% static 'common/css/bootstrap-datetimepicker.css' %}">
-  <script type="text/javascript" src="{% static 'common/js/bootstrap-datetimepicker.min.js' %}"></script>
-  <script type="text/javascript" src="{% static 'common/js/moment-with-locales.min.js' %}"></script>
-  <link href="/static/bootstrap_datepicker_plus/css/datepicker-widget.css" type="text/css" media="all" rel="stylesheet">
-  <script type="text/javascript" src="/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>
-
-
-
-
-
+  {{ form.media }} <!-- 左の設定でdatetimepickerに関連するJS等が読み込まれる -->
 
   <!-- 郵便番号から都道府県の自動入力 -->
-  {% comment %} <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script> {% endcomment %}
-
-  <!----- TinyMCE ------>
-  {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.0.16/tinymce.min.js"></script> {% endcomment %}
-  <script type="text/javascript" src="{% static 'common/js/tinymce.min.js' %}"></script>
-
-  {% comment %} <!----- Colorbox ------>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.6.4/jquery.colorbox-min.js"></script> {% endcomment %}
+  <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
 
 
-<script>
-    ///////////////////////////////////////////////////
-    ////ローディング////
-    ///////////////////////////////////////////////////
-    function loadingView(flag) {
-      $('#loading-view').remove();
-      if(!flag) return;
-      $('<div id="loading-view" />').appendTo('body');
-    }
-</script>
-
-
-<script>
-
-  $(function() {
-
-      // -----------------
-      // tinymceの設定
-      // -----------------
-      tinymce.init({
-          {% comment %} selector: "textarea", {% endcomment %}
-          content_css: false,
-          width : '100%',
-          height : 410,
-          language: "ja", // 言語 = 日本語
-          language_url: "{% static 'training/js/tinymce-ja.js' %}",
-
-          menubar: false,   // メニューバーを隠す
-          plugins: "textcolor image link", // 文字色、画像ボタン、リンク用のプラグインを適用
-          toolbar: [ // ツールバー(1段)
-          // 戻る 進む | 文字サイズ 文字色 リンク         | フォーマット   | 太字 斜体    | 左寄せ 中央寄せ 右寄せ 均等割付                    | 箇条書き 段落番号 インデントを減らす インデント
-          "undo redo | fontsizeselect forecolor link | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
-          ],
-          statusbar: false, // ステータスバーを隠す
-          default_link_target: "_blank",
-          fontsize_formats: "8px 10px 12px 14px 16px 18px 24px 36px",
-          force_br_newlines : true, //エディターにpタグを入れないようにする
-          forced_root_block : '', //エディターにpタグを入れないようにする
-          force_p_newlines : false, //エディターにpタグを入れないようにする
-
-      });
-
-
-
-      $("#send_data_btn").click(function (e) {
-          //送信関数の実行
-          send_data_ajax();
-      });
-
-
-  });
-
-
-</script>
-
-
-
-
-    
 
 
   <script>
@@ -680,30 +276,7 @@
     $(".info_icon").on("click", function() {
 
         $('#info_modal').modal('show')
-
-        console.log("あかかか")
-        var data = {};
-
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'training:notif_status' %}",
-            data: data,
-            dataType: 'json',
-            success: function(data){
-                if(data.status=='ok'){
-                    //window.location.href = '/';
-                }else{
-                    //window.location.href = '/';
-                }
-            }
-        });
-
     });
-
-    $('#info_modal').on('hidden.bs.modal', function (event) {
-        window.location.href = '/';
-    });
-
 
 
     toastr.options = {
@@ -732,9 +305,10 @@ $(function(){
     var url = $(this).data('url')
     var id = $(this).data('id')
 
+    console.log("削除?")
     $.ajax({
       type: "POST",
-      {% comment %} url: "{% url 'accounts:reset_session' %}", {% endcomment %}
+      url: "{% url 'accounts:reset_session' %}",
       data: {
         'url': url,
         'id': id
@@ -744,7 +318,7 @@ $(function(){
     }).done(function(data, textStatus, jqXHR) {
         // 成功時のコールバック
         if (url=="update_profile") {
-          {% comment %} window.location.href = '{% url "accounts:update_companyprofile" 1 %}'; {% endcomment %}
+          window.location.href = '{% url "accounts:update_companyprofile" 1 %}';
         }
 
 
@@ -752,9 +326,11 @@ $(function(){
         // 失敗時のコールバック
     });
 
+
+
+
+    console.log("あああ")
   });
-
-
 
 });
 </script>

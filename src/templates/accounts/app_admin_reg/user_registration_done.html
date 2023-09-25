@@ -1,0 +1,30 @@
+{% extends "common/base.html" %}
+
+{% load i18n static %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<!-- ステップ -->
+ <ul class="cp_stepflow02">
+ 	<li class="completed"><span class="bubble text">1</span><span>会社情報の登録</span></li>
+  <li class="active"><span class="bubble text">2</span><span>仮登録の完了</span></li>
+ 	<li><span class="bubble text">3</span><span>ユーザー情報の追加登録</span></li>
+ 	<li><span class="bubble text">4</span><span>本番登録完了</span></li>
+ </ul>
+
+<div class="container">
+  <div class="card card-login border-0 mx-auto mt-5">
+    <h6 class="card-header border-0">仮登録完了</h6>
+    <div class="card-body">
+      <p>
+        会員登録用のメールを送信しました。<br />
+        まだ、会員登録は完了していません。<br />
+        確認メールに記載されているリンクから本登録を行ってください。<br>
+        リンクの有効期限は1日です。
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

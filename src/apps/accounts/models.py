@@ -14,19 +14,10 @@ import os
 import uuid
 from django.db import models
 
-# from .choices import LEGALPERSONALITY_CHOICES, PREFECTURES_CHOICES, LEGALPERSON_POSI_CHOICES,CORPCLASS_CHOICES,MIDDLE_CHOICES
-# from .choices import SMTP_CONNECTION_CHOICES
-
-from .choices import LEGALPERSONALITY_CHOICES, PREFECTURES_CHOICES, LEGALPERSON_POSI_CHOICES,CORPCLASS_CHOICES,SETTING_CHOICES
-# from .forms import
+from .choices import LEGALPERSONALITY_CHOICES, PREFECTURES_CHOICES, LEGALPERSON_POSI_CHOICES,CORPCLASS_CHOICES,MIDDLE_CHOICES
+from .choices import SMTP_CONNECTION_CHOICES
 
 from django_mysql.models import ListCharField
-
-
-# ImageKit
-# from imagekit.models import ImageSpecField
-# from imagekit.models import ProcessedImageField
-# from imagekit.processors import ResizeToFill
 
 
 """
@@ -45,19 +36,11 @@ class Service(models.Model):
     icon = models.CharField('アイコン', max_length=255, default='', blank=True, null=True)
     # サービス番号
     number = models.CharField('番号', max_length=10, default='0', blank=True, null=True)
-    # 価格変更予定フラグ
-    price_change = models.BooleanField(_('price_change'), default=False)
-    # 現在の価格利用可能期限
-    price_end_date = models.DateTimeField(_('price_end_date'), null=True)
 
     def __str__(self):
         return self.name
-
     class Meta:
         managed = False
-
-
-
 
 """
 会社テーブル
@@ -66,72 +49,75 @@ class Company(models.Model):
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 会社名
-    pic_company_name = models.CharField('会社名', max_length=100)
-    #法人・個人
-    pic_corp_class = models.CharField('法人区分',max_length=2, choices=CORPCLASS_CHOICES,blank=True)
+    pic_company_name = models.CharField('会社名', max_length=255)
     # 法人格
     pic_legal_personality = models.CharField('法人格', max_length=2, choices=LEGALPERSONALITY_CHOICES, blank=True)
     # 法人格位置
     pic_legal_person_posi = models.CharField('法人格位置', max_length=1, choices=LEGALPERSON_POSI_CHOICES, blank=True)
     # 所属名
-    pic_dept_name = models.CharField('所属名', max_length=50, blank=True)
-    # 担当者名
-    pic_full_name = models.CharField('担当者名', max_length=50, blank=True)
+    pic_dept_name = models.CharField('所属名', max_length=150, blank=True)
+    # 氏名
+    pic_full_name = models.CharField('担当者名', max_length=255, blank=True)
     # 郵便番号
     postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = ("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
     pic_post_code = models.CharField(validators=[postal_code_regex], blank=True, max_length=7, verbose_name='郵便番号')
     # 都道府県
     pic_prefectures = models.CharField('都道府県', max_length=2, choices=PREFECTURES_CHOICES, blank=False)
-    # 市区町村
-    pic_municipalities = models.CharField('市区町村',max_length=100,blank=False)
-    # 丁目番地以降
-    pic_address = models.CharField('丁目番地以降', max_length=50, blank=False)
+    # 住所
+    pic_address = models.CharField('住所', max_length=255, blank=True)
     # 建物名称
-    pic_building_name = models.CharField('建物名称', max_length=50, blank=True)
+    pic_building_name = models.CharField('建物名称', max_length=255, blank=True)
     # 電話番号
     tel_number_regex = RegexValidator(regex=r'^[0-9]+$', message = ("Tel Number must be entered in the format: '09012345678'. Up to 15 digits allowed."))
-    pic_tel_number = models.CharField('担当者電話番号', max_length=15,  blank=True, validators=[tel_number_regex])
+    pic_tel_number = models.CharField('電話番号', max_length=15,  blank=True, validators=[tel_number_regex])
     # 会社名
-    invoice_company_name = models.CharField('会社名', max_length=100, blank=True)
+    invoice_company_name = models.CharField('会社名', max_length=255, blank=True)
     # 法人格
     invoice_legal_personality = models.CharField('法人格', max_length=2, choices=LEGALPERSONALITY_CHOICES, blank=True)
     # 法人格位置
     invoice_legal_person_posi = models.CharField('法人格位置', max_length=1, choices=LEGALPERSON_POSI_CHOICES, blank=True)
     # 所属名
-    invoice_dept_name = models.CharField('所属名', max_length=50, blank=True)
-    # 請求者氏名
-    invoice_full_name = models.CharField('担当者名', max_length=50, blank=True)
+    invoice_dept_name = models.CharField('所属名', max_length=150, blank=True)
+    # 氏名
+    invoice_full_name = models.CharField('請求者氏名', max_length=255, blank=True)
     # 郵便番号
     invoice_post_code = models.CharField(validators=[postal_code_regex], blank=True, max_length=7, verbose_name='郵便番号')
     # 都道府県
-    invoice_prefectures = models.CharField('都道府県', max_length=2, choices=PREFECTURES_CHOICES, blank=True)
-    # 市区町村
-    invoice_municipalities =models.CharField('市区町村', max_length=100, blank=True)
-    # 番地以降
-    invoice_address = models.CharField('丁目番地以降', max_length=50, blank=True)
+    invoice_prefectures = models.CharField('都道府県', max_length=2, choices=PREFECTURES_CHOICES, blank=False)
+    # 住所
+    invoice_address = models.CharField('住所', max_length=255, blank=True)
     # 建物名称
-    invoice_building_name = models.CharField('建物名称', max_length=50, blank=True)
-    # 請求先担当者電話番号
-    invoice_tel_number = models.CharField('担当者電話番号', max_length=15,  blank=True, null=True, validators=[tel_number_regex])
+    invoice_building_name = models.CharField('建物名称', max_length=255, blank=True)
+    # 電話番号
+    invoice_tel_number = models.CharField('電話番号', max_length=15,  blank=True, null=True, validators=[tel_number_regex])
     # バージョン
     version = models.DateTimeField(_('version'), blank=True, null=True)
     # 変更者
-    change_user = models.CharField('変更者ID', max_length=50, blank=True, null=True)
+    change_user = models.CharField('変更者ID', max_length=255, blank=True, null=True)
     # 上書きフラグ
-    change_row = models.CharField('上書きフラグ', max_length=50, blank=True, null=True)
+    change_row = models.CharField('上書きフラグ', max_length=255, blank=True, null=True)
     #ミドルネーム選択
-    middle_choice = models.CharField('ミドルネームの使用', max_length=2, choices=SETTING_CHOICES, default='2')
-    #パスワード変更
-    pass_change = models.CharField('パスワード変更', max_length=2, choices=SETTING_CHOICES, default='2')
-    #プロファイル変更
-    profile_change = models.CharField('プロフィール変更', max_length=2, choices=SETTING_CHOICES, default='2')
+    middle_choice = models.BooleanField(_('middle_choice'), default=False)
+    #ミドルネーム選択２
+    # middle_choice2 = models.CharField('ミドルネームの使用', max_length=2, choices=MIDDLE_CHOICES, default='2')
+    # メールサーバ
+    # email_host = models.CharField('メールサーバ', max_length=50, blank=True, null=True)
+    # メールサーバ
+    # port = models.CharField('ポート番号', max_length=50, blank=True, null=True)
+    # 認証ユーザー
+    # host_user = models.CharField('認証ユーザ', max_length=50, blank=True, null=True)
+    # 認証パスワード
+    # host_password = models.CharField('認証パスワード', max_length=50, blank=True, null=True)
+    # Fromアドレス
+    # from_address = models.CharField('送信元アドレス', max_length=50, blank=True, null=True)
+    # 通信タイプ
+    # smtp_connection_type = models.CharField('法人格', max_length=2, choices=SMTP_CONNECTION_CHOICES, blank=True, default=1)
 
     def __str__(self):
         return self.pic_company_name
 
-    class Meta:
+class Meta:
         managed = False
-
 """
 ユーザーやスーパーユーザーを作成するためのメソッド
 "UserCreationForm"を継承したFormを使うことでこの
@@ -171,8 +157,6 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
-    class Meta:
-        managed = False
 
 """
 カスタムユーザーテーブル
@@ -183,53 +167,44 @@ class User(AbstractBaseUser, PermissionsMixin):
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 表示名
-    display_name = models.CharField('表示名', max_length=30, blank=True, null=True)
+    display_name = models.CharField('表示名', max_length=255)
     # メールアドレス
     email = models.CharField(_('email address'), unique=True, max_length=255)
     # サブドメイン
-    subdomain = models.CharField(_('subdomain'), max_length=50, blank=True)
+    subdomain = models.CharField(_('subdomain'), max_length=255, blank=True)
     # 姓
-    last_name = models.CharField(_('last name'), max_length=20, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
     # ミドルネーム
-    middle_name = models.CharField('ミドルネーム', max_length=20, blank=True)
+    middle_name = models.CharField('ミドル', max_length=255, blank=True)
     # 名
-    first_name = models.CharField(_('first name'), max_length=20, blank=True)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
     # ふりがな表示名
-    p_display_name = models.CharField('ふりがな(表示名)', max_length=50, blank=True, null=True)
+    p_display_name = models.CharField('ふりがな(表示名)', max_length=255, blank=True, null=True)
     # ふりがな(姓)
-    p_last_name = models.CharField('ふりがな(姓)', max_length=30, blank=True, null=True)
+    p_last_name = models.CharField('ふりがな(姓)', max_length=255, blank=True, null=True)
     # ふりがな(名)
-    p_first_name = models.CharField('ふりがな(名)', max_length=30, blank=True, null=True)
-    # ふりがな(ミドルネーム)
-    p_middle_name = models.CharField('ふりがな(ミドルネーム)', max_length=30, blank=True)
+    p_first_name = models.CharField('ふりがな(名)', max_length=255, blank=True, null=True)
+    # 所属グループ
+    # group = models.ManyToManyField(CustomGroup, verbose_name="所属グループ", blank=True)
     # 説明
-    description = models.CharField('メモ', max_length=30, blank=True)
+    description = models.CharField('説明', max_length=30, blank=True)
     # 会社コード
     company = models.ForeignKey(Company, null=True, on_delete=models.PROTECT)
     # サービス
     service = models.ManyToManyField(Service, verbose_name="利用サービス", blank=True, related_name='service')
     # サービス管理者
     service_admin = models.ManyToManyField(Service, verbose_name="サービス管理者", blank=True, related_name='service_admin')
+    # 登録ユーザー(タスクサービスでユーザー一覧の抽出時に使用)
+    # reg_user = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
+    # 契約外ユーザーのフラグ
+    # is_nocontract = models.BooleanField(_('no contract'), default=False)
     # 作成日
     created_date = models.DateTimeField(_('created date'), default=timezone.now)
+    # pay.jpのID
+    # payjp_cus_id = models.CharField('PAY.JPのカスタマーID', max_length=35, blank=True, null=True)
     # メール送信可否
     is_send_mail = models.BooleanField(_('is_send_mail'), default=True)
-    # 画像のアップロード
-    # photo = models.ImageField(upload_to="avater", default='',blank=True)
 
-    # オリジンからサムネイル画像を自動生成
-    # thumbnail = ImageSpecField(source='origin',
-    #                         processors=[ResizeToFill(250,250)],
-    #                         format="JPEG",
-    #                         options={'quality': 60}
-    #                         )
-
-    # # オリジンからスモール画像を自動生成
-    # small = ImageSpecField(source='origin',
-    #                         processors=[ResizeToFill(75,75)],
-    #                         format="JPEG",
-    #                         options={'quality': 50}
-    #                         )
 
     is_activate = models.BooleanField(
         _('activate'),
@@ -240,9 +215,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('staff status'),
         default=False,
     )
-    # ステータス falseにするとログインできなくなる、Djangoのデフォルトで用意されているもの
+    # ステータス
     is_active = models.BooleanField(
-        # _('is_active'),
         _('active'),
         default=True,
     )
@@ -250,21 +224,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     # 論理的削除
     is_rogical_deleted = models.BooleanField(
         _('rogical_deleted'),
-        # _('is_rogical_deleted'),
         default=False,
     )
 
-    # 完了フラグ
-    # is_training_done = models.BooleanField(
-    #     _('is_training_done'),
-    #     default=False,
-    # )
-
-    # # トレーニングの表示の切り替え
-    # is_training_done_chg = models.BooleanField(
-    #     _('is_training_done_chg'),
-    #     default=False,
-    # )
 
     objects = UserManager()
 
@@ -275,14 +237,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-
-    class Meta:
         managed = False
 
     def get_full_name(self):
         """Return the first_name plus the last_name, with a space in
         between."""
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = '%s %s' % (self.last_name, self.first_name)
         return full_name.strip()
 
     def get_short_name(self):
@@ -299,6 +259,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             name = self.email
         return name
+
 
     @property
     def username(self):
@@ -325,72 +286,31 @@ class Messages(models.Model):
 
     class Meta:
         managed = False
-
 """
 リマインダー
 """
 class Notification(models.Model):
-
-    CATEGORY_CHOICES = (
-            ('お知らせ', 'お知らせ'),
-            ('メッセージ', 'メッセージ'),
-            ('メンテナンス', 'メンテナンス'),
-            ('メンテナンス終了', 'メンテナンス終了'),
-            ('メンテナンス中止', 'メンテナンス中止')
-    )
-
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
     title = models.CharField(_('title'), max_length=255)
-    category = models.CharField(_('category'), max_length=30, default="1", choices=CATEGORY_CHOICES, blank=True)
+    category = models.CharField(_('category'), max_length=255, default="お知らせ")
     target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+    is_read = models.BooleanField(_('is_read'), default=False)
     # 通知開始日
     start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
     #内容
     contents = models.TextField('内容', blank=True, null=True)
-    #メンテナンス情報（作業開始日時）
-    maintenance_start_date = models.DateTimeField(_('メンテナンス開始日時'), default=timezone.now, blank=True)
-    #メンテナンス情報（作業終了日時）
-    maintenance_end_date = models.DateTimeField(_('メンテナンス終了日時'), default=timezone.now, blank=True)
-    #メンテナンス情報（作業内容）
-    maintenance_contents = models.TextField('作業内容', blank=True, null=True)
-    #メンテナンス情報（作業対象）
-    maintenance_targets = models.TextField('作業対象', blank=True, null=True)
-    #メンテナンス情報（作業影響）
-    maintenance_affects = models.TextField('作業影響', blank=True, null=True)
-    #メンテナンス情報（作業中止理由）
-    maintenance_cancel_reason = models.TextField('作業中止理由', blank=True, null=True)
-
-    class Meta:
-        managed = False
-
-"""
-お知らせ既読管理
-"""
-class Read(models.Model):
-    # ユーザー
-    read_user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='read_user')
-    # 既読日
-    read_date = models.DateTimeField(_('read date'), default=timezone.now, blank=True)
-    # お知らせID
-    notification_id = models.ForeignKey(Notification, blank=True, null=True, on_delete=models.CASCADE, related_name='notification_id')
-
-    class Meta:
-        managed = False
-
 
 """
 Stripe情報
 """
 class Stripe(models.Model):
     # ユーザー
+    # user = models.OneToOneField(User, null=False, on_delete=models.CASCADE, default='')
     # stripeのカスタマーID
     stripe_cus_id = models.CharField('StripeのカスタマーID', max_length=35, blank=True, null=True)
     # stripeのCardーID
     stripe_card_id = models.CharField('StripeのCardID', max_length=35, blank=True, null=True)
     # 会社コード
     company = models.OneToOneField(Company, null=True, on_delete=models.CASCADE, default='')
-
-    class Meta:
-        managed = False

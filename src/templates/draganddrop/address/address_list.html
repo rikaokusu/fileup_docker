@@ -1,0 +1,1447 @@
+{% extends "draganddrop/common//base.html" %}
+{% load widget_tweaks %}
+{% load get_download_status %}
+
+
+{% block content %}
+
+<div class="top"></div>
+
+
+<div id="tabArea">
+
+    <input type="radio" name="tab" id="tab1" onclick="tabClick(1)" checked>
+    <label for="tab1">ユーザー
+        <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i></label>
+
+    <input type="radio" name="tab" id="tab2" onclick="tabClick(2)">
+    <label for="tab2">
+        <a href="{% url 'draganddrop:group_list' %}" role="button" style="color:#666;">グループ
+            <i class="fas fa-users fa-fw fa-lg" style="color:#666666;"></i></a>
+    </label>
+
+
+
+    <div class="tabBody">
+        <p>
+            <div class="address_list_table">
+                <header class="address_lists_header d-flex">
+
+                    <div class="mr-auto p-2 bd-highlight title_address_lists">
+                    </div>
+                    <button type="button" class="btn my-btn-w9 my-btn-h4 mr-2 blue_btn rounded-0 sign_up_btn"
+                        data-toggle="modal" data-target="#sign_up_modal">アドレス帳登録</button>
+                    <button type="button"
+                        class="btn my-btn-w9 my-btn-h4 rounded-0 mr-2 sign_up_delete_btn"
+                        data-toggle="modal" data-target="#address_multi_delete_modal" id="address_multi_delete_button"
+                        disabled>一括削除</button>
+
+                </header>
+                <table class="table" id="address_list_table">
+                    <thead>
+                        <tr>
+                            <th class="checkBox"><label><input type="checkbox" id="all_address_list"></label></th>
+                            <th>種別</th>
+                            <th>法人名</th>
+                            <th class="addressDepartmentName">部署名</th>
+                            <th class="addressFullName">氏名</th>
+                            <th>メールアドレス</th>
+                            <th class="updateIcon"></th>
+                            <th class="deleteIcon"></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody id="address_list_boxes">
+                        {% for address_list in address_lists %}
+                        <tr>
+                            <td><input type="checkbox" name="address_list_ids" value="{{address_list.id}}"
+                                    id="address_list_data">
+                            </td>
+
+                            <td>
+                                {% if address_list.legal_or_individual == 1 %}
+                                <span>法人</span>
+                                {% else %}
+                                <span>個人</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if address_list.legal_or_individual == 1 %}
+                                    {% if address_list.legal_person_posi == 1 %}
+                                        {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                                    {% else %}
+                                        {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                                    {% endif %}
+                                {% else %}
+                                    {% if address_list.trade_name == null %}
+                                        　ー　
+                                    {% else %}
+                                        {{address_list.trade_name}}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if address_list.legal_or_individual == 1 %}
+                                    {% if address_list.department_name == null %}
+                                        　ー　
+                                    {% else %}
+                                        {{address_list.department_name}}
+                                    {% endif %}
+                                {% else %}
+                                        　ー　
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{address_list.last_name}} {{address_list.first_name | truncatechars:3}}
+
+                            </td>
+
+                            <td>
+                                {{address_list.email}}
+                            </td>
+
+                            <!-- 変更ボタン -->
+                            <td class="updateIcon">
+                                <span data-toggle="tooltip" title="ファイルの編集" data-placement="top">
+                                    <button class="fas_button_edit" 
+                                    data-address_list_id="{{address_list.id}}"
+                                    data-address_list_name="{{address_list.last_name}} {{address_list.first_name}}"
+                                    data-target="#update_sign_up_modal"
+                                    data-toggle="modal"></button>
+                                </span>
+                            </td>
+                            
+                            <!-- 削除ボタン -->
+                            <td class="deleteIcon">
+                                <span data-toggle="tooltip" title="ファイルの削除" data-placement="top">
+                                    <button class="fas_button_delete"
+                                    data-delete_id="{{address_list.id}}"
+                                    data-delete_name="{{address_list.last_name}} {{address_list.first_name}}"
+                                    data-target="#address_del_task_modal"
+                                    data-toggle="modal"></button>
+                                </span>
+                            </td>
+                
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+
+            </div>
+
+
+        </p>
+    </div>
+    <p id="tabNo"></p>
+</div>
+
+
+<!--戻るボタン-->
+<div class="d-flex flex-row justify-content-center">
+    <a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fa-solid fa-angle-left mr-2"></i>トップ画面に戻る</a>
+</div>
+
+<!-- 削除モーダル 個別 -->
+
+<div class="modal fade" id="address_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                <p class="modal-body-text">選択したファイルを削除しますか?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="dl_del_address_modal_btn" type="button"
+                    class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 一括削除用モーダル -->
+<div class="modal fade" id="address_multi_delete_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content center-modal">
+            <div class="modal-header delete_modal_header">
+                <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+            </div>
+            <div class="modal-body">
+                選択したファイルを削除しますか?
+            </div>
+            <div class="modal-footer">
+                <button id="address_multi_delete_modal_btn" type="button"
+                    class="btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                    data-dismiss="modal">キャンセル</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!------------------------新規作成用モーダル-------------------------->
+<form action="" method="post" id="myForm">
+    {% csrf_token %}
+    
+    <div class="modal fade" id="sign_up_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content address_sign_up_modal" >
+
+                <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+                    <span class="big_modal_title">新規登録</span>
+                    <i class="fas fa-address-book fa-2x icon-address-book mr-3"></i>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+        
+            <div class="modal-body address_sign_up_modal_body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th class="th_w">
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">種別</div>
+                                </div>
+                            </th>
+                            <td class="">{{ form.legal_or_individual }}</td>
+                        </tr>
+
+                        <tr class="tr_legal_personality disp">
+                            <th>
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">法人格</div>
+                                </div>
+                            </th>
+                            <td>{% render_field form.legal_personality class="form-control" placeholder="法人格" %}
+                            </td>
+                        </tr>
+
+
+                        <tr class="tr_legal_person_posi disp">
+                            <th>
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">法人格 前後</div>
+                                </div>
+                            </th>
+                            <td class="">{{ form.legal_person_posi }}{{ form.legal_person_posi.errors }}</td>
+                        </tr>
+
+                        <tr class="tr_company_name disp">
+                            <th>
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">法人名</div>
+                                </div>
+                            </th>
+                            <td>{% render_field form.company_name class="form-control" placeholder="法人名"%}</td>
+                        </tr>
+
+                        <tr class="tr_trade_name hidden">
+                            <th>
+                                <div class="option_box">
+                                    <div class="address_sign_up_list">屋号名</div>
+                                </div>
+                            </th>
+                            <td>{% render_field form.trade_name class="form-control" placeholder="屋号名" %}</td>
+                        </tr>
+
+                        <tr class="tr_department_name disp">
+                            <th>
+                                <div class="option_box">
+                                    <div class="address_sign_up_list">部署名</div>
+                                </div>
+                            </th>
+                            <td>{% render_field form.department_name class="form-control" placeholder="部署名"%}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">氏名</div>
+                                </div>
+                            </th>
+                            <td class="d-flex pt-0 pb-0">
+                                {% render_field form.last_name class="form-control address_last_name" placeholder="姓"%}
+                                {% render_field form.first_name class="form-control address_first_name ml-2" placeholder="名"%}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="required_box">
+                                    <div class="address_sign_up_list">メールアドレス</div>
+                                </div>
+                            </th>
+                            <td>{% render_field form.email class="form-control" placeholder="メールアドレス"%}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <!--modal body-->
+
+
+            <div class="modal-footer address_sign_up_modal_footer">
+                <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn ml-2 rounded-0 confirm_sign_up"
+                    data-toggle="modal" data-target="#confirm_modal_for_sign_up" id="confirm_button" disabled>確認</button>
+
+
+                <button type="button" onfocus="this.blur();"
+                    class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0 sign_up_modal_cancel_btn" data-dismiss="modal">キャンセル</button>
+            </div>
+
+        </div>
+        <!--modal-content-->
+    </div>
+    <!--modal-dialog-->
+</div>
+<!--modal fade-->
+</form>
+
+
+
+<!--編集用モーダル-->
+<form action="" method="post" id="updateMyForm">
+{% csrf_token %}
+
+<div class="modal fade" id="update_sign_up_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content address_sign_up_modal">
+
+            <div class="modal-header address_lists_modal_header d-flex justify-content-center">
+                <span class="big_modal_title">アドレス帳 編集画面</span>
+                <i class="fas fa-address-book fa-2x icon-address-book mr-3"></i>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+
+        <div class="modal-body address_sign_up_modal_body">
+            <table class="table table-borderless">
+                <tbody>
+
+                    <tr>
+                        <th class="th_w">
+                            <div class="required_box">
+                                <div class="address_sign_up_list">種別</div>
+                            </div>
+                        </th>
+                        <td class="">{{ form.legal_or_individual }}</td>
+                    </tr>
+
+                    <tr class="tr_legal_personality disp">
+                        <th>
+                            <div class="required_box">
+                                <div class="address_sign_up_list">法人格</div>
+                            </div>
+                        </th>
+                        <td>
+                            {% render_field form.legal_personality class="form-control" placeholder="法人格"%}
+                        </td>
+
+
+                    </tr>
+
+
+                    <tr class="tr_legal_person_posi disp">
+                        <th>
+                            <div class="required_box">
+                                <div class="address_sign_up_list">法人格 前後</div>
+                            </div>
+                        </th>
+                        <td class="">{{ form.legal_person_posi }}{{ form.legal_person_posi.errors }}</td>
+                    </tr>
+
+                    <tr class="tr_company_name disp">
+                        <th>
+                            <div class="required_box">
+                                <div class="address_sign_up_list">法人名</div>
+                            </div>
+                        </th>
+                        <td>{% render_field form.company_name class="form-control" placeholder="法人名" %}</td>
+
+
+                    </tr>
+
+                    <tr class="tr_trade_name hidden">
+                        <th>
+                            <div class="option_box">
+                                <div class="address_sign_up_list">屋号名</div>
+                            </div>
+                        </th>
+                        <td>{% render_field form.trade_name class="form-control" placeholder="屋号名" %}</td>
+                    </tr>
+
+                    <tr class="tr_department_name disp">
+                        <th>
+                            <div class="option_box">
+                                <div class="address_sign_up_list">部署名</div>
+                            </div>
+                        </th>
+                        <td>{% render_field form.department_name class="form-control" placeholder="部署名"%}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            <div class="required_box">
+                                <div class="address_sign_up_list">氏名</div>
+                            </div>
+                        </th>
+                        <td class="d-flex pt-0 pb-0">
+                            {% render_field form.last_name class="form-control address_last_name" placeholder="姓"%}
+                            {% render_field form.first_name class="form-control address_first_name ml-2" placeholder="名"%}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            <div class="required_box">
+                                <div class="address_sign_up_list">メールアドレス</div>
+                            </div>
+                        </th>
+                        <td>{% render_field form.email class="form-control" placeholder="メールアドレス"%}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+                <div class="modal-footer address_sign_up_modal_footer">
+                    <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn ml-2 rounded-0"
+                        data-toggle="modal" data-target="#confirm_modal_for_update" id="update_data_btn" disabled>変更</button>
+                    <button type="button" onfocus="this.blur();"
+                        class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!------------------------------確認モーダル------------------------------->
+<div class="modal fade" id="confirm_modal_for_sign_up" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="dialog">
+        <div class="modal-content address_sign_up_confirm_modal">
+
+            <div class="modal-header default_modal_header">
+                <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+            </div>
+            
+            <div class="modal-body address_sign_up_confirm_modal_body">
+                <table class="table table-borderless">
+                    <tbody>
+
+                        <tr>
+                            <th class="th_w">
+                                <div class="address_sign_up_list">種別</div>
+                            </th>
+                            <td id="legal_or_individual"></td>
+                        </tr>
+
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list th_company_name">法人名</div>
+                            </th>
+                            <td id="company_name"></td>
+                        </tr>
+
+                        
+                        <tr class="confirm_modal_department_name disp">
+                            <th>
+                                <div class="address_sign_up_list">部署名</div>
+                            </th>
+                            <td id="department_name"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list">氏名</div>
+                            </th>
+                            <td id="full_name"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list">メールアドレス</div>
+                            </th>
+                            <td id="email"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+                <div class="modal-footer address_sign_up_confirm_modal_footer">
+                    <button type="submit" class="btn my-btn-w7 my-btn-h4 blue_btn ml-2 rounded-0"
+                        id="sign_up_button">登録</button>
+                    <button type="button" onfocus="this.blur();"
+                        class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                </div>
+
+        </div>
+        <!--modal-content-->
+    </div>
+    <!--modal-dialog-->
+</div>
+<!--modal fade-->
+
+<!------------------------------更新確認モーダル------------------------------->
+<div class="modal fade" id="confirm_modal_for_update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="dialog">
+        <div class="modal-content address_sign_up_confirm_modal">
+
+            <div class="modal-header default_modal_header">
+                <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+            </div>
+            
+            <div class="modal-body address_sign_up_confirm_modal_body">
+                <table class="table table-borderless">
+                    <tbody>
+
+                        <tr>
+                            <th class="th_w">
+                                <div class="address_sign_up_list">種別</div>
+                            </th>
+                            <td id="update_legal_or_individual"></td>
+                        </tr>
+
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list th_company_name">法人名</div>
+                            </th>
+                            <td id="update_company_name"></td>
+                        </tr>
+
+                        
+                        <tr class="confirm_modal_department_name disp">
+                            <th>
+                                <div class="address_sign_up_list">部署名</div>
+                            </th>
+                            <td id="update_department_name"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list">氏名</div>
+                            </th>
+                            <td id="update_full_name"></td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                <div class="address_sign_up_list">メールアドレス</div>
+                            </th>
+                            <td id="update_email"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+                <div class="modal-footer address_sign_up_confirm_modal_footer">
+                    <button type="submit" class="btn my-btn-w7 my-btn-h4 blue_btn ml-2 rounded-0"
+                        id="update_button">登録</button>
+                    <button type="button" onfocus="this.blur();"
+                        class="btn my-btn-w7 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+                </div>
+
+        </div>
+        <!--modal-content-->
+    </div>
+    <!--modal-dialog-->
+</div>
+<!--modal fade-->
+
+
+<!---汎用トーストメッセージ--->
+<div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+    <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+        <div class="toast-body">
+            <div>
+                メッセージを動的に変更
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+//checkbox全選択
+
+$(function () {
+    // 「全選択」する
+    $('#all_address_list').on('click', function () {
+        $("input[name='address_list_ids']").prop('checked', this.checked);
+    });
+
+    // 「全選択」以外のチェックボックスがクリックされたら、
+    $("input[name='address_list_ids']").on('click', function () {
+        if ($('#address_list_boxes :checked').length == $('#address_list_boxes :input').length) {
+            // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+            $('#all_address_list').prop('checked', true);
+        } else {
+            // 1つでもチェックが入っていたら、「全選択」 = checked
+            $('#all_address_list').prop('checked', false);
+        }
+    });
+});
+
+//button活性 非活性  一括削除 全選択時
+
+$("#all_address_list").change(function () {
+    var checks = [];
+    $("#address_list_table [name='address_list_ids']:checked").each(function () {
+        checks.push(this.value);
+    });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#address_multi_delete_button').prop("disabled", false);
+    } else {
+        $('#address_multi_delete_button').prop("disabled", true);
+    }
+});
+
+//button活性 非活性  一括削除 個別択時
+
+$("#address_list_table [name='address_list_ids']").change(function () {
+    var checks = [];
+    $("#address_list_table [name='address_list_ids']:checked").each(function () {
+        checks.push(this.value);
+    });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#address_multi_delete_button').prop("disabled", false);
+    } else {
+        $('#address_multi_delete_button').prop("disabled", true);
+    }
+});
+
+
+//確認モーダルを表示する際に新規登録モーダルのz-indexを調整する
+$('#sign_up_modal').on('show.bs.modal', function (event) {
+const $currentModal = $(event.currentTarget);
+var zIndex = 1040 + (10 * $('.modal:visible').length);
+$currentModal.css('z-index', zIndex);
+setTimeout(function () {
+    $('.modal-backdrop')
+        .not('.modal-stack')
+        .css('z-index', zIndex - 1)
+        .addClass('modal-stack');
+}, 0);
+});
+
+//更新確認モーダルを表示する際に編集モーダルのz-indexを調整する
+$('#update_sign_up_modal').on('show.bs.modal', function (event) {
+const $currentModal = $(event.currentTarget);
+var zIndex = 1040 + (10 * $('.modal:visible').length);
+$currentModal.css('z-index', zIndex);
+setTimeout(function () {
+    $('.modal-backdrop')
+        .not('.modal-stack')
+        .css('z-index', zIndex - 1)
+        .addClass('modal-stack');
+}, 0);
+});
+
+$('input[name=legal_or_individual]').on('change', function (event) {
+    switchLegalOrIndividual($(this).val())
+
+    function switchLegalOrIndividual(type) {
+
+        if (type == "1") { //法人
+            $(".tr_trade_name").removeClass('disp');
+            $(".tr_trade_name").addClass('hidden');
+            $(".tr_trade_name #id_trade_name").prop('disabled', true);
+            $(".tr_legal_personality").removeClass('hidden').addClass('disp');
+            $("#id_legal_personality").prop('disabled', false);
+            $(".tr_legal_person_posi").removeClass('hidden').addClass('disp');
+            $("input[name=legal_person_posi]").prop('disabled', false);
+            $(".tr_company_name").removeClass('hidden').addClass('disp');
+            $(".tr_company_name #id_company_name").prop('disabled', false);
+            $(".tr_department_name").removeClass('hidden').addClass('disp');
+            $("#id_department_name").prop('disabled', false);
+            
+        } else if (type == "2") { //個人
+            $(".tr_trade_name").removeClass('hidden');
+            $(".tr_trade_name").addClass('disp');
+            $(".tr_trade_name #id_trade_name").prop('disabled', false);
+            $(".tr_legal_personality").removeClass('disp').addClass('hidden');
+            $("#id_legal_personality").prop('disabled', true);
+            $(".tr_legal_person_posi").removeClass('disp').addClass('hidden');
+            $("input[name=legal_person_posi]").prop('disabled', true);
+            $(".tr_company_name").removeClass('disp').addClass('hidden');
+            $(".tr_company_name #id_company_name").prop('disabled', true);
+            $("#id_department_name").prop('disabled', true);
+            $(".tr_department_name").removeClass('disp').addClass('hidden');
+        }
+    }
+});
+
+// 新規登録モーダルキャンセルボタンがクリックされたときモーダル内を種別以外を初期値に戻す
+//種別のvalueを初期値にするとモーダルの切り替えができなくなるため
+$('.sign_up_modal_cancel_btn').on('click',function(){
+    $("#id_company_name").val("");
+    $("#id_department_name").val("");
+    $("#id_last_name").val("");
+    $("#id_first_name").val("");
+    $("#id_email").val("");
+    $("#id_trade_name").val("");
+});
+
+//確認モーダル
+$('#confirm_modal_for_sign_up').on('show.bs.modal', function (event) {
+    //種別
+    var legal_or_individual = $('input[name=legal_or_individual]:checked').val()
+
+    if (legal_or_individual == "1") {
+        $('#legal_or_individual').text('法人');
+        $('.th_company_name').text('法人名')
+
+        //法人格
+        var legal_personality_number = $('#id_legal_personality').val()
+
+        if (legal_personality_number == "1") {
+            legal_personality = '株式会社'
+
+        } else if (legal_personality_number == "2") {
+            legal_personality = '合同会社'
+
+        } else if (legal_personality_number == "3") {
+            legal_personality = '合資会社'
+
+        } else if (legal_personality_number == "4") {
+            legal_personality = '合名会社'
+
+        }
+
+        //法人名の生成
+        var legal_person_posi = $('input[name=legal_person_posi]:checked').val()
+        var company_name = $('#id_company_name').val()
+
+        if (legal_person_posi == "1") {
+            $('#company_name').text(legal_personality + " " + company_name)
+
+        } else if (legal_person_posi == "2") {
+            $('#company_name').text(company_name + " " + legal_personality)
+        }
+
+        //部署名
+        $(".confirm_modal_department_name").removeClass('hidden');
+        $(".confirm_modal_department_name").addClass('disp');
+
+        var department_name = $('#id_department_name').val()
+        if (department_name == "") {
+            $('#department_name').text('記載なし');
+        } else {
+            $('#department_name').text(department_name)
+        }
+
+    } else if (legal_or_individual == 2) {
+        $('#legal_or_individual').text('個人');
+        $('.th_company_name').text('屋号名')
+
+        //屋号
+        var company_name = $('.tr_trade_name #id_trade_name').val()
+        $('#company_name').text(company_name)
+
+        //部署名表示しない処理
+        $(".confirm_modal_department_name").removeClass('disp');
+        $(".confirm_modal_department_name").addClass('hidden');
+    }
+
+        //姓と名
+        var last_name = $('#id_last_name').val()
+        var first_name = $('#id_first_name').val()
+        var full_name_var = last_name + " " + first_name
+        $('#full_name').text(full_name_var)
+        //メールアドレス
+        var email = $('#id_email').val()
+        $('#email').text(email)
+
+        //表示名作成
+        var full_name_preview = company_name + " " + full_name_var
+
+        //submit
+        $('#sign_up_button').on('click', function (event) {
+            $('#myForm').submit()
+        });
+    });
+
+//更新確認モーダル
+$('#confirm_modal_for_update').on('show.bs.modal', function (event) {
+    //種別
+    var update_legal_or_individual = $('#update_sign_up_modal input[name=legal_or_individual]:checked').val()
+    if (update_legal_or_individual == "1") {
+        $('#update_legal_or_individual').text('法人');
+        $('.th_company_name').text('法人名')
+
+        //法人格
+        var update_legal_personality_number = $('#update_sign_up_modal #id_legal_personality').val()
+
+        if (update_legal_personality_number == "1") {
+            update_legal_personality = '株式会社'
+
+        } else if (update_legal_personality_number == "2") {
+            update_legal_personality = '合同会社'
+
+        } else if (update_legal_personality_number == "3") {
+            update_legal_personality = '合資会社'
+
+        } else if (update_legal_personality_number == "4") {
+            update_legal_personality = '合名会社'
+
+        }
+
+        //法人名の生成
+        var update_legal_person_posi = $('#update_sign_up_modal input[name=legal_person_posi]:checked').val()
+        var update_company_name = $('#update_sign_up_modal #id_company_name').val()
+
+        if (update_legal_person_posi == "1") {
+            $('#update_company_name').text(update_legal_personality + " " + update_company_name)
+
+        } else if (update_legal_person_posi == "2") {
+            $('#update_company_name').text(update_company_name + " " + update_legal_personality)
+        }
+
+        //部署名
+        $(".confirm_modal_department_name").removeClass('hidden');
+        $(".confirm_modal_department_name").addClass('disp');
+
+        var update_department_name = $('#update_sign_up_modal #id_department_name').val()
+        if (update_department_name == "") {
+            $('#update_department_name').text('記載なし');
+        } else {
+            $('#update_department_name').text(update_department_name)
+        }
+
+    } else if (update_legal_or_individual == 2) {
+        $('#update_legal_or_individual').text('個人');
+        $('.th_company_name').text('屋号名')
+
+        //屋号
+        var update_company_name = $('#update_sign_up_modal .tr_trade_name #id_trade_name').val()
+        $('#update_company_name').text(update_company_name)
+
+        //部署名表示しない処理
+        $(".confirm_modal_department_name").removeClass('disp');
+        $(".confirm_modal_department_name").addClass('hidden');
+    }
+
+        //姓と名
+        var update_last_name = $('#update_sign_up_modal #id_last_name').val()
+        var update_first_name = $('#update_sign_up_modal #id_first_name').val()
+        var update_full_name_var = update_last_name + " " + update_first_name
+        $('#update_full_name').text(update_full_name_var)
+        //メールアドレス
+        var update_email = $('#update_sign_up_modal #id_email').val()
+        $('#update_email').text(update_email)
+
+        //表示名作成
+        var full_name_preview = update_company_name + " " + update_full_name_var
+    
+    });
+
+
+
+// ---------------------
+// validateのoption作成
+// ---------------------
+
+// 新規登録モーダル
+$(function () {
+    var new_valid = {
+
+        errorElement: "div", // labelがdivにかわる
+        errorClass: "is-error",
+        rules: {
+            legal_or_individual: {
+                required: true,
+            },
+            legal_person_posi: {
+                required: true,
+            },
+            company_name: {
+                required: true,
+                maxlength: 25,
+            },
+            department_name: {
+                maxlength: 25,
+                required: false,
+            },
+            last_name: {
+                required: true,
+                maxlength: 10,
+            },
+            first_name: {
+                required: true,
+                maxlength: 10,
+            },
+            email: {
+                required: true,
+                email: true,
+                remote:{
+                    type:"post",
+                    async:false,
+                    url:"{% url 'draganddrop:address_email_validation' %}",
+                }
+            },
+        },
+
+        // エラーメッセージ
+        messages: {
+            legal_or_individual: {
+                required: '種別を選択してください',
+            },
+            legal_person_posi: {
+                required: '法人格 前後を選択してください',
+            },
+            company_name: {
+                required: '法人名を入力してください',
+                maxlength: '法人名は25文字以内に入力してください。',
+            },
+            department_name: {
+                maxlength: '部署名は25文字以内に入力してください。',
+            },
+            last_name: {
+                required: '氏名(姓)を入力してください',
+                maxlength: '氏名(姓)は10文字以内に入力してください。',
+            },
+            first_name: {
+                required: '氏名(名)を入力してください',
+                maxlength: '氏名(名)は10文字以内に入力してください。',
+            },
+            email: {
+                required: 'メールアドレスを入力してください。',
+                email: 'メールアドレスの形式で入力して下さい。',
+                remote: '既に登録されているメールアドレスです。'
+            },
+        },
+
+        //エラーメッセージの表示場所を設定
+        errorPlacement: function (err, elem) {
+            if (elem.attr("name") == "legal_or_individual") {
+                elem.parent().parent().append(err)
+            } else if (elem.attr("name") == "legal_person_posi") {
+                elem.parent().parent().append(err)
+            } else if (elem.attr("name") == "last_name") {
+                elem.parent().parent().append(err.addClass("ml-3 mr-3 d-inline-block"))
+            } else if (elem.attr("name") == "first_name") {
+                elem.parent().parent().append(err.addClass("ml-5 d-inline-block"))
+            } else {
+                err.insertAfter(elem); // default error placement.
+            }
+        }
+    }
+        // 確認ボタンクリックした時
+        $(".confirm_sign_up").on('click', function (event) {
+            new_form_validator = $('#myForm').validate(new_valid);
+            if ($("#myForm").valid()) {
+                return true;
+            } else {
+                $('.confirm_sign_up').prop('disabled', true); //validationの結果がfalseの場合
+                return false;
+            }
+        });
+    });
+
+//編集モーダル
+$(function () {
+    var new_valid_for_update = {
+
+        errorElement: "div", // labelがdivにかわる
+        errorClass: "is-error",
+        rules: {
+            legal_or_individual: {
+                required: true,
+            },
+            company_name: {
+                required: false,
+                maxlength: 25,
+            },
+            department_name: {
+                maxlength: 25,
+                required: false,
+            },
+            last_name: {
+                required: true,
+                maxlength: 10,
+            },
+            first_name: {
+                required: true,
+                maxlength: 10,
+            },
+            email: {
+                required: true,
+                email: true,
+            },
+        },
+
+        // エラーメッセージ
+        messages: {
+            legal_person_posi: {
+                required: '法人格 前後を選択してください',
+            },
+            company_name: {
+                //required: '法人名を入力してください',
+                maxlength: '屋号名は25文字以内に入力してください。',
+            },
+            department_name: {
+                maxlength: '部署名は25文字以内に入力してください。',
+            },
+            last_name: {
+                required: '氏名(姓)を入力してください',
+                maxlength: '氏名(姓)は10文字以内に入力してください。',
+            },
+            first_name: {
+                required: '氏名(名)を入力してください',
+                maxlength: '氏名(名)は10文字以内に入力してください。',
+            },
+            email: {
+                required: 'メールアドレスを入力してください。',
+                email: 'メールアドレスの形式で入力して下さい。'
+            },
+
+        },
+
+        //エラーメッセージの表示場所を設定
+        errorPlacement: function (err, elem) {
+            if (elem.attr("name") == "legal_or_individual") {
+                elem.parent().parent().append(err)
+            } else if (elem.attr("name") == "legal_person_posi") {
+                elem.parent().parent().append(err)
+            } else if (elem.attr("name") == "last_name") {
+                elem.parent().parent().append(err.addClass("ml-3 mr-3 d-inline-block"))
+            } else if (elem.attr("name") == "first_name") {
+                elem.parent().parent().append(err.addClass("ml-5 d-inline-block"))
+            } else {
+                err.insertAfter(elem); // default error placement.
+            }
+        }
+    }
+    // 変更ボタンクリックした時
+    $("#update_data_btn").on('click', function (event) {
+    // $(document).on("click", "#update_data_btn", function(){
+        new_update_form_validator = $('#updateMyForm').validate(new_valid_for_update);
+        //失敗で戻る（実際のヴァリデーションが動くトリガーになっている部分）
+        if (!$("#updateMyForm").valid()) {
+            return false;
+        };
+    });
+});
+
+// -----------------
+// Data table
+// -----------------
+
+$(document).ready(function () {
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+            url: "http://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json"
+        }
+    });
+    var table = $('#address_list_table').DataTable({
+        lengthMenu: [10, 15, 20],
+        order: [
+            [3, 'desc']
+        ],
+        columnDefs: [{
+                "targets": [0, 1, 6, 7],
+                "orderable": false
+            },
+
+        ]
+    });
+});
+
+
+// -----------------
+// 個別削除
+// -----------------
+
+var delete_id = ""
+var delete_name = ""
+
+$('#address_del_task_modal').off('show.bs.modal');
+$('#address_del_task_modal').on('show.bs.modal', function (event) {
+
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var delete_id = button.data('delete_id')
+    var delete_name = button.data('delete_name')
+    var modal = $(this);
+    modal.find('.modal-body-text').text(delete_name + "を削除しますか？");
+
+    $('#dl_del_address_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#dl_del_address_modal_btn').on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:address_delete" %}',
+            data: {
+                'address_delete_id': delete_id,
+                'address_delete_name': delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ユーザーを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+            }
+        });
+    });
+
+});
+
+
+// -----------------
+// 複数削除
+// -----------------
+//削除ボタンをクリックした時の処理
+$('#address_multi_delete_modal_btn').on('click', function () {
+
+
+    var vals = [];
+    //テンプレートのnameを指定してvalueの値を取得
+    // 取得した値をeachで回してlist型の値を作る
+
+    $('input[name = address_list_ids]:checked').each(function () {
+        vals.push($(this).val());
+
+    });
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:address_multi_delete" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            'address_delete_ids': vals
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("ユーザーを削除しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+        }
+    });
+
+});
+
+
+// -----------------
+// 編集
+// -----------------
+
+// モーダルが表示されたときにサーバーから取得した値を表示する
+$('#update_sign_up_modal').on('show.bs.modal', function (event) {
+    // 変更ボタンを有効にする
+    $("#update_data_btn").prop('disabled', false); 
+
+    //モーダルを開いたボタンを取得
+    var button = $(event.relatedTarget);
+
+    var address_list_id = button.data('address_list_id')
+
+        
+    // ボタン押下時,サーバとのAjax通信を開始
+    $.ajax({
+        type: 'GET',
+
+        url: '/get_update_address_modal/' + address_list_id, // 通信先のURL
+
+        dataType: 'json',
+        success: function (data) {
+            if (data.legal_or_individual == 1) {
+                $(".tr_trade_name").removeClass('disp');
+                $(".tr_trade_name").addClass('hidden');
+                $(".tr_trade_name #id_trade_name").prop('disabled', true);
+                $(".tr_legal_personality").removeClass('hidden').addClass('disp');
+                $("#id_legal_personality").prop('disabled', false);
+                $(".tr_legal_person_posi").removeClass('hidden').addClass('disp');
+                $("input[name=legal_person_posi]").prop('disabled', false);
+                $(".tr_company_name").removeClass('hidden').addClass('disp');
+                $(".tr_company_name #id_company_name").prop('disabled', false);
+                $(".tr_department_name").removeClass('hidden').addClass('disp');
+                $("#id_department_name").prop('disabled', false);
+                $('#update_sign_up_modal #id_legal_or_individual_0').prop("checked", true);
+                $('#update_sign_up_modal #id_legal_or_individual').val(data.legal_or_individual);
+                $('#update_sign_up_modal #id_legal_personality').val(data.legal_personality);
+                if (data.legal_person_posi == 1) {
+                    $('#update_sign_up_modal #id_legal_person_posi_0').prop("checked", true);
+                } else {
+                    $('#update_sign_up_modal #id_legal_person_posi_1').prop("checked", true);
+                }
+                $('#update_sign_up_modal #id_company_name').val(data.company_name);
+                $('#update_sign_up_modal #id_trade_name').val(data.trade_name);
+                $('#update_sign_up_modal #id_department_name').val(data.department_name);
+                $('#update_sign_up_modal #id_last_name').val(data.last_name);
+                $('#update_sign_up_modal #id_first_name').val(data.first_name);
+                $('#update_sign_up_modal #id_email').val(data.email);
+
+            } else {
+                $('#update_sign_up_modal #id_legal_or_individual_1').prop("checked", true);
+                $(".tr_trade_name").removeClass('hidden');
+                $(".tr_trade_name").addClass('disp');
+                $(".tr_trade_name #id_trade_name").prop('disabled', false);
+                $(".tr_legal_personality").removeClass('disp').addClass('hidden');
+                $("#id_legal_personality").prop('disabled', true);
+                $(".tr_legal_person_posi").removeClass('disp').addClass('hidden');
+                $("input[name=legal_person_posi]").prop('disabled', true);
+                $(".tr_company_name").removeClass('disp').addClass('hidden');
+                $(".tr_company_name #id_company_name").prop('disabled', true);
+                $("#id_department_name").prop('disabled', true);
+                $(".tr_department_name").removeClass('disp').addClass('hidden');
+                $('#update_sign_up_modal #id_trade_name').val(data.trade_name);
+                $('#update_sign_up_modal #id_last_name').val(data.last_name);
+                $('#update_sign_up_modal #id_first_name').val(data.first_name);
+                $('#update_sign_up_modal #id_email').val(data.email);
+            }
+        }
+    });
+
+    // 変更ボタンが押されたときの処理
+    $('#update_button').on('click', function () {
+        $('#update_sign_up_modal').hide();
+        $('#confirm_modal_for_update').hide();
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+
+            
+        //種別
+        var legal_or_individual = $('#update_sign_up_modal input[name=legal_or_individual]:checked').val()
+
+        if (legal_or_individual == "1") {
+            //法人格
+            var legal_personality = $('#update_sign_up_modal #id_legal_personality').val()
+
+            //法人格(前後)
+            var legal_person_posi = $('#update_sign_up_modal input[name=legal_person_posi]:checked').val()
+            
+            //法人名
+            var company_name = $('#update_sign_up_modal #id_company_name').val()
+            
+            //部署名
+            if ($('#update_sign_up_modal #id_department_name').val()) {
+                //部署名
+                var department_name = $('#update_sign_up_modal #id_department_name').val()
+            }
+
+        } else {
+            //法人格
+            var legal_personality = 0;
+            //法人格(前後)
+            var legal_person_posi = 0;
+            if ($('#update_sign_up_modal #id_trade_name').val()) {
+                //屋号名
+                var trade_name = $('#update_sign_up_modal #id_trade_name').val()
+            }
+        }
+
+        //姓と名
+        var last_name = $('#update_sign_up_modal #id_last_name').val()
+
+        var first_name = $('#update_sign_up_modal #id_first_name').val()
+
+        //メールアドレス
+        var email = $('#update_sign_up_modal #id_email').val()
+
+        //表示名
+        var full_name_preview = $('#update_sign_up_modal #id_full_name_preview').val()
+        
+        // ★変数に格納値をサーバーへ送信する(data{})
+        //コロンで区切った左側がサーバ側で受け取る時の名前、右側が上で格納した変数名
+
+        $.ajax({
+            type: 'POST',
+            url: '/address_update/' + address_list_id + '/', // 通信先のURL
+            dataType: 'json',
+            // Ajaxで送る値を定義
+            data: {
+                'legal_or_individual': legal_or_individual,
+                'legal_personality': legal_personality,
+                'legal_person_posi': legal_person_posi,
+                'company_name': company_name,
+                'trade_name' : trade_name,
+                'department_name': department_name,
+                'last_name': last_name,
+                'first_name': first_name,
+                'email': email,
+                'full_name_preview': full_name_preview,
+            },
+            //処理が成功したときの処理
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                    var toast = $(this);
+                    toast.find('.toast-body').addClass('alert-success');
+                    toast.find('.toast-body').text("更新しました");
+                    });
+                    $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                    setTimeout(function(){
+                        window.location.href = "./";},1*1000);
+            }
+        })
+    });
+});
+
+//button活性 非活性  アドレス帳一覧 全選択時
+
+
+$("#all").change(function () {
+    var checks = [];
+    $("#download_table [name='dest_user_ids']:checked").each(function () {
+        checks.push(this.value);
+    });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#address_multi_delete_button').prop("disabled", false);
+    } else {
+        $('address_#multi_delete_button').prop("disabled", true);
+    }
+});
+
+//button活性 非活性  アドレス帳一覧 個別択時
+
+
+$("#download_table [name='dest_user_ids']").change(function () {
+    var checks = [];
+    $("#download_table [name='dest_user_ids']:checked").each(function () {
+        checks.push(this.value);
+    });
+
+    // チェックされている場合は有効、チェックされていない場合は無効化
+    if (checks.length > 0) {
+        $('#address_multi_delete_button').prop("disabled", false);
+    } else {
+        $('#address_multi_delete_button').prop("disabled", true);
+    }
+});
+
+// ---------------------------------
+// 全選択ボタン次ページでも動作させる処理
+// ---------------------------------
+
+$(function (){
+    var table = $('#address_list_table').DataTable();
+
+    table.on( 'page.dt', function () {
+        var info = table.page.info();
+        var info_page = table.$('input, checkbox');
+        var table_data = table.data();
+        //処理を遅らせる
+        setTimeout(function(){
+        var all_user = $("input[name='address_list_ids']") //全ユーザー数
+        var all_checked_user = $("input[name='address_list_ids']:checked") //チェック済みユーザー数
+        $("#all_address_list").prop('checked', (all_user.length == all_checked_user.length));
+        // 一括削除ボタンチェックされている場合は有効、チェックされていない場合は無効化
+        if (all_checked_user.length > 0) {
+            $('#address_multi_delete_button').prop("disabled", false);
+        } else {
+            $('#address_multi_delete_button').prop("disabled", true);
+        }
+        },10);
+    } );
+})
+
+// ---------------------------------
+// 確認ボタンの制御
+// ---------------------------------
+
+// フォームに文字を入力した時
+$("#id_company_name, #id_last_name, #id_first_name, #id_email").on('input dp.change click', function () {
+    var legal_or_individual = $('input[name=legal_or_individual]:checked').val()
+
+    // 種別が法人の時
+    if (legal_or_individual == "1") {
+        // 新規登録モーダル
+        if (!$("#sign_up_modal input[name='company_name']").val() == '' && (!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+                $("#confirm_button").prop('disabled', false); 
+        // 編集モーダル
+        } else if (!$("#update_sign_up_modal input[name='company_name']").val() == '' && (!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+                $("#update_data_btn").prop('disabled', false); 
+        }else {
+                $("#confirm_button").prop('disabled', true); 
+                $("#update_data_btn").prop('disabled', true); 
+        }
+    // 種別が個人の時
+    } else {
+        // 新規登録モーダル
+        if ((!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+            $("#confirm_button").prop('disabled', false); 
+        // 編集モーダル
+        } else if ((!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+            $("#update_data_btn").prop('disabled', false);
+        }else {
+                $("#confirm_button").prop('disabled', true);
+                $("#update_data_btn").prop('disabled', true); 
+            }
+        }
+    });   
+
+//  法人と個人を切り替えた時
+$('input[name=legal_or_individual]').on('change', function (event) {
+    switchLegalOrIndividual($(this).val())
+    function switchLegalOrIndividual(type) {
+        console.log("type", type)
+        if (type == "1") {
+            // 新規登録モーダル
+            if (!$("#sign_up_modal input[name='company_name']").val() == '' && (!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+                $("#confirm_button").prop('disabled', false); 
+            // 編集モーダル
+            } else if (!$("#update_sign_up_modal input[name='company_name']").val() == '' && (!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+                $("#update_data_btn").prop('disabled', false); 
+            }else {
+                $("#confirm_button").prop('disabled', true); 
+                $("#update_data_btn").prop('disabled', true); 
+            }
+        }else {
+            // 新規登録モーダル
+            if ((!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+                $("#confirm_button").prop('disabled', false); 
+            // 編集モーダル
+            } else if ((!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+                $("#update_data_btn").prop('disabled', false);
+            } else {
+                $("#confirm_button").prop('disabled', true);
+                $("#update_data_btn").prop('disabled', true); 
+                }
+        }
+    }   
+});   
+
+</script>
+
+{% endblock %}

@@ -12,7 +12,6 @@ def regcreate_white():
 
     """任意の許可リスト読み込み"""
     white_domain = accounts.list.list_white.white_domain
-    print("ホワイトドメイン", white_domain)
 
     # リスト無いの文字列を結合させる
     white_domain_join =  '|'.join(white_domain)
@@ -23,7 +22,5 @@ def regcreate_white():
 
     # 正規表現を生成
     reg = domain_reg + "|" + subdomain_reg
-
-    print('ドメインの正規表現', reg)
 
     return reg

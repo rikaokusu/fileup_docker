@@ -1,0 +1,564 @@
+{% extends "common/base.html" %}
+
+{% load i18n static %}
+{% load widget_tweaks %}
+
+{% block title %}ユーザー作成{% endblock title %}
+
+{% block breadcrumbtitle %}
+  <span>
+    ユーザー作成
+  </span>
+
+    {% comment %} <a class="help_icon" href="{% url 'help:creation_user' %}" target="_blank"><i class="fas fa-question-circle"></i></a> {% endcomment %}
+{% endblock breadcrumbtitle %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data" validate data-validate>
+<div class="container user">
+  <div class="card card-register border-0 mt-0">
+      <div class="card-body user_create_body">
+          {% csrf_token %}
+
+          <!-- messages.succes や messages.errorにて利用 -->
+          {% if messages %}
+          <div class="messages">
+              {% for message in messages %}
+              <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+              {% endfor %}
+          </div>
+          {% endif %}
+
+
+          <!-- Form全体のバリデーション時のエラーを表示 -->
+          {% if form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                  {% for error in form.non_field_errors %}
+                      {{ error }}
+                  {% endfor %}
+              </div>
+          {% endif %}
+
+
+          <table class="table table-sm table-bordered">
+            <tbody>
+              <tr>
+                <th class="tr_head">
+                  <div class="required_box">
+                    <div class="label require_label">メールアドレス</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.email.errors %}<!-- エラー時の表示 -->
+                        <div class="domain-display">
+                            <!-- 入力フィールド -->
+                            <div class="form-inline">
+                              {% render_field form.email class="form-control is-invalid" placeholder="ユーザー名" id="email"%}
+                              <label for="email">@{{ current_user_domain }}</label>
+                            </div>
+                            <!-- エラー表示 -->
+                            {{form.email.errors}}
+                        </div>
+                        <div class="subdomain-display" style="display: none;">
+                          <!-- 入力フィールド -->
+                          <div class="form-inline">
+                            {% render_field form.email|append_attr:"disabled:disabled" class="form-control is-invalid" placeholder="ユーザー名" id="sub_email" %}
+                            <label for="email">@</label>
+                            {% render_field form.subdomain class="form-control is-invalid" placeholder="サブドメイン" %}
+                            <label for="email">.</label>
+                            <label for="email">{{ current_user_domain }}</label>
+                          </div>
+                          <!-- エラー表示 -->
+                          {{form.email.errors}}
+                        </div>
+
+                        {% for error in form.email.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        <div class="domain-display">
+                            <!-- 入力フィールド -->
+                            <div class="form-inline">
+                              {% render_field form.email class="form-control is-valid" placeholder="ユーザー名" id="email"%}
+                              <label for="email">@{{ current_user_domain }}</label>
+                            </div>
+                            <!-- エラー表示 -->
+                            {{form.email.errors}}
+                        </div>
+                        <div class="subdomain-display" style="display: none;">
+                          <!-- 入力フィールド -->
+                          <div class="form-inline">
+                            {% render_field form.email|append_attr:"disabled:disabled" class="form-control is-valid" placeholder="ユーザー名" id="sub_email" %}
+                            <label for="email">@</label>
+                            {% render_field form.subdomain class="form-control is-valid" placeholder="サブドメイン" %}
+                            <label for="email">.</label>
+                            <label for="email">{{ current_user_domain }}</label>
+                          </div>
+                          <!-- エラー表示 -->
+                          {{form.email.errors}}
+                        </div>
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                      <div class="domain-display">
+                          <!-- 入力フィールド -->
+                          <div class="form-inline">
+                            {% render_field form.email class="form-control" placeholder="ユーザー名" id="email"%}
+                            <label for="email">@{{ current_user_domain }}</label>
+                          </div>
+                          <!-- エラー表示 -->
+                          {{form.email.errors}}
+                      </div>
+                      <div class="subdomain-display" style="display: none;">
+                        <!-- 入力フィールド -->
+                        <div class="form-inline">
+                          {% render_field form.email|append_attr:"disabled:disabled" class="form-control" placeholder="ユーザー名" id="sub_email" %}
+                          <label for="email">@</label>
+                          {% render_field form.subdomain class="form-control" placeholder="サブドメイン" %}
+                          <label for="email">.</label>
+                          <label for="email">{{ current_user_domain }}</label>
+                        </div>
+                        <!-- エラー表示 -->
+                        {{form.email.errors}}
+                      </div>
+                  {% endif %}
+
+
+                  <!-- サブドメイン -->
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        <div class="form-inline subdomain_checkbox">
+                          {% render_field form.domain_check class="is-invalid mr-1" id="domain-check"%}
+                          <small class="form-text text-muted help_text">サブドメインを利用したい場合はチェックを入れてください。</small>
+                        </div>
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback subdomain_checkbox mr-1">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        <div class="form-inline subdomain_checkbox">
+                          {% render_field form.domain_check class="is-valid mr-1" id="domain-check"%}
+                          <small class="form-text text-muted help_text">サブドメインを利用したい場合はチェックを入れてください。</small>
+                        </div>
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    <div class="form-inline subdomain_checkbox">
+                      {% render_field form.domain_check class="mr-1"id="domain-check"%}
+                      <small class="form-text text-muted help_text">サブドメインを利用したい場合はチェックを入れてください。</small>
+                    </div>
+                  {% endif %}
+
+
+
+                </th>
+              </tr>
+
+
+              <tr>
+                <th class="tr_head">
+                  <div class="required_box">
+                    <div class="label require_label">姓</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.last_name class="form-control is-invalid" placeholder=form.last_name.label %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.last_name class="form-control is-valid" placeholder=form.last_name.label %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.last_name class="form-control" placeholder=form.last_name.label %}
+                  {% endif %}
+                </th>
+              </tr>
+
+              <tr>
+                <th class="tr_head">
+                  <div class="required_box">
+                    <div class="label require_label">名</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.first_name class="form-control is-invalid" placeholder=form.first_name.label %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.first_name class="form-control is-valid" placeholder=form.first_name.label %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.first_name class="form-control" placeholder=form.first_name.label %}
+                  {% endif %}
+                </th>
+              </tr>
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">ふりがな(姓)</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.p_last_name class="form-control is-invalid" placeholder=form.p_last_name.label %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.p_last_name class="form-control is-valid" placeholder=form.p_last_name.label %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.p_last_name class="form-control" placeholder=form.p_last_name.label %}
+                  {% endif %}
+                </th>
+              </tr>
+
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">ふりがな(名)</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.p_first_name class="form-control is-invalid" placeholder=form.p_first_name.label %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.p_first_name class="form-control is-valid" placeholder=form.p_first_name.label %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.p_first_name class="form-control" placeholder=form.p_first_name.label %}
+                  {% endif %}
+                </th>
+              </tr>
+
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">サービス</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.service class="is-invalid" %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.service class="is-valid" %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.service  %}
+                  {% endif %}
+                </th>
+              </tr>
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">メモ</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.domain_check.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.description class="form-control is-invalid" placeholder="30文字まで入力できます。" %}
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.description class="form-control is-valid" placeholder="30文字まで入力できます。" %}
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    {% render_field form.description class="form-control" placeholder="30文字まで入力できます。" %}
+                  {% endif %}
+                </th>
+              </tr>
+
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">管理者</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.is_staff.errors %}<!-- エラー時の表示 -->
+                        <div class="form-inline">
+                          {% render_field form.is_staff class="form-control is-invalid mr-1" placeholder="備考用にお使いください。" %}
+                          <small class="form-text text-muted help_text">管理者権限を付与したい場合はチェックを入れてください。</small>
+                        </div>
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        <div class="form-inline">
+                          {% render_field form.is_staff class="form-control is-valid mr-1" placeholder="備考用にお使いください。(最大20文字)" %}
+                          <small class="form-text text-muted help_text">管理者権限を付与したい場合はチェックを入れてください。</small>
+                        </div>
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                    <div class="form-inline">
+                      {% render_field form.is_staff class="form-control mr-1" %}
+                      <small class="form-text text-muted help_text">管理者権限を付与したい場合はチェックを入れてください。</small>
+                    </div>
+
+                  {% endif %}
+                </th>
+              </tr>
+
+
+              <tr>
+                <th class="tr_head">
+                  <div class="option_box">
+                    <div class="label option_label">サービス管理者</div>
+                  </div>
+                </th>
+                <th>
+                  <!-- 入力フィールド -->
+                  {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                      {% if form.service_admin.errors %}<!-- エラー時の表示 -->
+                        {% render_field form.service_admin class="form-control is-invalid" placeholder="" %}
+                        <small class="form-text text-muted help_text mt-1">サービスの管理者権限を付与したい場合はチェックを入れてください。</small>
+
+                        {% for error in form.domain_check.errors %}
+                          <div class="invalid-feedback">
+                            {{ error }}
+                          </div>
+                        {% endfor %}
+
+                      {% else %}<!-- 正常時の表示 -->
+                        {% render_field form.service_admin class="form-control is-valid" %}
+                        <small class="form-text text-muted help_text mt-1">サービスの管理者権限を付与したい場合はチェックを入れてください。</small>
+                      {% endif %}
+
+                  {% else %}<!-- 初期表示 -->
+                      {% render_field form.service_admin class="form-control" %}
+                      <small class="form-text text-muted help_text mt-1">サービスの管理者権限を付与したい場合はチェックを入れてください。</small>
+                  {% endif %}
+                </th>
+              </tr>
+
+
+            </tbody>
+          </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+    </div>
+  </div> <!-- end conter-->
+  </div> <!-- end conter-->
+
+          <div class="bar_button">
+
+            <div class="row">
+              <div class="col-sm-6 bar_button_r">
+                <button type="submit" class="my-btn my-btn-egypt-1 my-btn-w25" onfocus="this.blur();">登録</button>
+              </div>
+              <div class="col-sm-6 bar_button_l">
+                <a href="{% url 'accounts:user' %}" class="my-btn my-btn-cancel my-btn-w25" onfocus="this.blur();">キャンセル</a>
+              </div>
+            </div>
+          </div>
+
+        </form>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+
+$(function(){
+
+  // 戻るボタンで戻った時に値が入ったらボタンを有効化
+  $('form[data-validate]').each(function(){
+    $(this).find(':submit').prop('disabled', !this.checkValidity());
+  });
+
+  // 値が入ったらボタンを有効化
+  $('form[data-validate]').on('input', function () {
+    $(this).find(':submit').prop('disabled', !this.checkValidity());
+  });
+
+
+  // 再読込された場合の処理
+  if ( $('#domain-check').is(':checked') ){
+       // emailを無効、サブemailを有効
+      $('#email').prop('disabled', true);
+      $('#sub_email').prop('disabled', false);
+      $('.domain-display').css('display','none')
+      $('.subdomain-display').css('display','block')
+  } else {
+       // emailを有効、サブemailを無効
+      $('#email').prop('disabled', false);
+      $('#sub_email').prop('disabled', true);
+      $('.domain-display').css('display','block')
+      $('.subdomain-display').css('display','none')
+  }
+
+
+  $('#domain-check').change(function(){
+    $('.domain-display').toggle();
+    $('.subdomain-display').toggle();
+
+    if ( $(this).is(':checked') ){
+         // emailを無効、サブemailを有効
+        $('#email').prop('disabled', true);
+        $('#sub_email').prop('disabled', false);
+    } else {
+         // emailを有効、サブemailを無効
+        $('#email').prop('disabled', false);
+        $('#sub_email').prop('disabled', true);
+    }
+  });
+
+  // 入力画面で画面遷移する際に確認画面を表示する。
+  var checkValue = document.querySelectorAll('.form-control');
+  var submitBtn = $(':button');
+  var checkFlag = false;
+  var onBeforeunloadHandler = function(e) {
+    var msg = '';
+    e.returnValue = msg;
+  };
+  var formAlert = function() {
+    // フォームに入力値がない場合は確認画面を表示しない
+    if(!checkFlag) {
+      window.addEventListener('beforeunload', onBeforeunloadHandler);
+      for(var i = 0; i < checkValue.length; i++) {
+        checkValue[i].removeEventListener('input', formAlert);
+        checkValue[i].removeEventListener('change', formAlert);
+      }
+      checkFlag = true;
+    }
+  };
+  // フォームに入力値がある場合は確認画面を表示
+  for(var i = 0; i < checkValue.length; i++) {
+    checkValue[i].addEventListener('input', formAlert);
+    checkValue[i].addEventListener('change', formAlert);
+  }
+
+  // 登録ボタンをクリックした時は確認画面が表示しないようにする
+  $(submitBtn).on("click", function() {
+    window.removeEventListener('beforeunload', onBeforeunloadHandler);
+  });
+});
+
+</script>
+{% endblock %}

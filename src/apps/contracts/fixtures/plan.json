@@ -1,0 +1,29 @@
+[
+    {
+    "model": "accounts.service",
+    "pk": 1,
+        "fields": {
+            "name": "授業支援システム",
+            "description": "授業支援システム",
+            "initial": "L",
+            "icon": "<i class='fas fa-school fa-5x'></i>",
+            "number": "0000000001"
+        }
+    },
+    {
+    "model": "contracts.plan",
+    "pk": 1,
+        "fields": {
+            "service":1,
+            "payjp_plan_id":"pln_1add3e2f8232b397251c6635f162",
+            "name": "【試用】授業支援システム",
+            "price": "5000",
+            "unit_price": "500",
+            "description": "授業支援システムの説明",
+            "user_num": "10",
+            "category": "授業支援システム",
+            "is_option": false,
+            "is_trial": true
+        }
+    }
+]

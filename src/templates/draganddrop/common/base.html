@@ -1,0 +1,439 @@
+<!doctype html>
+{% load i18n static %}
+{% load render_bundle from webpack_loader %}
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  {% render_bundle 'main' %}
+
+  <!-- dropzpne css  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.css">
+  <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="{% static 'colorbox/colorbox.css'%}">
+
+  <!-- jQuery UI -->
+
+  <link rel="stylesheet" type="text/css" href="{% static './css/draganddrop/fileup_main.css'%}">
+
+  <!-- datatabl CSS -->
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css" />
+
+<!--Material Icons-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!--URL download-->
+<link rel="stylesheet" type="text/css" href="{% static './css/draganddrop/url_file_download.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static './css/draganddrop/url_file_download.css'%}">
+
+
+</head>
+
+<body id="page-top">
+
+  {% if url_name != 'url_file_download_auth_mail' %}
+  {% if url_name != 'url_file_download_auth_pass' %}
+  {% if url_name != 'url_file_download' %}
+
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+    <a class="navbar-brand mr-1" href="{% url 'accounts:home' %}">Yuitech</a>
+
+    <!-- <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+      <i class="fas fa-cogs"></i>
+    </button> -->
+
+    <!-- Navbar -->
+
+    <!-- Infoアイコン -->
+    <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0 ">
+      <div class="separator">
+        {% comment %} <i class="fas fa-info-circle fa-2x info_icon"></i> {% endcomment %}
+      </div>
+    </div>
+
+    <!-- 会社名とメアド -->
+    <div class="d-none d-md-inline-block form-inline ml-2 mr-0 mr-md-3 my-2 my-md-0">
+      <!-- <p class="lang-text ml-md-0"> current_user.company.pic_company_name</p> -->
+      <!-- <p class="lang-text ml-md-0"> current_user.email</p> -->
+    </div>
+
+    <!-- ユーザーアカウントのトグルメニュー -->
+    <ul class="navbar-nav ml-auto ml-md-0">
+      <li class="nav-item dropdown no-arrow">
+        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-user-circle fa-fw"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+          {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
+          <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
+          {% else %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'accounts:logout' %}" data-toggle="modal"
+            data-target="#logoutModal">ログアウト</a>
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+  {% endif %}
+  {% endif %}
+
+  {% if url_name != 'url_file_download_auth_mail' %}
+  {% if url_name != 'url_file_download_auth_pass' %}
+
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <p {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% endif %}
+  {% endif %}
+
+
+
+  <!-- メインコンテント -->
+  <div class="container mt-6">
+    {% block content %}{% endblock %}
+  </div>
+
+
+  <!-- モーダル -->
+
+  <!--キャンセルモーダル -->
+  <div class="modal fade" id="CancelModal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content center-modal">
+        <div class="modal-header default_modal_header">
+          <span class="modal-title home_modal_title">キャンセル<i class="fa-solid fa-ban ml-1"></i></span>
+      </div>
+        <div class="modal-body">
+          キャンセルしますか？<br>(作成中のデータは全て削除されます)
+        </div>
+        <div class="modal-footer">
+          <a id="execute_btn" class="btn btn_size blue_btn rounded-0" href="{% url 'draganddrop:cancel' %}"><span>実行</span></a>
+          <button type="button" class="btn btn_size btn-secondary rounded-0" data-dismiss="modal">閉じる</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ログアウト用Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">ログアウトしますか？</div>
+        <div class="modal-footer">
+          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a>
+          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal"
+            onfocus="this.blur();">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" 
+  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous">
+</script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
+  integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous">
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/ja.js" type="text/javascript"></script>
+  <script src="{% static 'js/dropzone-5.7.0/dist/dropzone.js' %}"></script>
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.6.4/jquery.colorbox-min.js"></script>
+
+  <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+  <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+  <!--chart.js-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+
+  {{ form.media }}
+
+<script>
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = jQuery.trim(cookies[i]);
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
+</script>
+
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>
+
+{% comment %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery.colorbox/1.6.4/jquery.colorbox-min.js"></script>
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+ {% endcomment %}
+
+
+
+<script>
+
+// --------------------------
+//  localStorageのデータを削除
+// --------------------------
+
+
+// キャンセルをした時
+$("#execute_btn").on('click', function () {
+    localStorage.removeItem('user_lists');
+    localStorage.removeItem('group_lists');
+});
+
+// 登録した時
+$(".register_btn").on('click', function () {
+localStorage.removeItem('user_lists');
+localStorage.removeItem('group_lists');
+});
+
+// ホーム画面が呼び出された時
+window.addEventListener('popstate', function(event) {
+  if (window.location.href === 'http://127.0.0.1:8000/') {
+    console.log("ホーム画面")
+    localStorage.removeItem('user_lists');
+    localStorage.removeItem('group_lists');
+  }
+});
+
+window.onbeforeunload = function() {
+  if (window.location.href === 'http://127.0.0.1:8000/') {
+    localStorage.removeItem('user_lists');
+    localStorage.removeItem('group_lists');
+  }
+};
+/////////////////////
+// 日付フィルター表示 //
+/////////////////////
+
+  // 今から3日後を生成
+
+
+  $('.3d_btn').on('click', function () {
+    var date = new Date();
+    date.setDate(date.getDate() + 2)
+    var year_str = date.getFullYear();
+    var month_str = date.getMonth() + 1;
+    var day_str = date.getDate();
+
+    month_str = ('0' + month_str).slice(-2);
+    day_str = ('0' + day_str).slice(-2);
+
+    a_3d_day_str = 'YYYY/MM/DD hh:mm:ss';
+    a_3d_day_str = a_3d_day_str.replace(/YYYY/g, year_str);
+    a_3d_day_str = a_3d_day_str.replace(/MM/g, month_str);
+    a_3d_day_str = a_3d_day_str.replace(/DD/g, day_str);
+    a_3d_day_str = a_3d_day_str.replace(/hh/g, '23');
+    a_3d_day_str = a_3d_day_str.replace(/mm/g, '59');
+    a_3d_day_str = a_3d_day_str.replace(/ss/g, '59');
+
+
+    $('#id_end_date').val(a_3d_day_str).change();
+
+  });
+
+  // 今から7日後を生成
+
+
+  $('.7d_btn').on('click', function () {
+    var date = new Date();
+    date.setDate(date.getDate() + 6)
+    var year_str = date.getFullYear();
+    var month_str = date.getMonth() + 1;
+    var day_str = date.getDate();
+
+    month_str = ('0' + month_str).slice(-2);
+    day_str = ('0' + day_str).slice(-2);
+
+    a_7d_day_str = 'YYYY/MM/DD hh:mm:ss ';
+    a_7d_day_str = a_7d_day_str.replace(/YYYY/g, year_str);
+    a_7d_day_str = a_7d_day_str.replace(/MM/g, month_str);
+    a_7d_day_str = a_7d_day_str.replace(/DD/g, day_str);
+    a_7d_day_str = a_7d_day_str.replace(/hh/g, '23');
+    a_7d_day_str = a_7d_day_str.replace(/mm/g, '59');
+    a_7d_day_str = a_7d_day_str.replace(/ss/g, '59');
+
+
+    $('#id_end_date').val(a_7d_day_str).change();
+
+  });
+
+  // 今から14日後を生成
+
+
+  $('.14d_btn').on('click', function () {
+    var date = new Date();
+    date.setDate(date.getDate() + 13)
+    var year_str = date.getFullYear();
+    var month_str = date.getMonth() + 1;
+    var day_str = date.getDate();
+
+    month_str = ('0' + month_str).slice(-2);
+    day_str = ('0' + day_str).slice(-2);
+
+    a_14d_day_str = 'YYYY/MM/DD hh:mm:ss ';
+    a_14d_day_str = a_14d_day_str.replace(/YYYY/g, year_str);
+    a_14d_day_str = a_14d_day_str.replace(/MM/g, month_str);
+    a_14d_day_str = a_14d_day_str.replace(/DD/g, day_str);
+    a_14d_day_str = a_14d_day_str.replace(/hh/g, '23');
+    a_14d_day_str = a_14d_day_str.replace(/mm/g, '59');
+    a_14d_day_str = a_14d_day_str.replace(/ss/g, '59');
+
+
+    $('#id_end_date').val(a_14d_day_str).change();
+
+  });
+
+  // 今から1ヶ月後を生成
+
+
+  $('.1m_btn').on('click', function () {
+    var date = new Date();
+    var year_str = date.getFullYear();
+    date.setMonth(date.getMonth() + 1)
+    var month_str = date.getMonth() + 1;
+    var day_str = date.getDate();
+
+    month_str = ('0' + month_str).slice(-2);
+    day_str = ('0' + day_str).slice(-2);
+
+    a_1m_day_str = 'YYYY/MM/DD hh:mm:ss ';
+    a_1m_day_str = a_1m_day_str.replace(/YYYY/g, year_str);
+    a_1m_day_str = a_1m_day_str.replace(/MM/g, month_str);
+    a_1m_day_str = a_1m_day_str.replace(/DD/g, day_str);
+    a_1m_day_str = a_1m_day_str.replace(/hh/g, '23');
+    a_1m_day_str = a_1m_day_str.replace(/mm/g, '59');
+    a_1m_day_str = a_1m_day_str.replace(/ss/g, '59');
+
+
+    $('#id_end_date').val(a_1m_day_str).change();
+
+  });
+
+  //無期限　（2099/01/01 00:00:00）
+
+  $('.mm_btn').on('click', function () {
+    var date = new Date();
+    var year_str = date.getFullYear();
+    date.setMonth(date.getMonth() + 1)
+    var month_str = date.getMonth() + 1;
+    var day_str = date.getDate();
+
+    month_str = ('01').slice(-2);
+    day_str = ('01').slice(-2);
+
+    a_mm_day_str = 'YYYY/MM/DD hh:mm:ss ';
+    a_mm_day_str = a_mm_day_str.replace(/YYYY/g, 2099);
+    a_mm_day_str = a_mm_day_str.replace(/MM/g, month_str);
+    console.log(a_mm_day_str)
+    a_mm_day_str = a_mm_day_str.replace(/DD/g, day_str);
+    a_mm_day_str = a_mm_day_str.replace(/hh/g, '00');
+    a_mm_day_str = a_mm_day_str.replace(/mm/g, '00');
+    a_mm_day_str = a_mm_day_str.replace(/ss/g, '00');
+
+
+    $('#id_end_date').val(a_mm_day_str).change();
+
+  });
+
+ //step3の削除機能
+
+  var delete_id = ""
+  var delete_name = ""
+
+  $('#del_file_btn').off('click'); //onイベントの重複イベントを削除
+  $('#del_file_btn').on('click', function (event) {
+
+    var button = $(event.relatedTarget)
+
+    var delete_id = button.data('value')
+    console.log("ファイルID", delete_id)
+    var delete_name = button.data('del_name')
+
+    $.ajax({
+      type: "POST",
+      url: '{% url "draganddrop:delete" %}',
+      data: {
+        'delete_id': delete_id,
+        'delete_name': delete_name
+      },
+      dataType: 'json',
+      success: function (data) {
+        alert(data.message);
+        {% comment %} window.location.href = '{% url "draganddrop:step3" delete_%}'; {% endcomment %}
+
+      }
+    });
+  });
+
+  {% comment %} var genuploadclass = getUniqueStr() {% endcomment %}
+
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+
+
+</script>
+

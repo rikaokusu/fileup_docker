@@ -1,0 +1,812 @@
+{% extends "common/base.html" %}
+
+{% load i18n static %}
+{% load widget_tweaks %}
+{% comment %} {% load bootstrap4 %} {% endcomment %}
+
+{% block title %}会社情報変更{% endblock title %}
+
+{% block breadcrumbtitle %}
+
+  <span>
+    会社情報変更
+  </span>
+
+{% endblock breadcrumbtitle %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="container company_profile">
+
+  {% comment %} <form action="{% url 'accounts:update_companyprofile' company.id %}" method="post" enctype="multipart/form-data" validate data-validate> {% endcomment %}
+  <form action="" method="post" enctype="multipart/form-data" validate data-validate>
+
+  <div class="row">
+    <div class="col-sm-6">
+        <div class="card border-0 card-register mt-0">
+            <div class="card-body company_profile_body h-adr">
+              <h6>会社情報</h6>
+
+
+                {% csrf_token %}
+
+                <!-- messages.succes や messages.errorにて利用 -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+
+                <!-- Form全体のバリデーション時のエラーを表示 -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+
+                <table class="table table-sm table-bordered">
+
+                  <!-- 郵便番号の自動入力用のクラス指定 -->
+                  <span class="p-country-name" style="display:none;">Japan</span>
+
+                  <tbody>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="option_box">
+                          <div class="label option_label">法人区分</div>
+                        </div>
+                      </th>
+
+                      <td>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_legal_personality.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_legal_personality class="form-control is-invalid" laceholder=form.pic_legal_personality.label id="pic_legal_personality"%}
+
+                              {% for error in form.pic_legal_personality.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_legal_personality class="form-control is-valid" laceholder=form.pic_legal_personality.label id="pic_legal_personality" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_legal_personality class="form-control" placeholder=form.pic_legal_personality.label id="pic_legal_personality" %}
+                        {% endif %}
+
+
+                      <!-- 法人格位置 -->
+                        <div class="row legal_person">
+
+                          <!-- 入力ラベル -->
+                          <label for="id_pic_legal_personality" class="col-sm-3 col-form-label">
+                            法人格位置
+                          </label>
+
+                            <div class="col-sm-">
+
+                            <!-- 入力フィールド -->
+                            {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                                {% if form.pic_legal_person_posi.errors %}<!-- エラー時の表示 -->
+                                  {% render_field form.pic_legal_person_posi class="form-control is-invalid" laceholder=form.pic_legal_person_posi.label id="pic_legal_person_posi"%}
+
+                                  {% for error in form.pic_legal_person_posi.errors %}
+                                    <div class="invalid-feedback">
+                                      {{ error }}
+                                    </div>
+                                  {% endfor %}
+
+                                {% else %}<!-- 正常時の表示 -->
+                                  {% render_field form.pic_legal_person_posi class="form-control is-valid" laceholder=form.pic_legal_person_posi.label id="pic_legal_person_posi" %}
+                                {% endif %}
+
+                            {% else %}<!-- 初期表示 -->
+                              {% render_field form.pic_legal_person_posi class="form-control" placeholder=form.pic_legal_person_posi.label id="pic_legal_person_posi" %}
+                            {% endif %}
+                          </div>
+                      </div>
+
+
+
+                      </td>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label require_label">会社名</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_company_name.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_company_name class="form-control is-invalid" laceholder=form.pic_company_name.label id="pic_company_name"%}
+
+                              {% for error in form.pic_company_name.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_company_name class="form-control is-valid" laceholder=form.pic_company_name.label id="pic_company_name" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_company_name class="form-control" placeholder=form.pic_company_name.label id="pic_company_name" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="option_box">
+                          <div class="label option_label">所属名</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_dept_name.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_dept_name class="form-control is-invalid" placeholder=form.pic_dept_name.label id="pic_dept_name" %}
+
+                              {% for error in form.pic_dept_name.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_dept_name class="form-control is-valid" placeholder=form.pic_dept_name.label id="pic_dept_name" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_dept_name class="form-control" placeholder=form.pic_dept_name.label id="pic_dept_name" %}
+                        {% endif %}
+                      </th>
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label required_label">郵便番号</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_post_code.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_post_code class="form-control p-postal-code is-invalid" placeholder="記入例：8900053" id="pic_post_code" %}
+                              <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+
+                              {% for error in form.pic_post_code.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_post_code class="form-control p-postal-code is-valid" placeholder="記入例：8900053" id="pic_post_code" %}
+                              <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_post_code class="form-control p-postal-code" placeholder="記入例：8900053" id="pic_post_code" %}
+                          <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+                        {% endif %}
+
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label required_label">都道府県</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_prefectures.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_prefectures class="form-control p-region-id is-invalid" placeholder=form.pic_prefectures.label id="pic_prefectures" %}
+
+                              {% for error in form.pic_prefectures.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_prefectures class="form-control p-region-id is-valid" placeholder=form.pic_prefectures.label id="pic_prefectures" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_prefectures class="form-control p-region-id" placeholder=form.pic_prefectures.label id="pic_prefectures" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label required_label">住所</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_address.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_address class="form-control p-locality p-street-address p-extended-address is-invalid" placeholder=form.pic_address.label id="pic_address" %}
+
+                              {% for error in form.pic_address.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_address class="form-control p-locality p-street-address p-extended-address is-valid" placeholder=form.pic_address.label id="pic_address" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_address class="form-control p-locality p-street-address p-extended-address" placeholder=form.pic_address.label id="pic_address" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="option_box">
+                          <div class="label option_label">建物名称</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_building_name.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_building_name class="form-control is-invalid" placeholder=form.pic_building_name.label id="pic_building_name" %}
+
+                              {% for error in form.pic_building_name.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_building_name class="form-control is-valid" placeholder=form.pic_building_name.label id="pic_building_name" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_building_name class="form-control" placeholder=form.pic_building_name.label id="pic_building_name" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label required_label">氏名</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_full_name.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_full_name class="form-control is-invalid" placeholder=form.pic_full_name.label id="pic_full_name" %}
+
+                              {% for error in form.pic_full_name.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_full_name class="form-control is-valid" placeholder=form.pic_full_name.label id="pic_full_name" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_full_name class="form-control" placeholder=form.pic_full_name.label id="pic_full_name" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+
+                    <tr>
+                      <th class="tr_head">
+                        <div class="required_box">
+                          <div class="label required_label">電話番号</div>
+                        </div>
+                      </th>
+
+                      <th>
+                        <!-- 入力フィールド -->
+                        {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                            {% if form.pic_tel_number.errors %}<!-- エラー時の表示 -->
+                              {% render_field form.pic_tel_number class="form-control is-invalid" placeholder=form.pic_tel_number.label id="pic_tel_number" %}
+
+                              {% for error in form.pic_tel_number.errors %}
+                                <div class="invalid-feedback">
+                                  {{ error }}
+                                </div>
+                              {% endfor %}
+
+                            {% else %}<!-- 正常時の表示 -->
+                              {% render_field form.pic_tel_number class="form-control is-valid" placeholder=form.pic_tel_number.label id="pic_tel_number" %}
+                            {% endif %}
+
+                        {% else %}<!-- 初期表示 -->
+                          {% render_field form.pic_tel_number class="form-control" placeholder=form.pic_tel_number.label id="pic_tel_number" %}
+                        {% endif %}
+
+                      </th>
+
+                    </tr>
+                  </tbody>
+                </table>
+
+              </div> <!--.card-body -->
+
+          </div> <!--.card -->
+
+      </div> <!-- /.col -->
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="col-sm-6">
+      <div class="card border-0 card-register mt-0">
+          <div class="card-body company_profile_body h-adr">
+            <div id="invoice_header">
+              <h6>請求先情報</h6>
+              <button type="button" class="btn btn-light btn-sm" id="company_info_copy">会社情報をコピー</button>
+            </div>
+
+            <table class="table table-sm table-bordered">
+
+              <!-- 郵便番号の自動入力用のクラス指定 -->
+              <span class="p-country-name" style="display:none;">Japan</span>
+
+              <tbody>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="option_box">
+                      <div class="label option_label">法人区分</div>
+                    </div>
+                  </th>
+
+                  <td>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_legal_personality.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_legal_personality class="form-control is-invalid" laceholder=form.invoice_legal_personality.label id="invoice_legal_personality"%}
+
+                          {% for error in form.invoice_legal_personality.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_legal_personality class="form-control is-valid" laceholder=form.invoice_legal_personality.label id="invoice_legal_personality" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_legal_personality class="form-control" placeholder=form.invoice_legal_personality.label id="invoice_legal_personality" %}
+                    {% endif %}
+
+
+
+
+                    <!-- 法人格位置 -->
+                      <div class="row legal_person">
+
+                        <!-- 入力ラベル -->
+                        <label for="id_invoice_legal_personality" class="col-sm-3 col-form-label">
+                          法人格位置
+                        </label>
+
+                          <div class="col-sm-">
+
+                          <!-- 入力フィールド -->
+                          {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                              {% if form.invoice_legal_person_posi.errors %}<!-- エラー時の表示 -->
+                                {% render_field form.invoice_legal_person_posi class="form-control is-invalid" laceholder=form.invoice_legal_person_posi.label id="invoice_legal_person_posi"%}
+
+                                {% for error in form.invoice_legal_person_posi.errors %}
+                                  <div class="invalid-feedback">
+                                    {{ error }}
+                                  </div>
+                                {% endfor %}
+
+                              {% else %}<!-- 正常時の表示 -->
+                                {% render_field form.invoice_legal_person_posi class="form-control is-valid" laceholder=form.invoice_legal_person_posi.label id="invoice_legal_person_posi" %}
+                              {% endif %}
+
+                          {% else %}<!-- 初期表示 -->
+                            {% render_field form.invoice_legal_person_posi class="form-control" placeholder=form.invoice_legal_person_posi.label id="invoice_legal_person_posi" %}
+                          {% endif %}
+                        </div>
+                    </div>
+
+
+
+                  </td>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label require_label">会社名</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_company_name.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_company_name class="form-control is-invalid" laceholder=form.invoice_company_name.label id="invoice_company_name"%}
+
+                          {% for error in form.invoice_company_name.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_company_name class="form-control is-valid" laceholder=form.invoice_company_name.label id="invoice_company_name" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_company_name class="form-control" placeholder=form.invoice_company_name.label id="invoice_company_name" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="option_box">
+                      <div class="label option_label">所属名</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_dept_name.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_dept_name class="form-control is-invalid" placeholder=form.invoice_dept_name.label id="invoice_dept_name" %}
+
+                          {% for error in form.invoice_dept_name.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_dept_name class="form-control is-valid" placeholder=form.invoice_dept_name.label id="invoice_dept_name" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_dept_name class="form-control" placeholder=form.invoice_dept_name.label id="invoice_dept_name" %}
+                    {% endif %}
+                  </th>
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label required_label">郵便番号</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_post_code.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_post_code class="form-control p-postal-code is-invalid" placeholder="記入例：8900053" id="invoice_post_code" %}
+                          <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+
+                          {% for error in form.invoice_post_code.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_post_code class="form-control p-postal-code is-valid" placeholder="記入例：8900053" id="invoice_post_code" %}
+                          <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_post_code class="form-control p-postal-code" placeholder="記入例：8900053" id="invoice_post_code" %}
+                      <small class="form-text text-muted">郵便番号を入力すると住所自動的に表示されます。</small>
+                    {% endif %}
+
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label required_label">都道府県</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_prefectures.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_prefectures class="form-control p-region-id is-invalid" placeholder=form.invoice_prefectures.label id="invoice_prefectures" %}
+
+                          {% for error in form.invoice_prefectures.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_prefectures class="form-control p-region-id is-valid" placeholder=form.invoice_prefectures.label id="invoice_prefectures" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_prefectures class="form-control p-region-id" placeholder=form.invoice_prefectures.label id="invoice_prefectures" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label required_label">住所</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_address.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_address class="form-control p-locality p-street-address p-extended-address is-invalid" placeholder=form.invoice_address.label id="invoice_address" %}
+
+                          {% for error in form.invoice_address.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_address class="form-control p-locality p-street-address p-extended-address is-valid" placeholder=form.invoice_address.label id="invoice_address" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_address class="form-control p-locality p-street-address p-extended-address" placeholder=form.invoice_address.label id="invoice_address" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="option_box">
+                      <div class="label option_label">建物名称</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_building_name.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_building_name class="form-control is-invalid" placeholder=form.invoice_building_name.label id="invoice_building_name" %}
+
+                          {% for error in form.invoice_building_name.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_building_name class="form-control is-valid" placeholder=form.invoice_building_name.label id="invoice_building_name" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_building_name class="form-control" placeholder=form.invoice_building_name.label id="invoice_building_name" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label required_label">氏名</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_full_name.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_full_name class="form-control is-invalid" placeholder=form.invoice_full_name.label id="invoice_full_name" %}
+
+                          {% for error in form.invoice_full_name.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_full_name class="form-control is-valid" placeholder=form.invoice_full_name.label id="invoice_full_name" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_full_name class="form-control" placeholder=form.invoice_full_name.label id="invoice_full_name" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+
+                <tr>
+                  <th class="tr_head">
+                    <div class="required_box">
+                      <div class="label required_label">電話番号</div>
+                    </div>
+                  </th>
+
+                  <th>
+                    <!-- 入力フィールド -->
+                    {% if form.is_bound %}<!-- エラーがはるかな以下の判断 -->
+
+                        {% if form.invoice_tel_number.errors %}<!-- エラー時の表示 -->
+                          {% render_field form.invoice_tel_number class="form-control is-invalid" placeholder=form.invoice_tel_number.label id="invoice_tel_number" %}
+
+                          {% for error in form.invoice_tel_number.errors %}
+                            <div class="invalid-feedback">
+                              {{ error }}
+                            </div>
+                          {% endfor %}
+
+                        {% else %}<!-- 正常時の表示 -->
+                          {% render_field form.invoice_tel_number class="form-control is-valid" placeholder=form.invoice_tel_number.label id="invoice_tel_number" %}
+                        {% endif %}
+
+                    {% else %}<!-- 初期表示 -->
+                      {% render_field form.invoice_tel_number class="form-control" placeholder=form.invoice_tel_number.label id="invoice_tel_number" %}
+                    {% endif %}
+
+                  </th>
+
+                </tr>
+              </tbody>
+            </table>
+
+            </div><!-- /.card-body -->
+        </div><!-- /.card -->
+
+    </div> <!-- /.col -->
+
+  </div><!-- /.row -->
+
+  <!-- <div class="col-sm-12"> -->
+    <div class="row">
+      <div class="col-sm-3">
+        <button type="submit" class="btn btn-primary btn-block" onfocus="this.blur();">変更</button>
+      </div>
+      <div class="col-sm-3">
+        <a role="button" class="btn btn-secondary btn-block" href="{% url 'accounts:cancel' company.id 'update_profile' %}" onfocus="this.blur();">キャンセル</a>
+      </div>
+    </div>
+
+</form>
+
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+
+$(function(){
+
+  // 戻るボタンで戻った時に値が入ったらボタンを有効化
+  $('form[data-validate]').each(function(){
+    $(this).find(':submit').prop('disabled', !this.checkValidity());
+  });
+
+  // 値が入ったらボタンを有効化
+  $('form[data-validate]').on('input change', function () {
+    $(this).find(':submit').prop('disabled', !this.checkValidity());
+  });
+
+
+  // 会社情報コピーボタンをクリックしたらコピーする
+  $("#company_info_copy").on("click", function() {
+    var pic_company_name = $("#pic_company_name").val()
+    var pic_legal_personality = $("#pic_legal_personality").val()
+    var pic_dept_name = $("#pic_dept_name").val()
+    var pic_full_name = $("#pic_full_name").val()
+    var pic_post_code = $("#pic_post_code").val()
+    var pic_prefectures = $("#pic_prefectures").val()
+    var pic_address = $("#pic_address").val()
+    var pic_building_name = $("#pic_building_name").val()
+    var pic_tel_number = $("#pic_tel_number").val()
+
+    $("#invoice_company_name").val(pic_company_name).change();
+    $("#invoice_legal_personality").val(pic_legal_personality).change();
+    $("#invoice_dept_name").val(pic_dept_name).change();
+    $("#invoice_full_name").val(pic_full_name).change();
+    $("#invoice_post_code").val(pic_post_code).change();
+    $("#invoice_prefectures").val(pic_prefectures).change();
+    $("#invoice_address").val(pic_address).change();
+    $("#invoice_building_name").val(pic_building_name).change();
+    $("#invoice_tel_number").val(pic_tel_number).change();
+  });
+
+});
+</script>
+{% endblock %}

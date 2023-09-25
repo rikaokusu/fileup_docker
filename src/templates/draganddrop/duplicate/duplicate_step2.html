@@ -1,0 +1,852 @@
+{% extends "draganddrop/common//base.html" %}
+
+
+{% block content %}
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-2 top_bar">
+
+  <div class="top">
+    <div class="tate mr-2"></div>
+    <h1>複製</h1><i class="fa-solid fa-copy fa-2x icon-globe"></i>
+  </div>
+
+
+  <div class="progressbar">
+    <div class="item flex-fill">STEP1<br>情報入力</div>
+    <div class="item active flex-fill">STEP2<br>ファイルを選択</div>
+    <div class="item flex-fill">STEP3<br>登録完了</div>
+
+  </div>
+
+</div>
+
+<form action="" method="post" name="myform" enctype="multipart/form-data" data-ajax="false" novalidate>{% csrf_token %}
+
+    <!-- Dropzone エラーメッセージ表示場所 -->
+    <div class="error_msg_place" style="height: 50px;"></div>
+    <div id="validation-error"></div>
+  
+  <div class="box1 box1_step2">
+    <div class="d-flex">
+      <!-- ファイルのドラッグアンドドロップ部 -->
+      <div id="myDropzone" class="dropzone dropzone_box">
+        <div class="fallback">
+          <!-- this is the fallback if JS isn't working -->
+          <input name="upload" type="file" />
+        </div>
+      </div>
+
+      <div class="files" id="previews">
+
+        <div id="template" class="upload_file_layout">
+
+          <!-- This is used as the file preview template -->
+          <div class="icon_colum mr-1">
+            <div class="preview">
+            </div>
+          </div>
+          <div class="name_colum mr-5" style="width: 600px;">
+            <span class="name preview-text upload_check_class" data-dz-name></span>
+            <strong class="error text-danger" data-dz-errormessage></strong>
+          </div>
+
+          <div class="upload_file_right_side_layout">
+            
+            <div class="size_colum mr-1">
+              <span class="size preview-text" data-dz-size></span>
+            </div>
+  
+            <div class="preview-button preview-text button_colum">
+              <div class="del_file_btn"></div>
+              <div>
+                <button type="button" data-toggle="modal" class="btn-danger dropzone_btn_size del_btn"
+                data-target="#fileDelModal">削除</button>
+              </div>
+            </div>
+            
+            <div class="preview_file_btn" data-toggle="tooltip" data-html="true" title="現在参照できません。"
+              data-placement="top">
+              <button type="button" class="btn-primary preview-button dropzone_btn_size ml-1" disabled>参照</button>
+            </div>
+          
+          </div>
+
+          <!--Step2 ファイル削除確認モーダル -->
+          <div class="modal fade" id="fileDelModal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content center-modal">
+                <div class="modal-header">
+                  <h5 class="modal-title">ファイル削除確認画面</h5>
+                </div>
+                <div class="modal-body" style="font-weight: 100;">ファイルを削除しますか？</div>
+                <div class="modal-footer">
+                  <button name="checked_del_file" type="button" class="btn btn_size btn-danger rounded-0">削除</button>            
+                  <button type="button" class="btn btn_size btn-secondary rounded-0" data-dismiss="modal">キャンセル</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 合計値ー -->
+        <div class="upload_file_information_wrap">
+          <div id="max_upload_file_size" class="byte-total"></div>
+          <div id="upload_file_number" class="byte-total"></div>
+          <div id="total_byte" class="byte-total"></div>
+        </div>
+
+      </div>
+    </div>
+    <!-- プログレスバー -->
+    <div class="progress progress-striped active preview-text" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+      aria-valuenow="0">
+      <div class="progress-bar progress-bar-success progress-text flex-item" style="width:0%;" data-dz-uploadprogress>
+      </div>
+    </div>
+
+  </div>
+  <!--box1閉じタグ-->
+
+  <div>
+
+    <div class="d-flex flex-row justify-content-center mt-3 bottom_bar">
+
+      <div class="ml-1 mr-4">
+        <button type="button" class="cancel btn-cancel" 
+        data-toggle="modal" data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+      </div>
+
+      <div class="ml-1 mr-1">
+        <button type="button" class="btn-default"
+          onclick="location.href='{% url 'draganddrop:duplicate_return' upload_manage_id %}'">
+          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
+      </div>
+      
+      <div class="ml-1 mr-1">
+        <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
+          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!------確認用モーダル------>
+
+  <!--step2-->
+  <div class="modal fade" id="confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-content center-modal confirm_modal">
+        
+        <div class="modal-header default_modal_header">
+          <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+        </div>
+
+        <div class="modal-body confirm_modal_body">
+          <div class="modal_box2">
+            <table class="table confirm_modal_table">
+              <tbody>
+                <tr>
+                  <th>
+                    <h2>タイトル</h2>
+                  </th>
+                  <td>{{request.session.title}}</td>
+                  <td rowspan="4" class="confirm_modal_update_button">
+                    <button type="button" onfocus="this.blur();"
+                      class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0" data-dismiss="modal"
+                      onclick="location.href='{% url 'draganddrop:return' upload_manage_id %}'">STEP1を編集</button>
+                  </td>
+                </tr>
+
+                <tr class="confirm_modal_dest_user">
+                  <th>
+                    <h2>送り先</h2>
+                  </th>
+                  <td class="vertical_align_top">
+                    {% if request.session.dest_user_all_list|length >= 6 %}
+                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
+                        {% if dest_user_all|slice:"-1:" == "1" %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}.</div>
+                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% else %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}</div>
+                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      <div class="dest_user_list_wrap">
+                        送り先 合計 {{request.session.dest_user_all_list|length}}件
+                        <div>
+                          <a class="triangle step3_dest_user_confirm_btn ml-3" data-toggle="modal"
+                            data-target="#all_dest_user_confirm_modal">全送信先確認</a>
+                        </div>
+                      </div>
+                    {% else %}
+                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
+                        {% if dest_user_all|slice:"-1:" == "1" %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}.</div>
+                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% else %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}.</div>
+                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      <div class="dest_user_list_wrap">
+                        送り先 合計 {{request.session.dest_user_all_list|length}}件
+                      </div>
+                    {% endif %}
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>
+                    <h2>保存期日</h2>
+                  </th>
+                  <td>{{request.session.end_date}}</td>
+                </tr>
+
+                <tr>
+
+                  <th>
+                    <h2>DL回数</h2>
+                  </th>
+                  {% if request.session.dl_limit <= "5" %}
+                  <td>{{request.session.dl_limit}}回</td>
+                  {% else %}
+                  <td>無期限</td>
+                  {% endif %}
+
+                </tr>
+
+                <tr class="confirm_modal_file_name">
+                  <th>
+                    <h2>ファイル</h2>
+                  </th>
+                  <td class="vertical_align_top">
+                    {% for file in files %}
+                    {{file.name}}<br>
+                    {% endfor %}
+                  </td>
+                  <td class="confirm_modal_update_button">
+                    <button type="button" onfocus="this.blur();"
+                      class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0"
+                      data-dismiss="modal">STEP2を編集</button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+        <div class="modal-footer confirm_modal_footer">
+          <button type="button" onclick="location.href='{% url 'draganddrop:duplicate_step3' upload_manage_id %}'"
+          class="register_btn btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 blue_btn rounded-0" data-toggle="modal"
+          data-target="#modal3">登録</button>
+          <button type="button" onfocus="this.blur();"
+            class="btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--全送信先確認モーダル-->
+  <div class="modal fade" id="all_dest_user_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content center-modal dest_user_confirm_modal">
+        <div class="modal-header all_send_user_confirm_modal_header d-flex justify-content-center">
+          <i class="fas fa-address-book fa-2x icon-address-book mr-3"></i><span class="address_modal_title"
+            id="label1">送り先</span>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+
+        <div class="modal-body">
+          {% for dest_user_all in request.session.dest_user_all_list %}
+            <!--ナンバリングが9以下の時-->
+            {% if forloop.counter <= 9 %}
+              {% if dest_user_all|slice:"-1:" == "1" %}
+                <div class="d-flex">
+                  <div class="w_25">{{ forloop.counter }}.</div>
+                  <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                </div>
+              {% else %}
+              <div class="d-flex">
+                <div class="w_25">{{ forloop.counter }}.</div>
+                <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+              </div>
+              {% endif %}
+            <!--ナンバリングが10以上の時-->
+            {% else %}
+              {% if dest_user_all|slice:"-1:" == "1" %}
+                <div class="d-flex">
+                  <div class="w_25">{{ forloop.counter }}.</div>
+                  <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                </div>
+              {% else %}
+              <div class="d-flex">
+                <div class="w_25">{{ forloop.counter }}.</div>
+                <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="modal-footer all_send_user_confirm_modal_footer">
+          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+            data-dismiss="modal">閉じる</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!---汎用トーストメッセージ--->
+<div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+  <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+      <div class="toast-body">
+          <div>
+              メッセージを動的に変更
+          </div>
+      </div>
+  </div>
+</div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+  // -----------------
+  // Dropzone.jsの設定
+  // -----------------
+  var plan = "{{plan}}";
+  var file_up_names = new Array;
+  var file_up_size = new Array;
+  var files = 0
+  let checked_button_clicked = false;
+
+  // Dropzoneの自動検出を無効
+  Dropzone.autoDiscover = false;
+
+  // Get the template HTML and remove it from the doumenthe template HTML and remove it from the document
+  var previewNode = document.querySelector("#template");
+  // #templateというIDがあるときのみ処理
+  if (previewNode) {
+    previewNode.id = "";
+    var previewTemplate = previewNode.parentNode.innerHTML;
+    previewNode.parentNode.removeChild(previewNode);
+  }
+
+  $("div#myDropzone").dropzone({
+    url: "{% url 'draganddrop:file_upload' %}",
+    params: {
+      'csrfmiddlewaretoken': getCookie('csrftoken')
+    },
+    autoProcessQueue: true,
+    uploadMultiple: true,
+    parallelUploads: 100,
+    maxFiles: null,
+    maxFilesize: 1024, // MiB
+    paramName: "file",
+    dictDefaultMessage: '<span class="dropzone_text">ファイルアップロード</span><br /><br /><br /><br /><br /><br /><br /><i class="fas fa-file-upload fa-5x dropzone_upload_icon"></i><br /><br />ドラッグ&ドロップまたはクリック',
+    dictMaxFilesExceeded: "アップロードできるファイルは5ファイルまでです。",
+    dictUploadCanceled: "アップロードをキャンセルしました。",
+    dictCancelUploadConfirmation: "アップロードをキャンセルしますか？",
+    previewTemplate: previewTemplate,
+    previewsContainer: "#previews",
+    filesizeBase:"1024",
+
+    
+    // The setting up of the dropzone
+    init: function () {
+      var myDropzone = this;
+
+      // ページ読み込み前に事前にアップロードされたファイルをサーバ側から読み込む
+      var dist_file = "{{dist_file|escapejs}}";
+      // 削除するファイルのPKをtasks_update.jsにわたす
+      var del_file_pk = "{{del_file_pk|escapejs}}";
+      // ファイルを追加したときの処理
+      myDropzone.on("addedfile", function (file) {
+        $('#confirm_button').prop("disabled", false);
+        $('#update_confirm_button').prop("disabled", false);
+        
+        // ファイル名の重複チェック(サーバとフロント)
+        // PKが存在するファイルはサーバ上のファイルと判断しチェック対象外とする
+        if (!file.pk) {
+          // JSONに変更
+          dist_file_json = JSON.parse(dist_file);
+          // dist_file_jsonをループで取り出す
+          for (var i = 0; i < dist_file_json.length; i++) {
+            if (dist_file_json[i].fields.name === file.name) {
+              this.removeFile(file);
+              $('.error_msg_place').remove();
+              $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+                "同じ名前のファイルはアップロードできません。" + '</div>');
+            }
+          }
+        }
+
+        // ファイルサイズ上限
+        let company_total_file_size = "{{total_file_size}}"
+        let server_file_size = 0;
+        let total_file_size = 0;
+        dist_file_json = JSON.parse(dist_file);
+
+        for (var i = 0; i < dist_file_json.length; i++) {
+            server_file_size += Number(dist_file_json[i].fields.size)
+            total_file_size = Number(company_total_file_size) + server_file_size
+            }
+        // フロント側のファイルサイズを合算する
+        total_file_size += Number(file.size)
+        
+        if (plan == "free") {
+          if (total_file_size >= 314572800) {
+              this.removeFile(file);
+              $('.error_msg_place').remove();
+              $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+                "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+            }
+        } else (plan == "light"); {
+          if (total_file_size >= 1073741824) {
+            this.removeFile(file);
+            $('.error_msg_place').remove();
+            $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+              "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+          }
+        } 
+
+        // ファイル名から拡張子を取得する
+        var ext = checkFileExt(file.name); // Get extension
+
+        // ファイルアップロードチェックボックスの無効化
+        $('#id_no_file_upload').prop({
+          'disabled': true
+        });
+        $('.no_file_upload_check_text').css("text-decoration", "line-through")
+
+        // 削除クラスを生成
+        var gendelclass = getUniqueStr()
+        // アイコンを表示するカラムのクラスをランダムに変更する。
+        $(".delete_checkbox").removeClass().addClass(gendelclass);
+        if (file.pk) {
+          // 全てのスペース、全てのシングルクォート、前後の括弧を削除
+          del_file_pk_str = del_file_pk.replace(/ /g, "").replace("[", "").replace("]", "").replace(/'/g, "")
+
+          // リストに変換
+          del_file_pk_list = del_file_pk_str.split(',')
+
+          if (del_file_pk_list.includes(file.pk.toString())) {
+            // ファイルIDをセット
+            $('.' + gendelclass).attr({
+              "value": file.pk,
+              "id": file.pk,
+              "for": file.pk,
+              "checked": true
+            });
+            // 親要素を削除
+            $('#previews div.preview-button.operation-button.preview-text.button_colum > button').remove();
+
+          } else {
+            // ファイルIDをセット
+            $('.' + gendelclass).attr({
+              "value": file.pk,
+              "id": file.pk,
+              "for": file.pk
+            });
+            // 親要素を削除
+            $('#previews div.preview-button.operation-button.preview-text.button_colum > button').remove();
+
+          }
+
+        } else {
+          // チェックボックス要素を削除
+          $('.' + gendelclass).remove();
+          // console.log("なし")
+        }
+
+
+        // アップロードラベルクラスを生成
+        var genuploadclass = getUniqueStr()
+        // アイコンを表示するカラムのクラスをランダムに変更する。
+        $(".upload_check_class").removeClass().addClass(genuploadclass);
+        if (file.pk) {
+
+          $('.' + genuploadclass).addClass("upload_check")
+
+        }
+        
+        // アップロードしたファイルにidを付与
+        result = $('.' + genuploadclass).is(":contains(" + file.name + ")")        
+        if (result) {            
+          $('.' + genuploadclass).parent().parent().find(".del_btn").attr('data-id', file.pk);        
+        }
+
+        // ランダムな文字を生成する
+        var genclass = getUniqueStr()
+        // アイコンを表示するカラムのクラスをランダムに変更する。
+        $(".preview").removeClass().addClass(genclass);
+
+        // 削除機能
+        $('#fileDelModal, #updateFileDelModal').off('show.bs.modal');
+        $('#fileDelModal, #updateFileDelModal').on('show.bs.modal', function (event) {
+          del_button = $(event.relatedTarget);
+          delete_file_id = del_button.data('id');
+          delete_file_name = del_button.data('name');
+          checked_button_clicked = true;
+          if ($('[name="checked_del_file"], [name="checked_updated_del_file"]').on('click', function(){
+            checked_button_clicked = true;
+            $('#fileDelModal, #updateFileDelModal').hide();
+            myDropzone.removeFile(file);
+          }));
+        });
+
+        switch (ext) {
+          // エクセル系
+          case 'xls':
+          case 'xlsx':
+            $('.' + genclass).addClass("icon xls");
+            $('.' + genclass).append('<i class="far fa-file-excel"></i>');
+            break;
+
+            // ワード系
+          case 'doc':
+          case 'docx':
+            $('.' + genclass).addClass("icon doc");
+            $('.' + genclass).append('<i class="far fa-file-word"></i>');
+            break;
+
+            // パワーポイント系
+          case 'ppt':
+          case 'pptx':
+            $('.' + genclass).addClass("icon ppt");
+            $('.' + genclass).append('<i class="far fa-file-powerpoint"></i>');
+            break;
+
+            // 写真系
+          case 'png':
+          case 'jpg':
+          case 'jpeg':
+          case 'svg':
+          case 'gif':
+          case 'tiff':
+          case 'bmp':
+            $('.' + genclass).addClass("icon img");
+            $('.' + genclass).append('<i class="far fa-file-image"></i>');
+            break;
+
+            // 音声系
+          case 'mp3':
+          case 'wma':
+          case 'aac':
+          case 'ogg':
+          case 'mov':
+          case 'm4a':
+          case 'mkv':
+          case 'flac':
+          case 'wav':
+          case 'aif':
+            $('.' + genclass).addClass("icon audio");
+            $('.' + genclass).append('<i class="far fa-file-audio"></i>');
+            break;
+
+            // 動画系
+          case 'mp4':
+          case 'mov':
+          case 'mpg':
+          case 'mpeg':
+          case 'avi':
+          case 'wmv':
+          case 'webm':
+          case 'flv':
+          case 'mkv':
+            $('.' + genclass).addClass("icon vido");
+            $('.' + genclass).append('<i class="far fa-file-video"></i>');
+            break;
+
+            // アーカイブ系
+          case 'zip':
+          case 'lzh':
+          case 'cab':
+          case 'tar':
+          case 'gz':
+          case 'tgz':
+            $('.' + genclass).addClass("icon arc");
+            $('.' + genclass).append('<i class="far fa-file-archive"></i>');
+            break;
+
+            // PDF
+          case 'pdf':
+            $('.' + genclass).addClass("icon pdf");
+            $('.' + genclass).append('<i class="far fa-file-pdf"></i>');
+            break;
+
+            // その他
+          default:
+            $('.' + genclass).addClass("icon");
+            $('.' + genclass).append('<i class="far fa-file"></i>');
+            break;
+        }
+
+        // 追加フラグをたてる
+        if (this.files.length > 0) {
+          addflug = true;
+        } else {
+          addflug = false;
+        }
+
+        // ローディング
+        // loadingView(true);
+
+
+      }); // end addfile event
+
+
+      // 確定ボタンを押下したらファイルをアップロード
+      $("#submit_file_upload, #draft_submit_file_upload").click(function (e) {
+        if (addflug) {
+          // フラグがtrueの時はファイルアップロードを実行
+          e.preventDefault();
+          // キューを実行
+          myDropzone.processQueue();
+
+
+        } else {
+          // フラグがfalseの時はメッセージ等の保存を実行
+          document.myform.submit();
+          window.opener.focus();
+        }
+      });
+
+      // サーバ上にあるファイルを描画する。
+      // StringとなっているのでJSONに変換
+      // dist_fileはHTMLのScriptタグで取得（Viewのコンテキストとして取得）
+      if (dist_file) {
+        dist_file_json = JSON.parse(dist_file);
+
+        // dist_file_jsonをループで取り出す
+        for (var i = 0; i < dist_file_json.length; i++) {
+
+          var mockFile = {
+            name: dist_file_json[i].fields.name,
+            size: dist_file_json[i].fields.size,
+            pk: dist_file_json[i].pk
+          };
+          sessionStorage.setItem(dist_file_json[i].fields.name, dist_file_json[i].fields.size)
+
+          // addfileイベントを発火し拡張子等のチェックを行う
+          myDropzone.emit("addedfile", mockFile);
+          file_up_names.push(mockFile.name);
+
+          // thumbnailイベントを発火しパスを紐付ける
+          myDropzone.emit("thumbnail", mockFile, dist_file_json[i].fields.file);
+
+        }
+      }
+
+    }, //end init
+
+
+    maxfilesexceeded: function (file) {
+      // 上限数を超えたファイルは削除する
+      this.removeFile(file);
+    },
+    
+    // アップロード成功時の処理
+    successmultiple: function (file, response) {
+      // アップロードに成功したファイルを配列に保存しておく
+      file_up_names.push(file.name);
+
+      for (let i = 0; i < file.length; ++i) {
+        file_up_size.push(file[i].size)
+        sessionStorage.setItem(file[i].name, file[i].size)
+      }
+      document.myform.submit();
+      //window.opener.focus();
+    },
+    // アップロード失敗時にメッセージを表示する。
+    error: function (file, response, xhr) {
+      // フロントエンドでエラーが発生した場合。(サーバからのレスポンスがないエラー)
+      if (xhr == null) {
+        //      // 2つ以上のファイルアップロードの場合
+        if (response == "You can not upload any more files.") {
+          //        // エラーを表示しない
+        } else {
+          $('#validation-error').html('<div class="alert alert-danger" role="alert">' + response + '</div>');
+          // 上限数を超えたファイルは削除する
+          this.removeFile(file);
+        }
+        // サーバーからレスポンスが帰ってきた場合(サーバ側でエラーが発生した場合)
+      } else {
+        $('#validation-error').html('<div class="alert alert-danger" role="alert">' + xhr.status + '</div>');
+        // 上限数を超えたファイルは削除する
+        this.removeFile(file);
+
+      }
+    },
+    
+    removedfile: function (file) {
+      let data_to_send = {};
+      if (checked_button_clicked) {
+        data_to_send = {
+          file_pk: delete_file_id,
+          file_name: delete_file_name,
+          url_name: "{{url_name|escapejs}}",
+          type: 'delete'
+        }
+      } else {
+        data_to_send = {
+            file_pk: file.pk,
+            file_name: file.name,
+            url_name: "{{url_name|escapejs}}",
+            type: 'delete'
+          }
+      }
+        //プログレスバー停止
+        // $("div").removeClass( "progress-bar" );
+      $.ajax({
+        url: "{% url 'draganddrop:dropzonefiledelete' %}", 
+        type: "POST",
+        data: data_to_send,
+        dataType: 'json',
+        success: function (data) {
+          sessionStorage.removeItem(data_to_send.file_name) //セッションから対象データを削除する
+          $('#result_toast').on('show.bs.toast', function (e) {
+            var toast = $(this);
+            toast.find('.toast-body').addClass('alert-success');
+            toast.find('.toast-body').text("ファイルを削除しました");
+            });
+            setTimeout(function() {
+              $('#result_toast').toast({ delay: 1500, animation: true }).toast('show');
+            }, 900);
+
+            setTimeout(function(){
+              window.location.reload();},1*1500);
+        }
+      });
+
+      // ファイル削除でフラグをfalseに変更
+      if (this.files.length == 0) {
+        addflug = false;
+      }
+      var ref;
+      (ref = file.previewElement) != null ? ref.parentNode.removeChild(file.previewElement) : void 0;
+    }
+
+  });
+  // ファイルの拡張子を取得する。
+  function checkFileExt(filename) {
+    filename = filename.toLowerCase();
+    return filename.split('.').pop();
+  }
+  // ランダムな値を生成
+  function getUniqueStr(myStrong) {
+    var strong = 1000;
+    if (myStrong) strong = myStrong;
+    return new Date().getTime().toString(16) + Math.floor(strong * Math.random()).toString(16)
+  }
+
+  //ローディング
+  function loadingView(flag) {
+    $('#loading-view').remove();
+    if (!flag) return;
+    $('<div id="loading-view" />').appendTo('body');
+  }
+
+  //ファイルサイズをセッションから取得。
+  $(document).ready(function () {
+
+    var bytes = 0;
+    for (let i = 0; i < sessionStorage.length; i++) {
+      let key = sessionStorage.key(i);
+
+      unit = "MB",
+        //mega = 1000
+
+      //文字列から数値に変換し、値を足して合計値として代入する。
+      bytes += Number(sessionStorage.getItem(key));
+
+    }
+    keta = String(bytes).length
+
+    if (keta <= 5) {
+      kbyte = bytes / 1000
+      kbyte_round = Math.round(kbyte * 10) / 10
+      total = kbyte_round + " " + "KB"
+
+
+    } else if (keta <= 8) {
+
+      mbyte = bytes / 1000 / 1000
+      mbyte_round = Math.round(mbyte * 10) / 10
+      total = mbyte_round + " " + "MB"
+
+    } else if (keta <= 12) {
+
+      gbyte = bytes / 1000 / 1000 / 1000
+      gbyte_round = Math.round(gbyte * 10) / 10
+      total = gbyte_round + " " + "GB"
+
+    }
+    //アップロードファイル情報表示
+    file_number = file_up_names.length
+    $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "1GB")
+    $("#upload_file_number").html("ファイル数" + " : " + file_number + "/5")
+    $("#total_byte").html("合計" + " : " + total)
+
+    if (file_number >= 5) {
+          $('#myDropzone').addClass("files-reached");
+          $('.dz-message').html("アップロード可能数の上限に達しています<br/> アップロード機能は無効です")
+        }
+
+    // ローディング画像止める
+    loadingView(false);
+
+  });
+
+
+//全送信先モーダル表示中に確認画面モーダルにz-indexを追加する処理//
+$('#confirm_modal').on('show.bs.modal', function (event) {
+
+const $currentModal = $(event.currentTarget);
+var zIndex = 1040 + (10 * $('.modal:visible').length);
+$currentModal.css('z-index', zIndex);
+setTimeout(function () {
+  $('.modal-backdrop')
+    .not('.modal-stack')
+    .css('z-index', zIndex - 1)
+    .addClass('modal-stack');
+}, 0);
+
+});
+  
+$('#update_confirm_modal').on('show.bs.modal', function (event) {
+const $currentModal = $(event.currentTarget);
+var zIndex = 1040 + (10 * $('.modal:visible').length);
+$currentModal.css('z-index', zIndex);
+setTimeout(function () {
+  $('.modal-backdrop')
+    .not('.modal-stack')
+    .css('z-index', zIndex - 1)
+    .addClass('modal-stack');
+}, 0);
+
+});
+
+</script>
+
+{% endblock %}

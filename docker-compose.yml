@@ -2,7 +2,7 @@ version: '3'
 
 services:
     nginx:
-        container_name: web
+        container_name: web_fileup
         image: nginx:1.16
         ports:
             # - "8000:8000"
@@ -16,15 +16,15 @@ services:
             # mediaファイルはローカルと同期を取るためにバインドマウントとする
             - ./media:/media
         depends_on:
-            - python_manamoa
+            - python_fileup
         environment:
             TZ: 'Asia/Tokyo'
         # 追加
         networks:
           - shared-network
 
-    db_manamoa: #(上原)DjnagoのDB接続先として設定する名前。同一NWに所属するコンテナ内でユニークである必要がある。
-      container_name: mysql8
+    db_fileup: #(上原)DjnagoのDB接続先として設定する名前。同一NWに所属するコンテナ内でユニークである必要がある。
+      container_name: mysql8_fileup
       # image: mysql:8.0.30
       image: mysql:8.0.34
       volumes:
@@ -43,7 +43,7 @@ services:
       networks:
         - shared-network
 
-    db-testing:
+    db-testing_fileup:
       # image: mysql:8.0.30
       image: mysql:8.0.34
       volumes:
@@ -61,8 +61,8 @@ services:
       networks:
         - shared-network
 
-    python_manamoa: #(上原)nginxのアップストリーム接続先として設定する名前。同一NWに所属するコンテナ内でユニークである必要がある。
-        container_name: django
+    python_fileup: #(上原)nginxのアップストリーム接続先として設定する名前。同一NWに所属するコンテナ内でユニークである必要がある。
+        container_name: django_filup
         # build: ./python
         build:
           context: .
@@ -80,7 +80,7 @@ services:
         # expose:
         #     - "8001"
         depends_on:
-            - db_manamoa
+            - db_fileup
         environment:
             TZ: 'Asia/Tokyo'
       # (上原)追加

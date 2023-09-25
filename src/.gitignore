@@ -1,4 +1,21 @@
 old/
+# media/
+# *.pyc
+# *.pyo
+# __pycache__
+# __init__.py
+
+# node_modules/
+# migrations/
+# uploads/
+# file/
+
+# mysql/my.cnf
+
+# db.sqlite3
+# _*
+
+old/
 media/
 *.pyc
 *.pyo
@@ -8,9 +25,6 @@ __init__.py
 node_modules/
 migrations/
 uploads/
-
-TODO
-
-mysql/my.cnf
-
-#webfonts
+.env
+nginx/log/access.log
+nginx/log/error.log
