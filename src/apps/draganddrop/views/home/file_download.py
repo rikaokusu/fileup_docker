@@ -80,8 +80,6 @@ class UrlFileDownloadZipView(View):
         # 対象課題のIDを取得
         pk = self.kwargs['pk']
 
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-
         # ファイル情報を取得
         url_download_table = UrlDownloadtable.objects.filter(pk=pk).first()
         url_downloadfiletable_qs = UrlDownloadFiletable.objects.filter(url_download_table=url_download_table)
@@ -130,8 +128,6 @@ class UrlFileDownloadZipView(View):
         # レスポンスに書き込み
         response.write(ret_zip)
         print("response.write(ret_zip)", ret_zip)
-
-        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 
         return response
 

@@ -379,11 +379,10 @@
                     {% elif url_dest_user_data.url_download_table.all|url_dl_file_count:url_dest_user_data.url_upload_manage.dl_limit == 0 %}
                     <span data-toggle="tooltip" title="DL回数制限を超えたためダウンロードできません。" data-placement="top">
                         <button class="fas_button_download past_due_download"></button></span>
-                        
+
                     {% elif url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
                     <span data-toggle="tooltip" title="ファイルが削除されました。" data-placement="top">
                         <button class="fas_button_download past_due_download"></button></span>
-    
 
                     {% else %}
                     <span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="top">
