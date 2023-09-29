@@ -24,6 +24,60 @@
 
 {% for resource_management in resource_management %}
 <div class="box1_resource_management mb-4">
+	<!--基本情報-->
+	<div class="contract_info_box">
+		<div style="margin-bottom:10px;">契約内容詳細</div>
+		<div class="d-flex">
+			<p>会社名:</p> 
+			<p class="ml-2" style="color: #005392;">
+				{% if current_user.company.pic_corp_class == '1' %}
+					{% if current_user.company.pic_legal_personality == '99' or current_user.company.pic_legal_personality == '' %}
+						{{ current_user.company.pic_company_name }}
+					{% else %}
+						{% if current_user.company.pic_legal_person_posi == '1' %}
+							{{ current_user.company.get_pic_legal_personality_display }}{{ current_user.company.pic_company_name }}
+						{% else %}
+							{{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}
+						{% endif %}
+					{% endif %}
+				{% elif current_user.company.pic_corp_class == '2' %}
+					{{ current_user.company.pic_company_name }}
+				{% endif %}
+			</p>
+		</div>
+		<div class="d-flex">
+			<p>使用可能容量:</p> 
+			<p class="ml-2" style="color: #005392;">20GB</p>
+		</div>
+		<div class="d-flex">
+			<p>URL共有:</p> 
+			<p class="ml-2" style="color: #005392;"> 共有可能</p>
+		</div>
+		<div class="d-flex">
+			<p>ダウンロード期限:</p> 
+			<p class="ml-2" style="color: #005392;"> 無制限</p>
+		</div>
+		<div class="d-flex">
+			<p>契約人数上限:</p> 
+			<p class="ml-2" style="color: #005392;"> 無制限</p>
+		</div>
+		<div class="d-flex">
+			<p>契約期間:</p> 
+			<p class="ml-2" style="color: #005392;"> 無制限</p>
+		</div>
+		<div class="d-flex">
+			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 20px; color: #212529;">契約内容の変更はこちら</a>
+			<p class="ml-1" style="color: #005392;"><i class="fa-solid fa-arrow-up-right-from-square"></i></p>
+		</div>
+	</div>
+	
+	<!--円グラフ-->
+	<div class="pie_chart_box">
+		<div class="myChart_container">
+			<canvas id="myChart"></canvas>
+		</div>
+	</div>
+	
 	<!--ディスク使用量-->
 	<div class="disk_capacity_box"> 
 		<div style="font-weight: normal; font-size: 25px;">ディスク使用量</div>
@@ -42,38 +96,8 @@
 		<div class="amount_of_space">(残容量: {{remaining_capacity}}{{remaining_capacity_unit}}/1.0GB)</div>
 		{% endif %}
 	</div>
-	
-	<!--円グラフ-->
-	<div class="pie_chart_box">
-		<div class="myChart_container">
-			<canvas id="myChart"></canvas>
-		</div>
-	</div>
 
-<!--基本情報-->
-	<div class="contract_info_box">
-		<div>契約内容詳細</div>
-		<div class="d-flex">
-			<p>会社名:</p> 
-			<p class="ml-2" style="color: #005392;"> ゆいテクノロジー</p>
-		</div>
-		<div class="d-flex">
-			<p>使用可能容量:</p> 
-			<p class="ml-2" style="color: #005392;">20GB</p>
-		</div>
-		<div class="d-flex">
-			<p>URL共有:</p> 
-			<p class="ml-2" style="color: #005392;"> 共有可能</p>
-		</div>
-		<div class="d-flex">
-			<p>ダウンロード期限:</p> 
-			<p class="ml-2" style="color: #005392;"> 無制限</p>
-		</div>
-		<div class="d-flex">
-			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 20px; color: #212529;">契約内容の変更はこちら</a>
-			<p class="ml-1" style="color: #005392;"><i class="fa-solid fa-arrow-up-right-from-square"></i></p>
-		</div>
-	</div>
+
 
 </div>
 
