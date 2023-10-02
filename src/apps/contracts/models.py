@@ -22,6 +22,8 @@ from accounts.models import User, Company, Messages, Service
 プランテーブル
 """
 class Plan(models.Model):
+    #id
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # サービス
     service = models.ForeignKey(Service, null=False, on_delete=models.CASCADE, default=1)
     # PAY.JPのプランID
@@ -57,11 +59,16 @@ class Contract(models.Model):
             ('1', '試用'),
             ('2', '本番'),
             ('3', '解約'),
+            ('4', '旧契約'),
+            ('5','振込前'),
+            ('6','振込通知済み')
     )
-
+    #ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # ユーザー
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, default="")
-    # user = models.CharField('契約者', max_length=255, blank=True, null=True)
+    # 会社
+    company = models.ForeignKey(Company, null=False, on_delete=models.CASCADE, default="")
     # サービス
     service = models.ForeignKey(Service, null=False, on_delete=models.CASCADE, default=1)
     # service = models.CharField('サービス', max_length=10, blank=True, null=True)
@@ -82,8 +89,18 @@ class Contract(models.Model):
     # プラン
     plan = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='プラン', related_name='contract_plan')
     # オプション
-    # option = models.ManyToManyField(Plan, blank=True, verbose_name='オプション', related_name='contract_option')
-    option = models.CharField('オプション', max_length=10, blank=True, null=True)
+    # option = models.CharField('オプション', max_length=10, blank=True, null=True)
+    # オプション1
+    option1 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション1', default="", related_name='contract_option1')
+    # オプション2
+    option2 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション2', default="", related_name='contract_option2')
+    # オプション3
+    option3 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション3', default="", related_name='contract_option3')
+    # オプション4
+    option4 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション4', default="", related_name='contract_option4')
+    # オプション5
+    option5 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション5', default="", related_name='contract_option5')
+
     # 小計
     minor_total = models.IntegerField('小計', blank=False, default=0)
     # 消費税
