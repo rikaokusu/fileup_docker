@@ -22,10 +22,10 @@ from accounts.models import User, Company, Messages, Service
 プランテーブル
 """
 class Plan(models.Model):
+    #id
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # サービス
     service = models.ForeignKey(Service, null=False, on_delete=models.CASCADE, default=1)
-    # PAY.JPのプランID
-    payjp_plan_id = models.CharField('PAY.JPのプランID', max_length=35, blank=False, default="pln")
     # 名前
     name = models.CharField('プラン名', max_length=30, blank=False)
     # 料金(年額)
@@ -35,7 +35,7 @@ class Plan(models.Model):
     # 説明
     description = models.TextField('説明', blank=True)
     # ユーザー数
-    user_num = models.IntegerField('ユーザー数', blank=True, default=0)
+    # user_num = models.IntegerField('ユーザー数', blank=True, default=0)
     # カテゴリー
     category = models.CharField('カテゴリー', max_length=30, default="なし")
     # オプションフラグ
@@ -46,7 +46,28 @@ class Plan(models.Model):
     def __str__(self):
         return self.name
 
-
+"""
+プラン・オプション詳細テーブル【FileUp!】
+"""
+class FileupDetail(models.Model):
+    #　id
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # プランまたはオプション
+    plan = models.ForeignKey(Plan, null=False, on_delete=models.CASCADE, default=1)
+    # 契約人数上限
+    user_limit = models.IntegerField('ユーザー上限', blank=True, null=True)
+    # 使用可能容量
+    capacity = models.IntegerField('使用可能容量', null=True, blank=True)
+    # URL共有
+    url_share = models.BooleanField('URL共有可否',null=True, blank=True)
+    # 管理
+    manage = models.BooleanField('管理',null=True, blank=True)
+    # DL期限
+    dl_limit = models.IntegerField('DL期限', null=True, blank=True)
+    # 件数上限
+    max_items = models.IntegerField('件数上限', null=True, blank=True)
+    # ワンタイムパスワード設定
+    one_time_pw = models.BooleanField('ワンタイムパスワード設定可否', null=True, blank=True)
 
 """
 契約テーブル
@@ -57,11 +78,16 @@ class Contract(models.Model):
             ('1', '試用'),
             ('2', '本番'),
             ('3', '解約'),
+            ('4', '旧契約'),
+            ('5','振込前'),
+            ('6','振込通知済み')
     )
-
+    #ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # ユーザー
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, default="")
-    # user = models.CharField('契約者', max_length=255, blank=True, null=True)
+    # 会社
+    company = models.ForeignKey(Company, null=False, on_delete=models.CASCADE, default="")
     # サービス
     service = models.ForeignKey(Service, null=False, on_delete=models.CASCADE, default=1)
     # service = models.CharField('サービス', max_length=10, blank=True, null=True)
@@ -82,8 +108,18 @@ class Contract(models.Model):
     # プラン
     plan = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='プラン', related_name='contract_plan')
     # オプション
-    # option = models.ManyToManyField(Plan, blank=True, verbose_name='オプション', related_name='contract_option')
-    option = models.CharField('オプション', max_length=10, blank=True, null=True)
+    # option = models.CharField('オプション', max_length=10, blank=True, null=True)
+    # オプション1
+    option1 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション1', default="", related_name='contract_option1')
+    # オプション2
+    option2 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション2', default="", related_name='contract_option2')
+    # オプション3
+    option3 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション3', default="", related_name='contract_option3')
+    # オプション4
+    option4 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション4', default="", related_name='contract_option4')
+    # オプション5
+    option5 = models.ForeignKey(Plan, null=True, on_delete=models.CASCADE, verbose_name='オプション5', default="", related_name='contract_option5')
+
     # 小計
     minor_total = models.IntegerField('小計', blank=False, default=0)
     # 消費税

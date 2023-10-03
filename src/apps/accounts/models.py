@@ -50,6 +50,8 @@ class Company(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 会社名
     pic_company_name = models.CharField('会社名', max_length=255)
+    #法人・個人
+    pic_corp_class = models.CharField('法人区分',max_length=2, choices=CORPCLASS_CHOICES,blank=True)
     # 法人格
     pic_legal_personality = models.CharField('法人格', max_length=2, choices=LEGALPERSONALITY_CHOICES, blank=True)
     # 法人格位置

@@ -2703,7 +2703,7 @@ DatePicker
     width: 385px;
     height: 380px;
     text-align: center;
-    padding: 35px;
+    padding: 10px 35px;
 }
 
 .amount_used {
@@ -2732,16 +2732,16 @@ DatePicker
     height: 380px;
 }
 .contract_info_box {
-    width: 310px;
+    width: 450px;
     height: 380px;
-    padding: 20px 30px 20px 30px;
+    padding: 10px 30px 20px 30px;
     font-size: 25px;
-    margin-left: 100px;
 }
 .contract_info_box div{
+    height: 35px;
     text-align: center;
     font-weight: normal;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 .contract_info_box p {
     text-align: left;
@@ -2786,6 +2786,9 @@ DatePicker
 }
 
 
-.tameshi{
-    color:red;
+/* akamine 追加分 */
+
+.contract_info_box p{
+    font-size: 16px;
 }
+

@@ -8,8 +8,8 @@ class ContractAdmin(admin.ModelAdmin):
 
 
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ('is_option', 'is_trial', 'service', 'category', 'payjp_plan_id', 'name', 'price', 'unit_price', 'user_num', 'description',)
-    list_display_links =('payjp_plan_id', 'name', 'price', 'user_num', 'description',)
+    list_display = ('is_option', 'is_trial', 'service', 'category', 'name', 'price', 'unit_price', 'description',)
+    list_display_links =('name', 'price', 'description',)
 
 
 admin.site.register(Contract, ContractAdmin,)

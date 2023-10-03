@@ -55,6 +55,7 @@ DATABASE_APPS_MAPPING = {
     # userにはユーザー系処理
     'accounts'          : 'user',
     'bulk'              : 'user',
+    'contracts'         : 'user',
     # defaultには契約関連のTable
     'draganddrop'         : 'default',
 }
