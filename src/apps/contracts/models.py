@@ -26,8 +26,6 @@ class Plan(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # サービス
     service = models.ForeignKey(Service, null=False, on_delete=models.CASCADE, default=1)
-    # PAY.JPのプランID
-    payjp_plan_id = models.CharField('PAY.JPのプランID', max_length=35, blank=False, default="pln")
     # 名前
     name = models.CharField('プラン名', max_length=30, blank=False)
     # 料金(年額)
@@ -37,7 +35,7 @@ class Plan(models.Model):
     # 説明
     description = models.TextField('説明', blank=True)
     # ユーザー数
-    user_num = models.IntegerField('ユーザー数', blank=True, default=0)
+    # user_num = models.IntegerField('ユーザー数', blank=True, default=0)
     # カテゴリー
     category = models.CharField('カテゴリー', max_length=30, default="なし")
     # オプションフラグ
@@ -48,7 +46,28 @@ class Plan(models.Model):
     def __str__(self):
         return self.name
 
-
+"""
+プラン・オプション詳細テーブル【FileUp!】
+"""
+class FileupDetail(models.Model):
+    #　id
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # プランまたはオプション
+    plan = models.ForeignKey(Plan, null=False, on_delete=models.CASCADE, default=1)
+    # 契約人数上限
+    user_limit = models.IntegerField('ユーザー上限', blank=True, null=True)
+    # 使用可能容量
+    capacity = models.IntegerField('使用可能容量', null=True, blank=True)
+    # URL共有
+    url_share = models.BooleanField('URL共有可否',null=True, blank=True)
+    # 管理
+    manage = models.BooleanField('管理',null=True, blank=True)
+    # DL期限
+    dl_limit = models.IntegerField('DL期限', null=True, blank=True)
+    # 件数上限
+    max_items = models.IntegerField('件数上限', null=True, blank=True)
+    # ワンタイムパスワード設定
+    one_time_pw = models.BooleanField('ワンタイムパスワード設定可否', null=True, blank=True)
 
 """
 契約テーブル

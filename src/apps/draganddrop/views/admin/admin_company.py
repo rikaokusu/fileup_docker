@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from contracts.models import Contract,Plan
 from draganddrop.views.home.home_common import CommonView
 from accounts.models import User,Service,Company
+from contracts.models import Plan, Contract, FileupDetail
 import datetime
 from django.db.models import Q
 from django.conf import settings
@@ -14,17 +14,20 @@ class ResourceManagementView(TemplateView,CommonView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        user = self.request.user
+        service = Service.objects.get(name="FileUP!")
         # 管理テーブル情報取得
         resource_management = ResourceManagement.objects.filter(company=self.request.user.company.id)
         context["resource_management"] = resource_management
 
-        ex_service = Service.objects.all()
-        context["ex_service"] = ex_service
-        # resource_contract = Contract.objects.all()
-        # print("resource_contractいるーーーー", resource_contract)
-        # context["resource_contract"] = resource_contract
+        # ex_service = Service.objects.all()
+        # context["ex_service"] = ex_service
+        
+        resource_contract = Contract.objects.get(company=user.company, service=service, status="2")
+        context["resource_contract"] = resource_contract
 
+        resource_detail = FileupDetail.objects.get(plan=resource_contract.plan)
+        context["resource_detail"] = resource_detail
         # ログインしている会社情報取得
 
 

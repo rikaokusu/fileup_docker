@@ -2738,6 +2738,7 @@ DatePicker
     font-size: 25px;
 }
 .contract_info_box div{
+    height: 35px;
     text-align: center;
     font-weight: normal;
     /* margin-bottom: 20px; */
@@ -2785,6 +2786,9 @@ DatePicker
 }
 
 
-.tameshi{
-    color:red;
+/* akamine 追加分 */
+
+.contract_info_box p{
+    font-size: 16px;
 }
+
