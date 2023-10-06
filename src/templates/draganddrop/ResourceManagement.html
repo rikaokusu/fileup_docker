@@ -31,22 +31,29 @@
 			<p>会社名:</p> 
 			{% if current_user.company.pic_corp_class == '1' %} <!--法人だったら、else個人-->
 				{% if current_user.company.pic_legal_personality == '99' or current_user.company.pic_legal_personality == '' %}  <!-- 法人格が「その他」か記載なし -->
-					<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}" style="color: #005392;">	{{ current_user.company.pic_company_name | truncatechars:12 }}
+					<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}" style="color: #005392;">	{{ current_user.company.pic_company_name | truncatechars:16 }}
 					</p>
 				{% else %} <!-- 法人格「その他」以外 株式会社など -->
 					{% if current_user.company.pic_legal_person_posi == '1' %} <!--法人格の位置：前-->
-						<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.get_pic_legal_personality_display }}{{ current_user.company.pic_company_name }}" style="color: #005392;">
-							{{ current_user.company.get_pic_legal_personality_display }}{{ current_user.company.pic_company_name| truncatechars:12 }}
-						</p>
+						{% with current_user.company.get_pic_legal_personality_display|add:current_user.company.pic_company_name as COMPNAME %}
+							<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ COMPNAME }}" style="color: #005392;">
+								{{ COMPNAME | truncatechars:16 }}
+							</p>
+						{% endwith %}
 					{% else %} <!-- 法人格の位置：後ろ -->
-						<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}" style="color: #005392;">
+						<!-- <p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}" style="color: #005392;">
 						{{ current_user.company.pic_company_name | truncatechars:12 }}{{ current_user.company.get_pic_legal_personality_display }}
-						</p>
+						</p> -->
+						{% with current_user.company.pic_company_name|add:current_user.company.get_pic_legal_personality_display as COMPNAME %}
+							<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ COMPNAME }}" style="color: #005392;">
+								{{ COMPNAME | truncatechars:16 }}
+							</p>
+						{% endwith %}
 					{% endif %}
 				{% endif %}
 			{% elif current_user.company.pic_corp_class == '2' %}<!--個人だったら-->
 				<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}" style="color: #005392;">
-				{{ current_user.company.pic_company_name | truncatechars:12 }}
+				{{ current_user.company.pic_company_name | truncatechars:16 }}
 				</p>
 			{% endif %}
 		</div>
@@ -113,13 +120,13 @@
 		<div class="d-flex">
 			<p>最大ファイルサイズ:</p> 
 			<p class="ml-2" style="color: #005392;">
-				300MB
+				
 			</p>
 		</div>
-		<!-- <div class="d-flex">
-			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 16px; color: #212529;">契約内容の変更はこちら</a>
-			<p class="ml-1" style="color: #005392;"><i class="fa-solid fa-arrow-up-right-from-square"></i></p>
-		</div> -->
+		<div class="d-flex">
+			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 16px; color: #212529;">契約内容の変更はこちら<i class="fa-solid fa-arrow-up-right-from-square ml-1" style="color: #005392;"></i>
+			</a>
+		</div>
 	</div>
 	
 	<!--円グラフ-->
