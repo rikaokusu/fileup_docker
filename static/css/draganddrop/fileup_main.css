@@ -2673,6 +2673,7 @@ DatePicker
 ---------------------------------*/
 
 .box1_resource_management {
+    justify-content: space-between;
     width: 1336px;
     height: 400px;
     padding: 10px 10px;
@@ -2728,11 +2729,11 @@ DatePicker
     font-weight: 300;
 }
 .pie_chart_box {
-    width: 455px;
+    width: 380px;
     height: 380px;
 }
 .contract_info_box {
-    width: 450px;
+    width: 380px;
     height: 380px;
     padding: 10px 30px 20px 30px;
     font-size: 25px;
@@ -2751,8 +2752,7 @@ DatePicker
 .myChart_container {
     position: relative;
     width: 380px;
-    height: 330px;
-    left: 60px;
+    height: 380px;
     bottom: 6px;
 }
 .amount_of_space {
@@ -2771,7 +2771,7 @@ DatePicker
     font-weight: 200;
     font-size: 30px;
     position: relative;
-    top: 43px;
+    top: 49px;
 }
 
 /*---------------------------------

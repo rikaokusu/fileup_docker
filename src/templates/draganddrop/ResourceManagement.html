@@ -29,21 +29,33 @@
 		<div style="margin-bottom:15px;">契約内容詳細</div>
 		<div class="d-flex">
 			<p>会社名:</p> 
-			<p class="ml-2" style="color: #005392;">
-				{% if current_user.company.pic_corp_class == '1' %}
-					{% if current_user.company.pic_legal_personality == '99' or current_user.company.pic_legal_personality == '' %}
-						{{ current_user.company.pic_company_name }}
-					{% else %}
-						{% if current_user.company.pic_legal_person_posi == '1' %}
-							{{ current_user.company.get_pic_legal_personality_display }}{{ current_user.company.pic_company_name }}
-						{% else %}
-							{{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}
-						{% endif %}
+			{% if current_user.company.pic_corp_class == '1' %} <!--法人だったら、else個人-->
+				{% if current_user.company.pic_legal_personality == '99' or current_user.company.pic_legal_personality == '' %}  <!-- 法人格が「その他」か記載なし -->
+					<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}" style="color: #005392;">	{{ current_user.company.pic_company_name | truncatechars:16 }}
+					</p>
+				{% else %} <!-- 法人格「その他」以外 株式会社など -->
+					{% if current_user.company.pic_legal_person_posi == '1' %} <!--法人格の位置：前-->
+						{% with current_user.company.get_pic_legal_personality_display|add:current_user.company.pic_company_name as COMPNAME %}
+							<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ COMPNAME }}" style="color: #005392;">
+								{{ COMPNAME | truncatechars:16 }}
+							</p>
+						{% endwith %}
+					{% else %} <!-- 法人格の位置：後ろ -->
+						<!-- <p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}" style="color: #005392;">
+						{{ current_user.company.pic_company_name | truncatechars:12 }}{{ current_user.company.get_pic_legal_personality_display }}
+						</p> -->
+						{% with current_user.company.pic_company_name|add:current_user.company.get_pic_legal_personality_display as COMPNAME %}
+							<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ COMPNAME }}" style="color: #005392;">
+								{{ COMPNAME | truncatechars:16 }}
+							</p>
+						{% endwith %}
 					{% endif %}
-				{% elif current_user.company.pic_corp_class == '2' %}
-					{{ current_user.company.pic_company_name }}
 				{% endif %}
-			</p>
+			{% elif current_user.company.pic_corp_class == '2' %}<!--個人だったら-->
+				<p class="ml-2" data-toggle="tooltip" data-placement="right" title="{{ current_user.company.pic_company_name }}" style="color: #005392;">
+				{{ current_user.company.pic_company_name | truncatechars:16 }}
+				</p>
+			{% endif %}
 		</div>
 		<div class="d-flex">
 			<p>使用可能容量:</p> 
@@ -72,7 +84,7 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<p>契約人数上限:</p> 
+			<p>ユーザー数上限:</p> 
 			<p class="ml-2" style="color: #005392;">
 				{% if resource_detail.user_limit == NULL %}
 					無制限
@@ -106,8 +118,14 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 16px; color: #212529;">契約内容の変更はこちら</a>
-			<p class="ml-1" style="color: #005392;"><i class="fa-solid fa-arrow-up-right-from-square"></i></p>
+			<p>最大ファイルサイズ:</p> 
+			<p class="ml-2" style="color: #005392;">
+				
+			</p>
+		</div>
+		<div class="d-flex">
+			<a href="" target="_blank" rel="noopener noreferrer" style="font-size: 16px; color: #212529;">契約内容の変更はこちら<i class="fa-solid fa-arrow-up-right-from-square ml-1" style="color: #005392;"></i>
+			</a>
 		</div>
 	</div>
 	
