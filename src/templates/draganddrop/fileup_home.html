@@ -209,7 +209,7 @@
                     <span data-toggle="tooltip" title="メッセージ" data-placement="top">
                         <button class="fas_button_message"
                         data-value="{{dest_user_data.pk}}"
-                        data-dl_message="{{dest_user_data.upload_manage.message}}"
+                        data-dl_message="{{dest_user_data.upload_manage.message|linebreaksbr}}"
                         data-target="#dl_message_modal"
                         data-toggle="modal"></button>
                     </span>
@@ -401,7 +401,7 @@
                     <span data-toggle="tooltip" title="メッセージ" data-placement="top">
                         <button class="fas_button_message"
                         data-value="{{url_dest_user_data.pk}}"
-                        data-dl_message="{{url_dest_user_data.url_upload_manage.message}}"
+                        data-dl_message="{{url_dest_user_data.url_upload_manage.message|linebreaksbr}}"
                         data-target="#dl_message_modal"
                         data-toggle="modal"></button>
                     </span>
@@ -653,7 +653,7 @@
                     <span data-toggle="tooltip" title="メッセージ" data-placement="top">
                         <button class="fas_button_message"
                         data-value="{{upload_manage.pk}}"
-                        data-send_message="{{upload_manage.message}}"
+                        data-send_message="{{upload_manage.message|linebreaksbr}}"
                         data-target="#send_message_modal"
                         data-toggle="modal"></button>
                     </span>
@@ -902,7 +902,7 @@
                     <span data-toggle="tooltip" title="メッセージ" data-placement="top">
                         <button class="fas_button_message"
                         data-value="{{url_upload_manage.pk}}"
-                        data-url_send_message="{{url_upload_manage.message}}"
+                        data-url_send_message="{{url_upload_manage.message|linebreaksbr}}"
                         data-target="#url_send_message_modal"
                         data-toggle="modal"></button>
                     </span>
@@ -2549,8 +2549,9 @@ $('#dl_message_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget)
     var dl_message_id = button.data('value')
     var dl_message = button.data('dl_message')
+    str = dl_message.replace(/\r?\n/g, '<br>');
     var modal = $(this);
-    modal.find('.dl_message').text(dl_message);
+    modal.find('.dl_message').html(str);
 });
 
 //URL共有 受信用
@@ -2563,8 +2564,9 @@ $('#dl_url_message_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget)
     var url_dl_message_id = button.data('value')
     var url_dl_message = button.data('url_dl_message')
+    str = url_dl_message.replace(/\r?\n/g, '<br>');
     var modal = $(this);
-    modal.find('.url_dl_message').text(url_dl_message);
+    modal.find('.url_dl_message').html(str);
 });
 
 //送信用
@@ -2577,8 +2579,9 @@ $('#send_message_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget)
     var send_message_id = button.data('value')
     var send_message = button.data('send_message')
+    str = send_message.replace(/\r?\n/g, '<br>');
     var modal = $(this);
-    modal.find('.send_message').text(send_message);
+    modal.find('.send_message').html(str);
 });
 
 //URL共有 送信用
@@ -2591,8 +2594,9 @@ $('#url_send_message_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget)
     var url_send_message_id = button.data('value')
     var url_send_message = button.data('url_send_message')
+    str = url_send_message.replace(/\r?\n/g, '<br>');
     var modal = $(this);
-    modal.find('.url_send_message').text(url_send_message);
+    modal.find('.url_send_message').html(str);
 });
 
 </script>
