@@ -71,13 +71,9 @@
 
 					{% else %}
 					<span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="right">
-						{% comment %} <button><input type="button" class="zip_dl_btn url_zip_download" value="一括ダウンロード"
-							data-url_downloadtable_id="{{ url_dest_user_data.id }}"
-							onclick="window.location.href='{% url 'draganddrop:url_file_download_zip' url_dest_user_data.id %}'"></button> {% endcomment %}
-
-						<button><input type="button" class="zip_dl_btn" value="一括ダウンロード"
-							data-url_downloadtable_id="{{ url_dest_user_data.id }}"
-							onclick="window.location.href='{% url 'draganddrop:url_file_download_zip' url_dest_user_data.id %}'"></button>
+						<button><input type="button" class="zip_dl_btn url_zip_download" value="一括ダウンロード"
+							data-url_downloadtable_id="{{ url_dest_user_data.id }}">
+						</button>
 					</span>
 					{% endif %}
 				</div>
@@ -96,7 +92,7 @@
 		{% if url_dest_user_data.url_upload_manage.message %}
 		<div class="url_dl_message">
 			<h3>メッセージ</h3>
-			<p>{{url_dest_user_data.url_upload_manage.message}}</p>
+			<p>{{url_dest_user_data.url_upload_manage.message|linebreaksbr}}</p>
 		</div>
 		{% endif %}
 
@@ -166,7 +162,6 @@
 			'is_type': is_type
 		};
 
-
 		$.ajax({
 			type: 'POST',
 			url: "{% url 'draganddrop:url_file_download_status' %}",
@@ -174,7 +169,13 @@
 			dataType: 'json',
 			success: function (data) {
 				if (data.status == 'ok') {
-					window.location.reload();
+
+					// url_file_download_zip(=一括(Zip)ダウンロード機能)にアクセス
+					window.location.href = '/url_file_download_zip/' + url_downloadtable_id + '/';
+
+					setTimeout(function(){
+						window.location.reload();
+					}, 2000);
 
 				} else {
 					window.location.reload();
