@@ -20,6 +20,7 @@ urlpatterns = [
      ## url_access ##
      path('url_check/<str:token>/', url_access.ApproveView.as_view(), name='approve'),
      path('url_file_download_auth_mail/<uuid:pk>', url_access.UrlFileDownloadAuthMail.as_view(), name='url_file_download_auth_mail'),
+     
      path('url_file_download_auth_pass/<uuid:pk>',url_access.UrlFileDownloadAuthPass.as_view(), name='url_file_download_auth_pass'),
      path('url_file_download/<uuid:pk>',url_access.UrlFileDownload.as_view(), name='url_file_download'),
      path('url_file_unable_download/', url_access.UrlFileUnableDownload.as_view(),name='url_file_unable_download'),

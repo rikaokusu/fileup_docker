@@ -423,7 +423,9 @@ class DuplicateStep2(FormView, CommonView):
                 # 実ファイル名を文字列にデコード
                 file_path = urllib.parse.unquote(file.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
-                file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認
@@ -469,7 +471,8 @@ class DuplicateStep2(FormView, CommonView):
                 file_path = urllib.parse.unquote(file.upload.url)
 
                 # ファイルパスを分割してファイル名だけ取得
-                file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
 
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
@@ -867,6 +870,7 @@ class UrlDuplicateStep1(FormView, CommonView):
         context["token_signed"] = token_signed
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        print('domainとは',domain)
         protocol = self.request.scheme        
         url_upload_manage.url = protocol + "://" + domain + "/" + "url_check" + "/" + token_signed
 
@@ -1034,7 +1038,9 @@ class UrlDuplicateStep2(FormView, CommonView):
                 # 実ファイル名を文字列にデコード
                 file_path = urllib.parse.unquote(file.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
-                file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認
@@ -1083,7 +1089,8 @@ class UrlDuplicateStep2(FormView, CommonView):
                 file_path = urllib.parse.unquote(file.upload.url)
 
                 # ファイルパスを分割してファイル名だけ取得
-                file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
 
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)

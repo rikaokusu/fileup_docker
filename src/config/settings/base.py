@@ -145,6 +145,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'file')
 MEDIA_URL = '/file/'
 FULL_MEDIA_ROOT = os.path.join(MEDIA_ROOT, 'file')
 
+# # ファイルの保存先(無課金アップロード前)
+FULL_MEDIA_ROOT_FREETMP = os.path.join(MEDIA_ROOT, 'free_tmp')
+# # ファイルの保存先(無課金アップロード後)
+FULL_MEDIA_ROOT_FREE = os.path.join(MEDIA_ROOT, 'free')
+# # ファイルの保存先(課金アップロード前)
+FULL_MEDIA_ROOT_PAYTMP = os.path.join(MEDIA_ROOT, 'pay_tmp')
+# # ファイルの保存先(課金アップロード後)
+FULL_MEDIA_ROOT_PAY = os.path.join(MEDIA_ROOT, 'pay')
+
 #自分で作ったUserモデルをデフォルトで使用するように宣言
 # accountsというアプリケーションです
 AUTH_USER_MODEL = 'accounts.User'

@@ -21,14 +21,18 @@ class ApproveView(TemplateView):
     model = UrlUploadManage
 
     def get_context_data(self, **kwargs):
+        print('Approveげっとこんてきすとでーた')
         context = super().get_context_data(**kwargs)
 
         # URLを返す
         url_name = self.request.resolver_match.url_name
+        print('urlねーむとは',url_name)
         context["url_name"] = url_name
 
 
     def get(self, request, token):
+        print('Approveげっとにはいった')
+        
         # if request.method == "GET":
             # GET = ランダムURLにアクセスしてきた際
 

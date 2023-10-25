@@ -67,16 +67,30 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # プロジェクト直下にmediaフォルダが作成される BASE_DIR(C:\Users\user\Dropbox\08.開発\training_pj)
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = '/'
 MEDIA_ROOT = '/media/'
+
 
 # ファイル削除用にパスを作成 MEDIA_ROOT(C:\Users\user\Dropbox\08.開発\training_pj\media)
 FULL_MEDIA_ROOT = os.path.join(MEDIA_ROOT, 'uploads')
+# ファイル削除用にパスを作成(無課金アップロード前)
+FULL_MEDIA_ROOT_FREETMP = os.path.join(MEDIA_ROOT, 'free_tmp')
+# ファイル削除用にパスを作成(無課金アップロード後)
+FULL_MEDIA_ROOT_FREE = os.path.join(MEDIA_ROOT, 'free')
+# ファイル削除用にパスを作成(課金アップロード前)
+FULL_MEDIA_ROOT_PAYTMP = os.path.join(MEDIA_ROOT, 'pay_tmp')
+# ファイル削除用にパスを作成(課金アップロード後)
+FULL_MEDIA_ROOT_PAY = os.path.join(MEDIA_ROOT, 'pay')
+
+
 
 # 動画ファイル削除用にパスを作成 FULL_MEDIA_ROOT(C:\Users\user\Dropbox\08.開発\training_pj\media\uploads)
 MOVIE_FULL_MEDIA_ROOT = os.path.join(FULL_MEDIA_ROOT, 'movie')
 
 # アップロードファイルにはFQDN+/media/+uploads+ファイル名でアクセスする
+# MEDIA_URL = '/'
 MEDIA_URL = '/media/'
+
 
 LOGGING = {
     'version': 1,

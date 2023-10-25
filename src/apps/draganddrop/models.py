@@ -1,10 +1,12 @@
 from django.db import models
 from django.conf import settings
-from accounts.models import User
+from accounts.models import User, Service, Company
+from contracts.models import Contract, Plan
 import uuid
 from datetime import date
 from django.utils import timezone
 from django_mysql.models import ListCharField
+import os
 
 # Create your models here.
 Legal_Personality = (
@@ -59,15 +61,28 @@ class Group(models.Model):
         return name
 
 class Filemodel(models.Model):
+    
+    def upload_name(instance, filename):
+        name=str(instance)
+        print('ネームの中身',name)
+        model_name = instance._meta.verbose_name.replace(' ', '-')
+        print('モデルネームの中身',model_name)
+        user = User.objects.filter(pk=instance.created_user).first()
+        cont = Contract.objects.filter(company=user.company,service__name='FileUP!',status='2').first()
+        if not cont.plan.name == 'フリープラン':
+            return "charge" + "/"  + filename
+        else:
+            return "free" + "/"  + filename
+
     size = models.CharField(max_length=140)
     name = models.CharField(max_length=140)
-    upload = models.FileField(upload_to='file')
+    upload = models.FileField(upload_to=upload_name)
     del_flag = models.IntegerField(null=True, blank=True, default=0)
-    
+    created_user = models.CharField(max_length=40, blank=True, null=True)
+
     def __str__(self):
         name = self.name
         return name
-
 
 class UploadManage(models.Model):
     # ID
