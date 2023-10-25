@@ -48,6 +48,8 @@ class DeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -121,6 +123,8 @@ class FileDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -195,6 +199,8 @@ class UrlDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -267,6 +273,8 @@ class UrlFileDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -336,6 +344,8 @@ class SendTableMultiDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -383,6 +393,8 @@ class SendTableMultiDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -451,6 +463,8 @@ class SendTableFileMultiDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認
@@ -502,6 +516,8 @@ class SendTableFileMultiDeleteAjaxView(View):
                         file_path = urllib.parse.unquote(file.upload.url)
                         # ファイルパスを分割してファイル名だけ取得
                         file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
                         # パスを取得
                         path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                         # パスの存在確認

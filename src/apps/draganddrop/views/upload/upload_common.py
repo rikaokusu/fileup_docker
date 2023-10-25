@@ -20,7 +20,7 @@ from django.core.signing import TimestampSigner, dumps, SignatureExpired
 ################################################
 class FileUpload(View):
     def post(self, request, *args, **kwargs):
-
+        print('FileUploadにはいった')
         up_file_id = []
         up_file_name = []
 
@@ -34,8 +34,9 @@ class FileUpload(View):
                 name=upload_file.name,
                 size=upload_file.size,
                 upload=upload_file,
+                created_user=self.request.user.id
             )
-
+            print('ファイル途中',file)
             file.save()
 
             up_file_id.append(file.id)
@@ -68,6 +69,8 @@ class DropZoneFileDeleteView(View):
                 file_path = urllib.parse.unquote(filemodel_obj.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認
@@ -134,6 +137,8 @@ class CancelView(View):
                 file_path = urllib.parse.unquote(file.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認
@@ -155,6 +160,8 @@ class CancelView(View):
                 file_path = urllib.parse.unquote(file.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認

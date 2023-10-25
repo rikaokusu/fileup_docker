@@ -225,9 +225,9 @@ class Step1UrlUpload(FormView, CommonView):
         context["token_signed"] = token_signed
         current_site = get_current_site(self.request)
         domain = current_site.domain
-        protocol = self.request.scheme        
+        print('domainとは',domain)
+        protocol = self.request.scheme
         url_upload_manage_obj.url = protocol + "://" + domain + "/" + "url_check" + "/" + token_signed
-        
 
         # upload_manageに追加する。データを追加し、戻った際にデータを反映させるため）
         url_upload_manage_obj.dest_user_mail1 = dest_user_mail1
@@ -406,23 +406,30 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
                 file_path = urllib.parse.unquote(file.upload.url)
 
                 # ファイルパスを分割してファイル名だけ取得
-                file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
+                # file_name = file_path.split('/', 3)[3]
+                print('----urlのfile_nameはなに',file_name)
+
 
                 # パスを取得
-                path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
+                print('----urlのpathはなに',path)
 
 
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
                 if file_name_without_dot == "txt":
-                    path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                    # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                    path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
+                    print('txtふぁいるにすすんだ',path)
                     with open(path) as f:
                         s = f.read()
 
                         # htmlファイルを生成して書き込む
                         upload_s = str(file.upload)
                         upload_ss = upload_s.split('/')[0]
-
+                        print('upload_ssとは',upload_ss)
                         file_path = urllib.parse.unquote(file.upload.url)
 
                         upload = file_path[1:]
@@ -441,11 +448,12 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
                         htmlfilename = path_html
                         htmlname = os.path.basename(htmlfilename)
                         path_html_s = upload_ss + "/" + htmlname
+                        
                         htmlfile, created = PDFfilemodel.objects.get_or_create(
                             name=htmlname,
                             size=file.size,
                             upload=path_html_s,
-                            file=file
+                            file=file,
                         )
 
                         htmlfile.save()
@@ -983,6 +991,8 @@ class Step2UrlUpdate(FormView, CommonView):
                 file_path = urllib.parse.unquote(file.upload.url)
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 2)[2]
+                
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 # パスの存在確認
@@ -1032,6 +1042,8 @@ class Step2UrlUpdate(FormView, CommonView):
 
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
+                # file_name = file_path.split('/', 2)[2]
+                
 
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
