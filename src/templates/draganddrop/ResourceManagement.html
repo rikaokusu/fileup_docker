@@ -155,7 +155,7 @@
 			<div class="amount_of_space balloonoya">
 				<p>
 					(<span class="title_color" style="font-weight: bold;">残容量</span>
-					: 0{{remaining_capacity_unit}}/10GB)
+					: 0{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
 				</p>
 				<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
 			</div>
@@ -163,7 +163,7 @@
 			<div class="amount_of_space balloonoya">
 				<p>
 					(<span class="title_color" style="font-weight: bold;">残容量</span>
-					: {{remaining_capacity}}{{remaining_capacity_unit}}/1.0GB)
+					: {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
 				</p>
 				<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
 			</div>
