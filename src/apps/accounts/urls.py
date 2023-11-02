@@ -72,6 +72,12 @@ urlpatterns = [
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.Logout.as_view(), name='logout'),
 
+    # ユーザーのパスワードリセット（ログイン画面にて）
+    path('password_reset/', views.PasswordReset.as_view(), name='password_reset'),
+    path('password_reset/done/', views.PasswordResetDone.as_view(), name='password_reset_done'),
+    path('password_reset/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
+    path('password_reset/complete/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
+
 
     # 会社情報
     path('companyprofile/',views.CompanyProfile.as_view(),name='companyprofile'),

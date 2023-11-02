@@ -316,3 +316,41 @@ class Stripe(models.Model):
     stripe_card_id = models.CharField('StripeのCardID', max_length=35, blank=True, null=True)
     # 会社コード
     company = models.OneToOneField(Company, null=True, on_delete=models.CASCADE, default='')
+
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+                            各アプリごとのユーザー・管理者権限詳細テーブル
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""
+FileUP用サービス権限
+"""
+class FileupPermissions(models.Model):
+    FILEUPPERMISSION_CHOICES = (
+            ('0', '一般ユーザー'),
+            ('1', '管理者１'),
+            ('2', '管理者２'),
+            ('3', '管理者３'),
+            ('4', '管理者４'),
+            ('5', '管理者５'),
+            ('6', '管理者６'),
+            ('7', '管理者７'),
+            ('8', '管理者８'),
+            ('9', '管理者９'),
+            ('10', '管理者１０')
+    )
+    # ユーザー
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, default="")
+    # 各機能権限
+    permission = models.CharField(max_length=2, default=0, choices=FILEUPPERMISSION_CHOICES, blank=True)
+    # 管理者権限有無（デフォルトは一般ユーザーであるFalse）
+    admin = models.BooleanField('管理者権限有無',default=False)
+    # 各機能権限１
+    role1 = models.BooleanField('各機能権限１',default=False)
+    # 各機能権限２
+    role2 = models.BooleanField('各機能権限２',default=False)
+    # 各機能権限３
+    role3 = models.BooleanField('各機能権限３',default=False)
+    # 各機能権限４
+    role4 = models.BooleanField('各機能権限４',default=False)
+    # 各機能権限５
+    role5 = models.BooleanField('各機能権限５',default=False)

@@ -242,38 +242,38 @@
       })
 
       // 申し込むボタンをクリックでPOST送信
-      $('#trialbutton').click(function() {
-        console.log("申し込むボタンクリック")
-        var service = $('input[name="service"]').val();
-        var start_date = $('input[name="sdate"]').val();
-        var end_date = $('input[name="edate"]').val();
+      // $('#trialbutton').click(function() {
+      //   console.log("申し込むボタンクリック")
+      //   var service = $('input[name="service"]').val();
+      //   var start_date = $('input[name="sdate"]').val();
+      //   var end_date = $('input[name="edate"]').val();
 
-        console.log(service)
-        console.log(start_date)
-        console.log(end_date)
+      //   console.log(service)
+      //   console.log(start_date)
+      //   console.log(end_date)
 
-        var data = { service : service, start_date : start_date, end_date : end_date };
-        console.log(data)
+      //   var data = { service : service, start_date : start_date, end_date : end_date };
+      //   console.log(data)
 
-        $.ajax({
-          type: "POST",
-          url: "{% url 'contracts:trial_contract_reg' %}",
-          data: data,
-          dataType: 'json',
-          success: function (data) {
-            if (data.is_created) {
+      //   $.ajax({
+      //     type: "POST",
+      //     url: "{% url 'contracts:trial_contract_reg' %}",
+      //     data: data,
+      //     dataType: 'json',
+      //     success: function (data) {
+      //       if (data.is_created) {
 
-              // モーダルの表示
-              $('#result_modal').on('show.bs.modal', function (e) {
-                var modal = $(this);
-                modal.find('.modal-body').text(data.messages);
-              });
-              $('#result_modal').modal('show')
-            }
-          }
-        });
-          $('#trialModal').modal('hide');
-      });
+      //         // モーダルの表示
+      //         $('#result_modal').on('show.bs.modal', function (e) {
+      //           var modal = $(this);
+      //           modal.find('.modal-body').text(data.messages);
+      //         });
+      //         $('#result_modal').modal('show')
+      //       }
+      //     }
+      //   });
+      //     $('#trialModal').modal('hide');
+      // });
 
   });
 </script>

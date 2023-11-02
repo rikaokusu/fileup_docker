@@ -34,85 +34,61 @@ class CommonView(ContextMixin):
 
 
 
-"""
-試用登録
-"""
-# @method_decorator(login_required, name = 'dispatch')
-class TrialContractRegAjaxView(View):
-    def post(self, request):
-        # model = Contract
-        service_id = request.POST.get('service')
-        start_date_str = request.POST.get('start_date')
-        end_date_str = request.POST.get('end_date')
+# """
+# 試用登録
+# """
+# # @method_decorator(login_required, name = 'dispatch')
+# class TrialContractRegAjaxView(View):
+#     def post(self, request):
+#         # model = Contract
+#         service_id = request.POST.get('service')
+#         start_date_str = request.POST.get('start_date')
+#         end_date_str = request.POST.get('end_date')
 
-        # 保存する対象のUserオブジェクトをPKを使って取得
-        user = User.objects.get(pk = request.user.pk)
+#         # 保存する対象のUserオブジェクトをPKを使って取得
+#         user = User.objects.get(pk = request.user.pk)
 
-        # 保存する対象のServiceオブジェクトをPKを使って取得
-        service = Service.objects.get(pk__iexact = service_id)
+#         # 保存する対象のServiceオブジェクトをPKを使って取得
+#         service = Service.objects.get(pk__iexact = service_id)
 
-        # サービスに関連するプランを取得
-        plan = Plan.objects.filter(service=service, is_option=False, is_trial=True).first()
+#         # サービスに関連するプランを取得
+#         plan = Plan.objects.filter(service=service, is_option=False, is_trial=True).first()
 
-        # サービスに関連するオプションを取得
-        option = Plan.objects.filter(service=service, is_option=True, is_trial=True).first()
+#         # サービスに関連するオプションを取得
+#         option = Plan.objects.filter(service=service, is_option=True, is_trial=True).first()
 
-        # 文字列を日付型へ変換
-        # start_date = datetime.datetime.strptime(start_date_str, '%Y/%m/%d')
-        start_date = datetime.strptime(start_date_str, '%Y/%m/%d')
+#         # 文字列を日付型へ変換
+#         # start_date = datetime.datetime.strptime(start_date_str, '%Y/%m/%d')
+#         start_date = datetime.strptime(start_date_str, '%Y/%m/%d')
 
-        # 変換した日付の時刻を除去
-        start_date = start_date.date()
+#         # 変換した日付の時刻を除去
+#         start_date = start_date.date()
 
-        # 文字列を日付型へ変換
-        # end_date = datetime.datetime.strptime(end_date_str, '%Y/%m/%d')
-        end_date = datetime.strptime(end_date_str, '%Y/%m/%d')
-        # 変換した日付の時刻を除去
-        end_date = end_date.date()
-
-
-        # TODO: 既存存在確認を追加
-        contract, created = Contract.objects.get_or_create(user=user, service=service, status="1", contract_start_date=start_date, contract_end_date=end_date)
-        contract.plan = plan
-        if option:
-            contract.option = option
-        contract.save()
-        # contract.option.set(option)
-
-        if created:
-            # obj.save()
-            data = {
-                'is_created': created,
-                'messages':'登録しました'
-            }
-        else:
-            data = {
-                'is_created': "false",
-                'messages':'登録に失敗しました'
-            }
-
-        return JsonResponse(data)
+#         # 文字列を日付型へ変換
+#         # end_date = datetime.datetime.strptime(end_date_str, '%Y/%m/%d')
+#         end_date = datetime.strptime(end_date_str, '%Y/%m/%d')
+#         # 変換した日付の時刻を除去
+#         end_date = end_date.date()
 
 
+#         # TODO: 既存存在確認を追加
+#         contract, created = Contract.objects.get_or_create(user=user, service=service, status="1", contract_start_date=start_date, contract_end_date=end_date)
+#         contract.plan = plan
+#         if option:
+#             contract.option = option
+#         contract.save()
+#         # contract.option.set(option)
 
-"""
-契約一覧画面
-この画面から契約と見積の一覧が見える。
-"""
-# @method_decorator(login_required(login_url='/manager/login/'), name = 'dispatch')
-class ContractIndexView(LoginRequiredMixin, ListView, CommonView):
-    model = Contract
-    template_name = 'contracts/contract.html'
-    login_url = '/login/'
+#         if created:
+#             # obj.save()
+#             data = {
+#                 'is_created': created,
+#                 'messages':'登録しました'
+#             }
+#         else:
+#             data = {
+#                 'is_created': "false",
+#                 'messages':'登録に失敗しました'
+#             }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-
-        contracts = Contract.objects.extra(
-            tables=["contracts_plan",],
-        )
-
-        context["contracts"] = contracts
-
-        return context
+#         return JsonResponse(data)
