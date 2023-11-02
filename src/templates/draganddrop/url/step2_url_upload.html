@@ -704,7 +704,6 @@
               });
               // 親要素を削除
               $('#previews div.preview-button.operation-button.preview-text.button_colum > button').remove();
-  
             }
   
           } else {
@@ -743,6 +742,7 @@
             if ($('[name="checked_del_file"], [name="checked_updated_del_file"]').on('click', function(){
               checked_button_clicked = true;
               $('#fileDelModal, #updateFileDelModal').hide();
+              $('#previews').hide()
               myDropzone.removeFile(file);
             }));
           });
