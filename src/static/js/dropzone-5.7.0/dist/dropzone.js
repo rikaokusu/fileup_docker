@@ -869,11 +869,10 @@ function (_Emitter) {
           if (file.previewElement != null && file.previewElement.parentNode != null) {
             file.previewElement.parentNode.removeChild(file.previewElement);
           }
-
           return this._updateMaxFilesReachedClass();
         },
-        // Called when a thumbnail has been generated
-        // Receives `file` and `dataUrl`
+        // Called when a thumbnail has been generated Receives `file` and `dataUrl`
+        // サムネイルが生成されたときに呼び出される `file` と `dataUrl` を受け取る
         thumbnail: function thumbnail(file, dataUrl) {
           if (file.previewElement) {
             file.previewElement.classList.remove("dz-file-preview");
@@ -994,8 +993,8 @@ function (_Emitter) {
         // `formData` object to add additional information.
         sending: function sending() {},
         sendingmultiple: function sendingmultiple() {},
-        // When the complete upload is finished and successful
-        // Receives `file`
+        // When the complete upload is finished and successful Receives `file`
+        //アップロードが完了し、成功したらファイルを受け取る
         success: function success(file) {
           if (file.previewElement) {
             return file.previewElement.classList.add("dz-success");
@@ -1961,7 +1960,7 @@ function (_Emitter) {
 
       if (file.status === Dropzone.ADDED && file.accepted === true) {
         file.status = Dropzone.QUEUED;
-
+        console.log('enqueueきた')
         if (this.options.autoProcessQueue) {
           return setTimeout(function () {
             return _this8.processQueue();
@@ -2008,6 +2007,7 @@ function (_Emitter) {
   }, {
     key: "removeFile",
     value: function removeFile(file) {
+      console.log('ここがうごいた２２２')
       if (file.status === Dropzone.UPLOADING) {
         this.cancelUpload(file);
       }
@@ -2016,6 +2016,7 @@ function (_Emitter) {
       this.emit("removedfile", file);
 
       if (this.files.length === 0) {
+        console.log('ここがうごいた３３３')
         return this.emit("reset");
       }
     } // Removes all files that aren't currently processed from the list
