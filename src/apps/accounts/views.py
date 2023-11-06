@@ -151,24 +151,19 @@ class Login(LoginView):
         email = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(email=email, password=password)
+        # user_record = User.objects.filter(email=email, password=password).first()
+        f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!",status__in=["1","2"])
         f_p = FileupPermissions.objects.filter(user=user).first()
-
+        print(f_contract,'userレコードしってます2222222222222会社イコール')
         # Check here if the user is an admin
+        #全体ユーザーテーブルにレコードがあるか、それが有効だったら
         if user is not None and user.is_active:
-            if f_p:
-                print('fileuppermissionいます',f_p)
-                print('fileuppermisiionの値これですーーーーーーーー',f_p.permission)
-
-                if f_p.permission == "0":
-                    print('いっぱん')
-                    messages.error(self.request, 'このユーザーは管理者権限がありません。')
-                    return redirect('accounts:login')
-                    # return self.form_invalid(form)
-                elif f_p.permission == "1":
-                    print('1ですーーーーーーーーーーーーー')
-                else:
+            print('全体ユーザーにいる',user.company)
+            # そのユーザーの所属会社がfileupを契約中or試用中
+            if f_contract:
+                # そのユーザーにfileupが割り当てられている場合
+                if f_p:
                     #認証処理
-                    print('permissionわかる？？？？？？',)
                     login(self.request, user)
                     redirect_to = self.request.POST.get('redirect_to')  #1 redirect_toの取得
                     if redirect_to is not None:
@@ -176,13 +171,17 @@ class Login(LoginView):
                     else:
                         return redirect('draganddrop:home')
                     # return HttpResponseRedirect(self.success_url)
+                else:
+                    print('はいれませーん')
+                    messages.error(self.request, 'このユーザーはサービスを利用できません。')
+                    return redirect('accounts:login')
             else:
-                print('はいれませーん')
-                messages.error(self.request, 'このユーザーはサービスを利用できません。')
+                print('そもそも契約してないです')
+                messages.error(self.request, 'ご契約状況を確認してください。')
                 return redirect('accounts:login')
         else:
+            #ユーザー無効
             return self.form_invalid(form)
-    
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
                                 パスワードを忘れた方
