@@ -122,7 +122,7 @@ class HomeTemplateView(LoginRequiredMixin, ListView, CommonView):
 #     # ユーザーリダイレクトしてPW設定が使用できなくなる
 
 """
-ログイン画面ポータル
+ログイン画面fileup
 """
 from django.contrib.auth import authenticate, login, logout
 class Login(LoginView):
@@ -134,18 +134,18 @@ class Login(LoginView):
     # ここでget_redirect_url使用不可。
     # ユーザーリダイレクトしてPW設定が使用できなくなる
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    #     url_name = self.request.resolver_match.url_name
+        url_name = self.request.resolver_match.url_name
 
-    #     context["url_name"] = url_name
+        context["url_name"] = url_name
 
     #     # サービス管理者の抽出
     #     # services = Service.objects.filter(number__in=current_user.service_admin)
     #     # context["services"] = services
 
-    #     return context
+        return context
     
     def form_valid(self, form):
         email = form.cleaned_data['username']
