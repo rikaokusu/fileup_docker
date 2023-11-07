@@ -47,8 +47,36 @@ class LoginForm(AuthenticationForm):
 
 
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+                                パスワードを忘れた方
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
+パスワード変更フォーム（old password あり）
+ユーザーが自身のパスワードを変更する際に使用
+"""
+class MyPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+"""
+パスワードリセットフォーム
+ユーザーが自身のパスワードをリセットする際に使用
+"""
+class MyPasswordResetForm(PasswordResetForm):
+    """パスワード忘れたときのフォーム"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
+class MySetPasswordForm(SetPasswordForm):
+    """パスワード再設定用フォーム(パスワード忘れて再設定)"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 
 

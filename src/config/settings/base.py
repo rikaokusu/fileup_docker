@@ -141,6 +141,14 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # アプリケーションディレクトリをプロジェクト直下のappsフォルダにまとめる
 sys.path.append(os.path.join(BASE_DIR, 'apps'))
 
+# # Gメールで送信する例
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ryookinawa@gmail.com' # Gmailのアカウント*
+EMAIL_HOST_PASSWORD = 'jqwmookzxurideve' # Gmailの2段階認証用のパスワード*
+EMAIL_USE_TLS = True
+EMAIL_FROM_ADDRESS = 'admin@hoge.com'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'file')
 MEDIA_URL = '/file/'
 FULL_MEDIA_ROOT = os.path.join(MEDIA_ROOT, 'file')

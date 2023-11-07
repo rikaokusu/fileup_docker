@@ -39,8 +39,9 @@
 </head>
 
 <body id="page-top">
+{% if url_name != "login" %}
 
-    <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
     <a class="navbar-brand mr-1" href="{% url 'accounts:home' %}">Yuitech</a>
 
@@ -84,6 +85,7 @@
       </li>
     </ul>
   </nav>
+{% endif %}
 
 
 

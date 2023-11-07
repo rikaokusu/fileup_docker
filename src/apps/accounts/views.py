@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 
 
-from accounts.forms import LoginForm, CompanyUpdateForm, MyUserCreationForm, MyUserChangeForm, CustomPasswordChangeForm, UserCompanyMultiForm, UserAddInfoForm
+from accounts.forms import LoginForm, CompanyUpdateForm, MyUserCreationForm, MyUserChangeForm, CustomPasswordChangeForm, UserCompanyMultiForm, UserAddInfoForm,MyPasswordResetForm,MySetPasswordForm
 from django.urls import reverse_lazy
 
 # アクセスURL生成
@@ -22,8 +22,8 @@ from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from accounts.models import User, Company, Messages, Service
-from contracts.models import Contract
+from accounts.models import User, Company, Messages, Service,FileupPermissions
+from contracts.models import Contract,Plan
 
 from django.db.models import Q
 
@@ -107,11 +107,24 @@ class HomeTemplateView(LoginRequiredMixin, ListView, CommonView):
 
 
 
-"""
-ログイン画面
-"""
+# """
+# ログイン画面
+# """
 
 
+# class Login(LoginView):
+#     """ログインページ"""
+#     form_class = LoginForm
+#     template_name = 'accounts/login.html'
+#     redirect_field_name = 'next'
+
+#     # ここでget_redirect_url使用不可。
+#     # ユーザーリダイレクトしてPW設定が使用できなくなる
+
+"""
+ログイン画面fileup
+"""
+from django.contrib.auth import authenticate, login, logout
 class Login(LoginView):
     """ログインページ"""
     form_class = LoginForm
@@ -121,7 +134,88 @@ class Login(LoginView):
     # ここでget_redirect_url使用不可。
     # ユーザーリダイレクトしてPW設定が使用できなくなる
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        url_name = self.request.resolver_match.url_name
+
+        context["url_name"] = url_name
+
+    #     # サービス管理者の抽出
+    #     # services = Service.objects.filter(number__in=current_user.service_admin)
+    #     # context["services"] = services
+
+        return context
+    
+    def form_valid(self, form):
+        email = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(email=email, password=password)
+        # user_record = User.objects.filter(email=email, password=password).first()
+        f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!",status__in=["1","2"])
+        f_p = FileupPermissions.objects.filter(user=user).first()
+        print(f_contract,'userレコードしってます2222222222222会社イコール')
+        # Check here if the user is an admin
+        #全体ユーザーテーブルにレコードがあるか、それが有効だったら
+        if user is not None and user.is_active:
+            print('全体ユーザーにいる',user.company)
+            # そのユーザーの所属会社がfileupを契約中or試用中
+            if f_contract:
+                # そのユーザーにfileupが割り当てられている場合
+                if f_p:
+                    #認証処理
+                    login(self.request, user)
+                    redirect_to = self.request.POST.get('redirect_to')  #1 redirect_toの取得
+                    if redirect_to is not None:
+                        return redirect(redirect_to)
+                    else:
+                        return redirect('draganddrop:home')
+                    # return HttpResponseRedirect(self.success_url)
+                else:
+                    print('はいれませーん')
+                    messages.error(self.request, 'このユーザーはサービスを利用できません。')
+                    return redirect('accounts:login')
+            else:
+                print('そもそも契約してないです')
+                messages.error(self.request, 'ご契約状況を確認してください。')
+                return redirect('accounts:login')
+        else:
+            #ユーザー無効
+            return self.form_invalid(form)
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+                                パスワードを忘れた方
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""
+ユーザーがパスワード忘れた際のパスワードリセット
+"""
+class PasswordReset(PasswordResetView):
+    subject_template_name = 'accounts/mail_template/password_reset/subject.txt'
+    email_template_name = 'accounts/mail_template/password_reset/message.txt'
+    template_name = 'accounts/password_reset_form.html'
+    form_class = MyPasswordResetForm
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+"""
+ユーザーがパスワード忘れた際のパスワードリセット完了
+"""
+class PasswordResetDone(PasswordResetDoneView):
+    template_name = 'accounts/password_reset_done.html'
+
+"""
+パスワードリセット時の新パスワード入力
+"""
+class PasswordResetConfirm(PasswordResetConfirmView):
+    form_class = MySetPasswordForm
+    success_url = reverse_lazy('accounts:password_reset_complete')
+    template_name = 'accounts/password_reset_confirm.html'
+
+"""
+パスワードリセット時の新パスワード入力完了ページ
+"""
+class PasswordResetComplete(PasswordResetCompleteView):
+    template_name = 'accounts/password_reset_complete.html'
 """
 ログアウト画面
 """

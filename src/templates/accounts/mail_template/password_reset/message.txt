@@ -3,6 +3,13 @@
 下記URLよりサイトにアクセスの上、パスワードの再設定を行ってください。
 
 再設定用URL
-{{ protocol}}://{{ domain }}{% url 'manager:password_reset_confirm' uid token %}
+{{ protocol}}://{{ domain }}{% url 'accounts:password_reset_confirm' uid token %}
 
-ほにゃらら
+※上記URLは発行後24時間を過ぎますと、無効となりますのでお早めにお手続きをお願いいたします。
+
+本メールは送信専用メールアドレスから配信されています。
+ご返信いただいてもお答えできませんのでご了承ください。
+本メールに心当たりがない場合は、お手数ですが本メールの破棄をお願いいたします。
+
+
+運営会社：Cloud Lab

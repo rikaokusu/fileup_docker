@@ -4,48 +4,170 @@
 
 {% block extra_css %}{% endblock %}
 
+<!--新-->
 {% block content %}
-<div class="container login">
+<style>
+      /*---------------------------------
+  
+  for Login Page
+  
+  ---------------------------------*/
+  .errornote {
+    font-weight: 700;
+    display: block;
+    padding: 10px 10px;
+    margin: 0 0 10px 0;
+    color: #ba2121;
+    border: 1px solid #ba2121;
+    border-radius: 4px;
+    background-color: #fff;
+    background-position: 5px 12px;
+}
 
-  <div class="card card-login mx-auto mt-5">
-    <div class="card-header">ログイン</div>
-    <div class="card-body">
-      <form action="" method="POST">
-        {% for error in form.non_field_errors %}
-        <p class="errornote">
-          {{ error }}
-        </p>
-        {% endfor %}
+.login .environ_link {
+  display: block;
+  margin-top: 0.5rem;
+}
 
+.login .iframe_op_environ {
+  color: #000;
+}
 
-        {% for field in form %}
-        <div class="form-group">
-          {{ field }}
-          {{ field.errors }}
+.login .forget_password {
+  color: #000;
+}
+
+.login .copyright {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.copyright-2{
+  font-size: 12px;
+  bottom: -23px;
+  
+}
+
+.login .for_first {
+  margin-top: 0.3rem;
+}
+
+.login_box{
+  border-radius: 3px;
+  padding: 10px 13px;
+  background: #808080;
+  font-size: 20px;
+}
+
+.login_box img{
+  width:65%;
+  height:65%;
+}
+
+.bg-orange {
+  background: #005392;
+}
+
+.login .card-header{
+  font-size: 27px;
+  padding:35px 0;
+}
+
+.sub_title{
+  font-size: 15px;
+}
+
+.login_card_body{
+  border-left: 15px solid #005392;
+  border-right: 15px solid #005392;
+  border-bottom: 17px solid #005392;
+  padding-bottom: 16px;
+}
+
+/* 動作環境画面 */
+.environ {
+  padding: 5px;
+}
+.environ .table1 thead th {
+  padding: 10px 0;
+  text-align: center;
+  color: #212529;
+  background: #e9ecef;
+  line-height: 24px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.environ .table1 th {
+  padding: 10px 10px;
+  line-height: 24px;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #F2F2F2;
+}
+.environ .table1 td {
+  padding: 10px 10px;
+  line-height: 24px;
+  font-size: 16px;
+}
+
+.environ .table1 th, .table1 td {
+    border: 1px solid #d4d4d4;
+    vertical-align: middle;
+}
+
+.environ p {
+  padding: 10px 10px;
+}
+
+.my-btn-blue{
+    background-color: #005392;
+    color:#fff;
+}
+.my-btn-blue:hover{
+    color:#fff;
+    background-color: #004376;
+}
+</style>
+    <div class="login">
+        <div class="login_box d-flex card-login mx-auto border-0 mt-5 mb-3 text-center text-white justify-content-center">
+            <img src="{% static 'img/CL_login3.svg' %}" alt="CloudLabログイン">
         </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary btn-block" onfocus="this.blur();">ログイン</button>
-        {% csrf_token %}
-      </form>
-      <a href="{% url 'accounts:user_registration' %}" class="btn btn-success btn-block for_first" onfocus="this.blur();">初めてご利用の方</a>
-      {% comment %} <a href="#" class="btn btn-success btn-block for_first" onfocus="this.blur();">初めてご利用の方</a> {% endcomment %}
-      {% comment %} <span class="environ_link hidden"><a class="forget_password"href="{% url 'manager:password_reset' %}"><i class="fas fa-chevron-circle-right"></i> パスワードを忘れた方</a></span> {% endcomment %}
-      <span class="environ_link hidden"><a class="forget_password"href="#"><i class="fas fa-chevron-circle-right"></i> パスワードを忘れた方</a></span>
-      {% comment %} <span class="environ_link hidden"><a class="iframe_op_environ" href="{% url 'manager:op_environ' %}"><i class="fas fa-chevron-circle-right"></i> 動作環境</a></span> {% endcomment %}
+        <div class="card card-login mx-auto border-0 position-relative">
+            <div class="card-header bg-orange text-white border-0 text-center">
+                <span class="sub_title">ファイル共有サービスといえば</span><br>
+                <span class="font-weight-bold">FileUP!</span>
+            </div>
+            <div class="card-body login_card_body">
+                <form action="" method="POST">
+                    {% for error in form.non_field_errors %}
+                        <p class="errornote">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
 
-    </div>  <!-- end card-body -->
-  </div>  <!-- end card -->
-</div> <!-- end container -->
-
-
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{ field }}
+                            {{ field.errors }}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn my-btn-blue btn-block" onfocus="this.blur();">ログイン</button>
+                    {% csrf_token %}
+                </form>
+                <span class="environ_link hidden"><a class="forget_password" href="{% url 'accounts:user_registration' %}"><i class="fas fa-chevron-circle-right"></i> 初めてご利用の方</a></span>
+                <span class="environ_link hidden"><a class="forget_password" href="http://localhost:8000/password_reset/"><i class="fas fa-chevron-circle-right"></i> パスワードを忘れた方</a></span>
+            </div>  
+            <div class="copyright-2 text-center">© CloudLab G.K.</div>
+        </div> 
+    </div>
 {% endblock %}
 
 {% block extra_js %}
-
-<script>
-  $(document).ready(function() {
-    $(".iframe_op_environ").colorbox({iframe:true, width:"760px", height:"350px"});
-  });
-</script>
-
-{% endblock %}
+    <script>
+        $(document).ready(function() {
+            $(".iframe_op_environ").colorbox({iframe:true, width:"760px", height:"350px"});
+        });
+    </script>
+{% endblock %} 
