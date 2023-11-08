@@ -166,7 +166,8 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
     for personal_resource_manage in personal_resource_manages:
         if type == 1:
             personal_resource_manage.number_of_active_upload_manage = UploadManage.objects.filter(created_user=user, file_del_flag=0, tmp_flag=0, end_date__gt=date).all().count()
-            personal_resource_manage.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(created_user=user, file_del_flag=1, tmp_flag=0) | Q(created_user=user, end_date__lt=date, tmp_flag=0)).all().count() 
+            personal_resource_manage.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(created_user=user, file_del_flag=1, tmp_flag=0) | Q(created_user=user, end_date__lt=date, tmp_flag=0)).all().count()
+            personal_resource_manage.number_of_removed_upload_manage += 1
             personal_resource_manage.number_of_download_table -= download_table
             personal_resource_manage.number_of_download_file_table -= download_file_table
             personal_resource_manage.upload_manage_file_size -= file_size
@@ -174,6 +175,7 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
         else:
             personal_resource_manage.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(created_user=user, file_del_flag=0, end_date__gt=date).all().count()
             personal_resource_manage.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(created_user=user, file_del_flag=1) | Q(created_user=user, end_date__lt=date)).all().count() 
+            personal_resource_manage.number_of_removed_url_upload_manage += 1
             personal_resource_manage.number_of_url_download_table -= download_table
             personal_resource_manage.number_of_url_download_file_table -= download_file_table
             personal_resource_manage.url_upload_manage_file_size -= file_size
@@ -189,7 +191,7 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
     personal_resource_manage.total_record_size = (personal_resource_manage.number_of_active_upload_manage 
     + personal_resource_manage.number_of_deactive_upload_manage 
     + personal_resource_manage.number_of_active_url_upload_manage 
-    + personal_resource_manage.number_of_deactive_url_upload_manage 
+    + personal_resource_manage.number_of_deactive_url_upload_manage
     + personal_resource_manage.number_of_download_table 
     + personal_resource_manage.number_of_download_file_table
     + personal_resource_manage.number_of_url_download_table
@@ -205,7 +207,6 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
 # 関数 会社管理画面計算処理  #
 ###############################
 def resource_management_calculation_process(company):
-
     # 個人管理データから同じ会社のオブジェクトを取得する
     personal_resource_manages = PersonalResourceManagement.objects.filter(company = company)
 
@@ -220,6 +221,8 @@ def resource_management_calculation_process(company):
     number_of_deactive_upload_manage = 0
     number_of_active_url_upload_manage = 0
     number_of_deactive_url_upload_manage = 0
+    number_of_removed_upload_manage = 0
+    number_of_removed_url_upload_manage = 0
     for personal_resource_manage in personal_resource_manages:
         download_table += personal_resource_manage.number_of_download_table
         url_download_table += personal_resource_manage.number_of_url_download_table
@@ -230,6 +233,8 @@ def resource_management_calculation_process(company):
         number_of_deactive_upload_manage += personal_resource_manage.number_of_deactive_upload_manage
         number_of_active_url_upload_manage += personal_resource_manage.number_of_active_url_upload_manage
         number_of_deactive_url_upload_manage += personal_resource_manage.number_of_deactive_url_upload_manage
+        number_of_removed_upload_manage += personal_resource_manage.number_of_removed_upload_manage
+        number_of_removed_url_upload_manage += personal_resource_manage.number_of_removed_url_upload_manage
         date = datetime.datetime.now()
 
         if created:
@@ -237,11 +242,14 @@ def resource_management_calculation_process(company):
             resource_manage.number_of_deactive_upload_manage = number_of_deactive_upload_manage
             resource_manage.number_of_active_url_upload_manage = number_of_active_url_upload_manage
             resource_manage.number_of_deactive_url_upload_manage = number_of_deactive_url_upload_manage
+
         else:
             resource_manage.number_of_active_upload_manage = UploadManage.objects.filter(company = company, file_del_flag=0, end_date__gt=date).all().count()
             resource_manage.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(company=company, file_del_flag=1) | Q(company = company, end_date__lt=date)).all().count() 
             resource_manage.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(company = company, file_del_flag=0, end_date__gt=date).all().count()
             resource_manage.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(company=company, file_del_flag=1) | Q(company = company, end_date__lt=date)).all().count() 
+            resource_manage.number_of_removed_upload_manage = number_of_removed_upload_manage
+            resource_manage.number_of_removed_url_upload_manage = number_of_removed_url_upload_manage
 
         resource_manage.number_of_download_table = download_table
         resource_manage.number_of_download_file_table = download_file_table

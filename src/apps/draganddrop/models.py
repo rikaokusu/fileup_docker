@@ -213,14 +213,16 @@ class UrlDownloadFiletable(models.Model):
 class PersonalResourceManagement(models.Model):
     company = models.CharField(max_length=245, blank=True, null=True) 
     user = models.CharField(max_length=245, blank=True, null=True)
-    number_of_active_upload_manage = models.IntegerField(blank=True, null=True, default=0)
-    number_of_deactive_upload_manage = models.IntegerField(blank=True, null=True, default=0)
-    number_of_active_url_upload_manage = models.IntegerField(blank=True, null=True, default=0)
-    number_of_deactive_url_upload_manage = models.IntegerField(blank=True, null=True, default=0)
-    number_of_download_table = models.IntegerField(blank=True, null=True, default=0)
-    number_of_url_download_table = models.IntegerField(blank=True, null=True, default=0)
-    number_of_download_file_table = models.IntegerField(blank=True, null=True, default=0)
-    number_of_url_download_file_table = models.IntegerField(blank=True, null=True, default=0)
+    number_of_active_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード有効送信レコード
+    number_of_deactive_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード無効送信レコード
+    number_of_active_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有有効レコード
+    number_of_deactive_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有無効レコード
+    number_of_download_table = models.IntegerField(blank=True, null=True, default=0) #ユーザー毎DL状況確認レコード
+    number_of_url_download_table = models.IntegerField(blank=True, null=True, default=0) #URL共有ユーザー毎DL状況確認レコード
+    number_of_download_file_table = models.IntegerField(blank=True, null=True, default=0) #ファイル毎DL状況確認レコード
+    number_of_url_download_file_table = models.IntegerField(blank=True, null=True, default=0) #URL共有ファイル毎DL状況確認レコード
+    number_of_removed_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード削除済みレコード数
+    number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
     total_record_size = models.IntegerField(blank=True, null=True, default=0)
     upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
     url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
@@ -237,6 +239,8 @@ class ResourceManagement(models.Model):
     number_of_url_download_table = models.IntegerField(blank=True, null=True, default=0)
     number_of_download_file_table = models.IntegerField(blank=True, null=True, default=0)
     number_of_url_download_file_table = models.IntegerField(blank=True, null=True, default=0)
+    number_of_removed_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード削除済みレコード数
+    number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
     total_record_size = models.IntegerField(blank=True, null=True, default=0) 
     upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
     url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
