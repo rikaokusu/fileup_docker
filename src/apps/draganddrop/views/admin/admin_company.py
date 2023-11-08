@@ -36,9 +36,10 @@ class ResourceManagementView(TemplateView,CommonView):
             resource_management.number_of_active_upload_manage = UploadManage.objects.filter(company = self.request.user.company.id, file_del_flag=0, end_date__gt=date).all().count()
             resource_management.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(company=self.request.user.company.id, file_del_flag=1) | Q(company = self.request.user.company.id, end_date__lt=date)).all().count() 
             resource_management.save()
-
+            print('ここのなか',resource_management.number_of_removed_url_upload_manage)
             # 会社管理画面のレコード数とディスク使用量計算
             if resource_management:
+                print('りそーすまねじめんとある！',resource_management)
                 resource_management.total_record_size = (resource_management.number_of_active_upload_manage
                 + resource_management.number_of_deactive_upload_manage
                 + resource_management.number_of_active_url_upload_manage
@@ -60,11 +61,12 @@ class ResourceManagementView(TemplateView,CommonView):
             context["number_of_user"] = number_of_user
 
             # アップロード総件数
-            total_upload_manage = resource_management.number_of_active_upload_manage + resource_management.number_of_deactive_upload_manage
+            total_upload_manage = resource_management.number_of_active_upload_manage + resource_management.number_of_deactive_upload_manage +  resource_management.number_of_removed_upload_manage
             context["total_upload_manage"] = total_upload_manage if total_upload_manage < 9999 else ("9,999+")
             
             # URL共有総件数
-            total_url_upload_manage = resource_management.number_of_active_url_upload_manage + resource_management.number_of_deactive_url_upload_manage
+            total_url_upload_manage = resource_management.number_of_active_url_upload_manage + resource_management.number_of_deactive_url_upload_manage + resource_management.number_of_removed_url_upload_manage
+            print('なんけんある＞＞＞',total_url_upload_manage)
             context["total_url_upload_manage"] = total_url_upload_manage if total_url_upload_manage < 9999 else ("9,999+")
 
             units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")

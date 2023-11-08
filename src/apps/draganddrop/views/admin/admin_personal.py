@@ -48,7 +48,7 @@ class PersonalResourceManagementView(TemplateView):
             context["total_upload_manage"] = total_upload_manage if total_upload_manage < 9999 else ("9,999+")
             
             # URL共有総件数
-            total_url_upload_manage = personal_resource_management.number_of_active_url_upload_manage + personal_resource_management.number_of_deactive_url_upload_manage
+            total_url_upload_manage = personal_resource_management.number_of_active_url_upload_manage + personal_resource_management.number_of_deactive_url_upload_manage + personal_resource_management.number_of_removed_url_upload_manage
             context["total_url_upload_manage"] = total_url_upload_manage if total_url_upload_manage < 9999 else ("9,999+")
 
             units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")
