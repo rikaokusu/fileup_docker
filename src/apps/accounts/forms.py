@@ -46,7 +46,6 @@ class LoginForm(AuthenticationForm):
             field.widget.attrs['placeholder'] = field.label  # placeholderにフィールドのラベルを入れる
 
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
                                 パスワードを忘れた方
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -77,7 +76,6 @@ class MySetPasswordForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-
 
 
 

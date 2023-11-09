@@ -322,6 +322,13 @@ common class
     /*---------------
     btn
 ----------------*/
+.my-btn-cancel {
+    color: #fff !important;
+    background:#a3a1a1;
+}
+.my-btn-cancel:hover {
+    background:#959393;
+}
 
     .btn-primary {
         color: #fff;
@@ -952,6 +959,130 @@ common class
     .paginate_button.btn.active.focus {
         outline-color: #fff;
     }
+
+
+
+/*---------------------------------
+
+for Login Page
+
+---------------------------------*/
+.errornote {
+    font-weight: 700;
+    display: block;
+    padding: 10px 10px;
+    margin: 0 0 10px 0;
+    color: #ba2121;
+    border: 1px solid #ba2121;
+    border-radius: 4px;
+    background-color: #fff;
+    background-position: 5px 12px;
+}
+
+.login .environ_link {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.login .iframe_op_environ {
+    color: #000;
+}
+
+.login .forget_password {
+    color: #000;
+}
+
+.login .copyright {
+    display: block;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.copyright-2{
+    font-size: 12px;
+    bottom: -23px;
+}
+
+.login .for_first {
+    margin-top: 0.3rem;
+}
+
+.login_box{
+    border-radius: 3px;
+    padding: 10px 13px;
+    background: #808080;
+    font-size: 20px;
+}
+
+.login_box img{
+    width:65%;
+    height:65%;
+}
+
+.bg-orange {
+    background: #005392;
+}
+
+.login .card-header{
+    font-size: 27px;
+    padding:35px 0;
+}
+
+.sub_title{
+    font-size: 15px;
+}
+
+.login_card_body{
+    border-left: 15px solid #005392;
+    border-right: 15px solid #005392;
+    border-bottom: 17px solid #005392;
+    padding-bottom: 16px;
+}
+
+/* 動作環境画面 */
+.environ {
+    padding: 5px;
+}
+.environ .table1 thead th {
+    padding: 10px 0;
+    text-align: center;
+    color: #212529;
+    background: #e9ecef;
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.environ .table1 th {
+    padding: 10px 10px;
+    line-height: 24px;
+    font-weight: bold;
+    font-size: 16px;
+    background-color: #F2F2F2;
+}
+.environ .table1 td {
+    padding: 10px 10px;
+    line-height: 24px;
+    font-size: 16px;
+}
+
+.environ .table1 th, .table1 td {
+    border: 1px solid #d4d4d4;
+    vertical-align: middle;
+}
+
+.environ p {
+    padding: 10px 10px;
+}
+
+.my-btn-blue{
+    background-color: #005392;
+    color:#fff;
+}
+.my-btn-blue:hover{
+    color:#fff;
+    background-color: #004376;
+}
     /*---------------
     Form
 ----------------*/
@@ -1190,6 +1321,155 @@ common class
         display: none;
     }
 
+    .navbar-nav .form-inline .input-group {
+        width: 100%;
+    }
+    
+    .navbar-nav .nav-item.active .nav-link {
+        color: #fff;
+    }
+    
+    .navbar-nav .nav-item.dropdown .dropdown-toggle::after {
+        width: 1rem;
+        text-align: center;
+        float: right;
+        vertical-align: 0;
+        border: 0;
+        font-weight: 900;
+        content: '\f105';
+        font-family: 'Font Awesome 5 Free';
+    }
+    
+    .navbar-nav .nav-item.dropdown.show .dropdown-toggle::after {
+        content: '\f107';
+    }
+    
+    /* .navbar-nav .nav-item.dropdown.no-arrow .dropdown-toggle::after {
+        display: none;
+    }
+    
+    .navbar-nav .nav-item .nav-link:focus {
+        outline: none;
+    } */
+
+    
+/*---------------------------------
+
+for Header
+
+---------------------------------*/
+/********************************************     base.html    ヘッダー用    */
+
+html,body{
+    min-width:100% !important;
+    max-width:100% !important;
+}
+.NavContents{
+    display:flex;
+    justify-content: space-between !important;
+    min-width: 1360px !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    height: 58px;
+}
+
+.nav-flex{
+    display:flex;
+    position: relative;
+}
+.icon_set{
+    min-width: 200px !important;
+    max-width: 200px !important;
+    padding-top: 9px !important;
+}
+.badge-warning{
+    right: 53px !important;
+}
+
+.login_user{
+    padding-top:10px !important;
+}
+
+.dropmenu-1{
+    padding-left: 5px;
+}
+
+.navbar{
+    width: 1376px !important;
+} 
+
+
+.navbar{
+    margin:auto;
+    width: 1519px;
+    /* background:#DDD8D0; */
+    background-color: #002B4D;
+    height:58px;
+}
+.navbar-expand .navbar-nav .nav-link {
+    padding: 0;
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: #a6a6a6;
+}
+
+
+/************************************************    メニュー部分　************/
+
+.lang-text{
+    color: white;
+    padding: 0px;
+    margin: 0px;
+    text-align: right;
+}
+
+.app_admin_icon {
+    color: #fff;
+}
+
+.separator {
+    padding-right: 20px;
+    border-right: 1px solid #fff;
+}
+
+.user_menu{
+    width:360px;
+    height:220px;
+    text-align: center;
+}
+
+.point-box {
+    position: relative;
+    border: 2px solid #005392; /* 枠の太さ・種類・色 */
+    border-radius: 4px; /* 枠の丸み */
+    margin: 1rem 1rem; /* 枠外の余白 */
+    padding: 5px 5px;
+}
+
+.point-title {
+    position: absolute;
+    padding: 0 0.5em;
+    left: 20px;
+    top: -13px; /* タイトルの位置を調整 */
+    color: #3d2c28; /* タイトルの文字色 */
+    font-weight: bold;
+    font-size:1rem; /* タイトルの文字サイズ */
+    background-color: #ffffff;
+    font: 14px/1.6 'arial narrow', sans-serif;
+    font-weight: bold;
+
+}
+
+ul.sample1{
+    padding: 15px;
+    font-size: 1rem;
+}
+
+ul.sample1 li{
+    list-style-type:none;
+}
 
     /*---------------
     home
@@ -1283,7 +1563,7 @@ common class
     margin: 0 0 3px 0;
     padding: 2px;
 }
- /*-------------------------
+/*-------------------------
     step1
 -------------------------*/
 
@@ -2825,3 +3105,4 @@ DatePicker
     content: "";/* コンテンツの挿入 */
     position: absolute;/* 親要素を基準 */
 }
+
