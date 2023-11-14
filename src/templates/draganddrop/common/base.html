@@ -82,7 +82,7 @@
                       <!-- ユーザーアカウントのトグルメニュー -->
                       <ul class="navbar-nav ml-auto ml-0" style="position:relative;">
                           <li class="nav-item no-arrow" style="background-color:#fff; position:absolute; top:0;">
-                              {% comment %} <a class="nav-link" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <a class="nav-link" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   {% if current_user.image %}
                                       <img src="/media/{{ current_user.image.file }}" class="user_icon_mini"/>
                                       <!--ユーザのアイコン画像が存在しない-->
@@ -92,7 +92,7 @@
                                           <div class="letter_two_personal_s">{{current_user.display_name|get_first_char}}</div>
                                       </div>
                                   {% endif %}
-                              </a> {% endcomment %}
+                              </a>
                               <div style="width: 400px;">
                               {% comment %} <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown" style="width: 400px;"> {% endcomment %}
                                   {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
@@ -179,7 +179,7 @@
                                           </div><!--warning-box-->
                                       </div><!--point-box-->
                                       <a class="dropdown-item base-d-item" href="{% url 'accounts:password_change' %}">パスワード変更</a>
-                                      {% comment %} <a class="dropdown-item base-d-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a>  {% endcomment %}
+                                      <a class="dropdown-item base-d-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a> 
                                   {% endif %}
                               </div><!--dropdown-menu-->
                           </li>
@@ -296,10 +296,10 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" 
   integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous">
-</script>
+</script> {% endcomment %}
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
   integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous">
 </script>
@@ -315,7 +315,9 @@
 
   <!--chart.js-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
-
+  
+  <!--validate.js-->
+  <script src="{% static 'common/js/validate.js' %}"></script>
   {{ form.media }}
 
 <script>

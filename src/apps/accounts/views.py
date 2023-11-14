@@ -246,7 +246,6 @@ class PasswordChange(LoginRequiredMixin, PasswordChangeView, CommonView):
         return super().dispatch(request, *args, **kwargs)
 
 
-
 """
 ユーザー自身のパスワード変更完了
 """

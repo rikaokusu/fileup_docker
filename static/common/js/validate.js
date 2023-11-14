@@ -7,8 +7,7 @@ $(function(){
         required: '入力して下さい。',
         digits: '整数を入力してください',
     });
-         
-
+    
     // 新規登録用バリデーション
     $('#my_form').validate({
         rules: {
@@ -140,12 +139,7 @@ $(function(){
         e.preventDefault();
       });
     }
-    $(function(){
-      $("#tameshi-btn").on("click", function(){
-        //listBの高さを取得
-        alert("アラートを表示します。")
-      });
-    });
+
     $("#user-password1").pwdMeasure({
       minScore: 50,
       minlength: 8,
