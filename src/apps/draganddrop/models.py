@@ -5,6 +5,7 @@ from contracts.models import Contract, Plan
 import uuid
 from datetime import date
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 import os
 
@@ -250,3 +251,51 @@ class Plan(models.Model):
     usable_capacity = models.IntegerField('使用可能容量', blank=True, default=0)
     sharing_url = models.BooleanField('URL共有可否',default=False, blank=True)
     download_expiration = models.IntegerField('ダウンロード期限', blank=True, null=True)
+
+
+"""
+リマインダー
+"""
+class Notification(models.Model):
+
+    CATEGORY_CHOICES = (
+            ('お知らせ', 'お知らせ'),
+            ('メッセージ', 'メッセージ'),
+            ('メンテナンス', 'メンテナンス'),
+            ('メンテナンス終了', 'メンテナンス終了'),
+            ('メンテナンス中止', 'メンテナンス中止')
+    )
+
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
+    title = models.CharField(_('title'), max_length=255)
+    category = models.CharField(_('category'), max_length=30, default="1", choices=CATEGORY_CHOICES, blank=True)
+    # category = models.CharField(_('category'), max_length=255, default="お知らせ")
+    target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+    # 通知開始日
+    start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
+    #内容
+    contents = models.TextField('内容', blank=True, null=True)
+    #メンテナンス情報（作業開始日時）
+    maintenance_start_date = models.DateTimeField(_('メンテナンス開始日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業終了日時）
+    maintenance_end_date = models.DateTimeField(_('メンテナンス終了日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業内容）
+    maintenance_contents = models.TextField('作業内容', blank=True, null=True)
+    #メンテナンス情報（作業対象）
+    maintenance_targets = models.TextField('作業対象', blank=True, null=True)
+    #メンテナンス情報（作業影響）
+    maintenance_affects = models.TextField('作業影響', blank=True, null=True)
+    #メンテナンス情報（作業中止理由）
+    maintenance_cancel_reason = models.TextField('作業中止理由', blank=True, null=True)
+"""
+お知らせ既読管理
+"""
+class Read(models.Model):
+    # ユーザー
+    read_user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='read_user')
+    # 既読日
+    read_date = models.DateTimeField(_('read date'), default=timezone.now, blank=True)
+    # お知らせID
+    notification_id = models.ForeignKey(Notification, blank=True, null=True, on_delete=models.CASCADE, related_name='notification_id')

@@ -63,7 +63,10 @@ urlpatterns = [
      # ゴミ箱 一括削除
      path('multidelete/', download_table.MultiDeleteAjaxView.as_view(), name='multidelete'),
 
-
+     # """
+     # お知らせ
+     # """
+     path('infomation/<uuid:pk>', home_common.InfomationView.as_view(), name='information'),
 
      ##########################################
      # upload  ファイルアップロード、URL共有、複製 #

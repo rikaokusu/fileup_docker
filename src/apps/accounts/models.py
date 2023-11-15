@@ -301,21 +301,21 @@ class Messages(models.Model):
 
     class Meta:
         managed = False
-"""
-リマインダー
-"""
-class Notification(models.Model):
-    # ID
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
-    title = models.CharField(_('title'), max_length=255)
-    category = models.CharField(_('category'), max_length=255, default="お知らせ")
-    target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
-    is_read = models.BooleanField(_('is_read'), default=False)
-    # 通知開始日
-    start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
-    #内容
-    contents = models.TextField('内容', blank=True, null=True)
+# """
+# リマインダー
+# """
+# class Notification(models.Model):
+#     # ID
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
+#     title = models.CharField(_('title'), max_length=255)
+#     category = models.CharField(_('category'), max_length=255, default="お知らせ")
+#     target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+#     is_read = models.BooleanField(_('is_read'), default=False)
+#     # 通知開始日
+#     start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
+#     #内容
+#     contents = models.TextField('内容', blank=True, null=True)
 
 """
 Stripe情報

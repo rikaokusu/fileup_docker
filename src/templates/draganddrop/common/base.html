@@ -67,13 +67,13 @@
               <!-- ヘッダーアイコン -->
               <div class="d-none d-inline-block form-inline icon_set">
                   {% comment %} <a href="{% url 'accounts:contact' %}" style="font-size:1.5rem;"><img src="{% static 'common/img/contact_po.svg' %}" alt="お問い合わせ" style="width:35px; height:35px;" class="mr-2 mt-1"></a> {% endcomment %}
-                  {% comment %} <img src="{% static 'common/img/info_po.svg' %}" alt="お知らせ" style="width:35px; height:35px;" class="info_icon mb-1">
+                  <img src="{% static 'img/info_fi2.svg' %}" alt="お知らせ" style="width:35px; height:35px;" class="info_icon mb-1">
                   
                   {% if no_read > 0 %}
                   <h6 class="badge badge-warning">
                       {{ no_read }}
                   </h6>
-                  {% endif %} {% endcomment %}
+                  {% endif %} 
               </div>
 
               <!-- 会社名とメアド -->
@@ -283,13 +283,72 @@
       <div class="modal-content">
         <div class="modal-body">ログアウトしますか？</div>
         <div class="modal-footer">
-          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a>
-          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal"
+          {% comment %} <a class="btn btn-primary btn-sm logout-btn" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a> {% endcomment %}
+          <button type="button" class="btn my-btn-blue btn-sm logout-btn" onclick="location.href='{% url 'accounts:logout' %}'">ログアウト</button>
+          <button class="btn btn-sm logout-btn my-btn-cancel" type="button" data-dismiss="modal"
             onfocus="this.blur();">キャンセル</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- お知らせモーダル用 -->
+  <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content info-modal-content">
+            <ul class="tab clearfix info_tab">
+                <li class="active">全て表示</li>
+                <li>お知らせ</li>
+                <li>メンテナンス</li>
+            </ul>
+            <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
+            <div class="area">
+                <ul class="show">
+                    {% for all in all_informations %}
+                        <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not all.id in read_info %}
+                            <span class="bg-warning">{{ all.category }}</span>
+                        {% else %}
+                            <span>{{ all.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ all.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for notice in notice_informations %}
+                        <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not notice.id in read_info %}
+                            <span class="bg-warning">{{ notice.category }}</span>
+                        {% else %}
+                            <span>{{ notice.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ notice.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for mainte in maintenance_informations %}
+                        <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not mainte.id in read_info %}              
+                            <span class="bg-warning">{{ mainte.category }}</span>
+                        {% else %}
+                            <span>{{ mainte.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li> 
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer justify-content-center bg-white">
+                <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();">閉じる</button>
+            </div><!-- /.modal-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -373,6 +432,13 @@
 
 
 <script>
+
+///// お知らせモーダル用
+$(document).ready(function() {
+  $(".info_icon").on("click", function() {
+    $("#info_modal").modal('show')
+  })
+})
 
 // --------------------------
 //  localStorageのデータを削除

@@ -1,12 +1,13 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User
+from draganddrop.models import Notification,Read
+from datetime import datetime, date, timedelta, timezone
 from django.urls import reverse
 from django.urls import reverse
-import datetime
 from django.db.models import Q
 from django.conf import settings
 import math
@@ -17,6 +18,7 @@ class CommonView(ContextMixin):
 
     # ログインユーザーを返す
     def get_context_data(self, **kwargs):
+        today = datetime.now(timezone.utc)
         context = super().get_context_data(**kwargs)
         current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         context["current_user"] = current_user
@@ -28,6 +30,41 @@ class CommonView(ContextMixin):
         context["app_name"] = app_name
         context["current_user"] = current_user
 
+
+        #インフォメーション
+        all_informations = Notification.objects.filter(start_date__lte = today)
+        notice_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),Q(category = 'メッセージ')|Q(category = 'お知らせ'),start_date__lte = today).distinct().values()
+        maintenance_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today, category__contains = 'メンテナンス').distinct().values()
+        read = Read.objects.filter(read_user=current_user).count()
+        read_info = Read.objects.filter(read_user=current_user).values_list('notification_id', flat=True)
+        if read > 0:
+            info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
+            no_read = info_all - read
+        else:
+            no_read = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
+
+        email_list = current_user.email.rsplit('@', 1)
+        # メールアドレスをユーザ名とドメインに分割
+        email_domain = email_list[1]
+
+        url_name = self.request.resolver_match.url_name
+        app_name = self.request.resolver_match.app_name
+        if no_read > 99 :
+            context["no_read"] = "99+"
+
+        else:
+            context["no_read"] = no_read
+        context["read_info"] = read_info
+        context["url_name"] = url_name
+        context["app_name"] = app_name
+        context["all_informations"] = all_informations
+        context["maintenance_informations"] = maintenance_informations
+        context["notice_informations"] = notice_informations
+
+        context["current_user"] = current_user
+        context["email_domain"] = email_domain
+        # information終わり
+        
         # 契約プラン
         plan = "light"
         context["plan"] = plan
@@ -40,6 +77,39 @@ class CommonView(ContextMixin):
                 # context["total_data_usage"] = resource_manage.total_data_usage
         
         return context
+
+"""
+お知らせページ
+"""
+class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
+    template_name = 'accounts/infomation.html'
+    login_url = '/login/'
+
+    def get_context_data(self, **kwargs):
+        print('インフォメーションがうごいた')
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        info = Notification.objects.get(id=self.kwargs['pk'])
+        if Read.objects.filter(read_user=user,notification_id=info).exists()==False:
+            read = Read.objects.create(read_user=user,notification_id=info)
+            read.save()
+            
+            #追記
+            today = datetime.now(timezone.utc)
+
+            read2 = Read.objects.filter(read_user=user).count()
+            if read2 > 0:
+                info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = user),start_date__lte = today).distinct().count()
+                no_read = info_all - read2
+                if no_read > 99 :
+                    context["no_read"] = "99+"
+                else:
+                    context["no_read"] = no_read
+        
+        context["user"] = user
+        context["info"] = info
+        return context
+
 
 
 class FileuploadListView(LoginRequiredMixin, ListView, CommonView):

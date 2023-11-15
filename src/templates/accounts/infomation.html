@@ -1,0 +1,67 @@
+{% extends "draganddrop/common//base.html" %}
+
+{% load i18n static %}
+{% comment %} {% load bootstrap4 %} {% endcomment %}
+{% load widget_tweaks %}
+
+{% block title %}
+    各種お知らせ
+{% endblock title %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto py-0  pt-4">
+        <h5 class="">
+            {{ info.title }}
+        </h5>
+        <h5 class="text-right info-guide">{{ info.release_date|date:'Y年m月d日' }}</h5>
+        <h6 class="info-message pt-2 py-3">
+        
+            {% if info.category == 'メッセージ' %}
+                {{ info.contents }}<br>
+                ご契約中のサービス詳細を確認したい場合はページ上部の契約管理をご利用ください。
+            {% elif info.category == 'メンテナンス' %}
+                いつもCloudLabポータルをご利用いただきまして誠にありがとうございます。<br>
+                ご利用のお客様にメンテナンスのご案内です。<br>
+                {{ info.contents }}<br>
+                <div class="font-weight-bold py-4">
+                    作業日時：{{ info.maintenance_start_date }}から{{ info.maintenance_end_date }}まで<br>
+                    作業内容：{{ info.maintenance_contents }}<br>
+                    対象となるサービス：{{ info.maintenance_targets }}<br>
+                    作業に伴う影響：{{ info.maintenance_affects }}<br>
+                </div>
+                ご利用のお客様にはご迷惑をおかけしますが予めご了承ください。<br>
+                なお、ご契約に関して緊急のご用件がある場合は、お手数ですが下記メールアドレスへご連絡ください。<br><br>
+                緊急の連絡先：cloudlab_service@cl.jp<br>
+            {% elif info.category == 'メンテナンス終了' %}
+                いつもCloudLabポータルをご利用いただきまして誠にありがとうございます。<br>
+                先にご連絡しております、以下のメンテナンスが正常に完了した事をご報告いたします。<br>
+                <div class="font-weight-bold py-4">
+                    作業内容：{{ info.maintenance_contents }}<br>
+                    対象となるサービス：{{ info.maintenance_targets }}<br>
+                </div>
+                メンテナンス作業において、ご協力いただきまして誠にありがとうございました。<br>
+            {% elif info.category == 'メンテナンス中止' %}
+                いつもCloudLabポータルをご利用いただきまして誠にありがとうございます。<br>
+                先にご連絡しております、以下のメンテナンスを中止いたしました。<br>
+                <div class="font-weight-bold py-4">
+                    作業内容：{{ info.maintenance_contents }}<br>
+                    対象となるサービス：{{ info.maintenance_targets }}<br>
+                    作業を中止した理由：{{ info.maintenance_cancel_reason }}<br>
+                    ※作業実施前のため、作業影響はございません。
+                </div>
+                当メンテナンス作業について再度実施する場合はあらためてご連絡いたします。<br>
+            {% else %}
+                {{ info.contents }}
+            {% endif %}
+        </h6>
+        <h6 class="text-right">CloudLab運営</h6>
+    </div>
+    <div class="text-center">
+        <button type="button" class="btn my-btn-w11 mr-3 my-btn-blue text-align-center" onclick="location.href='{% url 'draganddrop:home' %}'">ホームに戻る</button>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

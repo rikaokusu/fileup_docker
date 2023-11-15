@@ -322,6 +322,9 @@ common class
     /*---------------
     btn
 ----------------*/
+.btn {
+    border-radius: 0.4rem;
+}
 .my-btn-cancel {
     color: #fff !important;
     background:#a3a1a1;
@@ -2455,7 +2458,7 @@ body {
 .btn-sm {
     padding: .1rem .4rem;
     font-size: 0.8rem;
-    border-color: #808080;
+    /* border-color: #808080; */
 }
 
 
@@ -3106,3 +3109,34 @@ DatePicker
     position: absolute;/* 親要素を基準 */
 }
 
+
+
+
+
+
+/********************　ログアウト　****************************/
+.logout-btn{
+    font-size:14px !important;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.4rem;
+    width: 87px;
+    height:30px;
+    border:none;
+}
+
+/**********************  お知らせ  ****************************/
+.tab > li.active {
+    color: #fff;
+    background: #008080;
+    cursor: auto;
+}
+.tab {
+    border-bottom: 3px solid #008080;
+    padding-left: 0;
+    display: table;
+    table-layout: fixed;
+}
+
+.info-guide {
+    border-bottom: 4px solid #004376;
+}
