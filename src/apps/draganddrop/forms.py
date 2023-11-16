@@ -4,7 +4,7 @@ from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploa
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
 
 # 日付
 import datetime
@@ -135,6 +135,44 @@ class ManageTasksStep1Form(forms.ModelForm):
                             mark_safe('同じタイトルが既に存在しています。'))
         return title
 
+"""
+管理ユーザーの情報変更画面
+"""
+class UserChangeForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        last_name = forms.CharField(label='姓', required=True)
+        first_name = forms.CharField(label='名', required=True)
+        fields = ('display_name','last_name', 'first_name', 'middle_name', 'p_last_name', 'p_first_name', 'p_middle_name', 'p_display_name', 'description','image')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    #getcontextは追加
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget'].update({
+            'include_preview': self.include_preview,
+        })
+        return context
+
+    # def clean_email(self):
+    #     email = self.cleaned_data["email"]
+
+    #     try:
+    #         validate_email(email)
+    #     except forms.ValidationError:
+    #         raise forms.ValidationError("正しいメールアドレスを指定してください。")
+
+    #     try:
+    #         user = User.objects.get(email=email)
+    #     except User.DoesNotExist:
+    #         return email
+    #     else:
+    #         if self.user.email == email:
+    #             return email
+
+    #         raise forms.ValidationError("このメールアドレスは既に使用されています。別のメールアドレスを指定してください")
 
 class DistFileUploadForm(forms.ModelForm):
 

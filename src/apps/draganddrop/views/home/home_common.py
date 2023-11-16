@@ -1,16 +1,20 @@
-from django.views.generic import ListView, TemplateView
+from django.http import HttpResponse
+from django.views.generic import View,ListView, TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
-from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement, File
 from accounts.models import User
 from draganddrop.models import Notification,Read
+from draganddrop.forms import UserChangeForm
 from datetime import datetime, date, timedelta, timezone
 from django.urls import reverse
 from django.urls import reverse
 from django.db.models import Q
 from django.conf import settings
 import math
+from django.shortcuts import redirect
+from django.http import JsonResponse
 
 # Token_LENGTH = 5  # ランダムURLを作成するためのTOKEN
 
@@ -126,7 +130,7 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["upload_manages"] = upload_manages
 
-       # URLアップロード用
+        # URLアップロード用
         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["url_upload_manages"] = url_upload_manages
 
@@ -158,7 +162,146 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
                 del self.request.session[key]
 
         return context
+    
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+                                    ユーザー管理関連
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
+イメージ削除(Ajax用)
+"""
+def delete_image(request):
+    # print('削除Ajaxにきた')
+    gen_image = request.POST.get('gen_image')
+    # print('げんいめーーーーーーじ',gen_image)
+    file = File.objects.filter(file=gen_image).first()
+    # print('ファイル来てる？？？？？？？？',file)
+    user = User.objects.filter(image=file.id).first()
+    user.image = None
+    user.save()
+    is_deleted = file.delete()
 
+    data = {
+        'is_exist': is_deleted
+    }
+    if data['is_exist']:
+        data['error_message'] = '現在設定している画像を削除しました'
+
+    return JsonResponse(data)
+
+"""
+プロファイル画像変更
+"""
+import json
+class ImageImportView(View):
+    def post(self, request, *args, **kwargs):
+        upload_file = self.request.FILES.get('file')
+
+        file, created = File.objects.get_or_create(name=upload_file.name,size=upload_file.size,file=upload_file,)
+
+        file.save()
+        up_file_id = file.id
+
+        # 保存したファイルをセッションへ保存
+        up_file_id_json = json.dumps(up_file_id)
+        self.request.session['up_file_id'] = up_file_id_json
+        print('イメージのセッション作成！！')
+        # 何も返したくない場合、HttpResponseで返す
+        return HttpResponse('OK')
+"""
+ユーザー情報変更画面
+プロフィール情報編集アイコンから情報を変更する画面
+"""
+class UserUpdateInfoView(LoginRequiredMixin, UpdateView, CommonView):
+    model = User
+    template_name = "draganddrop/update_userinfomation.html"
+    form_class = UserChangeForm
+    login_url = '/login/'
+# フォームに対してログインユーザーを渡す
+    def get_form_kwargs(self):
+        kwargs = super(UserUpdateInfoView, self).get_form_kwargs()
+        return kwargs
+
+    # ログインユーザーを返す
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = User.objects.filter(pk=self.request.user.id).first()
+
+        print('karenntoゆーざーきてるよーーー',current_user)
+        #排他処理のタイムスタンプを上書きする
+        # target_user.last_updated = datetime.now(timezone.utc)
+        # target_user.is_updating = True
+        # target_user.save()
+
+        today = datetime.now(timezone.utc)
+        # qs = []
+        # s_qs = Service.objects.order_by("number").all()
+        # user_contract = []
+        # for s in s_qs:
+        #     user_contract_raw = Contract.objects.filter(company=current_user.company, status__in=["1","2"], service=s)
+        #     if user_contract_raw.count() >= 2 or user_contract_raw.filter(status="2").exists():
+        #         user_contract_obj = user_contract_raw.filter(status=2).first()
+        #         user_contract.append(user_contract_obj)
+        #     else:#レコードが1つのみ(1のみ)
+        #         if user_contract_raw.filter(status="1",contract_end_date__gte=today):
+        #             user_contract_obj = user_contract_raw.all().first()
+        #             user_contract.append(user_contract_obj)
+        # context["user_contract"] = user_contract
+        
+        context = super().get_context_data(**kwargs)
+        #すでにそのユーザーのレコードが存在してたたら（すでに利用中）
+
+        if current_user.image:
+            gen_image = File.objects.filter(pk=current_user.image.id)
+            context["gen_image"] = current_user.image
+        return context
+
+    def form_valid(self, form):
+        old_data = User.objects.filter(pk=self.request.user.id).first()
+        user = form.save(commit=False)  
+
+        # 姓と名をディスプレイ名にセットする
+        last_name = form.cleaned_data['last_name']
+        first_name = form.cleaned_data['first_name']
+        middle_name = form.cleaned_data['middle_name']
+        if last_name and first_name and middle_name:
+            display_name = last_name + ' ' + middle_name + ' ' + first_name
+            user.display_name = display_name
+        elif last_name and first_name:
+            display_name = last_name + ' ' + first_name
+            user.display_name = display_name
+
+        # ふりがなの姓と名をディスプレイ名にセットする
+        p_last_name = form.cleaned_data['p_last_name']
+        p_first_name = form.cleaned_data['p_first_name']
+        p_middle_name = form.cleaned_data['p_middle_name']
+        if p_last_name and p_first_name and p_middle_name:
+            p_display_name = p_last_name + ' ' + p_middle_name + ' ' + p_first_name
+            user.p_display_name = p_display_name
+        elif p_last_name and p_first_name:
+            p_display_name = p_last_name + ' ' + p_first_name
+            user.p_display_name = p_display_name
+
+        # 本番登録後、is_staff属性をTrueにする。
+        user.is_staff = True
+
+        # Serviceを登録する(UpdateViewで自動的にやってくれない？)
+        # servicesはquerysetになっていて、object.set()で保存できる
+        #services = form.cleaned_data['service']
+        #user.service.set(services)
+        old_image = ''
+
+        if old_data.image:
+            old_image = File.objects.filter(pk=old_data.image.id)
+        
+        if 'up_file_id' in self.request.session:
+            
+            user.image = File.objects.filter(id=self.request.session['up_file_id']).first()
+            if old_image:
+                old_image.delete()
+
+        user.save()
+        
+        return redirect('draganddrop:home')
 
 ###########################
 # 関数 個人管理画面計算処理  #

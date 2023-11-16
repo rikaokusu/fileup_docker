@@ -70,7 +70,7 @@ services:
         # command: gunicorn -b 0.0.0.0:8001 --env DJANGO_SETTINGS_MODULE=training.config.settings.production training.config.wsgi
         #(上原)あくまでもマナモアのDjangoコンテナのポート番号なので他コンテナのポート番号と被っても問題ない
         # 修正に伴い、app_nginx.confの設定も「server python_manamoa:8001 fail_timeout=0;」へ修正
-        command: gunicorn -b 0.0.0.0:8001 --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi
+        command: gunicorn -b 0.0.0.0:8001 --reload --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi
         volumes:
             - ./src:/code
             - ./static:/static

@@ -17,7 +17,6 @@ Legal_Personality = (
     (3, '合資会社'),
     (4, '合名会社'),
     )
-
 class Address(models.Model):
     # ユーザー登録者
     created_user = models.CharField(max_length=245, blank=True, null=True)
@@ -48,6 +47,16 @@ class Address(models.Model):
     def __str__(self):
         name = self.full_name_preview
         return name
+    
+"""
+ファイルテーブル
+"""
+class File(models.Model):
+    file = models.FileField(_('file'), upload_to='uploads/', null=True, blank=True)
+    name = models.CharField(_('name'), max_length=255, blank=True)
+    size = models.CharField(_('size'), max_length=255, blank=True)
+    def __str__(self):
+        return self.name
 
 class Group(models.Model):
     # Group名

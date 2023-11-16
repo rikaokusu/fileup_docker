@@ -46,17 +46,6 @@
   {% if url_name != 'url_file_download_auth_mail' %}
   {% if url_name != 'url_file_download_auth_pass' %}
   {% if url_name != 'url_file_download' %}
-  <div class="dropdown">
-    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Dropdown link
-    </a>
-  
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-      <a class="dropdown-item" href="#">Action</a>
-      <a class="dropdown-item" href="#">Another action</a>
-      <a class="dropdown-item" href="#">Something else here</a>
-    </div>
-  </div>
     <!--ポータルから移行-->
     <!-- Navbar -->
     <nav class="navbar navbar-expand static-top navbar-dark">
@@ -101,8 +90,8 @@
 
                                       <div class="point-box">
                                           <!--会社によって編集アイコンをつけるorつけないを作成する、編集アイコンありはコメントにしてる-->
-                                          {% comment %} <div class="point-title">ユーザープロファイル&nbsp;<a href="{% url 'accounts:update_userinfomation' user.id %}"><i class="fas fa-edit edit_icon" data-target="#change_profile_modal" data-toggle="modal"></i></a></div> {% endcomment %}
-                                          <div class="point-title">ユーザープロファイル</div>
+                                          <div class="point-title">ユーザープロファイル&nbsp;<a href="{% url 'draganddrop:update_userinfomation' user.id %}"><i class="fas fa-edit edit_icon" data-target="#change_profile_modal" data-toggle="modal"></i></a></div>
+                                          {% comment %} <div class="point-title">ユーザープロファイル</div> {% endcomment %}
                                           <div class="warning-box">
                                               <ul class="sample1">
                                                   <li class="text-center mb-2">
@@ -164,13 +153,18 @@
 
                                                           <div class="">
                                                               <!-- 値 -->
-                                                              <td class=" pt-3  pb-2 float-right">
-                                                                  {% comment %} <div class="radioArea pl-2" id="mail_radio">
-                                                                      <input type="radio" name="mail_choice" id="ma-valid" value="1" {% if current_user.is_send_mail == True %}checked{% endif %}>
+                                                              <td class="pt-3  pb-2 float-right">
+                                                                  <div class="radioArea pl-2" id="mail_radio">
+                                                                      <input type="radio" name="mail_choice" id="ma-valid" value="1" disabled>
+                                                                      <label for="ma-valid"> 有効</label>
+                                                                      <input type="radio" name="mail_choice" id="ma-invalid" value="2" checked>
+                                                                      <label for="ma-invalid">無効</label>
+                                                                      {% comment %} あとで↓に戻す {% endcomment %}
+                                                                      {% comment %} <input type="radio" name="mail_choice" id="ma-valid" value="1" {% if current_user.is_send_mail == True %}checked{% endif %}>
                                                                       <label for="ma-valid"> 有効</label>
                                                                       <input type="radio" name="mail_choice" id="ma-invalid" value="2" {% if current_user.is_send_mail == False %}checked{% endif %}>
-                                                                      <label for="ma-invalid">無効</label>
-                                                                  </div> {% endcomment %}
+                                                                      <label for="ma-invalid">無効</label> {% endcomment %}
+                                                                  </div>
                                                               </td>
                                                           </div>
                                                       </div><!--d-flex-->
@@ -178,6 +172,8 @@
                                               </ul>
                                           </div><!--warning-box-->
                                       </div><!--point-box-->
+                                      <a class="dropdown-item base-d-item" href="{% url 'draganddrop:resource_management' %}">会社管理画面</a>
+                                      <a class="dropdown-item base-d-item" href="{% url 'draganddrop:personal_resource_management' %}">個人管理画面</a>
                                       <a class="dropdown-item base-d-item" href="{% url 'accounts:password_change' %}">パスワード変更</a>
                                       <a class="dropdown-item base-d-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a> 
                                   {% endif %}
@@ -375,8 +371,8 @@
   <!--chart.js-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
   
-  <!--validate.js-->
-  <script src="{% static 'common/js/validate.js' %}"></script>
+  {% comment %} <!--validate.js-->
+  <script src="{% static 'common/js/validate.js' %}"></script> {% endcomment %}
   {{ form.media }}
 
 <script>
