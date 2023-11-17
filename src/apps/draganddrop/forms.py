@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage
+from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
@@ -299,6 +299,94 @@ class UrlDistFileUploadForm(forms.ModelForm):
         model = UrlUploadManage
         fields = ('file',)
 
+"""
+OTP管理フォーム
+"""
+class ManageTasksOTPStep1Form(forms.ModelForm):
+
+
+    dest_user = forms.ModelMultipleChoiceField(
+        queryset=Address.objects.all(),
+        widget=User_Checkbox, required=False)
+
+    dest_user_group = forms.ModelMultipleChoiceField(
+            queryset=Group.objects.all(),
+            widget=User_Checkbox, required=False)
+
+    end_date = forms.DateTimeField(required=True, label="DL期間", widget=datetimepicker.DateTimePickerInput(format='%Y/%m/%d %H:%M:%S',
+        options={
+            'locale': 'ja',
+            'dayViewHeaderFormat': 'YYYY年 MMMM',
+            'minDate': (datetime.datetime.today() + datetime.timedelta(days=0)).strftime('%Y-%m-%d 00:00:00'),
+            # 'maxDate': (datetime.datetime.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d 23:59:59'),
+            # 'enabledHours': [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+        }),
+        input_formats=['%Y/%m/%d %H:%M:%S'])
+
+    dl_limit = forms.ChoiceField(
+        widget=forms.widgets.Select, choices=Number, initial=3)
+
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={"rows":3}), required=False)
+
+    class Meta:
+        model = OTPUploadManage
+        fields = (
+            'title',
+            'dest_user',
+            'dest_user_group',
+            'dest_user_mail1',
+            'dest_user_mail2',
+            'dest_user_mail3',
+            'dest_user_mail4',
+            'dest_user_mail5',
+            'dest_user_mail6',
+            'dest_user_mail7',
+            'dest_user_mail8',
+            'end_date',
+            'dl_limit',
+            'password',
+            'decode_token',
+            'url',
+            'message'
+        )
+        error_messages = {
+            'end_date': {
+                'required': '必須です!',
+            }}
+
+    def __init__(self, *args, **kwargs):
+        # Viewからログインユーザーを取得
+        self.user = kwargs.pop('user', None)
+        self.url = kwargs.pop('url', None)
+        super(ManageTasksOTPStep1Form, self).__init__(*args, **kwargs)
+
+    def clean_title(self):
+
+        # ログインユーザーと同じ会社のユーザーidを取得
+        created_user = []
+        users = User.objects.filter(company=self.user.company.id)
+        for user in users:
+           created_user.append(user.id)
+        
+        # formに入力された値を取得
+        title = self.cleaned_data['title']
+        # タイトル制限
+        if self.url != "step1_url_update" :
+            url_upload_manages = UrlUploadManage.objects.filter(created_user__in=created_user).all()
+            for url_upload_manage in url_upload_manages:
+                if url_upload_manage.tmp_flag == 0:
+                    if url_upload_manage.title == title:
+                        raise forms.ValidationError(
+                            mark_safe('同じタイトルが既に存在しています。'))
+
+        return title        
+
+class OTPDistFileUploadForm(forms.ModelForm):
+
+    class Meta:
+        model = OTPUploadManage
+        fields = ('file',)
 
 """
 URL認証用のフォーム
@@ -320,3 +408,16 @@ class UrlFileDownloadAuthPassForm(forms.Form):
     class Meta:
         model = UrlUploadManage
         fields = ('email','password')
+        
+"""
+OTP認証用のフォーム
+"""
+class OTPFileDownloadAuthForm(forms.Form):
+    email = forms.CharField(widget=forms.EmailInput, required=False)
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model = OTPUploadManage
+        fields = ('email','password')
+
+

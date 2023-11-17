@@ -210,6 +210,63 @@ class UrlDownloadFiletable(models.Model):
     del_flag = models.BooleanField(null=True, blank=True, default=False)
     url_dl_count = models.IntegerField(default=0)
 
+## OTPテーブル ##
+class OTPUploadManage(models.Model):
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=140)
+    file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
+    dest_user = models.ManyToManyField(Address, blank=True)
+    dest_user_mail1 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail2 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail3 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail4 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail5 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail6 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail7 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_mail8 = models.EmailField(max_length=100, null=True, blank=True)
+    dest_user_group = models.ManyToManyField(Group, blank=True)
+    created_user = models.CharField(max_length=245, blank=True, null=True)
+    company = models.CharField(max_length=245, blank=True, null=True) 
+    created_date = models.DateTimeField(verbose_name='作成日時', blank=True, null=True,)
+    end_date = models.DateTimeField(verbose_name='終了日時', blank=False, null=True)
+    tmp_flag = models.IntegerField(null=True, blank=True, default=0)
+    is_downloaded = models.BooleanField(null=True, blank=True, default=False)
+    dl_limit = models.IntegerField(verbose_name='ダウンロード回数', default=0, blank=True)
+    password = models.CharField(max_length=10, null=True, blank=True)
+    password_create_time = models.DateTimeField(verbose_name='OTP作成日時', blank=True, null=True,)
+    decode_token = models.CharField(max_length=50, null=True, blank=True)
+    url = models.CharField(max_length=140, null=True, blank=True)
+    file_del_flag = models.IntegerField(null=True, blank=True, default=0)
+    message = models.CharField(max_length=140, blank=True, null=True)
+
+    @property
+    def is_past_due(self):
+        return date.today() > self.end_date
+
+    def __str__(self):
+        title = self.title
+        return title
+
+
+class OTPDownloadtable(models.Model):
+    otp_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.CASCADE, related_name='otp_uploadmanage', null=True)
+    is_downloaded = models.BooleanField(null=True, blank=True, default=False)
+    dest_user = models.ForeignKey(Address, related_name='otp_downloadtable_dest_user', on_delete=models.CASCADE, blank=True, null=True)
+    dowloaded_date = models.DateTimeField(verbose_name='サンプル項目4 期間 開始日', blank=True, null=True,)
+    del_flag = models.BooleanField(null=True, blank=True, default=False)
+    trash_flag = models.IntegerField(null=True, blank=True, default=0)
+
+
+class OTPDownloadFiletable(models.Model):
+    otp_download_table = models.ForeignKey(OTPDownloadtable, on_delete=models.CASCADE, related_name='otp_download_table', null=True)
+    download_file = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='otp_download_file', null=True)
+    is_downloaded = models.BooleanField(null=True, blank=True, default=False)
+    dowloaded_date = models.DateTimeField(verbose_name='サンプル項目4 期間 開始日', blank=True, null=True,)
+    del_flag = models.BooleanField(null=True, blank=True, default=False)
+    otp_dl_count = models.IntegerField(default=0)
+    
+## 会社・個人管理テーブル ##
 class PersonalResourceManagement(models.Model):
     company = models.CharField(max_length=245, blank=True, null=True) 
     user = models.CharField(max_length=245, blank=True, null=True)
@@ -217,15 +274,21 @@ class PersonalResourceManagement(models.Model):
     number_of_deactive_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード無効送信レコード
     number_of_active_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有有効レコード
     number_of_deactive_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有無効レコード
+    number_of_active_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP有効レコード
+    number_of_deactive_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP無効レコード
     number_of_download_table = models.IntegerField(blank=True, null=True, default=0) #ユーザー毎DL状況確認レコード
     number_of_url_download_table = models.IntegerField(blank=True, null=True, default=0) #URL共有ユーザー毎DL状況確認レコード
+    number_of_otp_download_table = models.IntegerField(blank=True, null=True, default=0) #OTPユーザー毎DL状況確認レコード
     number_of_download_file_table = models.IntegerField(blank=True, null=True, default=0) #ファイル毎DL状況確認レコード
     number_of_url_download_file_table = models.IntegerField(blank=True, null=True, default=0) #URL共有ファイル毎DL状況確認レコード
+    number_of_otp_download_file_table = models.IntegerField(blank=True, null=True, default=0) #OTPファイル毎DL状況確認レコード
     number_of_removed_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード削除済みレコード数
     number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
+    number_of_removed_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP削除済みレコード数
     total_record_size = models.IntegerField(blank=True, null=True, default=0)
     upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
     url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
+    otp_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
     total_file_size = models.IntegerField(blank=True, null=True, default=0)
     total_data_usage = models.IntegerField(blank=True, null=True, default=0)
 
@@ -235,12 +298,17 @@ class ResourceManagement(models.Model):
     number_of_deactive_upload_manage = models.IntegerField(blank=True, null=True, default=0)
     number_of_active_url_upload_manage = models.IntegerField(blank=True, null=True, default=0)
     number_of_deactive_url_upload_manage = models.IntegerField(blank=True, null=True, default=0)
+    number_of_active_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP有効レコード
+    number_of_deactive_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP無効レコード
     number_of_download_table = models.IntegerField(blank=True, null=True, default=0)
     number_of_url_download_table = models.IntegerField(blank=True, null=True, default=0)
+    number_of_otp_download_table = models.IntegerField(blank=True, null=True, default=0) #OTPユーザー毎DL状況確認レコード
     number_of_download_file_table = models.IntegerField(blank=True, null=True, default=0)
     number_of_url_download_file_table = models.IntegerField(blank=True, null=True, default=0)
+    number_of_otp_download_file_table = models.IntegerField(blank=True, null=True, default=0) #OTPファイル毎DL状況確認レコード
     number_of_removed_upload_manage = models.IntegerField(blank=True, null=True, default=0) #アップロード削除済みレコード数
     number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
+    number_of_removed_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP削除済みレコード数
     total_record_size = models.IntegerField(blank=True, null=True, default=0) 
     upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
     url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)

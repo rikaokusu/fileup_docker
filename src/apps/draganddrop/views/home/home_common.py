@@ -2,7 +2,7 @@ from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
-from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User
 from django.urls import reverse
 from django.urls import reverse
@@ -59,6 +59,10 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
        # URLアップロード用
         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["url_upload_manages"] = url_upload_manages
+        
+        # OTPアップロード用
+        otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+        context["otp_upload_manages"] = otp_upload_manages
 
         """受信テーブル"""
         # ダウンロード用
@@ -68,6 +72,10 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # URLダウンロード用
         url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["url_upload_manage_for_dest_users"] = url_upload_manage_for_dest_users
+        
+        # OTPダウンロード用
+        otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+        context["otp_upload_manage_for_dest_users"] = otp_upload_manage_for_dest_users
 
         """ゴミ箱表示"""
         # アップロード用
@@ -77,6 +85,10 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # URLアップロード用
         url_upload_manage_for_dest_users_deleted = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=1)
         context["url_upload_manage_for_dest_users_deleted"] = url_upload_manage_for_dest_users_deleted
+        
+        # OTPアップロード用
+        otp_upload_manage_for_dest_users_deleted = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=1)
+        context["otp_upload_manage_for_dest_users_deleted"] = otp_upload_manage_for_dest_users_deleted
 
         """会社毎のレコード数取得"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
@@ -116,7 +128,7 @@ def total_data_usage(object, company, user, download_table, download_file_table,
             personal_resource_manage.save()
     
     # URL共有
-    else:
+    elif type == 2:
         personal_resource_manage, created = PersonalResourceManagement.objects.get_or_create(user = user)
         if created:
             personal_resource_manage.company = company
@@ -136,8 +148,30 @@ def total_data_usage(object, company, user, download_table, download_file_table,
             personal_resource_manage.url_upload_manage_file_size = file_size
             personal_resource_manage.save()
     
+    # OTP共有
+    else:
+        personal_resource_manage, created = PersonalResourceManagement.objects.get_or_create(user = user)
+        if created:
+            personal_resource_manage.company = company
+            personal_resource_manage.number_of_active_otp_upload_manage = 1
+            personal_resource_manage.number_of_otp_download_table =  download_table
+            personal_resource_manage.number_of_otp_download_file_table = download_file_table
+            personal_resource_manage.otp_upload_manage_file_size = file_size
+            personal_resource_manage.save()
+        else:
+            date = datetime.datetime.now()
+            
+            personal_resource_manage.company = company
+            personal_resource_manage.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(created_user=user, file_del_flag=0, end_date__gt=date).all().count()
+            personal_resource_manage.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(created_user=user, file_del_flag=1) | Q(created_user=user, end_date__lt=date)).all().count() 
+            personal_resource_manage.number_of_otp_download_table = download_table
+            personal_resource_manage.number_of_otp_download_file_table = download_file_table
+            personal_resource_manage.otp_upload_manage_file_size = file_size
+            personal_resource_manage.save()
+
+
     # ファイルサイズ合計
-    personal_resource_manage.total_file_size = personal_resource_manage.upload_manage_file_size + personal_resource_manage.url_upload_manage_file_size
+    personal_resource_manage.total_file_size = personal_resource_manage.upload_manage_file_size + personal_resource_manage.url_upload_manage_file_size + personal_resource_manage.otp_upload_manage_file_size
     personal_resource_manage.save()
 
     # レコード総件数
@@ -145,10 +179,14 @@ def total_data_usage(object, company, user, download_table, download_file_table,
     + personal_resource_manage.number_of_deactive_upload_manage 
     + personal_resource_manage.number_of_active_url_upload_manage 
     + personal_resource_manage.number_of_deactive_url_upload_manage 
+    + personal_resource_manage.number_of_active_otp_upload_manage 
+    + personal_resource_manage.number_of_deactive_otp_upload_manage 
     + personal_resource_manage.number_of_download_table 
     + personal_resource_manage.number_of_download_file_table
     + personal_resource_manage.number_of_url_download_table
-    + personal_resource_manage.number_of_url_download_file_table ) * settings.DEFAULT_RECORD_SIZE
+    + personal_resource_manage.number_of_url_download_file_table
+    + personal_resource_manage.number_of_otp_download_table
+    + personal_resource_manage.number_of_otp_download_file_table) * settings.DEFAULT_RECORD_SIZE
 
     # データ使用量
     personal_resource_manage.total_data_usage = personal_resource_manage.total_record_size + personal_resource_manage.total_file_size
@@ -172,7 +210,7 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
             personal_resource_manage.number_of_download_file_table -= download_file_table
             personal_resource_manage.upload_manage_file_size -= file_size
             personal_resource_manage.save()
-        else:
+        elif type == 2:
             personal_resource_manage.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(created_user=user, file_del_flag=0, end_date__gt=date).all().count()
             personal_resource_manage.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(created_user=user, file_del_flag=1) | Q(created_user=user, end_date__lt=date)).all().count() 
             personal_resource_manage.number_of_removed_url_upload_manage += 1
@@ -180,9 +218,17 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
             personal_resource_manage.number_of_url_download_file_table -= download_file_table
             personal_resource_manage.url_upload_manage_file_size -= file_size
             personal_resource_manage.save()
+        else:
+            personal_resource_manage.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(created_user=user, file_del_flag=0, end_date__gt=date).all().count()
+            personal_resource_manage.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(created_user=user, file_del_flag=1) | Q(created_user=user, end_date__lt=date)).all().count() 
+            personal_resource_manage.number_of_removed_otp_upload_manage += 1
+            personal_resource_manage.number_of_otp_download_table -= download_table
+            personal_resource_manage.number_of_otp_download_file_table -= download_file_table
+            personal_resource_manage.otp_upload_manage_file_size -= file_size
+            personal_resource_manage.save()
 
     # ファイルサイズ合計
-    personal_resource_manage.total_file_size = personal_resource_manage.upload_manage_file_size + personal_resource_manage.url_upload_manage_file_size
+    personal_resource_manage.total_file_size = personal_resource_manage.upload_manage_file_size + personal_resource_manage.url_upload_manage_file_size + personal_resource_manage.otp_upload_manage_file_size
     personal_resource_manage.save()
 
     # レコード総件数
@@ -192,10 +238,14 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
     + personal_resource_manage.number_of_deactive_upload_manage 
     + personal_resource_manage.number_of_active_url_upload_manage 
     + personal_resource_manage.number_of_deactive_url_upload_manage
+    + personal_resource_manage.number_of_active_otp_upload_manage 
+    + personal_resource_manage.number_of_deactive_otp_upload_manage
     + personal_resource_manage.number_of_download_table 
     + personal_resource_manage.number_of_download_file_table
     + personal_resource_manage.number_of_url_download_table
-    + personal_resource_manage.number_of_url_download_file_table ) * settings.DEFAULT_RECORD_SIZE
+    + personal_resource_manage.number_of_url_download_file_table
+    + personal_resource_manage.number_of_otp_download_table
+    + personal_resource_manage.number_of_otp_download_file_table) * settings.DEFAULT_RECORD_SIZE
     # データ使用量
     personal_resource_manage.total_data_usage = personal_resource_manage.total_record_size + personal_resource_manage.total_file_size
 
@@ -214,27 +264,37 @@ def resource_management_calculation_process(company):
     resource_manage, created = ResourceManagement.objects.get_or_create(company = company)
     download_table = 0
     url_download_table = 0
+    otp_download_table = 0
     download_file_table = 0
     url_download_file_table = 0
+    otp_download_file_table = 0
     total_file_size = 0
     number_of_active_upload_manage = 0
     number_of_deactive_upload_manage = 0
     number_of_active_url_upload_manage = 0
     number_of_deactive_url_upload_manage = 0
+    number_of_active_otp_upload_manage = 0
+    number_of_deactive_otp_upload_manage = 0
     number_of_removed_upload_manage = 0
     number_of_removed_url_upload_manage = 0
+    number_of_removed_otp_upload_manage = 0
     for personal_resource_manage in personal_resource_manages:
         download_table += personal_resource_manage.number_of_download_table
         url_download_table += personal_resource_manage.number_of_url_download_table
+        otp_download_table += personal_resource_manage.number_of_otp_download_table
         download_file_table += personal_resource_manage.number_of_download_file_table
         url_download_file_table += personal_resource_manage.number_of_url_download_file_table
+        otp_download_file_table += personal_resource_manage.number_of_otp_download_file_table
         total_file_size += personal_resource_manage.total_file_size
         number_of_active_upload_manage += personal_resource_manage.number_of_active_upload_manage
         number_of_deactive_upload_manage += personal_resource_manage.number_of_deactive_upload_manage
         number_of_active_url_upload_manage += personal_resource_manage.number_of_active_url_upload_manage
         number_of_deactive_url_upload_manage += personal_resource_manage.number_of_deactive_url_upload_manage
+        number_of_active_otp_upload_manage += personal_resource_manage.number_of_active_otp_upload_manage
+        number_of_deactive_otp_upload_manage += personal_resource_manage.number_of_deactive_otp_upload_manage
         number_of_removed_upload_manage += personal_resource_manage.number_of_removed_upload_manage
         number_of_removed_url_upload_manage += personal_resource_manage.number_of_removed_url_upload_manage
+        number_of_removed_otp_upload_manage += personal_resource_manage.number_of_removed_otp_upload_manage
         date = datetime.datetime.now()
 
         if created:
@@ -242,19 +302,26 @@ def resource_management_calculation_process(company):
             resource_manage.number_of_deactive_upload_manage = number_of_deactive_upload_manage
             resource_manage.number_of_active_url_upload_manage = number_of_active_url_upload_manage
             resource_manage.number_of_deactive_url_upload_manage = number_of_deactive_url_upload_manage
+            resource_manage.number_of_active_otp_upload_manage = number_of_active_otp_upload_manage
+            resource_manage.number_of_deactive_otp_upload_manage = number_of_deactive_otp_upload_manage
 
         else:
             resource_manage.number_of_active_upload_manage = UploadManage.objects.filter(company = company, file_del_flag=0, end_date__gt=date).all().count()
             resource_manage.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(company=company, file_del_flag=1) | Q(company = company, end_date__lt=date)).all().count() 
             resource_manage.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(company = company, file_del_flag=0, end_date__gt=date).all().count()
             resource_manage.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(company=company, file_del_flag=1) | Q(company = company, end_date__lt=date)).all().count() 
+            resource_manage.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(company = company, file_del_flag=0, end_date__gt=date).all().count()
+            resource_manage.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(company=company, file_del_flag=1) | Q(company = company, end_date__lt=date)).all().count() 
             resource_manage.number_of_removed_upload_manage = number_of_removed_upload_manage
             resource_manage.number_of_removed_url_upload_manage = number_of_removed_url_upload_manage
+            resource_manage.number_of_removed_otp_upload_manage = number_of_removed_otp_upload_manage 
 
         resource_manage.number_of_download_table = download_table
         resource_manage.number_of_download_file_table = download_file_table
         resource_manage.number_of_url_download_table = url_download_table
         resource_manage.number_of_url_download_file_table = url_download_file_table
+        resource_manage.number_of_otp_download_table = otp_download_table
+        resource_manage.number_of_otp_download_file_table = otp_download_file_table
         resource_manage.total_file_size = total_file_size
         resource_manage.save()
 
@@ -262,11 +329,15 @@ def resource_management_calculation_process(company):
     resource_manage.total_record_size = (resource_manage.number_of_active_upload_manage 
     + resource_manage.number_of_deactive_upload_manage 
     + resource_manage.number_of_active_url_upload_manage 
-    + resource_manage.number_of_deactive_url_upload_manage 
+    + resource_manage.number_of_deactive_url_upload_manage
+    + resource_manage.number_of_active_otp_upload_manage 
+    + resource_manage.number_of_deactive_otp_upload_manage 
     + resource_manage.number_of_download_table 
     + resource_manage.number_of_download_file_table
     + resource_manage.number_of_url_download_table
-    + resource_manage.number_of_url_download_file_table ) * settings.DEFAULT_RECORD_SIZE
+    + resource_manage.number_of_url_download_file_table
+    + resource_manage.number_of_otp_download_table
+    + resource_manage.number_of_otp_download_file_table ) * settings.DEFAULT_RECORD_SIZE
 
     # データ使用量
     resource_manage.total_data_usage = resource_manage.total_record_size + resource_manage.total_file_size

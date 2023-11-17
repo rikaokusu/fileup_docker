@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
-from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable
+from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable
 from django.http import JsonResponse
 import urllib.parse
 import os
@@ -544,6 +544,156 @@ class SendTableFileMultiDeleteAjaxView(View):
             # メッセージを格納してJSONで返す
             data = {}
             data['message'] = '削除しました'
+            return JsonResponse(data)
+
+        except:
+            # 失敗時のメッセージを格納してJASONで返す
+            data = {}
+            data['message'] = '削除に失敗しました'
+            return JsonResponse(data)
+
+##################################
+# 送信テーブル OTPの削除 #
+##################################
+
+class OTPDeleteAjaxView(View):
+    def post(self, request):
+
+        otp_send_delete_id = request.POST.getlist('otp_send_delete_id[]')
+        otp_send_delete_name = request.POST.get('otp_send_delete_name')
+
+        otp_upload_manages = OTPUploadManage.objects.filter(pk__in=otp_send_delete_id)
+
+        try:
+            for otp_upload_manage in otp_upload_manages:
+
+                #download_tableのレコード数を取得
+                number_of_otp_download_table = OTPDownloadtable.objects.filter(otp_upload_manage=otp_upload_manage).all().count()
+
+                # download_file_tableのレコード数を取得
+                number_of_otp_download_file_table = 0
+                for otpdownloadtable in OTPDownloadtable.objects.filter(otp_upload_manage=otp_upload_manage).all():
+                    number_of_otp_download_file_table += int(otpdownloadtable.otp_download_table.all().count())
+                
+                # ファイルの実態が削除されていないデータのみ抽出する
+                files = otp_upload_manage.file.all()
+                otp_upload_manage_file_size = 0
+                for file in files:
+                    
+                    # 管理テーブルから合計サイズをマイナスするためサイズデータ抽出する
+                    otp_upload_manage_file_size = otp_upload_manage_file_size + int(file.size)
+
+                    # 複製データがある場合はファイルの実体は削除しない
+                    file_upload = file.upload
+                    file_num = Filemodel.objects.filter(upload=file_upload).all().count()
+                    if file_num == 1:
+
+                        # 実ファイル名を文字列にデコード
+                        file_path = urllib.parse.unquote(file.upload.url)
+                        # ファイルパスを分割してファイル名だけ取得
+                        file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
+                        # パスを取得
+                        path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                        # パスの存在確認
+                        result = os.path.exists(path)
+                        if result:
+                            # 絶対パスでファイル実体を削除
+                            os.remove(os.path.join(
+                                settings.FULL_MEDIA_ROOT, file_name))
+                    
+                    # DBの対象行を削除
+                    file.delete()
+
+                otp_upload_manage.delete()
+
+            # PersonalResourceManagementテーブル情報を修正
+            # 個人管理テーブルの作成・更新
+            send_table_delete(self.request.user.id, number_of_otp_download_table, number_of_otp_download_file_table, otp_upload_manage_file_size, 2)
+            # 会社管理テーブルの作成・更新
+            resource_management_calculation_process(self.request.user.company.id)
+
+            # メッセージを格納してJSONで返す
+            data = {}
+            data['message'] = otp_send_delete_name + 'を削除しました'
+            return JsonResponse(data)
+
+        except:
+            # 失敗時のメッセージを格納してJASONで返す
+            data = {}
+            data['message'] = '削除に失敗しました'
+            return JsonResponse(data)
+
+#######################################
+# 送信テーブル OTP ファイルのみ削除 #
+#######################################
+
+class OTPFileDeleteAjaxView(View):
+    def post(self, request):
+
+        otp_send_delete_id = request.POST.getlist('otp_send_delete_id[]')
+        otp_send_delete_name = request.POST.get('otp_send_delete_name')
+
+        otp_upload_manages = OTPUploadManage.objects.filter(pk__in=otp_send_delete_id)
+
+        try:
+            for otp_upload_manage in otp_upload_manages:
+
+                # del_flagを1に変更
+                for otpdownloadtable in OTPDownloadtable.objects.filter(otp_upload_manage=otp_upload_manage).all():
+                    otpdownloadtable.del_flag= 1
+                    otpdownloadtable.save()
+                    otpdownloadfiletables = []
+                    for otpdownloadfiletable in OTPDownloadFiletable.objects.filter(otp_download_table=otpdownloadtable, del_flag=0).all():
+                        otpdownloadfiletable.del_flag = 1
+                        otpdownloadfiletables.append(otpdownloadfiletable)
+                    OTPDownloadFiletable.objects.bulk_update(otpdownloadfiletables, fields=['del_flag'])
+
+                files = otp_upload_manage.file.filter(del_flag=0).all()
+                otp_upload_manage_file_size = 0
+                for file in files:
+                    
+                    # 管理テーブルから合計サイズをマイナスするために削除するファイルのサイズを取得
+                    otp_upload_manage_file_size = otp_upload_manage_file_size + int(file.size)
+
+                    # 複製データがある場合はファイルの実体は削除しない
+                    file_upload = file.upload
+                    file_num = Filemodel.objects.filter(upload=file_upload).all().count()
+                    if file_num == 1:
+
+                        # 実ファイル名を文字列にデコード
+                        file_path = urllib.parse.unquote(file.upload.url)
+                        # ファイルパスを分割してファイル名だけ取得
+                        file_name = file_path.split('/', 3)[3]
+                        # file_name = file_path.split('/', 2)[2]
+                        
+                        # パスを取得
+                        path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                        # パスの存在確認
+                        result = os.path.exists(path)
+                        if result:
+                            # 絶対パスでファイル実体を削除
+                            os.remove(os.path.join(
+                                settings.FULL_MEDIA_ROOT, file_name))
+                    
+                    # DBのfile_del_flagを1に変更しサイズを0にする
+                    file.del_flag = 1
+                    file.size = 0
+                    file.save()
+
+                    otp_upload_manage.file_del_flag = 1
+                    otp_upload_manage.save()
+            
+            # PersonalResourceManagementテーブル情報を修正
+            # 個人管理テーブルの作成・更新
+            send_table_delete(self.request.user.id, 0, 0, otp_upload_manage_file_size, 2)
+            # 会社管理テーブルの作成・更新
+            resource_management_calculation_process(self.request.user.company.id)
+
+            # メッセージを格納してJSONで返す
+            data = {}
+            data['message'] = otp_send_delete_name + 'を削除しました'
             return JsonResponse(data)
 
         except:

@@ -1,0 +1,55 @@
+{% extends "draganddrop/common//base.html" %}
+
+
+{% load static %}
+
+<body>
+
+    {% block content %}
+
+
+    <div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar">
+
+        <div class="top">
+            <div class="tate mr-2"></div>
+            <h1>OTP共有 複製</h1><i class="fa-solid fa-copy fa-2x icon-globe"></i>
+        </div>
+
+
+
+        <div class="progressbar">
+            <div class="item flex-fill">STEP1<br>情報入力</div>
+            <div class="item flex-fill">STEP2<br>ファイルを選択</div>
+            <div class="item active flex-fill">STEP3<br>登録完了</div>
+
+        </div>
+
+    </div>
+    <div class="box2">
+        <h1 class="text-center mt-5 mb-5">登録完了</h1>
+        <p class="text-center mt-5 mb-5 block-txt">
+            ファイルの登録が完了致しました。<br>
+            *5秒後に自動的にホーム画面に戻ります。
+        </p>
+    </div>
+
+    <div class="home d-flex justify-content-center bottom_bar">
+        <a href="{% url 'draganddrop:home' %}"
+            class="btn btn_home btn-outline-primary  my-btn-w7 my-btn-h4 rounded-0">ホーム</a>
+    </div>
+
+</body>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    //５秒後にhomeに画面遷移する処理。
+
+    url = "{% url 'draganddrop:home' %}"
+    setTimeout("location.href=url", 1000 * 5);
+</script>
+ 
+
+{% endblock %}

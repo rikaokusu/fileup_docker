@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic import FormView, View, CreateView, TemplateView
 from draganddrop.views.home.home_common import CommonView, total_data_usage, resource_management_calculation_process
 from django.contrib.auth.mixins import LoginRequiredMixin
-from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, ManageTasksOTPStep1Form, OTPDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -23,7 +23,9 @@ Token_LENGTH = 5  # ランダムURLを作成するためのTOKEN
 ###########################
 # 複製機能  #
 ###########################
-
+"""
+アップロード 複製
+"""
 class DuplicateStep1(FormView, CommonView):
     model = UploadManage
     template_name = 'draganddrop/duplicate/duplicate_step1.html'
@@ -599,7 +601,9 @@ class DuplicateStep3(TemplateView, CommonView):  # サーバサイドだけの�
         resource_management_calculation_process(self.request.user.company.id)
             
         return context
-
+"""
+URL 複製
+"""
 class UrlDuplicateStep1(FormView, CommonView):
     model = UrlUploadManage
     template_name = 'draganddrop/url_duplicate/url_duplicate_step1.html'
@@ -1217,11 +1221,612 @@ class UrlDuplicateStep3(TemplateView, CommonView):
 
         return context
 
+"""
+OTP 複製
+"""
+class OTPDuplicateStep1(FormView, CommonView):
+    model = OTPUploadManage
+    template_name = 'draganddrop/otp_duplicate/otp_duplicate_step1.html'
+    form_class = ManageTasksOTPStep1Form
+
+        # フォームに対してログインユーザーを渡す
+    def get_form_kwargs(self):
+        kwargs = super(OTPDuplicateStep1, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        kwargs.update({'url': self.request.resolver_match.url_name})
+        return kwargs
+
+    # 戻るを実装した際に最初に入力した値を表示するための処理。formに使用する初期データを返す。
+    def get_initial(self):
+
+        # ページ情報をセッションに保存しておく
+        self.request.session['page_num'] = 1
+
+        otp_upload_manage_id = self.kwargs['pk']
+        if 'otp_upload_manage_id' in self.request.session:
+            otp_upload_manage = OTPUploadManage.objects.filter(pk=self.request.session['otp_upload_manage_id']).first()  # 新データ
+
+            dest_user_mail1 = otp_upload_manage.dest_user_mail1
+            dest_user_mail2 = otp_upload_manage.dest_user_mail2
+            dest_user_mail3 = otp_upload_manage.dest_user_mail3
+            dest_user_mail4 = otp_upload_manage.dest_user_mail4
+            dest_user_mail5 = otp_upload_manage.dest_user_mail5
+            dest_user_mail6 = otp_upload_manage.dest_user_mail6
+            dest_user_mail7 = otp_upload_manage.dest_user_mail7
+            dest_user_mail8 = otp_upload_manage.dest_user_mail8
+            dest_user = otp_upload_manage.dest_user
+            dest_user_group = otp_upload_manage.dest_user_group
+            title = otp_upload_manage.title
+            dl_limit = otp_upload_manage.dl_limit
+            end_date = otp_upload_manage.end_date
+            message = otp_upload_manage.message
+
+            if otp_upload_manage.dest_user.all().count() == 0:
+                otp_upload_manage_old = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).prefetch_related('dest_user',).first()  # 旧データ
+                dest_user = otp_upload_manage_old.dest_user.all()
+            else:
+                dest_user = otp_upload_manage.dest_user.all()
+
+            if otp_upload_manage.dest_user_group.all().count() == 0:
+                otp_upload_manage_old = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).prefetch_related('dest_user_group',).first()  # 旧データ
+                dest_user_group = otp_upload_manage_old.dest_user_group.all()
+            else:
+                dest_user_group = otp_upload_manage.dest_user_group.all()
+
+            if otp_upload_manage.end_date == None:
+                otp_upload_manage_old = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).first()  # 旧データ
+                end_date = otp_upload_manage_old.end_date
+            else:
+                end_date = otp_upload_manage.end_date
+
+            if otp_upload_manage.dl_limit == None:
+                otp_upload_manage_old = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).first()  # 旧データ
+                dl_limit = otp_upload_manage_old.dl_limit
+            else:
+                dl_limit = otp_upload_manage.dl_limit
+
+            initial = {
+                        'title': title,
+                        'dest_user': dest_user,
+                        'dest_user_group': dest_user_group,
+                        'dest_user_mail1': dest_user_mail1,
+                        'dest_user_mail2': dest_user_mail2,
+                        'dest_user_mail3': dest_user_mail3,
+                        'dest_user_mail4': dest_user_mail4,
+                        'dest_user_mail5': dest_user_mail5,
+                        'dest_user_mail6': dest_user_mail6,
+                        'dest_user_mail7': dest_user_mail7,
+                        'dest_user_mail8': dest_user_mail8,
+                        'dl_limit': dl_limit,
+                        'end_date': end_date,
+                        'message': message
+                    }
+
+        # formに新たな値が書き込まれなかった時に元の旧データを返す処理。
+        else:
+            otp_upload_manage_old = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).prefetch_related('dest_user',).first()  # 旧データ
+            initial = {
+                        'title': otp_upload_manage_old.title + "_copy",
+                        'dest_user': otp_upload_manage_old.dest_user.all(),
+                        'dest_user_group': otp_upload_manage_old.dest_user_group.all(),
+                        'dest_user_mail1': otp_upload_manage_old.dest_user_mail1,
+                        'dest_user_mail2': otp_upload_manage_old.dest_user_mail2,
+                        'dest_user_mail3': otp_upload_manage_old.dest_user_mail3,
+                        'dest_user_mail4': otp_upload_manage_old.dest_user_mail4,
+                        'dest_user_mail5': otp_upload_manage_old.dest_user_mail5,
+                        'dest_user_mail6': otp_upload_manage_old.dest_user_mail6,
+                        'dest_user_mail7': otp_upload_manage_old.dest_user_mail7,
+                        'dest_user_mail8': otp_upload_manage_old.dest_user_mail8,
+                        'end_date': otp_upload_manage_old.end_date,
+                        'dl_limit': otp_upload_manage_old.dl_limit,
+                        'message': otp_upload_manage_old.message,
+                        }
+
+        # 返す
+        return initial
+
+    # アドレス帳のデータをもってくる。
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        """ アドレス帳の情報"""
+        address_lists = Address.objects.filter(created_user=self.request.user.id, is_direct_email=False)
+        context["address_lists"] = address_lists
+
+        """ グループ一覧の情報"""
+        group_lists = Group.objects.filter(created_user=self.request.user.id)
+        context["group_lists"] = group_lists
+
+        otp_upload_manage_id = self.kwargs['pk']
+        if 'otp_upload_manage_id' in self.request.session:
+            otp_upload_manage = OTPUploadManage.objects.filter(pk=self.request.session['otp_upload_manage_id']).first()  # 新データ
+        else:
+            otp_upload_manage = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).prefetch_related('dest_user').first()
+        
+        context["dest_users"] = otp_upload_manage.dest_user.all()
+
+        dest_user_qs = otp_upload_manage.dest_user.all().order_by('pk')
+        full_name_list = []
+        for dest_user in dest_user_qs:
+            full_name = dest_user.last_name + " " + dest_user.first_name
+            full_name_list.append(full_name)
+        context["name"] = full_name_list
+
+        company_name = dest_user_qs.values_list('company_name', flat=True)
+        context["company_name"] = list(company_name)
+
+        pk_list = dest_user_qs.values_list('pk', flat=True)
+        context["pk_list"] = list(pk_list)
+
+        dest_user_group_qs = otp_upload_manage.dest_user_group.all().order_by('pk')
+        group_list = dest_user_group_qs.values_list('pk', flat=True)
+        context["group_list"] = list(group_list)
+
+        return context
+
+    def form_valid(self, form):
+
+        if 'otp_upload_manage_id' in self.request.session:
+            otp_upload_manage = OTPUploadManage.objects.filter(pk=self.request.session['otp_upload_manage_id']).first()
+
+        else:
+            # セッションに値がない場合新たにカラムを作成する。
+            otp_upload_manage = form.save(commit=False)
+
+        title = form.cleaned_data['title']
+        end_date = form.cleaned_data['end_date']
+        dl_limit = form.cleaned_data['dl_limit']
+        message = form.cleaned_data['message']
+        dest_user_qs = form.cleaned_data['dest_user']
+        dest_user_group_qs = form.cleaned_data['dest_user_group']
+
+        # ログインユーザーを登録ユーザーとしてセット
+        otp_upload_manage.created_user = self.request.user.id
+        # ログインユーザーの会社idをセット
+        otp_upload_manage.company = self.request.user.company.id
+        # 作成日をセット
+        otp_upload_manage.created_date = datetime.datetime.now()
+        # テンポラリフラグをセット
+        otp_upload_manage.tmp_flag = 1
+        # タイトルをセット
+        otp_upload_manage.title = title
+        # 終了日をセット
+        otp_upload_manage.end_date = end_date
+        # ダウンロード回数をセット
+        otp_upload_manage.dl_limit = dl_limit
+        # メッセージをセット
+        otp_upload_manage.message = message
+
+        # メールアドレス直接入力 DBへ保存
+        dest_user_mail1 = form.cleaned_data['dest_user_mail1']
+
+        if dest_user_mail1:
+            address1, created = Address.objects.update_or_create(email=dest_user_mail1)
+            address1.is_direct_email = True
+            address1.full_name_preview = dest_user_mail1
+            address1.save()
+        
+        dest_user_mail2 = form.cleaned_data['dest_user_mail2']
+
+        if dest_user_mail2:
+            address2, created = Address.objects.update_or_create(email=dest_user_mail2)
+            address2.is_direct_email = True
+            address2.full_name_preview = dest_user_mail2
+            address2.save()
+            
+        dest_user_mail3 = form.cleaned_data['dest_user_mail3']
+
+        if dest_user_mail3:
+            address3, created = Address.objects.update_or_create(email=dest_user_mail3)
+            address3.is_direct_email = True
+            address3.full_name_preview = dest_user_mail3
+            address3.save()
+
+        dest_user_mail4 = form.cleaned_data['dest_user_mail4']
+
+        if dest_user_mail4:
+            address4, created = Address.objects.update_or_create(email=dest_user_mail4)
+            address4.is_direct_email = True
+            address4.full_name_preview = dest_user_mail4
+            address4.save()
+
+        dest_user_mail5 = form.cleaned_data['dest_user_mail5']
+
+        if dest_user_mail5:
+            address5, created = Address.objects.update_or_create(email=dest_user_mail5)
+            address5.is_direct_email = True
+            address5.full_name_preview = dest_user_mail5
+            address5.save()
+
+        dest_user_mail6 = form.cleaned_data['dest_user_mail6']
+
+        if dest_user_mail6:
+            address6, created = Address.objects.update_or_create(email=dest_user_mail6)
+            address6.is_direct_email = True
+            address6.full_name_preview = dest_user_mail6
+            address6.save()
+
+        dest_user_mail7 = form.cleaned_data['dest_user_mail7']
+
+        if dest_user_mail7:
+            address7, created = Address.objects.update_or_create(email=dest_user_mail7)
+            address7.is_direct_email = True
+            address7.full_name_preview = dest_user_mail7
+            address7.save()
+
+        dest_user_mail8 = form.cleaned_data['dest_user_mail8']
+
+        if dest_user_mail8:
+            address8, created = Address.objects.update_or_create(email=dest_user_mail8)
+            address8.is_direct_email = True
+            address8.full_name_preview = dest_user_mail8
+            address8.save()
+
+        #URLの作成
+        #ランダムな文字列を作る
+        def get_random_chars(char_num=Token_LENGTH):
+            return "".join([random.choice(string.ascii_letters + string.digits) for i in range(char_num)])
+
+        # アクティベーションURL生成
+        Timestamp_signer = TimestampSigner()
+        context = {}
+        token = get_random_chars()
+        otp_upload_manage.decode_token = token #tokenをDBに保存
+        token_signed = Timestamp_signer.sign(token)  # ランダムURLの生成
+        context["token_signed"] = token_signed
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+        print('domainとは',domain)
+        protocol = self.request.scheme        
+        otp_upload_manage.url = protocol + "://" + domain + "/" + "otp_check" + "/" + token_signed
+
+        # upload_manageに追加する。（データを追加し、戻った際にデータを反映させるため）
+        otp_upload_manage.dest_user_mail1 = dest_user_mail1
+        otp_upload_manage.dest_user_mail2 = dest_user_mail2
+        otp_upload_manage.dest_user_mail3 = dest_user_mail3
+        otp_upload_manage.dest_user_mail4 = dest_user_mail4
+        otp_upload_manage.dest_user_mail5 = dest_user_mail5
+        otp_upload_manage.dest_user_mail6 = dest_user_mail6
+        otp_upload_manage.dest_user_mail7 = dest_user_mail7
+        otp_upload_manage.dest_user_mail8 = dest_user_mail8
+
+        # dest_userをsessionに追加するためQSをリスト化して保存。
+        dest_user_all_list = []
+
+        for user in dest_user_qs:
+            if user.company_name:
+                dest_user_all_list.append(user.company_name +" " + user.last_name + "" + user.first_name + " " + "1")
+            elif user.trade_name:
+                dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
+            else:
+                dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
+        
+        for group in dest_user_group_qs:
+            dest_user_all_list.append(group.group_name + " " + "2")
+
+        if dest_user_mail1:
+            dest_user_all_list.append(dest_user_mail1 + " " + "1")
+        if dest_user_mail2:
+            dest_user_all_list.append(dest_user_mail2 + " " + "1")
+        if dest_user_mail3:
+            dest_user_all_list.append(dest_user_mail3 + " " + "1")
+        if dest_user_mail4:
+            dest_user_all_list.append(dest_user_mail4 + " " + "1")
+        if dest_user_mail5:
+            dest_user_all_list.append(dest_user_mail5 + " " + "1")
+        if dest_user_mail6:
+            dest_user_all_list.append(dest_user_mail6 + " " + "1")
+        if dest_user_mail7:
+            dest_user_all_list.append(dest_user_mail7 + " " + "1")
+        if dest_user_mail8:
+            dest_user_all_list.append(dest_user_mail8 + " " + "1")
+
+        # 日付をString化
+        # dist_start_date = dist_start_date.strftime('%Y-%m-%d %H:%M:%S')
+        end_date = end_date.strftime('%Y-%m-%d %H:%M:%S')
+
+        # POST送信された情報をセッションへ保存
+        self.request.session['title'] = title
+        self.request.session['end_date'] = end_date
+        self.request.session['dl_limit'] = dl_limit
+        self.request.session['message'] = message
+        self.request.session['dest_user_all_list'] = dest_user_all_list
+
+        otp_upload_manage.save()
+        otp_upload_manage_id = str(otp_upload_manage.id)
+
+
+        # # MonyToMonyの値はquerysetとして取得するのでupload_manageに保存したうえで、set関数を使ってセット
+        otp_upload_manage.dest_user.set(dest_user_qs)
+        otp_upload_manage.dest_user_group.set(dest_user_group_qs)
+
+        if dest_user_mail1:
+            otp_upload_manage.dest_user.add(address1)
+        if dest_user_mail2:
+            otp_upload_manage.dest_user.add(address2)
+        if dest_user_mail3:
+            otp_upload_manage.dest_user.add(address3)
+        if dest_user_mail4:
+            otp_upload_manage.dest_user.add(address4)
+        if dest_user_mail5:
+            otp_upload_manage.dest_user.add(address5)
+        if dest_user_mail6:
+            otp_upload_manage.dest_user.add(address6)
+        if dest_user_mail7:
+            otp_upload_manage.dest_user.add(address7)
+        if dest_user_mail8:
+            otp_upload_manage.dest_user.add(address8)
+
+        # 生成されたDBの対象行のIDをセッションに保存しておく
+        otp_upload_manage_id_old = self.kwargs['pk']
+        self.request.session['otp_upload_manage_id'] = otp_upload_manage_id
+
+        # ステップ2へ遷移
+        return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step2', kwargs={'pk': otp_upload_manage_id_old}))
+
+class OTPDuplicateStep2(FormView, CommonView):
+    model = OTPUploadManage
+    template_name = "draganddrop/otp_duplicate/otp_duplicate_step2.html"
+    form_class = OTPDistFileUploadForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        original_otp_upload_manage_id = self.kwargs['pk'] #複製元データ
+        context["otp_upload_manage_id"] = original_otp_upload_manage_id
+        
+        otp_upload_manage_id_tmp = self.request.session['otp_upload_manage_id']
+        
+        otp_upload_manage_tmp = OTPUploadManage.objects.filter(pk=otp_upload_manage_id_tmp).prefetch_related('file', 'dest_user').first()
+        number_of_files = otp_upload_manage_tmp.file.filter(del_flag=0).all().count()
+        if number_of_files == 0:
+            original_otp_upload_manage = OTPUploadManage.objects.filter(pk=original_otp_upload_manage_id).prefetch_related('file').first()
+            original_files = original_otp_upload_manage.file.filter(del_flag=0).all()
+            
+            for file in original_files:
+                file_id = file.id
+                filemodel = Filemodel.objects.get(pk=file_id)
+                filemodel.id = None
+                filemodel.save()
+
+                otp_upload_manage_tmp.file.add(filemodel)
+
+        otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+        context["otp_upload_manages"] = otp_upload_manages
+
+        # ページ情報をセッションに保存しておく
+        self.request.session['page_num'] = 2
+
+        
+        # 複製データ
+        otp_upload_manage_tmp = OTPUploadManage.objects.filter(pk=otp_upload_manage_id_tmp).prefetch_related('file').first()
+        
+        files_tmp = otp_upload_manage_tmp.file.filter(del_flag=0).all()
+        files = files_tmp
+
+        # otp_upload_manage = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).prefetch_related('file', 'dest_user').first()
+        otp_upload_manage_tmp = OTPUploadManage.objects.filter(pk=otp_upload_manage_id_tmp).prefetch_related('file', 'dest_user').first()
+        file = serializers.serialize("json", files, fields=('name', 'size', 'upload', 'id'))
+        context["dist_file"] = file
+
+        # URLを返す
+        url_name = self.request.resolver_match.url_name
+        context["url_name"] = url_name
+
+        context["files"] = files
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.del_file = request.POST.getlist('del_file')
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+
+        # セッションの対象IDからDBオブジェクトを生成
+        otp_upload_manage_id = self.kwargs['pk']
+        otp_upload_manage_id_tmp = self.request.session['otp_upload_manage_id']
+        otp_upload_manage = OTPUploadManage.objects.get(pk=otp_upload_manage_id)
+        otp_upload_manage_tmp = OTPUploadManage.objects.get(pk=otp_upload_manage_id_tmp)
+
+        # 作成日を更新
+        otp_upload_manage.created_date = datetime.datetime.now()
+
+        # # ファイルの削除
+        if 'del_file_pk' in self.request.session:
+            del_file_pk = self.request.session['del_file_pk']
+
+            files = OTPFilemodel.objects.filter(pk__in=del_file_pk)
+
+            for file in files:
+                # 実ファイル名を文字列にデコード
+                file_path = urllib.parse.unquote(file.upload.url)
+                # ファイルパスを分割してファイル名だけ取得
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
+                
+                # パスを取得
+                path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                # パスの存在確認
+                result = os.path.exists(path)
+                if result:
+                    # 絶対パスでファイル実体を削除
+                    os.remove(os.path.join(
+                        settings.FULL_MEDIA_ROOT, file_name))
+                # DBの対象行を削除
+                file.delete()
+
+        # 保存
+        otp_upload_manage.save()
+
+        # 保存
+        # upload_manage_tmp.delete()
+
+        if 'up_file_id' in self.request.session:
+
+            # ファイルとタスクを紐付ける
+            # ファイル情報をセッションから取得
+            up_file_id_str = self.request.session['up_file_id'].replace(" ", "").replace("[", "").replace("]", "")
+
+            # リストに変換
+            up_file_id_list = up_file_id_str.split(',')
+
+            # リストのInt型に変換
+            up_file_id_int = [int(s) for s in up_file_id_list]
+
+            # オブジェクトの取得
+            files = Filemodel.objects.filter(pk__in=up_file_id_int, del_flag=0)
+            # タスクとファイルを紐付ける
+            for file in files:
+                otp_upload_manage_tmp.file.add(file)
+                
+                t = threading.Thread
+
+                # PDF変換
+                # ①ファイル名から拡張子のみ取得
+                file_name = file.name
+
+                file_name_without_dot = os.path.splitext(file_name)[1][1:]
+                file_name_no_extention = os.path.splitext(file_name)[0]
+
+                # 実ファイル名を文字列にデコード
+                file_path = urllib.parse.unquote(file.upload.url)
+
+                # ファイルパスを分割してファイル名だけ取得
+                # file_name = file_path.split('/', 3)[3]
+                file_name = file_path.split('/', 2)[2]
+
+                # パスを取得
+                path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+
+
+                # .txtファイルをHTMLファイルへ変換
+                # テキストファイルを一括で読み込む
+                if file_name_without_dot == "txt":
+                    path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                    with open(path) as f:
+                        s = f.read()
+
+                        # htmlファイルを生成して書き込む
+                        upload_s = str(file.upload)
+                        upload_ss = upload_s.split('/')[0]
+
+                        file_path = urllib.parse.unquote(file.upload.url)
+
+                        upload = file_path[1:]
+                        upload_path = upload.split('.')
+                        path_html = upload_path[0] + ".html"
+                        with open(path_html, mode='w') as f:
+                            f.write("<html>\n")
+                            f.write("<head>\n")
+                            f.write("</head>\n")
+                            f.write("<body>\n")
+                            f.write("<pre>\n")
+                            f.write(s)
+                            f.write("</pre>\n")
+                            f.write("</body>\n")
+                            f.write("</html>\n")
+                        htmlfilename = path_html
+                        htmlname = os.path.basename(htmlfilename)
+                        path_html_s = upload_ss + "/" + htmlname
+                        htmlfile, created = PDFfilemodel.objects.get_or_create(
+                            name=htmlname,
+                            size=file.size,
+                            upload=path_html_s,
+                            file=file
+                        )
+
+                        htmlfile.save()
+
+        otp_upload_manage.save()
+        
+        return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step2', kwargs={'pk': otp_upload_manage_id}))
+
+class OTPDuplicateStep3(TemplateView, CommonView):
+    template_name = 'draganddrop/otp_duplicate/otp_duplicate_step3.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        otp_upload_manage_original_id = self.kwargs['pk'] # 複製元データ
+        otp_upload_manage_id = self.request.session['otp_upload_manage_id'] # 複製データ
+
+        context["otp_upload_manage_id"] = otp_upload_manage_id
+
+        # 複製元データ
+        otp_upload_manage_original = OTPUploadManage.objects.filter(pk=otp_upload_manage_original_id).prefetch_related('file').first()
+        # 複製データ
+        otp_upload_manage = OTPUploadManage.objects.filter(pk=self.request.session['otp_upload_manage_id']).first()
+        otp_upload_manage.tmp_flag = 0
+
+        otp_upload_manage.save()
+
+        # 複製元ファイルと複製ファイルを結合
+        otp_upload_manage_file = otp_upload_manage_original.file.filter(del_flag=0).all() | otp_upload_manage.file.filter(del_flag=0).all()
+
+        context["otp_upload_manage"] = otp_upload_manage
+
+        # otp_upload_manageに紐付くグループを取得
+        dest_user_groups = otp_upload_manage.dest_user_group.all()
+        for group in dest_user_groups:
+            for download_user in group.address.all():
+                # ユーザー毎のダウンロード状況を管理するテーブルを作成
+                otp_downloadtable, created = OTPDownloadtable.objects.get_or_create(otp_upload_manage=otp_upload_manage, dest_user=download_user)
+                otp_downloadtable.save()
+            
+                # OTPDownloadfiletableへ保存(ファイル毎のダウンロード状況を管理するテーブルを作成)
+                for file in otp_upload_manage.file.filter(del_flag=0).all():
+                    # ファイル毎のダウンロード状況を管理するテーブルを作成
+                    otp_downloadfiletable, created = OTPDownloadFiletable.objects.get_or_create(otp_download_table=otp_downloadtable, download_file=file)
+                    otp_downloadfiletable.download_file = file
+                    otp_downloadfiletable.save()
+
+        # upload_manageに紐付くdest_userを取得
+        for download_user in otp_upload_manage.dest_user.all():
+            otp_downloadtable, created = OTPDownloadtable.objects.get_or_create(otp_upload_manage=otp_upload_manage, dest_user=download_user)
+            otp_downloadtable.save()
+
+            # OTPDownloadfiletableへ保存(ファイル毎のダウンロード状況を管理するテーブルを作成)
+            for file in otp_upload_manage.file.filter(del_flag=0).all():
+                # ファイル毎のダウンロード状況を管理するテーブルを作成
+                otp_downloadfiletable, created = OTPDownloadFiletable.objects.get_or_create(otp_download_table=otp_downloadtable, download_file=file)
+                otp_downloadfiletable.download_file = file
+                otp_downloadfiletable.save()
+
+        # PersonalResourceManagementへ保存
+        
+        # ログインユーザーが作成したotp_upload_manageを取得
+        personal_user_otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id).all()
+        otp_upload_manage_file_size = 0
+        download_table = 0
+        download_file_table = 0
+
+        for personal_user_otp_upload_manage in personal_user_otp_upload_manages:
+
+            # ファイルの合計サイズを取得
+            for file in personal_user_otp_upload_manage.file.all():
+                otp_upload_manage_file_size = otp_upload_manage_file_size + int(file.size)
+
+            # otp_download_tableのレコード数を取得
+            download_table += OTPDownloadtable.objects.filter(otp_upload_manage=personal_user_otp_upload_manage).all().count()
+
+            # otp_download_file_tableのレコード数を取得
+            for otpdownloadtable in OTPDownloadtable.objects.filter(otp_upload_manage=personal_user_otp_upload_manage).all():
+                download_file_table += int(otpdownloadtable.otp_download_table.all().count())
+
+        # 個人管理テーブルの作成・更新
+        total_data_usage(otp_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)
+        # 会社管理テーブルの作成・更新
+        resource_management_calculation_process(self.request.user.company.id)
+
+        return context
 
 ###########################
 # 複製 戻る  #
 ###########################
-
+"""
+アップロード用
+"""
 class DuplicateReturnView(View):
     def get(self, request, *args, **kwargs):
 
@@ -1255,7 +1860,9 @@ class DuplicateReturnView(View):
             self.request.session['page_num'] = 3
             return HttpResponseRedirect(reverse('draganddrop:duplicate_step3', kwargs={'pk': upload_manage_id}))
 
-
+"""
+URL用
+"""
 class UrlDuplicateReturnView(View):
     def get(self, request, *args, **kwargs):
 
@@ -1288,3 +1895,38 @@ class UrlDuplicateReturnView(View):
             # ページ情報をセッションに保存しておく
             self.request.session['page_num'] = 3
             return HttpResponseRedirect(reverse('draganddrop:url_duplicate_step3', kwargs={'pk': url_upload_manage_id}))
+"""
+OTP用
+"""
+class OTPDuplicateReturnView(View):
+    def get(self, request, *args, **kwargs):
+
+        # 不正な遷移をチェック
+        if not 'page_num' in self.request.session:
+            raise PermissionDenied
+
+        page_num = self.request.session['page_num']
+
+        otp_upload_manage_id = self.kwargs['pk']
+
+        # 2ページから1ページに戻る時の処理
+        if page_num == 1:
+            return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step1', kwargs={'pk': otp_upload_manage_id}))
+
+        # 3ページから2ページに戻る時の処理
+        if page_num == 2:
+            # ページ情報をセッションに保存しておく
+            self.request.session['page_num'] = 1
+            return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step1', kwargs={'pk': otp_upload_manage_id}))
+
+        # 4ページから3ページに戻る時の処理
+        if page_num == 3:
+            # ページ情報をセッションに保存しておく
+            self.request.session['page_num'] = 2
+            return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step2', kwargs={'pk': otp_upload_manage_id}))
+
+        # 5ページから4ページに戻る時の処理
+        if page_num == 4:
+            # ページ情報をセッションに保存しておく
+            self.request.session['page_num'] = 3
+            return HttpResponseRedirect(reverse('draganddrop:otp_duplicate_step3', kwargs={'pk': otp_upload_manage_id}))

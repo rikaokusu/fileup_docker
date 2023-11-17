@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, UpdateView, FormView, View, CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from django.http import JsonResponse
 from django.http import HttpResponse
 import datetime
@@ -131,6 +131,66 @@ class UrlFileDownloadZipView(View):
 
         return response
 
+################################
+# OTP 一括(Zip)ダウンロード機能  #
+################################
+class OTPFileDownloadZipView(View):
+
+    def get(self, request, *args, **kwargs):
+        # 対象課題のIDを取得
+        pk = self.kwargs['pk']
+
+        # ファイル情報を取得
+        otp_download_table = OTPDownloadtable.objects.filter(pk=pk).first()
+        otp_downloadfiletable_qs = OTPDownloadFiletable.objects.filter(otp_download_table=otp_download_table)
+
+        # レスポンスの生成
+        response = HttpResponse(content_type='application/zip')
+
+        # ダウンロードするファイル名を定義
+        fn_on_space = "download"
+
+        # 半角スペース削除
+        fn = fn_on_space.replace(" ", "")
+
+        response['Content-Disposition'] = 'filename="{fn}.zip"'.format(fn=urllib.parse.quote(fn))
+
+        # メモリーに保存する
+        buffer = io.BytesIO()
+
+        # Zipファイルの生成
+        zip = zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED)
+
+        #dl_limitを取得する
+        otp_zip_dl_limit = otp_download_table.otp_upload_manage.dl_limit
+
+        # Zipファイルに追加する
+        for otp_downloadfiletable in otp_downloadfiletable_qs:
+            file = otp_downloadfiletable.download_file
+
+            otp_dl_file_count = otp_downloadfiletable.otp_dl_count
+            if otp_dl_file_count < otp_zip_dl_limit:
+                zip.writestr(file.name, file.upload.read())
+
+
+        # Zipファイルをクローズ
+        zip.close()
+
+        # バッファのフラッシュ
+        buffer.flush()
+
+        # バッファの内容を書き出し
+        ret_zip = buffer.getvalue()
+
+        # バッファをクローズ
+        buffer.close()
+
+        # レスポンスに書き込み
+        response.write(ret_zip)
+        print("response.write(ret_zip)", ret_zip)
+
+        return response
+
 ######################################################
 # ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
 ######################################################
@@ -222,7 +282,7 @@ class FileDownloadStatus(LoginRequiredMixin, View):
                             })
 
 ######################################################
-# ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
+# URL共有　ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
 ######################################################
 
 class UrlFileDownloadStatus(LoginRequiredMixin, View):
@@ -300,6 +360,96 @@ class UrlFileDownloadStatus(LoginRequiredMixin, View):
                 url_downloadtable.url_upload_manage.is_downloaded = True  # 対応完了
 
                 url_downloadtable.url_upload_manage.save()
+
+        except Exception as e:
+            return JsonResponse({"status": "ng",
+                                "message": str(e),
+                                })
+
+        return JsonResponse({"status": "ok",
+                            "message": "ダウンロードしました",
+                            })
+
+
+######################################################
+# OTP　ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
+######################################################
+
+class OTPFileDownloadStatus(LoginRequiredMixin, View):
+
+    def post(self, request):
+
+        # ダウンロードされたファイルが単体か複数か判断するための変数
+        is_type = request.POST.get('is_type')
+
+        # downloadtableのidを呼び出す
+        otp_downloadtable_id = request.POST.get('otp_downloadtable_id')
+
+        # downloadtable_idからdownloadtableのオブジェクトを取得する
+        otp_downloadtable = OTPDownloadtable.objects.filter(id=otp_downloadtable_id).first()
+
+        # downloadfiletableのQSを取得する。取得条件はdownloadtableが一致する行。
+        otp_downloadfiletable_qs = OTPDownloadFiletable.objects.filter(otp_download_table=otp_downloadtable)
+
+        # ファイルのIDをリスト化
+        # file_idsの中身が単体と複数ファイルの場合の条件定義
+        file_ids = []
+        if is_type == "single":
+            file_ids.append(request.POST.get('file_id'))
+        elif is_type == "multiple":
+            for file in otp_downloadfiletable_qs.all():
+                file_ids.append(file.download_file.id)
+
+        else:
+            pass
+
+        try:
+            for file_id in file_ids:
+                # ファイルIDからファイルモデルのオブジェクトを取得する
+                filemodel = Filemodel.objects.filter(id=file_id).first()
+
+                otp_downloadfiletable = OTPDownloadFiletable.objects.filter(otp_download_table=otp_downloadtable, download_file=filemodel).first()
+                # 取得したDownloadFiletableのオブジェクトのis_downloadedの値をTrueに変更する
+                otp_downloadfiletable.is_downloaded = True
+                otp_downloadfiletable.otp_dl_count += 1
+
+
+                # DownloadFiletableのオブジェクトを保存する"""
+                otp_downloadfiletable.save()
+
+                # ダウンロード時間を保持して保存する
+                otp_downloadfiletable.dowloaded_date = datetime.datetime.now()
+                otp_downloadfiletable.save()
+
+                otp_downloadfiletable.dowloaded_date = datetime.datetime.now()
+                otp_downloadfiletable.save()
+
+            # ユーザー個別のDL状況
+            # ダウンロードファイルテーブルで受信テーブルに紐づいている全ての行を取得
+            # 最後に.count()をつけて、QSの数がint型で返ってくるようにする。
+            file_number = OTPDownloadFiletable.objects.filter(otp_download_table=otp_downloadtable).count()
+
+            # ダウンロードファイルテーブルで受信テーブルに紐づいている中で、is_downloadedフラグがTrueのものを取得
+            # 最後に.count()をつけて、QSの数がint型で返ってくるようにする。
+            downloaded_file_number = OTPDownloadFiletable.objects.filter(otp_download_table=otp_downloadtable, is_downloaded=True).count()
+
+            if file_number == downloaded_file_number:
+
+                otp_downloadtable.is_downloaded = True  # 対応完了
+
+                otp_downloadtable.save()
+
+            # DownloadtableでUploadManageに紐づいている行を取得
+
+            file_number = OTPDownloadtable.objects.filter(otp_upload_manage=otp_downloadtable.otp_upload_manage).count()
+
+            downloaded_file_number = OTPDownloadtable.objects.filter(otp_upload_manage=otp_downloadtable.otp_upload_manage, is_downloaded=True).count()
+
+            if file_number == downloaded_file_number:
+
+                otp_downloadtable.otp_upload_manage.is_downloaded = True  # 対応完了
+
+                otp_downloadtable.otp_upload_manage.save()
 
         except Exception as e:
             return JsonResponse({"status": "ng",

@@ -137,6 +137,7 @@ class UrlFileDownloadAuthPass(FormView, CommonView):
             messages.info(self.request, f'正しいメールアドレスまたはパスワードを入力して下さい。')
             return HttpResponseRedirect(reverse('draganddrop:url_file_download_auth_pass', kwargs={'pk': url_upload_manage.id}))
 
+
 ###########################
 # URLファイルダウンロード画面  #
 ###########################
