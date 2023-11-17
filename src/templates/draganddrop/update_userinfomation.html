@@ -11,7 +11,7 @@
 
 {% block content %}
 <!--css-->
-  <form action="" method="post" enctype="multipart/form-data" id="myform" validate data-validate>
+  <form action="" class="userupdate-form" method="post" enctype="multipart/form-data" id="myform" validate data-validate>
     <div class="row">
       <div class="col-6 mb-5 pb-5">
         <div class="card border-0 card-register mt-2">
@@ -35,7 +35,7 @@
               </div>
             {% endif %}
 
-            <table class="table table-sm table-bordered" style="color: #595959;">
+            <table class="table table-sm table-bordered update-table" style="color: #595959;">
               <tbody>
                 <tr>
                   <th class="tr_head h6">
@@ -251,7 +251,8 @@
                       <div class="label h6">プロファイル画像</div>
                   </th>
                   {% if gen_image %}
-                    <th class="text-center image_aria">現在の画像<br>
+                    <th class="text-center image_aria" style="font-size:12px;">現在の画像<br>
+                      {{ gen_image.file }}
                       <img src="/media/{{ gen_image.file }}" style="width:80px; height:80px;" ><br><br>
                       <button type="button" onfocus="this.blur();" id="del_image_btn" data-gen="{{gen_image.file}}">削除する</button>
                       
@@ -283,7 +284,7 @@
         <h6>現在の入力した内容は全て破棄されます。</h6>
       </div>
       <div class="modal-footer">
-        <button type="button" class="my-btn my-btn-accept my-btn-sm my-btn-w6" onclick="location.href='{% url 'accounts:home' %}'">OK</button>
+        <button type="button" class="my-btn my-btn-blue my-btn-sm my-btn-w6" onclick="location.href='{% url 'accounts:home' %}'">OK</button>
         <button type="button" class="my-btn my-btn-cancel my-btn-sm my-btn-w6" data-dismiss="modal">戻る</button>
       </div><!-- /.modal-footer -->
     </div><!-- /.modal-content -->

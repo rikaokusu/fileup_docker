@@ -3,8 +3,8 @@ from django.views.generic import View,ListView, TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
-from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement, File
-from accounts.models import User
+from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement
+from accounts.models import User, File
 from draganddrop.models import Notification,Read
 from draganddrop.forms import UserChangeForm
 from datetime import datetime, date, timedelta, timezone
@@ -189,25 +189,6 @@ def delete_image(request):
     return JsonResponse(data)
 
 """
-プロファイル画像変更
-"""
-import json
-class ImageImportView(View):
-    def post(self, request, *args, **kwargs):
-        upload_file = self.request.FILES.get('file')
-
-        file, created = File.objects.get_or_create(name=upload_file.name,size=upload_file.size,file=upload_file,)
-
-        file.save()
-        up_file_id = file.id
-
-        # 保存したファイルをセッションへ保存
-        up_file_id_json = json.dumps(up_file_id)
-        self.request.session['up_file_id'] = up_file_id_json
-        print('イメージのセッション作成！！')
-        # 何も返したくない場合、HttpResponseで返す
-        return HttpResponse('OK')
-"""
 ユーザー情報変更画面
 プロフィール情報編集アイコンから情報を変更する画面
 """
@@ -233,19 +214,6 @@ class UserUpdateInfoView(LoginRequiredMixin, UpdateView, CommonView):
         # target_user.save()
 
         today = datetime.now(timezone.utc)
-        # qs = []
-        # s_qs = Service.objects.order_by("number").all()
-        # user_contract = []
-        # for s in s_qs:
-        #     user_contract_raw = Contract.objects.filter(company=current_user.company, status__in=["1","2"], service=s)
-        #     if user_contract_raw.count() >= 2 or user_contract_raw.filter(status="2").exists():
-        #         user_contract_obj = user_contract_raw.filter(status=2).first()
-        #         user_contract.append(user_contract_obj)
-        #     else:#レコードが1つのみ(1のみ)
-        #         if user_contract_raw.filter(status="1",contract_end_date__gte=today):
-        #             user_contract_obj = user_contract_raw.all().first()
-        #             user_contract.append(user_contract_obj)
-        # context["user_contract"] = user_contract
         
         context = super().get_context_data(**kwargs)
         #すでにそのユーザーのレコードが存在してたたら（すでに利用中）
@@ -290,18 +258,45 @@ class UserUpdateInfoView(LoginRequiredMixin, UpdateView, CommonView):
         #user.service.set(services)
         old_image = ''
 
+        print( 'せるふりくえすとせっしょん',self.request.session)
+        print( 'おーるどでーた',old_data)
         if old_data.image:
-            old_image = File.objects.filter(pk=old_data.image.id)
+            old_image = File.objects.filter(pk=old_data.image.id).first()
+            print('オールドあります',old_image)
         
         if 'up_file_id' in self.request.session:
-            
+            print( 'ゆーざーいめーじ２２２２２２２',type(self.request.session['up_file_id']))
+            # up_file_id = int(self.request.session['up_file_id'])
+            # user.image = File.objects.get(id=up_file_id)
             user.image = File.objects.filter(id=self.request.session['up_file_id']).first()
-            if old_image:
-                old_image.delete()
+            # if old_image:
+            #     old_image.delete()
 
         user.save()
         
         return redirect('draganddrop:home')
+    
+
+"""
+プロファイル画像変更
+"""
+import json
+class ImageImportView(View):
+    def post(self, request, *args, **kwargs):
+        upload_file = self.request.FILES.get('file')
+
+        file, created = File.objects.get_or_create(name=upload_file.name,size=upload_file.size,file=upload_file,)
+
+        file.save()
+        up_file_id = file.id
+        print('----------------------------------------------------------ふぁいるID',up_file_id)
+
+        # 保存したファイルをセッションへ保存
+        up_file_id_json = json.dumps(up_file_id)
+        self.request.session['up_file_id'] = up_file_id_json
+        print('イメージのセッション作成！！')
+        # 何も返したくない場合、HttpResponseで返す
+        return HttpResponse('OK')
 
 ###########################
 # 関数 個人管理画面計算処理  #

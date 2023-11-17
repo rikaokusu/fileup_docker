@@ -761,56 +761,6 @@ common class
     background    : #90bee0;
     font-weight   : 500;
 }
-
-/******************************
-ユーザー編集画面
-*******************************/
-.btn-toolbar{
-    background-color: #e1e1e1;
-}
-.cancel::after {
-    font-family: "Font Awesome 5 Free";
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-weight: 900;
-    content: '\f00d';
-    margin-left: 10px;
-    font-size: 16px;
-    right:5px;
-}
-
-.change::after {
-    font-family: "Font Awesome 5 Free";
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-weight: 900;
-    content: '\f2f1';
-    position: absolute;
-    margin-left: 12px;
-    margin-top: 5px;
-    font-size: 20px;
-}
-
-/***************************************************************************    table */
-.table th{
-    padding: 0.75rem;
-}
-.tr_head {
-    padding: 0.75rem;
-    width: 180px;
-    font-weight: 500;
-    background-color: #F2F2F2;
-}
 /*---------------
     prpgressbar
 ----------------*/
@@ -1050,7 +1000,73 @@ common class
     }
 
 
+/******************************
+ユーザー編集画面
+*******************************/
+.btn-toolbar{
+    background-color: #e1e1e1;
+}
+.cancel::after {
+    font-family: "Font Awesome 5 Free";
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-weight: 900;
+    content: '\f00d';
+    margin-left: 10px;
+    font-size: 16px;
+    right:5px;
+}
 
+.change::after {
+    font-family: "Font Awesome 5 Free";
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-weight: 900;
+    content: '\f2f1';
+    position: absolute;
+    margin-left: 12px;
+    margin-top: 5px;
+    font-size: 20px;
+}
+.userupdate-form{
+    margin-top:40px;
+}
+/* ユーザー編集画面＞アイコン*/
+.update-image-area .dropzone .dz-preview .dz-image {
+    border-radius: 50%;
+}
+#del_estimate_btn, #del_image_btn {
+    padding: 1px 6px;
+    font-size: 11px;
+    color: red;
+    border: 2px solid red;
+    font-weight: bold;
+    background-color: #fff;
+}
+/***************************************************************************    table */
+.update-table th{
+    padding: 0.75rem !important;
+}
+.tr_head {
+    padding: 0.75rem;
+    width: 180px;
+    font-weight: 500;
+    background-color: #F2F2F2;
+}
+.form-control {
+    font-size: 0.75rem;
+    border-radius: 0rem;
+}
 /*---------------------------------
 
 for Login Page
@@ -1504,7 +1520,6 @@ html,body{
     color: #a6a6a6;
 }
 
-
 /************************************************    メニュー部分　************/
 
 .lang-text{
@@ -1560,6 +1575,23 @@ ul.sample1 li{
     list-style-type:none;
 }
 
+/******  アイコン    ******/
+.user_icon_mini {
+    height: 35px;
+    width: 35px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    border-radius: 50%;
+    /* border: 1.5px solid #eee; */
+}
+.user_icon {
+    height: 50px;
+    width: 50px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    border-radius: 50%;
+    /* border: 1.5px solid #eee; */
+}
     /*---------------
     home
 ----------------*/
@@ -2150,8 +2182,8 @@ font-family: 'Font Awesome 5 Free';
         border-collapse: collapse !important;
         border-spacing: 0 !important;
         text-align: left !important;
-        padding: 0px 10px !important;
-        margin: 0% !important;
+        padding: 0px 10px;
+        margin: 0%;
     }
 
     .step1_url_end_date_bar,
