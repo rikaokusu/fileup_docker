@@ -99,6 +99,12 @@
 // -----------------------------------------
 //フォーム入力による認証ボタン制御 メールアドレスver
 // -----------------------------------------
+//ローディング
+function loadingView(flag) {
+    $('#loading-view').remove();
+    if (!flag) return;
+        $('<div id="loading-view" />').appendTo('body');
+}
 
 $(function () {
     $("#form_auth_mail").on('input', function () { //メールアドレスフォームに入力されたら動く処理
@@ -110,7 +116,9 @@ $(function () {
         var mail = $('#form_auth_mail').val()
     });
     $('#otp_button').on('click', function () {
-         var mail = $('#form_auth_mail').val()
+        // ローディング
+        loadingView(true);
+        var mail = $('#form_auth_mail').val()
         $.ajax({
             type: "POST",
             url: "{% url 'draganddrop:otp_send' %}",
@@ -126,6 +134,8 @@ $(function () {
                 toast.find('.toast-body').removeClass('alert-danger');//このクラスを付与して成功時の色を定義
                 toast.find('.toast-body').text(data["messages"]);//サーバ側から戻ってきたメッセージを表示
             });
+            // ローディング画像止める
+            loadingView(false);
             $('#result_toast').toast({ delay: 6000, animation: true }).toast('show'); //表示処理
 
         }).fail(function(data, jqXHR, textStatus, errorThrown){
@@ -135,6 +145,8 @@ $(function () {
                 toast.find('.toast-body').addClass('alert-danger');//このクラスを付与して成功時の色を定義
                 toast.find('.toast-body').text('処理中にエラーが発生しました。再度送信ボタンを押してください。');
             });
+            // ローディング画像止める
+            loadingView(false);
             $('#result_toast').toast({ delay: 6000, animation: true }).toast('show'); //表示処理
         });
     });

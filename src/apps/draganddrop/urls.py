@@ -35,6 +35,8 @@ urlpatterns = [
      # 一括ダウンロード
      path('file_download_zip/<int:pk>/', file_download.FileDownloadZipView.as_view(), name='file_download_zip'),
      path('url_file_download_zip/<int:pk>/', file_download.UrlFileDownloadZipView.as_view(), name='url_file_download_zip'),
+     path('otp_file_download_zip/<int:pk>/', file_download.OTPFileDownloadZipView.as_view(), name='otp_file_download_zip'),
+
      # ファイルダウンロード時にテーブルを更新する処理
      path('filedownloadstatus/', file_download.FileDownloadStatus.as_view(), name='filedownloadstatus'),
      path('url_file_download_status/', file_download.UrlFileDownloadStatus.as_view(), name='url_file_download_status'),

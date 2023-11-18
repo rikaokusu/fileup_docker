@@ -34,33 +34,33 @@
 			</td>
 			<td class="url_dl_file">
 				{% for file in otp_upload_manage.file.all %}
-				{% if otp_dest_user_data.otp_download_table.all|otp_dl_count:file.id >= otp_dest_user_data.otp_upload_manage.dl_limit %}
-				<span class="past_file file_name" data-toggle="tooltip" data-otp_downloadtable_id="{{ otpdownloadtable.id }}"
-					data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i></span><br>
-				<hr class="file_name_border">
-				{% else %}
-				<a href="{{ file.upload.url }}" id="{{ file.id }}" class="file_name urldownloadtable" download="{{ file.name }}"
-					data-toggle="tooltip" data-otp_downloadtable_id="{{ otp_dest_user_data.id }}" data-placement="right"
-					title="{{ file.name }}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i>
-					
-					{% if extention == ".pptx" or extention == ".docx" or extention == ".xlsx" or extention == ".doc" or extention == ".xls" or extention == ".ppt" %}
-					<a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.pdffilemodel.upload.url }}"></a>
-			
-					{% elif extention == ".pdf" %}
-					<a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"></a>
-			
-					{% elif extention == ".jpg" or extention == ".png" or extention == ".gif" %}
-					<a class="iframe" href="{{ file.upload.url }}"></a>
-			
-					{% elif extention == ".txt" %}
-					<a class="iframe" href="{{ file.pdffilemodel.upload.url }}"></a>
-			
-					{%endif%}
-					<br>
-				</a>
-				<hr class="file_name_border">
+                    {% if otp_dest_user_data.otp_download_table.all|otp_dl_count:file.id >= otp_dest_user_data.otp_upload_manage.dl_limit %}
+                    <span class="past_file file_name" data-toggle="tooltip" data-otp_downloadtable_id="{{ otpdownloadtable.id }}"
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i></span><br>
+                    <hr class="file_name_border">
+                    {% else %}
+                    <a href="{{ file.upload.url }}" id="{{ file.id }}" class="file_name urldownloadtable" download="{{ file.name }}"
+                        data-toggle="tooltip" data-otp_downloadtable_id="{{ otp_dest_user_data.id }}" data-placement="right"
+                        title="{{ file.name }}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i>
+                        
+                        {% if extention == ".pptx" or extention == ".docx" or extention == ".xlsx" or extention == ".doc" or extention == ".xls" or extention == ".ppt" %}
+                        <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.pdffilemodel.upload.url }}"></a>
+                
+                        {% elif extention == ".pdf" %}
+                        <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"></a>
+                
+                        {% elif extention == ".jpg" or extention == ".png" or extention == ".gif" %}
+                        <a class="iframe" href="{{ file.upload.url }}"></a>
+                
+                        {% elif extention == ".txt" %}
+                        <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"></a>
+                
+                        {% endif %}
+                        <br>
+                    </a>
+                    <hr class="file_name_border">
 
-				{%endif%}
+                    {% endif %}
 				{% endfor %}
 				<!----------------- Zipファイル ----------------->
 				<div>
@@ -121,12 +121,12 @@
 		var file_id = $(this).attr('id');
 		console.log(file_id)
 
-		var url_downloadtable_id = $(this).data('url_downloadtable_id');
+		var otp_downloadtable_id = $(this).data('otp_downloadtable_id');
 
 		// 送信データとして保存
 		var data = {
 			'file_id': file_id,
-			'otp_downloadtable_id': url_downloadtable_id,
+			'otp_downloadtable_id': otp_downloadtable_id,
 			'is_type': is_type
 		};
 
@@ -154,11 +154,11 @@
 
 		var is_type = "multiple"
 		var file_id = $(this).attr('id');
-		var url_downloadtable_id = $(this).data('url_downloadtable_id');
+		var otp_downloadtable_id = $(this).data('otp_downloadtable_id');
 
 		// 送信データとして保存
 		var data = {
-			'url_downloadtable_id': url_downloadtable_id,
+			'otp_downloadtable_id': otp_downloadtable_id,
 			'is_type': is_type
 		};
 
@@ -170,8 +170,8 @@
 			success: function (data) {
 				if (data.status == 'ok') {
 
-					// url_file_download_zip(=一括(Zip)ダウンロード機能)にアクセス
-					window.location.href = '/otp_file_download_zip/' + url_downloadtable_id + '/';
+					// otp_file_download_zip(=一括(Zip)ダウンロード機能)にアクセス
+					window.location.href = '/otp_file_download_zip/' + otp_downloadtable_id + '/';
 
 					setTimeout(function(){
 						window.location.reload();
