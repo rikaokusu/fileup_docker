@@ -47,6 +47,7 @@
     .container {
         width: 1336px;
         max-width: 1366px;
+        min-width: 900px;
         margin-right: auto;
         margin-left: auto;
         padding-bottom: 16px;
@@ -2824,4 +2825,39 @@ DatePicker
     left : 5%;/* 吹き出し口の横位置 */
     content: "";/* コンテンツの挿入 */
     position: absolute;/* 親要素を基準 */
+}
+
+
+
+
+/*************************************************
+    操作ログ
+*************************************************/
+.log-container{
+    width: 100%;
+    margin:0 auto;
+}
+.log-title{
+    width:100%;
+    height:50px;
+    background-color: #005392;
+    color:#fff;
+    margin-top:20px;
+}
+
+.log-title p{
+    font-size: 21px;
+    line-height:50px;
+    margin: 0 auto;
+    margin-left: 10px;
+}
+
+.log-table{
+    width:95%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.log-table tr{
+    line-height: 35px;
 }

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views.home import send_table, download_table, home_common, file_download, url_access, otp_access
-from .views.admin import admin_personal, admin_company
+from .views.admin import admin_personal, admin_company,log
 from .views.recipient import address, group
 from .views.upload import upload, url_share, duplicate, upload_common, otp_upload
 from django.contrib.auth import views as auth_views
@@ -194,5 +194,8 @@ urlpatterns = [
      ## admin_personal.py 個人のリソース管理 ##
      path('personal_resource_management/', admin_personal.PersonalResourceManagementView.as_view(), name='personal_resource_management'),
 
-
+     ##################################
+     # 操作ログ  
+     ##################################
+     path('log/', log.LogView.as_view(), name='log'),
 ]
