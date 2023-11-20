@@ -261,17 +261,15 @@ class UserUpdateInfoView(LoginRequiredMixin, UpdateView, CommonView):
         print( 'せるふりくえすとせっしょん',self.request.session)
         print( 'おーるどでーた',old_data)
         if old_data.image:
-            old_image = File.objects.filter(pk=old_data.image.id).first()
+            old_image = File.objects.filter(pk=old_data.image.id)
             print('オールドあります',old_image)
         
         if 'up_file_id' in self.request.session:
             print( 'ゆーざーいめーじ２２２２２２２',type(self.request.session['up_file_id']))
-            # up_file_id = int(self.request.session['up_file_id'])
-            # user.image = File.objects.get(id=up_file_id)
             user.image = File.objects.filter(id=self.request.session['up_file_id']).first()
-            # if old_image:
-            #     old_image.delete()
-
+            if old_image:
+                print('おーるどいめーじあるよ！！！！！！！！！！',old_image)
+                # old_image.delete()
         user.save()
         
         return redirect('draganddrop:home')
