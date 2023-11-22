@@ -45,7 +45,7 @@
     }
 
     .container {
-        width: 1336px;
+        /* width: 1336px; */
         max-width: 1366px;
         min-width: 900px;
         margin-right: auto;
@@ -2864,4 +2864,19 @@ DatePicker
 
 .log-table td{
     border: solid 2px #fff;
+}
+.log-filename{
+    margin: 0;
+    line-height:20px;
+}
+
+/* 操作ログナンバー */
+.log-table{
+    counter-reset: rowCount;
+}
+.log-table > tbody > tr{
+    counter-increment: rowCount;
+}
+.log-table > tbody > tr > td:first-child::before {
+    content: counter(rowCount);
 }

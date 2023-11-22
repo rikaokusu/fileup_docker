@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address
+from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
 # Register your models here.
 
 
@@ -30,6 +30,10 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = ('company_name', 'last_name','first_name', 'email',)
     list_display_links = ('company_name', 'last_name','first_name', 'email',)
 
+class OperationLogAdmin(admin.ModelAdmin):
+    list_display = ('id','operation_user', 'operation',)#表示したいやつ
+    list_display_links = ('id',)#クリックして変更したい時に
+
 admin.site.register(Filemodel)
 admin.site.register(UploadManage, UploadManageAdmin)
 admin.site.register(PDFfilemodel)
@@ -40,3 +44,4 @@ admin.site.register(UrlUploadManage)
 admin.site.register(UrlDownloadtable)
 admin.site.register(UrlDownloadFiletable)
 admin.site.register(Address)
+admin.site.register(OperationLog)

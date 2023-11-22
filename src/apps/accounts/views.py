@@ -42,7 +42,7 @@ from django.http import JsonResponse
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from lib.my_utils import check_session
+# from lib.my_utils import check_session
 
 
 # 逆参照のテーブルをフィルタやソートする

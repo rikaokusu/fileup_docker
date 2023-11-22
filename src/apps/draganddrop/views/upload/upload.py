@@ -13,7 +13,7 @@ import os
 from django.conf import settings
 import threading
 #操作ログ関数
-from draganddrop.views.admin.log import add_log
+from lib.my_utils import add_log
 
 ###########################
 # アップロード機能  #
@@ -304,6 +304,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
     template_name = "draganddrop/upload/step2_update.html"
     form_class = DistFileUploadForm
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -327,11 +328,13 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         self.del_file = request.POST.getlist('del_file')
         return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        print('updalods_2のform_valid')
+    def form_valid(self, form,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-
+        destusers = upload_manage.dest_user.all()
+        print('あっぷろーどまねーじ送信先リスト来てます＝＝＝',destusers)
         # ファイルの削除
         if self.del_file:
             del_file_pk = self.del_file
@@ -420,6 +423,8 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                         htmlfile.save()
 
         upload_manage.save()
+        # 操作ログ
+        add_log(2,2,current_user,files,destusers,0,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2', kwargs={'pk': upload_manage.id}))
 

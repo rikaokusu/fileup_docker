@@ -11,7 +11,6 @@
             操作ログ一覧
         </p>
     </div>
-    {{ logsfirst }}
     <table class="table table-striped log-table">
         <thead>
             <tr>
@@ -19,25 +18,37 @@
                 <th scope="col">操作日時</th>
                 <th scope="col">操作した人</th>
                 <th scope="col" style="min-width:170px;">操作したIPアドレス</th>
-                <th scope="col" style="min-width:85px;">カテゴリ</th>
-                <th scope="col" style="min-width:85px;">操作種別</th>
+                <th scope="col" style="min-width:120px;">カテゴリ</th>
+                <th scope="col" style="min-width:95px;">操作種別</th>
                 <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
                 <th scope="col">対象ファイル名</th>
-                <th scope="col" style="min-width:85px;">共有種別</th>
+                <th scope="col" style="min-width:155px;">共有種別</th>
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
             <tr>
-                <th scope="row">1</th>
+                <td></td><!--counter-->
                 <td>{{ log.created_date }}</td>
                 <td>{{ log.operation_user }}</td>
                 <td>{{ log.client_addr }}</td>
-                <td>{{ log.category }}</td>
-                <td>{{ log.operation }}</td>
-                <td>あとで</td>
-                <td>{{ log.log_filename }}</td>
-                <td>{{ log.upload_category }}</td>
+                <td>{{ log.get_category_display }}</td>
+                <td>{{ log.get_operation_display }}</td>
+                <td>
+                    {% for log_destuser in log_destusers %}
+                        {{ log_destuser }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for log_file in log_files %}
+                        {% if log_file.log == log %}
+                            <p class="log-filename">
+                                {{ log_file.file.name }}<br>
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ log.get_upload_category_display }}</td>
             </tr>
             {% endfor %}
         </tbody>

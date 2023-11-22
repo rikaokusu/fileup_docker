@@ -149,11 +149,11 @@ class DownloadFiletable(models.Model):
     dl_count = models.IntegerField(default=0)
 
 
-class logtable(models.Model):
-    user = models.CharField(max_length=245, blank=True, null=True)
-    date = models.DateTimeField(default=timezone.now)
-    file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
-    text = models.CharField(max_length=140)
+# class logtable(models.Model):
+#     user = models.CharField(max_length=245, blank=True, null=True)
+#     date = models.DateTimeField(default=timezone.now)
+#     file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
+#     text = models.CharField(max_length=140)
 
 
 class UrlUploadManage(models.Model):
@@ -352,7 +352,7 @@ class OperationLog(models.Model):
     # 操作日時
     created_date = models.DateTimeField(_('作成日時'), default=timezone.now, blank=True)
     # 操作した人
-    operation_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='operation_user')
+    operation_user = models.CharField(_('操作した人'), max_length=64, null=True) 
     # 操作したIPアドレス
     client_addr = models.CharField(_('IPアドレス'), max_length=64, null=True) #1
     # カテゴリ
@@ -360,9 +360,25 @@ class OperationLog(models.Model):
     # 操作種別
     operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
     # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
-    # destination_address=(null=true)
+    destination_address=models.CharField(_('宛先メールアドレス'),max_length=64, null=True)
     # ファイルタイトル
-    # 対象ファイル名
-    log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+
+    # # 対象ファイル名
+    # log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
     # 共有種別（通常、URL,OTP）
     upload_category = models.IntegerField(_('共有種別'), default='0', choices=UPLOAD_LOG_CATEGORY)
+
+# 操作ログ用のファイルテーブル
+class LogFile(models.Model):
+    # 操作ログ紐づけ
+    log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # 対象ファイル名
+    file = models.OneToOneField(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+
+# 操作ログ用の宛先メールテーブル
+class LogDestUser(models.Model):
+    # 操作ログ紐づけ
+    log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_destuser', null=True)
+    # ???
+    log_dest_user = models.OneToOneField(Address, on_delete=models.CASCADE, related_name='log_filename', null=True)
+

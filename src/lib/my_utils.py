@@ -2,7 +2,7 @@ from accounts.models import User
 from datetime import datetime,timezone
 from django.contrib import messages
 from django.shortcuts import redirect
-from draganddrop.models import OperationLog
+from draganddrop.models import OperationLog,LogFile,LogDestUser
 
 
 import logging
@@ -54,7 +54,7 @@ def check_session(self, request, instance):
             # 保存
             instance.save()
 
-def add_log(operation, category, op_user,log_filename,upload_category, client_addr):
+def add_log(category, operation, op_user,files,destusers,upload_category, client_addr):
 
     logger.debug("operation")
     logger.debug(operation)
@@ -70,7 +70,19 @@ def add_log(operation, category, op_user,log_filename,upload_category, client_ad
         operation_user = op_user,
         category = category,
         operation = operation,
-        log_filename = log_filename,
+        # log_filename = log_filename,
         upload_category = upload_category,
         client_addr = client_addr,
     )
+
+    for file in files:
+        LogFile.objects.create(
+            log = operation_log_obj,
+            file = file,
+        )
+
+    for destuser in destusers:
+        LogDestUser.objects.create(
+            log = operation_log_obj,
+            log_dest_user = destuser,
+        )
