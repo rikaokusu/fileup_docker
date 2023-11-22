@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
-from accounts.models import User, Service, Company
+from accounts.models import User, Service, Company,FileupPermissions
 from contracts.models import Contract, Plan
 import uuid
 from datetime import date
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 import os
 
@@ -322,3 +323,46 @@ class Plan(models.Model):
     usable_capacity = models.IntegerField('使用可能容量', blank=True, default=0)
     sharing_url = models.BooleanField('URL共有可否',default=False, blank=True)
     download_expiration = models.IntegerField('ダウンロード期限', blank=True, null=True)
+
+##############  操作ログ
+class OperationLog(models.Model):
+    OPERATION_LOG_CATEGORY = (
+    (0, 'なし'),
+    (1, 'ログイン'),
+    (2, 'ファイル共有'),
+    (3, 'アドレス帳'),
+    (4, 'ユーザー権限'),
+    (5, '組織設定'),
+    )
+    OPERATION_LOG_OPERATION = (
+    (0, 'なし'),
+    (1, 'ログイン'),
+    (2, '作成'),
+    (3, '変更'),
+    (4, '削除'),
+    (5, '登録'),
+    )
+    UPLOAD_LOG_CATEGORY = (
+    (0,'通常アップロード'),
+    (1,'URL共有'),
+    (2,'OTP共有'),
+    )
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # 操作日時
+    created_date = models.DateTimeField(_('作成日時'), default=timezone.now, blank=True)
+    # 操作した人
+    operation_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='operation_user')
+    # 操作したIPアドレス
+    client_addr = models.CharField(_('IPアドレス'), max_length=64, null=True) #1
+    # カテゴリ
+    category = models.IntegerField(_('カテゴリ'), default='0', choices=OPERATION_LOG_CATEGORY)
+    # 操作種別
+    operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
+    # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
+    # destination_address=(null=true)
+    # ファイルタイトル
+    # 対象ファイル名
+    log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # 共有種別（通常、URL,OTP）
+    upload_category = models.IntegerField(_('共有種別'), default='0', choices=UPLOAD_LOG_CATEGORY)

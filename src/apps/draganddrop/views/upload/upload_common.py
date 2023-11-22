@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import View
+from draganddrop.views.home.home_common import CommonView
 from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from accounts.models import User
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
 from django.http import JsonResponse
 import json
@@ -14,12 +16,18 @@ from django.conf import settings
 from rest_framework import status
 # 全てで実行させるView
 from django.core.signing import TimestampSigner, dumps, SignatureExpired
+# from lib.my_utils import add_log
 
 ################################################
 # ファイルアップロード直後にFilemodelオブジェクト作成 #
 ################################################
-class FileUpload(View):
+class FileUpload(View, CommonView):
+
     def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
+        context["current_user"] = current_user
+        
         print('FileUploadにはいった')
         up_file_id = []
         up_file_name = []
@@ -46,6 +54,9 @@ class FileUpload(View):
         up_file_id_json = json.dumps(up_file_id)
         self.request.session['up_file_id'] = up_file_id_json
         self.request.session['up_file_name'] = up_file_name
+        
+        # 操作ログの登録(登録#2 口座情報#5)
+        # add_log("2", "2", current_user,"file-nameが入ります","1", self.request.META.get('REMOTE_ADDR'))
 
         # 何も返したくない場合、HttpResponseで返す
         return HttpResponse("OK")

@@ -12,6 +12,8 @@ import urllib.parse
 import os
 from django.conf import settings
 import threading
+#操作ログ関数
+from draganddrop.views.admin.log import add_log
 
 ###########################
 # アップロード機能  #

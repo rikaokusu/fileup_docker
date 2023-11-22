@@ -11,8 +11,38 @@
             操作ログ一覧
         </p>
     </div>
-    
+    {{ logsfirst }}
     <table class="table table-striped log-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">操作日時</th>
+                <th scope="col">操作した人</th>
+                <th scope="col" style="min-width:170px;">操作したIPアドレス</th>
+                <th scope="col" style="min-width:85px;">カテゴリ</th>
+                <th scope="col" style="min-width:85px;">操作種別</th>
+                <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
+                <th scope="col">対象ファイル名</th>
+                <th scope="col" style="min-width:85px;">共有種別</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <th scope="row">1</th>
+                <td>{{ log.created_date }}</td>
+                <td>{{ log.operation_user }}</td>
+                <td>{{ log.client_addr }}</td>
+                <td>{{ log.category }}</td>
+                <td>{{ log.operation }}</td>
+                <td>あとで</td>
+                <td>{{ log.log_filename }}</td>
+                <td>{{ log.upload_category }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+    {% comment %} <table class="table table-striped log-table">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -53,7 +83,6 @@
                 <td>"ユーザー名"が"共有名"のファイル"xxx"を削除しました。</td>
             </tr>
         </tbody>
-    </table>
+    </table> {% endcomment %}
 </div>
-
 {% endblock %}

@@ -2853,11 +2853,15 @@ DatePicker
 }
 
 .log-table{
-    width:95%;
+    width:100%;
     margin: 0 auto;
     margin-top: 20px;
 }
 
 .log-table tr{
     line-height: 35px;
+}
+
+.log-table td{
+    border: solid 2px #fff;
 }
