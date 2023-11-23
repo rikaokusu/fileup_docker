@@ -160,7 +160,7 @@ def total_data_usage(object, company, user, download_table, download_file_table,
             personal_resource_manage.save()
         else:
             date = datetime.datetime.now()
-            
+
             personal_resource_manage.company = company
             personal_resource_manage.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(created_user=user, file_del_flag=0, end_date__gt=date).all().count()
             personal_resource_manage.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(created_user=user, file_del_flag=1) | Q(created_user=user, end_date__lt=date)).all().count() 
@@ -345,9 +345,3 @@ def resource_management_calculation_process(company):
     resource_manage.save()
 
     return resource_management_calculation_process
-
-
-
-
-
-

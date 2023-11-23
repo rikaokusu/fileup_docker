@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, OTPUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User
 import datetime
 from django.db.models import Q
@@ -28,16 +28,22 @@ class PersonalResourceManagementView(TemplateView):
                 personal_resource_management.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(created_user=self.request.user.id, file_del_flag=1) | Q(created_user=self.request.user.id, end_date__lt=date)).all().count() 
                 personal_resource_management.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(created_user=self.request.user.id, file_del_flag=0, end_date__gt=date).all().count()
                 personal_resource_management.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(created_user=self.request.user.id, file_del_flag=1) | Q(created_user=self.request.user.id, end_date__lt=date)).all().count() 
+                personal_resource_management.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(created_user=self.request.user.id, file_del_flag=0, end_date__gt=date).all().count()
+                personal_resource_management.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(created_user=self.request.user.id, file_del_flag=1) | Q(created_user=self.request.user.id, end_date__lt=date)).all().count() 
                 
                 # レコード総件数とデータ使用量計算
                 personal_resource_management.total_record_size = (personal_resource_management.number_of_active_upload_manage 
                 + personal_resource_management.number_of_deactive_upload_manage 
                 + personal_resource_management.number_of_active_url_upload_manage 
-                + personal_resource_management.number_of_deactive_url_upload_manage 
+                + personal_resource_management.number_of_deactive_url_upload_manage
+                + personal_resource_management.number_of_active_otp_upload_manage 
+                + personal_resource_management.number_of_deactive_otp_upload_manage 
                 + personal_resource_management.number_of_download_table 
                 + personal_resource_management.number_of_download_file_table
                 + personal_resource_management.number_of_url_download_table
-                + personal_resource_management.number_of_url_download_file_table) * settings.DEFAULT_RECORD_SIZE
+                + personal_resource_management.number_of_url_download_file_table
+                + personal_resource_management.number_of_otp_download_table
+                + personal_resource_management.number_of_otp_download_file_table) * settings.DEFAULT_RECORD_SIZE
                 
                 personal_resource_management.total_data_usage = personal_resource_management.total_record_size + personal_resource_management.total_file_size
                 personal_resource_management.save()
@@ -50,6 +56,11 @@ class PersonalResourceManagementView(TemplateView):
             # URL共有総件数
             total_url_upload_manage = personal_resource_management.number_of_active_url_upload_manage + personal_resource_management.number_of_deactive_url_upload_manage + personal_resource_management.number_of_removed_url_upload_manage
             context["total_url_upload_manage"] = total_url_upload_manage if total_url_upload_manage < 9999 else ("9,999+")
+
+             # OTP総件数
+            total_otp_upload_manage = personal_resource_management.number_of_active_otp_upload_manage + personal_resource_management.number_of_deactive_otp_upload_manage + personal_resource_management.number_of_removed_otp_upload_manage
+            context["total_otp_upload_manage"] = total_otp_upload_manage if total_otp_upload_manage < 9999 else ("9,999+")
+
 
             units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")
 

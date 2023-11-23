@@ -68,7 +68,8 @@ class FileupDetail(models.Model):
     max_items = models.IntegerField('件数上限', null=True, blank=True)
     # ワンタイムパスワード設定
     one_time_pw = models.BooleanField('ワンタイムパスワード設定可否', null=True, blank=True)
-
+    # 一回の共有に対する最大ファイル容量(MBで計算　1024=1GB)
+    maxsize_every_share = models.IntegerField('1共有毎の最大ファイル容量', null=True, blank=True)
 """
 契約テーブル
 """

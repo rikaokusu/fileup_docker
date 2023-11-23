@@ -87,12 +87,12 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<p>ユーザー数上限:</p> 
+			<p>登録ユーザー数(上限):</p> 
 			<p class="ml-2" style="color: #005392;">
 				{% if resource_detail.user_limit == NULL %}
-					無制限
+                    {{number_of_user}}人 (無制限)
 				{% else %}
-					{{ resource_detail.user_limit }} 人
+					{{number_of_user}}人 ({{ resource_detail.user_limit }} 人)
 				{% endif %}
 			</p>
 		</div>
@@ -123,7 +123,11 @@
 		<div class="d-flex">
 			<p>最大ファイルサイズ:</p> 
 			<p class="ml-2" style="color: #005392;">
-				
+				{% if max_size_every_share_GB %}
+                    {{ max_size_every_share_GB }}GB
+                {% else %}
+                    {{ max_size_every_share }}MB
+                {% endif %}
 			</p>
 		</div>
 		<div class="d-flex">
@@ -177,13 +181,13 @@
 <!--データ使用量詳細-->
 <div class="box2_resource_management">
 
-	<div class="box3_resource_management mr-4">
+	{% comment %} <div class="box3_resource_management mr-4">
 		<div>登録ユーザー数</div>
 		<div class="d-flex justify-content-center">
 			<div class="box3_resource_management_value">{{number_of_user}}</div>
-			<div class="box3_resource_management_unit">/50</div>
+			<div class="box3_resource_management_unit">/{{ resource_detail.user_limit }}</div>
 		</div>
-	</div>
+	</div> {% endcomment %}
 
 	<div class="box3_resource_management mr-4">
 		<div>アップロード件数</div>
@@ -201,6 +205,15 @@
 			<div class="box3_resource_management_unit">件</div>
 		</div>
 		<div>(無効:{{resource_management.number_of_deactive_url_upload_manage}} 削除済:{{resource_management.number_of_removed_url_upload_manage}} 総数:{{total_url_upload_manage}})</div>
+	</div>
+    
+    <div class="box3_resource_management mr-4">
+		<div>OTP共有件数</div>
+		<div class="d-flex justify-content-center">
+			<div class="box3_resource_management_value">{{resource_management.number_of_active_otp_upload_manage}}</div>
+			<div class="box3_resource_management_unit">件</div>
+		</div>
+		<div>(無効:{{resource_management.number_of_deactive_otp_upload_manage}} 削除済:{{resource_management.number_of_removed_otp_upload_manage}} 総数:{{total_otp_upload_manage}})</div>
 	</div>
 
 	<div class="box3_resource_management">
