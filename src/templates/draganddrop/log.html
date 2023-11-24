@@ -21,6 +21,7 @@
                 <th scope="col" style="min-width:120px;">カテゴリ</th>
                 <th scope="col" style="min-width:95px;">操作種別</th>
                 <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
+                <th scope="col" style="min-width:200px;">タイトル</th>
                 <th scope="col">対象ファイル名</th>
                 <th scope="col" style="min-width:155px;">共有種別</th>
             </tr>
@@ -35,9 +36,18 @@
                 <td>{{ log.get_category_display }}</td>
                 <td>{{ log.get_operation_display }}</td>
                 <td>
-                    {% for log_destuser in log_destusers %}
-                        {{ log_destuser }}
-                    {% endfor %}
+                    {% comment %} {% for log_destuser in log_destusers %}
+                        {% if log_destuser.log == log %}
+                            {{ log_destuser.log_dest_user.email }}
+                        {% endif %}
+                    {% endfor %} {% endcomment %}
+                    {% comment %} {% for mail in log.destination_address%}
+                        {{ log.destination_address }}
+                    {% endfor %} {% endcomment %}
+                    {{ log.destination_address }}
+                </td>
+                <td>
+                    {{ log.file_title }}
                 </td>
                 <td>
                     {% for log_file in log_files %}

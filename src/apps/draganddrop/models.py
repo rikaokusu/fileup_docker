@@ -360,9 +360,9 @@ class OperationLog(models.Model):
     # 操作種別
     operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
     # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
-    destination_address=models.CharField(_('宛先メールアドレス'),max_length=64, null=True)
+    destination_address=models.CharField(_('宛先メールアドレス'),max_length=999, null=True)
     # ファイルタイトル
-
+    file_title = models.CharField(_(')ファイルタイトル'),max_length=64,null=True)
     # # 対象ファイル名
     # log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
     # 共有種別（通常、URL,OTP）
@@ -380,5 +380,5 @@ class LogDestUser(models.Model):
     # 操作ログ紐づけ
     log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_destuser', null=True)
     # ???
-    log_dest_user = models.OneToOneField(Address, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    log_dest_user = models.OneToOneField(Address, on_delete=models.CASCADE, related_name='log_destuser', null=True)
 

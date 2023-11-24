@@ -333,8 +333,18 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         current_user = self.request.user
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-        destusers = upload_manage.dest_user.all()
-        print('あっぷろーどまねーじ送信先リスト来てます＝＝＝',destusers)
+        # 操作ログ用
+        # 宛先メールアドレス
+        dest_mails = [upload_manage.dest_user_mail1,upload_manage.dest_user_mail2,upload_manage.dest_user_mail3,upload_manage.dest_user_mail4,upload_manage.dest_user_mail5,upload_manage.dest_user_mail6,upload_manage.dest_user_mail7,upload_manage.dest_user_mail8]
+        # 宛先メールアドレスNoneのやつを省く
+        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
+        # 宛先メールアドレス('')を省くため文字列に変換
+        dest_mail_log = ' '.join(dest_mail_ok)
+        print(dest_mail_log,"かっこけしたい")
+        # ファイルタイトル
+        file_title = upload_manage.title
+        # 操作ログ終わり
+
         # ファイルの削除
         if self.del_file:
             del_file_pk = self.del_file
@@ -424,7 +434,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
         upload_manage.save()
         # 操作ログ
-        add_log(2,2,current_user,files,destusers,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,2,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2', kwargs={'pk': upload_manage.id}))
 

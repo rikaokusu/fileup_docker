@@ -54,7 +54,7 @@ def check_session(self, request, instance):
             # 保存
             instance.save()
 
-def add_log(category, operation, op_user,files,destusers,upload_category, client_addr):
+def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_category, client_addr):
 
     logger.debug("operation")
     logger.debug(operation)
@@ -70,7 +70,9 @@ def add_log(category, operation, op_user,files,destusers,upload_category, client
         operation_user = op_user,
         category = category,
         operation = operation,
+        file_title = file_title,
         # log_filename = log_filename,
+        destination_address = dest_mail_log,
         upload_category = upload_category,
         client_addr = client_addr,
     )
@@ -81,8 +83,8 @@ def add_log(category, operation, op_user,files,destusers,upload_category, client
             file = file,
         )
 
-    for destuser in destusers:
-        LogDestUser.objects.create(
-            log = operation_log_obj,
-            log_dest_user = destuser,
-        )
+    # for destuser in destusers:
+    #     LogDestUser.objects.create(
+    #         log = operation_log_obj,
+    #         log_dest_user = destuser,
+    #     )
