@@ -322,3 +322,112 @@ class Plan(models.Model):
     usable_capacity = models.IntegerField('使用可能容量', blank=True, default=0)
     sharing_url = models.BooleanField('URL共有可否',default=False, blank=True)
     download_expiration = models.IntegerField('ダウンロード期限', blank=True, null=True)
+
+
+"""
+承認ワークフロー 基本設定
+"""
+
+IS_APPROVA_WORKFLOW = (
+    (1, '使用する'),
+    (2, '使用しない'),
+)
+
+APPROVAL_FORMAT = (
+    (1, '１人が承認すれば次の承認者に進む'),
+    (2, '全員が承認すると次の承認者に進む'),
+)
+
+class ApprovalWorkflow(models.Model):
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # 登録ユーザー
+    reg_user = models.CharField('登録ユーザー', max_length=255, blank=True, null=True)
+    # 会社
+    reg_user_company = models.CharField('会社', max_length=255, blank=True, null=True)
+    # 登録日
+    registration_date = models.DateTimeField('登録日', default=timezone.now)
+    # 承認ワークフロー
+    is_approval_workflow = models.IntegerField(
+        verbose_name='承認ワークフロー', default=0, null=True, blank=True, choices=IS_APPROVA_WORKFLOW)
+    # 承認形式
+    approval_format = models.IntegerField(
+        verbose_name='承認形式', default=0, null=True, blank=True, choices=APPROVAL_FORMAT)
+
+
+"""
+一次承認者(自作中間テーブル)
+"""
+class FirstApproverRelation(models.Model):
+    # 会社のID
+    company_id = models.CharField(max_length=500, verbose_name="会社のID", null=True, blank=True)
+
+    # 一次承認者
+    first_approver = models.CharField(max_length=500, verbose_name="一次承認者", null=True, blank=True)
+
+
+"""
+二次承認者(自作中間テーブル)
+"""
+class SecondApproverRelation(models.Model):
+    # 会社のID
+    company_id = models.CharField(max_length=500, verbose_name="会社のID", null=True, blank=True)
+
+    # 二次承認者
+    second_approver = models.CharField(max_length=500, verbose_name="二次承認者", null=True, blank=True)
+
+
+OPERATION_CONTENT = (
+    (1, '承認ワークフロー変更'),
+    (2, '承認形式変更'),
+    (3, '一次承認者変更'),
+    (4, '二次承認者変更'),
+)
+
+"""
+操作履歴
+"""
+class ApprovalOperationLog(models.Model):
+    # 操作ユーザー
+    operation_user = models.CharField('操作ユーザー', max_length=255, blank=True, null=True)
+    # 操作ユーザーの会社のID
+    operation_user_company_id = models.CharField(max_length=500, verbose_name="操作ユーザーの会社のID", null=True, blank=True)
+    # 操作日時
+    operation_date = models.DateTimeField('操作日時', default=timezone.now)
+    # 操作
+    operation_content = models.IntegerField(
+        verbose_name='操作', default=0, null=True, blank=True, choices=OPERATION_CONTENT)
+
+
+"""
+承認申請
+"""
+
+APPLICATION_STATUS_CHOICE = (
+    (1, '申請中'),
+    (2, '一次承認待ち'),
+    (3, '最終承認待ち'),
+    (4, '承認済み'),
+    (5, '差戻し'),
+    (6, 'キャンセル'),
+)
+
+class ApprovalManage(models.Model):
+    # ファイルアップロード
+    upload_mange = models.ForeignKey(UploadManage, on_delete=models.CASCADE, null=True, related_name='upload_mange')
+    # 申請件名
+    application_title = models.CharField('申請件名', max_length=500, blank=True, null=True)
+    # 申請ユーザー
+    application_user = models.CharField('申請ユーザー', max_length=255, blank=True, null=True)
+    # 申請日時
+    application_date = models.DateTimeField('申請日時', default=timezone.now)
+    # 申請ユーザーの会社のID
+    application_user_company_id = models.CharField('申請ユーザーの会社のID', max_length=500, null=True, blank=True)
+    # 申請ステータス
+    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 一次承認者
+    first_approver = models.CharField('一次承認者', max_length=255, blank=True, null=True)
+    # 二次承認者
+    second_approver = models.CharField('二次承認者', max_length=255, blank=True, null=True)
+    # 承認日時
+    approval_date = models.DateTimeField('承認日時', default=timezone.now)

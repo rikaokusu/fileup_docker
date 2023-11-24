@@ -1,0 +1,390 @@
+{% extends "draganddrop/common//base.html" %}
+
+{% load is_past_due %}
+{% load dl_file_count %}
+{% load url_dl_file_count %}
+{% load dl_count %}
+{% load url_dl_count %}
+{% load get_extention %}
+{% load get_group_download_status %}
+{% load url_get_group_download_status %}
+{% load get_download_status %}
+{% load url_get_download_status %}
+{% load get_direct_users %}
+{% load url_get_direct_users %}
+{% load get_display_name %}
+{% load mathfilters %}
+
+{% block content %}
+
+<style>
+	/*---------------------------------
+
+    テーブル全体
+
+    ---------------------------------*/
+    /* テーブル */
+    .table {
+        width: 100%;
+        table-layout: fixed;/* 固定レイアウト */
+    }
+
+    .table th,td{
+        border-color: #fff !important;
+        border: 2px solid #fff;
+    }
+
+    /* テーブル */
+    .table thead th{
+        vertical-align: middle;
+    }
+
+    /* モーダル内のテーブル */
+    .table_modal {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .table_modal td {
+        border: 2px solid #ccc;
+		height: 50px;
+		width: 170px;
+    }
+
+    /* ボーダー */
+    hr.style-one {
+        border: 0;
+        height: 1px;
+        background: #494949;
+    }
+
+    .border_tite {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .border_tite::after {
+        content: "";
+        flex-grow: 1;
+        height: 1px;
+        background: #494949;
+        display: block;
+    }
+
+    .border_tite::after {
+        margin-left: 15px;
+    }
+
+    /* 見出しセルの色 */
+    .tr_head {
+        background-color: #e9ecef;
+        {% comment %} width: 125px; {% endcomment %}
+    }
+
+    /* 見出しセルの色 審査結果通知書 */
+    .results_notification_tr_head {
+        background-color: #f8f9fa;
+        width: 250px;
+    }
+
+    .title_label {
+        color: #595959;
+        font-size: 0.85rem;
+        margin-top: 3px;
+    }
+
+    .search_checkbox label {
+        width: 280px;
+        display: block;
+        float: left;
+    }
+
+    .search_checkbox label input {
+        margin-right: 0.5em;
+    }
+
+    .search_checkbox_lage label {
+        width: 417px;
+        display: block;
+        float: left;
+        margin-right: 25px;
+    }
+
+    .search_checkbox_small label input {
+        margin-right: 0.5em;
+    }
+
+    .search_checkbox_small label {
+        display: block;
+        float: left;
+        margin-right: 20px;
+    }
+
+    .font_color {
+        color: #158ae6;
+    }
+
+    /* 給付情報モーダルの備考 input */
+    .chg_bikou_input {
+        height: 100px;
+    }
+
+</style>
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar" >
+    <div class="top">
+        <div class="tate mr-4" style="height:74px;"></div>
+        <h1>申請内容</h1>
+    </div>
+</div>
+
+<div class="">
+
+    {% comment %} <div class="box1-3 d-flex bd-highlight mb-3">
+        <div class="mr-auto p-2 bd-highlight zyushin-title-bar">
+            <h2 class="m-0 zyushin-title">操作履歴一覧</h2>
+        </div>
+	</div> {% endcomment %}
+
+	{% comment %} <table id="myTable" class="display" style="width:100%">
+		<thead>
+			<tr>
+				<th>No</th>
+				<th>操作日時</th>
+				<th>ユーザー名</th>
+				<th>部署名</th>
+				<th>操作内容</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>2023/11/07 10:00</td>
+				<td>山田 太郎</td>
+				<td>総務部</td>
+				<td>
+					一次承認者を変更
+				</td>
+			</tr>
+
+			<tr>
+				<td>2</td>
+				<td>2023/11/08 10:00</td>
+				<td>小林 太郎</td>
+				<td>営業部</td>
+				<td>
+					上長承認機能を無効に変更
+				</td>
+			</tr>
+		</tbody>
+	</table> {% endcomment %}
+
+	<table class="table_modal">
+		<tbody>
+			<tr>
+				<td rowspan="6" class="tr_head">
+					申請概要
+				</td>
+
+				<tr>
+					<td class="tr_head">申請件名</td>
+					<td>業務管理向けファイルの共有</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">申請者</td>
+					<td>山田 太郎</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">申請日時</td>
+					<td>2023/11/07 10:00</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">コメント内容</td>
+					<td>テストコメントですテストコメントですテストコメントですテストコメントです</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">送付ファイル</td>
+					<td>ファイル1<br>
+						ファイル2
+					</td>
+				</tr>
+			</tr>
+
+			<tr>
+				<td rowspan="6" class="tr_head">
+					承認概要
+				</td>
+
+				<tr>
+					<td class="tr_head">ステータス</td>
+					<td>承認済み</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">承認者</td>
+					<td>山田 太郎</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">承認日時</td>
+					<td>2023/11/22 15:00</td>
+				</tr>
+
+				<tr>
+					<td class="tr_head">次の承認者</td>
+					<td>佐藤 勇作</td>
+				</tr>
+			</tr>
+
+			<!-- ステータス -->
+			{% comment %} <tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">ステータス</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox_small" id="personal_info_chg_jumin">
+						<span>承認済み</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- 申請件名 -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">申請件名</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox_small" id="personal_info_chg_jumin">
+						<span>業務管理向けファイルの共有</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- 申請者 -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">申請者</div>
+					</div>
+				</th>
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox" id="personal_info_chg_c_jumin_type">
+						<span>山田 太郎</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- 申請日時 -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">申請日時</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox" id="personal_info_chg_c_jumin_condition">
+						<span>2023/11/07 10:00</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- 承認日時 -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">承認日時</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox_small" id="personal_info_chg_kana1">
+						<span>2023/11/22 15:00</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- コメント内容 -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">コメント内容</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox_small" id="personal_info_chg_name">
+						<span>テストコメントですテストコメントですテストコメントですテストコメントです</span>
+					</div>
+				</th>
+			</tr>
+
+			<!-- 送付ファイル -->
+			<tr>
+				<th class="tr_head">
+					<div class="box">
+						<div class="label title_label">送付ファイル</div>
+					</div>
+				</th>
+
+				<th colspan="8" class="title_label">
+					<div class="search_checkbox" id="personal_info_chg_c_label">
+					</div>
+				</th>
+			</tr> {% endcomment %}
+		</tbody>
+	</table>
+</div>
+
+<!--戻るボタン-->
+<div class="d-flex flex-row mt-5 justify-content-center">
+    <a class="return_top_btn" href="{% url 'draganddrop:approval_workflow' %}"><i class="fa-solid fa-angle-left mr-2"></i>承認ワークフロー画面に戻る</a>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+
+{% comment %} <script>
+	$(document).ready(function(){
+		$("#target").DataTable({
+			"language":{//日本語化
+				url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
+			},
+			ordering:false,//並び替え
+			searching:false,//絞り込み検索
+			paging:false,//ページ送り（無効化すると表示件数も停止する）
+			lengthChange:false,//表示件数
+			info:false,//総件数
+		});//end datatables
+	});//end ready
+</script> {% endcomment %}
+
+<script>
+// -----------------
+// Data table
+// -----------------
+$(document).ready(function(){
+    $('#myTable').DataTable({
+        "language": {
+			url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

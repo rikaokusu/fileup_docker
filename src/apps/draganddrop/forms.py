@@ -1,6 +1,8 @@
 from django.forms import ModelForm
 from django import forms
 from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage
+from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
@@ -8,6 +10,10 @@ from django.contrib.auth.forms import AuthenticationForm
 
 # 日付
 import datetime
+
+# 逆参照のテーブルをフィルタやソートする
+from django.db.models import Prefetch
+from django.db.models import Q
 
 
 class FileForm(ModelForm):
@@ -421,3 +427,103 @@ class OTPFileDownloadAuthForm(forms.Form):
         fields = ('email','password')
 
 
+
+
+"""
+テストの設問作成画面 承認ワークフローの選択をラジオボタンに変更
+"""
+class Is_Approval_Workflow_Radio(forms.RadioSelect):
+    input_type = 'radio'
+    template_name = 'forms/widget/is_approval_workflow_radio.html'
+
+
+"""
+承認ワークフロー基本設定 編集画面
+"""
+class ApprovalWorkflowEditForm(forms.ModelForm):
+
+    class Meta:
+        model = ApprovalWorkflow
+        fields = ('is_approval_workflow','approval_format')
+
+        widgets = {
+            # 回答タイプの選択をラジオボタンに変更
+            'is_approval_workflow' : Is_Approval_Workflow_Radio,
+        }
+
+        approval_format = forms.IntegerField(
+            required=True,
+            label='承認形式'
+        )
+
+    # views.pyから送られてきたログインユーザーをpopで受け取る
+    def __init__(self, *args, **kwargs):
+        # self.user = kwargs.pop('user', None)
+        # self.pk = kwargs.pop('pk', None)
+        super(ApprovalWorkflowEditForm, self).__init__(*args, **kwargs)
+
+        # 初期表示の「--------」を消す
+        self.fields['is_approval_workflow'].choices = self.fields['is_approval_workflow'].choices[1:]
+        self.fields['approval_format'].choices = self.fields['approval_format'].choices[1:]
+
+
+"""
+第一承認者設定
+"""
+class FirstApproverSetForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        self.first_approver_lists = kwargs.pop('first_approver_lists', None)
+        self.second_approver_lists = kwargs.pop('second_approver_lists', None)
+        self.admin_user_company = kwargs.pop('admin_user_company', None)
+
+        queryset = User.objects.filter(company=self.admin_user_company, is_superuser=False, is_staff=False, is_rogical_deleted=False).exclude(Q(service_admin__name="FileUP!")|Q(id__in=self.first_approver_lists)|Q(id__in=self.second_approver_lists))
+
+        super(FirstApproverSetForm, self).__init__(*args, **kwargs)
+
+        # ユーザー管理者権限
+        self.fields['first_approver'] = forms.ModelChoiceField(
+            required=True,
+            empty_label=None,#初期表示の「--------」を消す
+            label="第一承認者",
+            queryset=queryset,
+            widget=forms.Select(
+                attrs={
+                    'class':'form-control',
+                    'multiple':'multiple',
+                    'size':'20',
+                    'title':'is_staff[]'
+                    }
+                )
+        )
+
+
+"""
+第二承認者設定
+"""
+class SecondApproverSetForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        self.second_approver_lists = kwargs.pop('second_approver_lists', None)
+        self.first_approver_lists = kwargs.pop('first_approver_lists', None)
+        self.admin_user_company = kwargs.pop('admin_user_company', None)
+
+        queryset = User.objects.filter(company=self.admin_user_company, is_superuser=False, is_staff=False, is_rogical_deleted=False).exclude(Q(service_admin__name="FileUP!")|Q(id__in=self.second_approver_lists)|Q(id__in=self.first_approver_lists))
+
+        super(SecondApproverSetForm, self).__init__(*args, **kwargs)
+
+        # ユーザー管理者権限
+        self.fields['second_approver'] = forms.ModelChoiceField(
+            required=True,
+            empty_label=None,#初期表示の「--------」を消す
+            label="第二承認者",
+            queryset=queryset,
+            widget=forms.Select(
+                attrs={
+                    'class':'form-control',
+                    'multiple':'multiple',
+                    'size':'20',
+                    'title':'is_staff[]'
+                    }
+                )
+        )

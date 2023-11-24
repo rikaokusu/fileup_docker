@@ -1,0 +1,424 @@
+{% extends "draganddrop/common//base.html" %}
+
+{% load is_past_due %}
+{% load dl_file_count %}
+{% load url_dl_file_count %}
+{% load dl_count %}
+{% load url_dl_count %}
+{% load get_extention %}
+{% load get_group_download_status %}
+{% load url_get_group_download_status %}
+{% load get_download_status %}
+{% load url_get_download_status %}
+{% load get_direct_users %}
+{% load url_get_direct_users %}
+{% load get_display_name %}
+{% load mathfilters %}
+
+
+{% load widget_tweaks %}
+
+{% comment %} {% block title %}アンケートパーツ変更 | {{ block.super }}{% endblock %} {% endcomment %}
+
+{% block content %}
+
+<style>
+
+/*---------------------------------
+
+    タイトル、サブタイトル
+
+---------------------------------*/
+
+.cp_p_title {
+    text-align: left;
+    font-size: 15px;
+}
+
+/*---------------------------------
+
+    テーブル
+
+---------------------------------*/
+
+.approval_workflow_edit_table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.approval_workflow_edit_table th,
+.approval_workflow_edit_table td {
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+
+.approval_workflow_edit_table th {
+    width: 300px;
+    height: 50px;
+}
+
+
+.approval_workflow_edit_table th {
+    font-weight: bold;
+    background-color: #eeeeee;
+}
+
+.btn-grp {
+    margin: 80px;
+}
+
+
+/*---------------------------------
+
+    必須、任意ラベル
+
+---------------------------------*/
+.require_label {
+    color: #595959;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+
+.option_label {
+    color: #595959;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+
+.required_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    /*display: block;*/
+    position: relative;
+}
+
+
+.option_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    position: relative;
+}
+
+
+.required_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    position: absolute;
+    right: 3px;
+    top: 5px;
+    background-color: red;
+    border-radius: 3px;
+    padding: 2px 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "必須";
+
+}
+
+.option_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    position: absolute;
+    right: 3px;
+    top: 5px;
+    background-color: #7d8285;
+    border-radius: 3px;
+    padding: 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "任意";
+}
+
+.name_error_message {
+    text-align: left;
+    color: red;
+
+}
+
+span.error {
+    color: red;
+    display: block;
+    text-align: left;
+}
+
+/*---------------------------------
+
+for btn
+
+---------------------------------*/
+
+    {% comment %} * {
+    &:before,
+    &:after{
+        box-sizing:border-box;
+        padding:0;
+        margin:0;
+    }
+    } {% endcomment %}
+
+    body{
+    font-family:$fonts;
+    background-color:$bg_color;
+    color: $font_color;
+    text-align: center;
+    a, a:visited{
+        color: $link_color;
+        text-decoration:none;
+    }
+    a:hover{
+        color: $link_hover_color;
+    }
+    }
+
+
+</style>
+
+
+
+
+
+
+
+    <div class="container">
+
+        <div>
+            {% comment %} <h3 class="cp_h1title">基本情報編集</h3> {% endcomment %}
+
+            <div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar" >
+                <div class="top">
+                    <div class="tate mr-4" style="height:74px;"></div>
+                    <h1>基本情報編集</h1>
+                </div>
+            </div>
+
+            <p class="cp_p_title m-0 pb-3">・【必須】がついている項目は必須です。必ず入力してください。</p>
+
+            <!-- 存在確認のエラー -->
+            <div>
+                {% for error in form.title.errors %}
+                <p class="name_error_message">
+                    {{ error }}
+                </p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="my-div-style w-100">
+
+                <form method="POST" enctype='multipart/form-data' id="approval_workflow_edit_form">
+
+                    <!-- 登録フォームを表示 -->
+                    {% csrf_token %}
+
+                    <table class="approval_workflow_edit_table">
+
+                        <tbody>
+
+                            <!-- 承認ワークフロー -->
+                            <tr>
+                                <th>
+                                    <div class="required_box">
+                                        <div class="label require_label">承認ワークフロー</div>
+                                    </div>
+                                </th>
+                                <td colspan="5" style="text-align: left;">
+                                    {% render_field form.is_approval_workflow class="form-control" placeholder="" %}
+                                </td>
+                            </tr>
+
+                            <!-- 承認形式 -->
+                            <tr>
+                                <th>
+                                    <div class="required_box">
+                                        <div class="label require_label">承認形式</div>
+                                    </div>
+                                </th>
+                                <td colspan="5">
+                                    {% render_field form.approval_format class="form-control"  placeholder="" %}
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="btn-grp">
+
+                        <!-- 前のページへ遷移 -->
+                        <a href="{{request.META.HTTP_REFERER}}">
+                            <button type="button" class="my-btn my-btn-gray-2 my-btn-w12 mr-3"><span class="my_btn_text">戻る</span></button>
+                        </a>
+
+                        <button type="submit" id="approval_workflow_edit_btn" class="my-btn my-btn-egypt-1 my-btn-w12" disabled><span class="my_btn_text">変更</span></button>
+
+                    </div>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+    // -----------------
+    // form全体のバリデーションチェック
+    // -----------------
+    function validateForm(id) {
+
+        var valid = $(id).validate().checkForm();
+        console.log("valid", valid)
+
+        return valid
+
+    }
+
+    // -----------------
+    // .serialize()でformのデータを保存して
+    // 変更ごとに値が一致するかどうかを確認する
+    // -----------------
+
+    $(function(){
+
+        $('form')
+        .each(function(){
+            $(this).data('serialized', $(this).serialize())
+        })
+        .on('change dp.change input', function(){
+
+            // formの入力が正しく行われている場合
+            if(validateForm('#approval_workflow_edit_form')){
+
+                // 入力前の値と入力後の値が一致した場合
+                if($(this).serialize() == $(this).data('serialized')){
+
+                    $(this)
+                    .find('input:submit, button:submit')
+                        .prop('disabled', true)// ボタンを無効にする
+                    ;
+                }else{
+
+                    $(this)
+                    .find('input:submit, button:submit')
+                        .prop('disabled', false)// ボタンを有効にする
+                    ;
+                }
+            // 正しく行われていない場合
+            }else{
+                $('#approval_workflow_edit_btn').prop('disabled', true);// ボタンを無効にする
+            }
+
+        })
+        .find('input:submit, button:submit')
+            .prop('disabled', true);
+
+    })
+
+</script>
+
+
+<script>
+    // ---------------------------------------------------
+    // 承認ワークフローを「使用しない」を選択したときに
+    // 承認形式を押せないようにする処理
+    // ---------------------------------------------------
+    $(function() {
+        changeSelect();
+        $("input[name=is_approval_workflow]").on('change', function() {
+            changeSelect();
+        });
+    });
+
+    function changeSelect() {
+        if ($("input[name=is_approval_workflow]:checked").val() == 1) {// 使用する
+            console.log("val=1")
+            $("#id_approval_format").removeAttr("disabled");
+            // 追加した項目を削除
+            $("#id_approval_format option[value=0]").remove();
+
+        } else if ($("input[name=is_approval_workflow]:checked").val() == 2) {// 使用しない
+            console.log("val=2")
+            $("#id_approval_format").attr("disabled", "disabled");
+            // 項目追加
+            $("#id_approval_format option[value='1']").before($("<option>").val("0").text("--------------"));
+            // 追加した項目を選択状態にする
+            $("#id_approval_format").val("0");
+        }
+    }
+</script>
+
+
+<script>
+    $(document).ready(function() {
+
+        // -----------------
+        // validateのoption作成
+        // -----------------
+        $('#approval_workflow_edit_form').validate({
+
+            errorElement: "span",// labelがspanにかわる
+
+            //入力欄別にルールを作成　※nameを指定すること
+            rules:{
+                is_approval_workflow:{
+                    required: true,
+                },
+                approval_format:{
+                    required: true,
+                },
+            },
+            // エラーメッセージを設定
+            messages:{
+                is_approval_workflow:{
+                    required: '承認ワークフローの選択は必須です。',
+                },
+                approval_format:{
+                    required: '承認形式の選択は必須です。',
+                },
+            },
+
+
+        });
+
+        // -----------------
+        // validate 変更
+        // -----------------
+        $("#approval_workflow_edit_form").on('keyup change', function(event) {
+
+            // validateForm(): フォームのバリデーションを担当する
+            //validateForm('#approval_workflow_edit_form');
+
+        });
+    });
+
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "draganddrop/common//base.html" %}
+{% load i18n static %}
+
+{% load get_user_email %}
+{% load get_user_invoice_dept_name %}
+{% load get_operation_user_name %}
+
+{% block content %}
+
+{% comment %} <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> {% endcomment %}
+
+<style>
+</style>
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar" >
+    <div class="top">
+        <div class="tate mr-4" style="height:74px;"></div>
+        <h1>操作履歴</h1>
+    </div>
+</div>
+
+<div class="box1-1 zhushin_table">
+
+    <div class="box1-3 d-flex bd-highlight mb-3">
+        <div class="mr-auto p-2 bd-highlight zyushin-title-bar">
+            <h2 class="m-0 zyushin-title">操作履歴一覧</h2>
+        </div>
+	</div>
+
+	<table id="myTable" class="display" style="width:100%">
+		<thead>
+			<tr>
+				<th style="text-align:left; vertical-align: middle;">No</th>
+				<th style="text-align:left; vertical-align: middle;">操作ユーザー</th>
+				<th style="text-align:left; vertical-align: middle;">メールアドレス</th>
+				<th style="text-align:left; vertical-align: middle;">部署名</th>
+				<th style="text-align:left; vertical-align: middle;">役職</th>
+				<th style="text-align:left; vertical-align: middle;">操作日時</th>
+				<th style="text-align:left; vertical-align: middle;">操作内容</th>
+			</tr>
+		</thead>
+		<tbody id="">
+			{% for approval_operation_log in approval_operation_logs %}
+				<tr class="table-light">
+
+					<!-- No -->
+					<td class="r_task_reminder_col_3 align-middle">
+						{{ forloop.counter }}
+					</td>
+
+					<!-- 操作ユーザー -->
+					<td class="r_task_reminder_col_3 align-middle">
+						{{ approval_operation_log.operation_user|get_operation_user_name }}
+					</td>
+
+					<!-- メールアドレス -->
+					<td class="r_task_reminder_col_2 align-middle">
+						{{ approval_operation_log.operation_user|get_user_email }}
+					</td>
+
+					<!-- 役職 -->
+					<td class="r_task_reminder_col_2 align-middle">
+						{% comment %} {{ user.company.pic_company_name }} {% endcomment %}
+					</td>
+
+					<!-- 部署名 -->
+					<td class="r_task_reminder_col_2 align-middle">
+						{{ approval_operation_log.operation_user|get_user_invoice_dept_name }}
+					</td>
+
+					<!-- 操作日時 -->
+					<td class="r_task_reminder_col_2 align-middle">
+						{{ approval_operation_log.operation_date }}
+					</td>
+
+					<!-- 操作内容 -->
+					<td class="r_task_reminder_col_2 align-middle">
+						{% if approval_operation_log.operation_content == 1 %}
+							承認ワークフロー変更
+						{% elif approval_operation_log.operation_content == 2 %}
+							承認形式変更
+						{% elif approval_operation_log.operation_content == 3 %}
+							一次承認者変更
+						{% else %}
+							二次承認者変更
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<!--戻るボタン-->
+<div class="d-flex flex-row mt-5 justify-content-center">
+    <a class="return_top_btn" href="{% url 'draganddrop:approval_workflow' %}"><i class="fa-solid fa-angle-left mr-2"></i>前の画面に戻る</a>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+
+{% comment %} <script>
+	$(document).ready(function(){
+		$("#target").DataTable({
+			"language":{//日本語化
+				url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
+			},
+			ordering:false,//並び替え
+			searching:false,//絞り込み検索
+			paging:false,//ページ送り（無効化すると表示件数も停止する）
+			lengthChange:false,//表示件数
+			info:false,//総件数
+		});//end datatables
+	});//end ready
+</script> {% endcomment %}
+
+<script>
+// -----------------
+// Data table
+// -----------------
+$(document).ready(function(){
+    $('#myTable').DataTable({
+        "language": {
+			url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

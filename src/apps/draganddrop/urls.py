@@ -3,6 +3,8 @@ from .views.home import send_table, download_table, home_common, file_download, 
 from .views.admin import admin_personal, admin_company
 from .views.recipient import address, group
 from .views.upload import upload, url_share, duplicate, upload_common, otp_upload
+from .views.upload import upload, url_share, duplicate, upload_common
+from .views.approval import approval
 from django.contrib.auth import views as auth_views
 
 app_name = 'draganddrop'
@@ -194,5 +196,25 @@ urlpatterns = [
      ## admin_personal.py 個人のリソース管理 ##
      path('personal_resource_management/', admin_personal.PersonalResourceManagementView.as_view(), name='personal_resource_management'),
 
+
+     ##################################
+     # 承認ワークフロー 
+     ##################################
+     # 基本設定
+     path('approval_workflow/', approval.ApprovalWorkflowView.as_view(), name='approval_workflow'),
+     # 基本設定 編集画面
+     path('approval_workflow_edit/<uuid:pk>/', approval.ApprovalWorkflowEditView.as_view(), name='approval_workflow_edit'),
+     # 第一承認者設定
+     path('first_approver_set/', approval.FirstApproverSetView.as_view(), name='first_approver_set'),
+     # 第一承認者の個別削除
+     path('first_approver_delete/<uuid:pk>/',approval.FirstApproverDeleteView.as_view(),name='first_approver_delete'),
+     # 第二承認者設定
+     path('second_approver_set/', approval.SecondApproverSetView.as_view(), name='second_approver_set'),
+     # 第二承認者の個別削除
+     path('second_approver_delete/<uuid:pk>/',approval.SecondApproverDeleteView.as_view(),name='second_approver_delete'),
+     # 操作ログ
+     path('approval_log/', approval.ApprovalLogView.as_view(), name='approval_log'),
+     # 申請詳細
+     path('approval_detail/', approval.ApprovalDetailView.as_view(), name='approval_detail'),
 
 ]

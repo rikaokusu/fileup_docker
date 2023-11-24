@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address
+from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 # Register your models here.
 
 
@@ -30,6 +31,31 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = ('company_name', 'last_name','first_name', 'email',)
     list_display_links = ('company_name', 'last_name','first_name', 'email',)
 
+
+class ApprovalWorkflowAdmin(admin.ModelAdmin):
+    list_display = ('id', 'reg_user', 'reg_user_company', 'registration_date', 'is_approval_workflow', 'approval_format')
+    list_display_links = ('id', 'reg_user', 'reg_user_company', 'registration_date', 'is_approval_workflow', 'approval_format',)
+
+
+class FirstApproverRelationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'company_id','first_approver')
+    list_display_links = ('id', 'company_id','first_approver',)
+
+
+class SecondApproverRelationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'company_id','second_approver')
+    list_display_links = ('id', 'company_id','second_approver',)
+
+
+class ApprovalOperationLogAdmin(admin.ModelAdmin):
+    list_display = ('operation_user', 'operation_user_company_id', 'operation_date','operation_content')
+    list_display_links = ('operation_user', 'operation_user_company_id', 'operation_date','operation_content',)
+
+
+class ApprovalManageAdmin(admin.ModelAdmin):
+    list_display = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
+    list_display_links = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
+
 admin.site.register(Filemodel)
 admin.site.register(UploadManage, UploadManageAdmin)
 admin.site.register(PDFfilemodel)
@@ -40,3 +66,8 @@ admin.site.register(UrlUploadManage)
 admin.site.register(UrlDownloadtable)
 admin.site.register(UrlDownloadFiletable)
 admin.site.register(Address)
+admin.site.register(ApprovalWorkflow, ApprovalWorkflowAdmin)
+admin.site.register(FirstApproverRelation, FirstApproverRelationAdmin)
+admin.site.register(SecondApproverRelation, SecondApproverRelationAdmin)
+admin.site.register(ApprovalOperationLog, ApprovalOperationLogAdmin)
+admin.site.register(ApprovalManage, ApprovalManageAdmin)

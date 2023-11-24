@@ -4,6 +4,7 @@ from draganddrop.views.home.home_common import CommonView, total_data_usage, res
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
 from draganddrop.models import UploadManage, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -419,12 +420,17 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
         upload_manage.save()
 
+        print("------------------- Step2")
+
         return HttpResponseRedirect(reverse('draganddrop:step2', kwargs={'pk': upload_manage.id}))
 
 class Step3(TemplateView, CommonView):
     template_name = 'draganddrop/upload/step3_update.html'
 
     def get_context_data(self, **kwargs):
+
+        print("------------------- Step3")
+
         context = super().get_context_data(**kwargs)
 
         upload_manage_id = self.kwargs['pk']
@@ -491,6 +497,20 @@ class Step3(TemplateView, CommonView):
         total_data_usage(upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, upload_manage_file_size, 1)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
+
+
+        # ユーザーの承認ワークフロー設定を取得
+        # approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        # print("------------------ approval_workflow step2", approval_workflow)
+
+        # # 承認ワークフローが「使用する」に設定されている場合
+        # if approval_workflow.is_approval_workflow:
+        #     # 一次承認者を取得
+        #     first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        #     print("------------------ first_approvers step2", first_approvers)
+        #     # 二次承認者を取得
+        #     second_approver = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        #     print("------------------ second_approver step2", second_approver)
 
         return context
 

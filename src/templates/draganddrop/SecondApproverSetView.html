@@ -1,0 +1,653 @@
+{% extends "draganddrop/common//base.html" %}
+{% load i18n static %}
+{% block content %}
+
+
+<!-- bootstrap-duallistbox -->
+<link rel="stylesheet" href="{% static 'css/draganddrop/bootstrap-duallistbox.css' %}">
+
+
+<style>
+
+    .title_h6 {
+        border-bottom: solid 3px #c8d6dc;
+        position: relative;
+        color: #494949;
+        font-size: 16px;
+    }
+    .text {
+        color: #494949;
+    }
+    .number{
+        font-size: 25px;
+        line-height: 1.4em;
+        color: #7db4e6;
+        font-weight: bold;
+    }
+    .items{
+        font-size: 16px;
+        color: #494949;
+    }
+
+    /*---------------------------------
+
+        bootstrap-duallistbox
+
+    ---------------------------------*/
+
+    .box1 {
+        width: initial;
+        height: initial;
+        padding-top: initial;
+        padding-bottom: initial;
+        margin: initial;
+        font-weight: initial;
+        border: initial;
+    }
+
+    .box2 {
+        padding: initial;
+        margin: initial;
+        border: initial;
+        width: initial;
+    }
+
+    .bootstrap-duallistbox-container select {
+        width: 100%;
+        height: 250px;
+        border: 1px solid #ced4da;
+        padding: 0;
+    }
+
+    .bootstrap-duallistbox-container label {
+        font-weight: bold;
+        color: #494949;
+    }
+
+    .moveall,
+    .removeall {
+        border: 1px solid #ced4da !important;
+        color: #808080;
+    }
+
+    .buttons > .btn i + i{
+        display:none;
+    }
+
+    /*---------------------------------
+
+        モーダル
+
+    ---------------------------------*/
+
+    .modal .service_admin_modal .modal-body{
+        min-height:400px;/* - height - 100*/
+    }
+
+    select[multiple] {
+        height: auto;
+        min-height: 188px;
+    }
+
+    option {
+        font-size: 14px;
+    }
+
+    /*---------------------------------
+
+        タイトル
+
+    ---------------------------------*/
+    .training_title {
+        padding: 0.25em 0.5em;/*上下 左右の余白*/
+        color: #494949;/*文字色*/
+        background: transparent;/*背景透明に*/
+        border-left: solid 10px #7db4e6;/*左線*/
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+    .cp_p_title {
+        text-align: left;
+        padding-top: 10px;
+        font-size: 15px;
+    }
+
+    /*---------------------------------
+
+        ラベル
+
+    ---------------------------------*/
+
+    span.label {
+        line-height: 1.6;
+        font-size: 1em;
+        margin: 10px 0;
+        font-weight: 700;
+        vertical-align: text-bottom;
+        color: #fff;
+        padding: 5px 14px;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        background-color: #0d94ec;
+    }
+
+/*---------------------------------
+
+    管理者権限の付与ボタン
+
+---------------------------------*/
+
+/* 管理者権限の付与 */
+.btn01 {
+    display: block;
+    position: relative;
+    border: 2px solid #00a7e9;
+    width: 300px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: .1rem;
+    cursor: pointer;
+}
+
+.btn01:before {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    width: 10px;
+    color: #7cb4e6;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\2b';
+    font-size: 22px;
+}
+
+.btn01:hover {
+	background: #7cb4e6;
+	color: #fff;
+}
+
+.btn01:hover:before {
+    position: absolute;
+    top: 15%;
+    left: 15px;
+    width: 10px;
+    color: #fff;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\2b';
+    font-size: 22px;
+}
+
+/*---------------------------------
+
+    削除ボタン
+
+---------------------------------*/
+
+.my-btn-danger-1 {
+    color: #ffffff !important;
+    background: #e73c64;
+}
+
+/*---------------------------------
+
+    戻るボタン
+
+---------------------------------*/
+.btn-grp {
+    margin: 35px;
+}
+
+.return_btn {
+    color: #ffffff !important;
+    background: #7db4e6;
+    height: 45px;
+    width: 25%;
+}
+
+/*---------------------------------
+
+    テーブル
+
+---------------------------------*/
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+    /* margin-right: -15px; */
+    /* margin-left: -15px; */
+    justify-content: space-between;
+}
+
+@media (min-width: 576px){
+    .col-sm-6 {
+        flex: none !important;
+        max-width: 50%;
+    }
+}
+
+
+/*画面幅を狭めても元のレイアウトをキープ*/
+div.dataTables_wrapper div.dataTables_length,
+div.dataTables_wrapper div.dataTables_info,
+div.dataTables_wrapper div.dataTables_paginate {
+    text-align: initial !important;
+}
+
+
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    justify-content: right !important;
+}
+
+
+</style>
+
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar" >
+    <div class="top">
+        <div class="tate mr-4" style="height:74px;"></div>
+        <h1>第二承認者設定</h1>
+    </div>
+</div>
+
+    <div class="">
+
+        {% comment %} <p class="cp_p_title mb-0">・共同管理者権限を他のユーザーに割り当てることができます。</p>
+        <p class="cp_p_title mb-3">・共同管理者に設定できるユーザー数は3名までです。</p> {% endcomment %}
+
+        {% if second_approver_count < 3 or second_approver_count == 0 %}
+            <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2">
+                <span>第二承認者を設定する</span>
+            </button>
+        {% else %}
+            <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2" style="opacity: 0.33;" title="第二承認者に設定できるユーザー数は3名までです。" disabled>
+                <span>第二承認者を設定する</span>
+            </button>
+        {% endif %}
+
+    </div>
+
+    <div class="my-div-style w-100 mt-4">
+
+        <h6 class="section_title mb-3">第二承認者一覧</h6>
+
+        <table id="second_approver_table" class="table table-hover mb-5">
+
+            <thead>
+                <tr>
+                    <th style="text-align:left; vertical-align: middle;">ユーザー名</th>
+                    <th style="text-align:left; vertical-align: middle;">メールアドレス</th>
+                    <th style="text-align:left; vertical-align: middle;">部署</th>
+                    <th style="text-align:left; vertical-align: middle;">役職</th>
+                    <th style="text-align:left; vertical-align: middle;"></th><!-- 削除ボタン -->
+                </tr>
+            </thead>
+
+            <tbody id="boxes">
+
+                {% for user in second_approver_users %}
+
+                    <tr class="table-light">
+
+                        <!-- ユーザー名 -->
+                        <td class="r_task_reminder_col_3 align-middle">
+                            {{ user.display_name }}
+                        </td>
+
+                        <!-- メールアドレス -->
+                        <td class="r_task_reminder_col_3 align-middle">
+                            {{ user.email }}
+                        </td>
+
+                        <!-- 部署名 -->
+                        <td class="r_task_reminder_col_2 align-middle">
+                            {{ user.company.invoice_dept_name }}
+                        </td>
+
+                        <!-- 役職名 -->
+                        <td class="r_task_reminder_col_2 align-middle">
+                            {% comment %} {{ user.company.pic_company_name }} {% endcomment %}
+                            部長
+                        </td>
+
+                        <!-- 削除ボタン -->
+                        <td class="r_task_reminder_col_2" style="text-align:right; vertical-align: middle;">
+
+                            <!-- ログインユーザーの削除ボタンは非表示 -->
+                            <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" title="権限の取り消し" id="delete_is_co_admin_user" data-toggle="modal" data-target="#second_approver_delete_modal{{forloop.counter}}" data-pk="{{ user.id }}">
+                                権限の取り消し
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    <!-- 削除モーダル　個別 -->
+                    <div class="modal fade" id="second_approver_delete_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+                        <div class="modal-dialog modal-dialog-centered">
+
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+
+                                    <h5 class="modal-title" id="myModalLabel" style="font-weight: bold; text">第二承認者権限取り消し確認</h5>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>「{{ user.display_name }}」の第二承認者権限を取り消しますか？</h6>
+
+                                </div>
+
+                                <div class="modal-footer justify-content-center">
+
+                                    <form action="{% url 'draganddrop:second_approver_delete' user.id %}" method="POST" id="delete-form">
+
+                                        {% csrf_token %}
+
+                                        <div class="btn_group">
+                                            <button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+                                            <button type="submit" class="my-btn my-btn-egypt-1 my-btn-w7">取り消す</button>
+                                        </div>
+
+                                    </form>
+
+                                </div><!-- /.modal-footer -->
+
+                            </div><!-- /.modal-content -->
+
+                        </div><!-- /.modal-card -->
+
+                    </div><!-- /.modal -->
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- 第二承認者追加モーダル -->
+        <div class="modal service_admin_modal fade" id="exampleModal_2" tabindex="-1" aria-labelledby="exampleModalLabel">
+
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" style="font-weight: bold; text">第二承認者設定</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="d-flex">
+                            <p style="font-size: 16px; margin-right: auto;">
+                                ・第二承認者に設定したいユーザーを選択してください。<br>
+                                ・選択できる第二承認者は最大3人までです。<br>
+                                ・第一承認者に設定されたユーザーを第二承認者に設定することはできません。
+                            </p>
+
+                            <div class="justify-content-end">
+                                <p class="title_h6 m-0" align="right">あと<span class="number"></span>人まで設定できます</p>
+                                <p class="text inner m-0" align="right">選択済み第二承認者 : <span class="items"></span><span class="small_letter">人</span></p>
+                            </div>
+
+                        </div>
+
+                        <form method="POST" enctype='multipart/form-data' id="is_second_approver_check_form" class="">
+                            {% csrf_token %}
+
+                            {% for field in form %}
+                                {{ field }}
+                            {% endfor %}
+                        </from>
+
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+
+                        <div class="btn_group">
+                            <button type="button" class="my-btn my-btn-gray-1 my-btn-w8 mr-3" data-dismiss="modal">閉じる</button>
+                            <button type="submit" id="is_second_approver_check_btn" class="my-btn my-btn-egypt-1 my-btn-w8 mr-3"><span class="my_btn_text">追加</span></button>
+                        </div>
+
+                    </div><!-- /.modal-footer -->
+
+                </div><!-- /.modal-content -->
+
+            </div><!-- /.modal-dialog -->
+
+        </div><!-- /.modal -->
+
+        <div class="d-flex flex-row mt-5 justify-content-center">
+            <a class="return_top_btn" href="{% url 'draganddrop:approval_workflow' %}"><i class="fa-solid fa-angle-left mr-2"></i>前の画面に戻る</a>
+        </div>
+
+    </div>
+
+
+
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+    <!----- Bootstrap duallistbox ------>
+	<script type="text/javascript" src="{% static 'js/jquery.bootstrap-duallistbox.js' %}"></script>
+
+
+<script>
+    // 5秒後にエラーメッセージを消す関数
+    $('.messages').fadeIn("slow", function () {
+        //コールバックで5秒後にフェードアウト
+        $(this).delay(5000).fadeOut("slow");
+    });
+</script>
+
+
+<script>
+    // -----------------
+    // Datatables
+    // -----------------
+    jQuery(function($){
+        // デフォルトの設定を変更
+        $.extend( $.fn.dataTable.defaults, {
+            language: {
+                "sProcessing":   "処理中...",
+                "sLengthMenu":   "_MENU_ 件表示",
+                //"sZeroRecords":  "データはありません。",
+                "sEmptyTable": "第二承認者に設定されたユーザーはいません。",
+                "sInfo":         " _TOTAL_ 件中 _START_ から _END_ まで表示",
+                "sInfoEmpty":    " 0 件中 0 から 0 まで表示",
+                "sInfoFiltered": "（全 _MAX_ 件より抽出）",
+                "sInfoPostFix":  "",
+                "sSearch":       "検索:",
+                "sUrl":          "",
+                "oPaginate": {
+                    "sFirst":    "先頭",
+                    "sPrevious": "前",
+                    "sNext":     "次",
+                    "sLast":     "最終"
+                }
+        }
+    });
+
+        $("#second_approver_table").DataTable({
+            "dom":
+            "<'row'<'col-sm-6 col-auto mr-auto'l><'col-sm-6 col-auto'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5 col-auto mr-auto'i><'col-sm-7 col-auto'p>>",
+
+            "columnDefs":[{
+                "autowidth": false,
+                "bAutoWidth": false,
+            }],
+            // ページネーションボタンの表示
+            "pagingType": "simple_numbers",
+            "lengthMenu": [ [5, 10, 15,-1], [5, 10, 15, "全件"]],//表示件数メニュー
+            //　列設定
+            columnDefs: [
+                { orderable: false, targets: 0, width: "350px" },
+                { orderable: true, targets: 1, width: "350px" },
+                { orderable: true, targets: 2, width: "350px" },
+                { orderable: true, targets: 2, width: "350px" },
+                { orderable: false, targets: 3, width: "200px" },
+            ]
+
+
+        });
+    });
+
+
+    $(document).ready( function () {
+        var table = $('#second_approver_table').DataTable();
+        // テーブルから行の数を取得
+        var colCount = table.rows().eq(0).length;
+        console.log("colCount", colCount)
+
+        // 0人の場合
+        if(colCount == 0){
+
+            // 選択済みの共同管理者の人数表示
+            $(".items").html(colCount);
+
+            // 選択可能な共同管理者の人数
+            var i = 3;
+            $(".number").html(i - colCount);
+
+            $('select[name="second_approver"]').on('change', function(){
+                // 選択されているユーザーの人数を取得
+                var size = demo1.find(":selected").length;
+                console.log("sizeeeeeeeee", size)
+
+                // 選択に応じて人数の表示を変える
+                $(".number").html(i - colCount - size);
+
+                // 選択したユーザー数が1人より小さい時
+                if(size > 3){
+                    // 選択しているユーザーを回す
+                    demo1.find(":selected").each(function(ind, sel){
+                        if(ind > 2)
+                            $(this).prop("selected", false)// 選べるのは2人まで
+                            $(".number").html(i - colCount - size + 1);// 人数表記がマイナスになってしまうのを防ぐ
+                    })
+                    demo1.bootstrapDualListbox('refresh', true);
+                }
+            })
+
+        // 1人の場合
+        }else if(colCount == 1){
+
+            $(".items").html(colCount);
+
+            var i = 3;
+            $(".number").html(i - colCount);
+
+            $('select[name="second_approver"]').on('change', function(){
+                // 選択されているユーザーの人数を取得
+                var size = demo1.find(":selected").length;
+                console.log("sizeeeeeeeee", size)
+
+                $(".number").html(i - colCount - size);
+
+                // 選択したユーザー数が1人より小さい時
+                if(size > 2){
+
+                    // 選択しているユーザーを回す
+                    demo1.find(":selected").each(function(ind, sel){
+                        if(ind > 1)
+                            $(this).prop("selected", false)// 選べるのは2人まで
+                            $(".number").html(i - colCount - size + 1);// 人数表記がマイナスになってしまうのを防ぐ
+                    })
+                    demo1.bootstrapDualListbox('refresh', true);
+                }
+            })
+
+        // 2人の場合
+        } else if(colCount == 2){
+
+            $(".items").html(colCount);
+
+            var i = 3;
+            $(".number").html(i - colCount);
+
+            $('select[name="second_approver"]').on('change', function(){
+                // 選択されているユーザーの人数を取得
+                var size = demo1.find(":selected").length;
+                console.log("sizeeeeeeeee", size)
+
+                $(".number").html(i - colCount - size);
+
+                // 選択したユーザー数が1人より小さい時
+                if(size > 1){
+                    // 選択しているユーザーを回す
+                    demo1.find(":selected").each(function(ind, sel){
+                        if(ind > 0)
+                            $(this).prop("selected", false)// 選べるのは1人まで
+                            $(".number").html(i - colCount - size + 1);// 人数表記がマイナスになってしまうのを防ぐ
+                    })
+                    demo1.bootstrapDualListbox('refresh', true);
+                }
+            })
+
+        }
+    });
+
+</script>
+
+
+<script>
+    // -----------------
+    // bootstrap-duallistbox
+    // -----------------
+    var demo1 = $('select[name="second_approver"]').bootstrapDualListbox({
+        moveOnSelect: true,
+        //sortByInputOrder: false,
+        filterTextClear:'全件表示',
+        filterPlaceHolder:'検索',
+        nonSelectedListLabel: 'ユーザー一覧',
+        selectedListLabel: '選択済みユーザー一覧',
+        preserveSelectionOnMove: 'moved',
+        moveAllLabel: '選択済みに全て移動',
+        removeAllLabel: '選択を全て解除',
+        infoText:'{0}件',
+        infoTextEmpty:'0件',
+        infoTextFiltered:'{1}件中{0}件表示',
+
+    });
+
+    // 共同管理者権限 移動アイコン変更
+    $(function() {
+        var customSettings = $('select[name="second_approver"]').bootstrapDualListbox('getContainer');
+        // >>を削除
+        customSettings.find('.moveall').text('');
+        customSettings.find('.moveall').append('<i class="fas fa-long-arrow-alt-right"></i> <i class="fas fa-long-arrow-alt-right"></i>')
+        // <<を削除
+        customSettings.find('.removeall').text('');
+        customSettings.find('.removeall').append('<i class="fas fa-long-arrow-alt-left"></i> <i class="fas fa-long-arrow-alt-left"></i>')
+
+        // 全ユーザー追加 / 削除ボタンを無効化
+        $(".btn.moveall").prop('disabled', true);
+        $(".btn.removeall").prop('disabled', true);
+
+    });
+
+
+</script>
+
+
+{% endblock %}
