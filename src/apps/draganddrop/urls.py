@@ -79,10 +79,22 @@ urlpatterns = [
      path('otptrashdelete/', download_table.OTPTrashDeleteAjaxView.as_view(),name='otptrashdelete'),
      # ゴミ箱 一括削除
      path('multidelete/', download_table.MultiDeleteAjaxView.as_view(), name='multidelete'),
+     
 
+     # """
+     # お知らせ
+     # """
+     path('infomation/<uuid:pk>', home_common.InfomationView.as_view(), name='information'),
 
+     ############################
+     #  ユーザープロフィール情報変更
+     path('update_userinfomation/<uuid:pk>', home_common.UserUpdateInfoView.as_view(), name='update_userinfomation'),
 
-     ##########################################
+     #現在の写真削除
+     path('accounts/delete_image/', home_common.delete_image, name='delete_image'),
+     #ユーザープロファイル画像変更
+     path('user/image_import/', home_common.ImageImportView.as_view(), name='image_import'),
+
      # upload  ファイルアップロード、URL共有、複製 #
      ##########################################    
      ## upload.py ##

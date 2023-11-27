@@ -1,6 +1,7 @@
 <!doctype html>
 {% load i18n static %}
 {% load render_bundle from webpack_loader %}
+{% load get_first_char %}
 
 <head>
   <!-- Required meta tags -->
@@ -45,31 +46,167 @@
   {% if url_name != 'url_file_download_auth_mail' %}
   {% if url_name != 'url_file_download_auth_pass' %}
   {% if url_name != 'url_file_download' %}
+    <!--ポータルから移行-->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand static-top navbar-dark">
+      <div class="NavContents">
+          <a class="navbar-brand py-0 mr-0 h4" href="{% url 'draganddrop:home' %}"><img src="{% static 'img/fileup_logo1.svg' %}" alt="CloudLab" style="width:130px; height:58px;" class="p-0"></a>
+          {% if current_user.is_authenticated and current_user.is_active and current_user.is_staff %}
+            <div class="nav-flex">
+              <!-- ヘッダーアイコン -->
+              <div class="d-none d-inline-block form-inline icon_set">
+                  {% comment %} <a href="{% url 'accounts:contact' %}" style="font-size:1.5rem;"><img src="{% static 'common/img/contact_po.svg' %}" alt="お問い合わせ" style="width:35px; height:35px;" class="mr-2 mt-1"></a> {% endcomment %}
+                  <img src="{% static 'img/info_fi2.svg' %}" alt="お知らせ" style="width:35px; height:35px;" class="info_icon mb-1">
+                  
+                  {% if no_read > 0 %}
+                  <h6 class="badge badge-warning">
+                      {{ no_read }}
+                  </h6>
+                  {% endif %} 
+              </div>
 
+              <!-- 会社名とメアド -->
+              <div class=" p-1 login_user">
+                  <div class="pl-1">
+                      <!-- ユーザーアカウントのトグルメニュー -->
+                      <ul class="navbar-nav ml-auto ml-0" style="position:relative;">
+                          <li class="nav-item no-arrow" style="background-color:#fff; position:absolute; top:0;">
+                              <a class="nav-link" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  {% if current_user.image %}
+                                      <img src="/media/{{ current_user.image.file }}" class="user_icon_mini"/>
+                                      <!--ユーザのアイコン画像が存在しない-->
+                                  {% else %}
+                                      <div class="maru size_s c{{current_user.color_num}} ml-1 mt-1">
+                                          <div class="letter_two_company_s">{{current_user.company.pic_company_name|get_first_char}}</div>
+                                          <div class="letter_two_personal_s">{{current_user.display_name|get_first_char}}</div>
+                                      </div>
+                                  {% endif %}
+                              </a>
+                              <div style="width: 400px;">
+                              {% comment %} <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown" style="width: 400px;"> {% endcomment %}
+                                  {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
+                                      <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
+                                  {% else %}
+
+                                      <div class="point-box">
+                                          <!--会社によって編集アイコンをつけるorつけないを作成する、編集アイコンありはコメントにしてる-->
+                                          <div class="point-title">ユーザープロファイル&nbsp;<a href="{% url 'draganddrop:update_userinfomation' user.id %}"><i class="fas fa-edit edit_icon" data-target="#change_profile_modal" data-toggle="modal"></i></a></div>
+                                          {% comment %} <div class="point-title">ユーザープロファイル</div> {% endcomment %}
+                                          <div class="warning-box">
+                                              <ul class="sample1">
+                                                  <li class="text-center mb-2">
+                                                      {% if user.image %}
+                                                          <img src="/media/{{ current_user.image.file }}" class="user_icon mt-2"/>
+                                                          <!--ユーザのアイコン画像が存在しない-->
+                                                      {% else %}
+                                                          <div class="maru size_m c{{current_user.color_num}} ml-1">
+                                                          <div class="letter_two_company_m">{{user.company.pic_company_name|get_first_char}}</div>
+                                                          <div class="letter_two_personal_m">{{user.display_name|get_first_char}}</div>
+                                                          </div>
+                                                      {% endif %}
+                                                  </li>
+                                                  <li id="current_display_name">
+                                                      <h6><small>氏名</small>&emsp;&nbsp;
+                                                          {% if current_user.company.middle_choice == '1' %}
+                                                              {% if current_user.middle_name %}
+                                                                  {{ current_user.first_name }} {{ current_user.middle_name }} {{current_user.last_name}}
+                                                              {% else %}
+                                                                  {{ current_user.last_name }} {{ current_user.first_name }}
+                                                              {% endif %}
+                                                          {% else %}
+                                                              {{ current_user.last_name }} {{ current_user.first_name }}
+                                                          {% endif %}
+                                                      </h6>
+                                                  </li>
+                                                  <li id="current_pic_company_name">
+                                                      <h6><small>会社名</small>&nbsp;
+                                                          {% if current_user.company.pic_corp_class == '1' %}
+                                                              {% if current_user.company.pic_legal_personality == '99' or current_user.company.pic_legal_personality == '' %}
+                                                                  {{ current_user.company.pic_company_name }}
+                                                              {% else %}
+                                                                  {% if current_user.company.pic_legal_person_posi == '1' %}
+                                                                      {{ current_user.company.get_pic_legal_personality_display }}{{ current_user.company.pic_company_name }}
+                                                                  {% else %}
+                                                                      {{ current_user.company.pic_company_name }}{{ current_user.company.get_pic_legal_personality_display }}
+                                                                  {% endif %}
+                                                              {% endif %}
+                                                          {% elif current_user.company.pic_corp_class == '2' %}
+                                                              {{ current_user.company.pic_company_name }}
+                                                          {% endif %}
+                                                      </h6>
+                                                  </li>
+                                                  <li id="current_pic_dept_name">
+                                                      <h6><small>部署</small>&emsp;&nbsp;
+                                                          {{current_user.company.pic_dept_name|default_if_none:"未設定" }}</li>
+                                                      </h6>
+                                                  <li>
+                                                      <h6><small>メール</small>&nbsp;&nbsp;
+                                                          {{current_user.email}}</li>
+                                                      </h6>
+                                                  <hr class="mt-3 mb-3">
+                                                  <li>
+                                                      <div class="d-flex">
+                                                          <div class="">
+                                                              <!-- 項目 -->
+                                                              <div class="item_col">メール通知設定</div>
+                                                          </div>
+
+                                                          <div class="">
+                                                              <!-- 値 -->
+                                                              <td class="pt-3  pb-2 float-right">
+                                                                  <div class="radioArea pl-2" id="mail_radio">
+                                                                      <input type="radio" name="mail_choice" id="ma-valid" value="1" disabled>
+                                                                      <label for="ma-valid"> 有効</label>
+                                                                      <input type="radio" name="mail_choice" id="ma-invalid" value="2" checked>
+                                                                      <label for="ma-invalid">無効</label>
+                                                                      {% comment %} あとで↓に戻す {% endcomment %}
+                                                                      {% comment %} <input type="radio" name="mail_choice" id="ma-valid" value="1" {% if current_user.is_send_mail == True %}checked{% endif %}>
+                                                                      <label for="ma-valid"> 有効</label>
+                                                                      <input type="radio" name="mail_choice" id="ma-invalid" value="2" {% if current_user.is_send_mail == False %}checked{% endif %}>
+                                                                      <label for="ma-invalid">無効</label> {% endcomment %}
+                                                                  </div>
+                                                              </td>
+                                                          </div>
+                                                      </div><!--d-flex-->
+                                                  </li>
+                                              </ul>
+                                          </div><!--warning-box-->
+                                      </div><!--point-box-->
+                                      <a class="dropdown-item base-d-item" href="{% url 'draganddrop:resource_management' %}">会社管理画面</a>
+                                      <a class="dropdown-item base-d-item" href="{% url 'draganddrop:personal_resource_management' %}">個人管理画面</a>
+                                      <a class="dropdown-item base-d-item" href="{% url 'accounts:password_change' %}">パスワード変更</a>
+                                      <a class="dropdown-item base-d-item" href="{% url 'accounts:logout' %}" data-toggle="modal" data-target="#logoutModal">ログアウト</a> 
+                                  {% endif %}
+                              </div><!--dropdown-menu-->
+                          </li>
+                      </ul>
+                  </div> 
+              </div><!--login_user-->
+          {% elif current_user %}
+              <!-- 会社名とメアド -->
+              {% comment %} <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3">
+                  <img src="{% static 'common/img/info_po.svg' %}" alt="お知らせ" style="width:40px; height:40px;" class="info_icon mb-1 ">
+              </div> {% endcomment %}
+            </div>
+          {% endif %}
+      </div>
+  </nav>
+<!--ポータルから移行おわり-->
+<!--元々のナビ-->
+{% comment %} 
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
     <a class="navbar-brand mr-1" href="{% url 'draganddrop:home' %}">Yuitech</a>
 
-    <!-- <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-      <i class="fas fa-cogs"></i>
-    </button> -->
 
-    <!-- Navbar -->
-
-    <!-- Infoアイコン -->
     <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0 ">
       <div class="separator">
-        {% comment %} <i class="fas fa-info-circle fa-2x info_icon"></i> {% endcomment %}
       </div>
     </div>
 
-    <!-- 会社名とメアド -->
     <div class="d-none d-md-inline-block form-inline ml-2 mr-0 mr-md-3 my-2 my-md-0">
-      <!-- <p class="lang-text ml-md-0"> current_user.company.pic_company_name</p> -->
-      <!-- <p class="lang-text ml-md-0"> current_user.email</p> -->
     </div>
 
-    <!-- ユーザーアカウントのトグルメニュー -->
     <ul class="navbar-nav ml-auto ml-md-0">
       <li class="nav-item dropdown no-arrow">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
@@ -87,7 +224,7 @@
         </div>
       </li>
     </ul>
-  </nav>
+  </nav> {% endcomment %}
   {% endif %}
   {% endif %}
   {% endif %}
@@ -143,23 +280,81 @@
       <div class="modal-content">
         <div class="modal-body">ログアウトしますか？</div>
         <div class="modal-footer">
-          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a>
-          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal"
+          {% comment %} <a class="btn btn-primary btn-sm logout-btn" href="{% url 'accounts:logout' %}" onfocus="this.blur();">ログアウト</a> {% endcomment %}
+          <button type="button" class="btn my-btn-blue btn-sm logout-btn" onclick="location.href='{% url 'accounts:logout' %}'">ログアウト</button>
+          <button class="btn btn-sm logout-btn my-btn-cancel" type="button" data-dismiss="modal"
             onfocus="this.blur();">キャンセル</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- お知らせモーダル用 -->
+  <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content info-modal-content">
+            <ul class="tab clearfix info_tab">
+                <li class="active">全て表示</li>
+                <li>お知らせ</li>
+                <li>メンテナンス</li>
+            </ul>
+            <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
+            <div class="area">
+                <ul class="show">
+                    {% for all in all_informations %}
+                        <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not all.id in read_info %}
+                            <span class="bg-warning">{{ all.category }}</span>
+                        {% else %}
+                            <span>{{ all.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ all.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for notice in notice_informations %}
+                        <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not notice.id in read_info %}
+                            <span class="bg-warning">{{ notice.category }}</span>
+                        {% else %}
+                            <span>{{ notice.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ notice.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for mainte in maintenance_informations %}
+                        <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                        {% if not mainte.id in read_info %}              
+                            <span class="bg-warning">{{ mainte.category }}</span>
+                        {% else %}
+                            <span>{{ mainte.category }}</span>
+                        {% endif %}
+                        </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
+                    {% empty %}
+                        <li><span class="newsList-empty">お知らせはありません</span></li> 
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer justify-content-center bg-white">
+                <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();">閉じる</button>
+            </div><!-- /.modal-footer -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+  {% comment %} <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" 
   integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous">
-</script>
+</script> {% endcomment %}
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" 
   integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous">
 </script>
@@ -175,7 +370,9 @@
 
   <!--chart.js-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
-
+  
+  {% comment %} <!--validate.js-->
+  <script src="{% static 'common/js/validate.js' %}"></script> {% endcomment %}
   {{ form.media }}
 
 <script>
@@ -231,6 +428,13 @@
 
 
 <script>
+
+///// お知らせモーダル用
+$(document).ready(function() {
+  $(".info_icon").on("click", function() {
+    $("#info_modal").modal('show')
+  })
+})
 
 // --------------------------
 //  localStorageのデータを削除
