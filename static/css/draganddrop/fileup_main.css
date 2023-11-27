@@ -2859,7 +2859,11 @@ DatePicker
 }
 
 .log-table tr{
-    line-height: 35px;
+    line-height:25px;
+}
+.log-table th{
+    margin:0;
+    padding:0;
 }
 
 .log-table td{
