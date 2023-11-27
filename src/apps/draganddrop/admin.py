@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address
 from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
+from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
 # Register your models here.
 
 
@@ -55,6 +56,9 @@ class ApprovalOperationLogAdmin(admin.ModelAdmin):
 class ApprovalManageAdmin(admin.ModelAdmin):
     list_display = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
     list_display_links = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
+class OperationLogAdmin(admin.ModelAdmin):
+    list_display = ('id','operation_user', 'operation',)#表示したいやつ
+    list_display_links = ('id',)#クリックして変更したい時に
 
 admin.site.register(Filemodel)
 admin.site.register(UploadManage, UploadManageAdmin)
@@ -71,3 +75,4 @@ admin.site.register(FirstApproverRelation, FirstApproverRelationAdmin)
 admin.site.register(SecondApproverRelation, SecondApproverRelationAdmin)
 admin.site.register(ApprovalOperationLog, ApprovalOperationLogAdmin)
 admin.site.register(ApprovalManage, ApprovalManageAdmin)
+admin.site.register(OperationLog)

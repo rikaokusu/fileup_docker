@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
-from accounts.models import User, Service, Company
+from accounts.models import User, Service, Company,FileupPermissions
 from contracts.models import Contract, Plan
 import uuid
 from datetime import date
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 import os
 
@@ -16,7 +17,6 @@ Legal_Personality = (
     (3, '合資会社'),
     (4, '合名会社'),
     )
-
 class Address(models.Model):
     # ユーザー登録者
     created_user = models.CharField(max_length=245, blank=True, null=True)
@@ -148,11 +148,11 @@ class DownloadFiletable(models.Model):
     dl_count = models.IntegerField(default=0)
 
 
-class logtable(models.Model):
-    user = models.CharField(max_length=245, blank=True, null=True)
-    date = models.DateTimeField(default=timezone.now)
-    file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
-    text = models.CharField(max_length=140)
+# class logtable(models.Model):
+#     user = models.CharField(max_length=245, blank=True, null=True)
+#     date = models.DateTimeField(default=timezone.now)
+#     file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
+#     text = models.CharField(max_length=140)
 
 
 class UrlUploadManage(models.Model):
@@ -431,3 +431,108 @@ class ApprovalManage(models.Model):
     second_approver = models.CharField('二次承認者', max_length=255, blank=True, null=True)
     # 承認日時
     approval_date = models.DateTimeField('承認日時', default=timezone.now)
+##############  操作ログ
+class OperationLog(models.Model):
+    OPERATION_LOG_CATEGORY = (
+    (0, 'なし'),
+    (1, 'ログイン'),
+    (2, 'ファイル共有'),
+    (3, 'アドレス帳'),
+    (4, 'ユーザー権限'),
+    (5, '組織設定'),
+    )
+    OPERATION_LOG_OPERATION = (
+    (0, 'なし'),
+    (1, 'ログイン'),
+    (2, '作成'),
+    (3, '変更'),
+    (4, '削除'),
+    (5, '登録'),
+    )
+    UPLOAD_LOG_CATEGORY = (
+    (0,'通常アップロード'),
+    (1,'URL共有'),
+    (2,'OTP共有'),
+    )
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # 操作日時
+    created_date = models.DateTimeField(_('作成日時'), default=timezone.now, blank=True)
+    # 操作した人
+    operation_user = models.CharField(_('操作した人'), max_length=64, null=True) 
+    # 操作したIPアドレス
+    client_addr = models.CharField(_('IPアドレス'), max_length=64, null=True) #1
+    # カテゴリ
+    category = models.IntegerField(_('カテゴリ'), default='0', choices=OPERATION_LOG_CATEGORY)
+    # 操作種別
+    operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
+    # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
+    destination_address=models.CharField(_('宛先メールアドレス'),max_length=999, null=True)
+    # ファイルタイトル
+    file_title = models.CharField(_(')ファイルタイトル'),max_length=64,null=True)
+    # # 対象ファイル名
+    # log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # 共有種別（通常、URL,OTP）
+    upload_category = models.IntegerField(_('共有種別'), default='0', choices=UPLOAD_LOG_CATEGORY)
+
+# 操作ログ用のファイルテーブル
+class LogFile(models.Model):
+    # 操作ログ紐づけ
+    log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # 対象ファイル名
+    file = models.OneToOneField(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+
+# 操作ログ用の宛先メールテーブル
+class LogDestUser(models.Model):
+    # 操作ログ紐づけ
+    log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_destuser', null=True)
+    # ???
+    log_dest_user = models.OneToOneField(Address, on_delete=models.CASCADE, related_name='log_destuser', null=True)
+
+
+"""
+リマインダー
+"""
+class Notification(models.Model):
+
+    CATEGORY_CHOICES = (
+            ('お知らせ', 'お知らせ'),
+            ('メッセージ', 'メッセージ'),
+            ('メンテナンス', 'メンテナンス'),
+            ('メンテナンス終了', 'メンテナンス終了'),
+            ('メンテナンス中止', 'メンテナンス中止')
+    )
+
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
+    title = models.CharField(_('title'), max_length=255)
+    category = models.CharField(_('category'), max_length=30, default="1", choices=CATEGORY_CHOICES, blank=True)
+    # category = models.CharField(_('category'), max_length=255, default="お知らせ")
+    target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+    # 通知開始日
+    start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
+    #内容
+    contents = models.TextField('内容', blank=True, null=True)
+    #メンテナンス情報（作業開始日時）
+    maintenance_start_date = models.DateTimeField(_('メンテナンス開始日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業終了日時）
+    maintenance_end_date = models.DateTimeField(_('メンテナンス終了日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業内容）
+    maintenance_contents = models.TextField('作業内容', blank=True, null=True)
+    #メンテナンス情報（作業対象）
+    maintenance_targets = models.TextField('作業対象', blank=True, null=True)
+    #メンテナンス情報（作業影響）
+    maintenance_affects = models.TextField('作業影響', blank=True, null=True)
+    #メンテナンス情報（作業中止理由）
+    maintenance_cancel_reason = models.TextField('作業中止理由', blank=True, null=True)
+"""
+お知らせ既読管理
+"""
+class Read(models.Model):
+    # ユーザー
+    read_user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='read_user')
+    # 既読日
+    read_date = models.DateTimeField(_('read date'), default=timezone.now, blank=True)
+    # お知らせID
+    notification_id = models.ForeignKey(Notification, blank=True, null=True, on_delete=models.CASCADE, related_name='notification_id')

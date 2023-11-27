@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views.home import send_table, download_table, home_common, file_download, url_access, otp_access
-from .views.admin import admin_personal, admin_company
+from .views.admin import admin_personal, admin_company,log
 from .views.recipient import address, group
 from .views.upload import upload, url_share, duplicate, upload_common, otp_upload
 from .views.upload import upload, url_share, duplicate, upload_common
@@ -81,10 +81,22 @@ urlpatterns = [
      path('otptrashdelete/', download_table.OTPTrashDeleteAjaxView.as_view(),name='otptrashdelete'),
      # ゴミ箱 一括削除
      path('multidelete/', download_table.MultiDeleteAjaxView.as_view(), name='multidelete'),
+     
 
+     # """
+     # お知らせ
+     # """
+     path('infomation/<uuid:pk>', home_common.InfomationView.as_view(), name='information'),
 
+     ############################
+     #  ユーザープロフィール情報変更
+     path('update_userinfomation/<uuid:pk>', home_common.UserUpdateInfoView.as_view(), name='update_userinfomation'),
 
-     ##########################################
+     #現在の写真削除
+     path('accounts/delete_image/', home_common.delete_image, name='delete_image'),
+     #ユーザープロファイル画像変更
+     path('user/image_import/', home_common.ImageImportView.as_view(), name='image_import'),
+
      # upload  ファイルアップロード、URL共有、複製 #
      ##########################################    
      ## upload.py ##
@@ -217,4 +229,8 @@ urlpatterns = [
      # 申請詳細
      path('approval_detail/', approval.ApprovalDetailView.as_view(), name='approval_detail'),
 
+     ##################################
+     # 操作ログ  
+     ##################################
+     path('log/', log.LogView.as_view(), name='log'),
 ]

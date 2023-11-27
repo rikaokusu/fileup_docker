@@ -13,6 +13,8 @@ import urllib.parse
 import os
 from django.conf import settings
 import threading
+#操作ログ関数
+from lib.my_utils import add_log
 
 ###########################
 # アップロード機能  #
@@ -303,6 +305,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
     template_name = "draganddrop/upload/step2_update.html"
     form_class = DistFileUploadForm
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -326,10 +329,22 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         self.del_file = request.POST.getlist('del_file')
         return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        print('updalods_2のform_valid')
+    def form_valid(self, form,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
+        # 操作ログ用
+        # 宛先メールアドレス
+        dest_mails = [upload_manage.dest_user_mail1,upload_manage.dest_user_mail2,upload_manage.dest_user_mail3,upload_manage.dest_user_mail4,upload_manage.dest_user_mail5,upload_manage.dest_user_mail6,upload_manage.dest_user_mail7,upload_manage.dest_user_mail8]
+        # 宛先メールアドレスNoneのやつを省く
+        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
+        # 宛先メールアドレス('')を省くため文字列に変換
+        dest_mail_log = ' '.join(dest_mail_ok)
+        print(dest_mail_log,"かっこけしたい")
+        # ファイルタイトル
+        file_title = upload_manage.title
+        # 操作ログ終わり
 
         # ファイルの削除
         if self.del_file:
@@ -419,6 +434,8 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                         htmlfile.save()
 
         upload_manage.save()
+        # 操作ログ
+        add_log(2,2,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
 
         print("------------------- Step2")
 

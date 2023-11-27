@@ -158,7 +158,15 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self._create_user(email, password, **extra_fields)
-
+"""
+ファイルテーブル
+"""
+class File(models.Model):
+    file = models.FileField(_('file'), upload_to='uploads/', null=True, blank=True)
+    name = models.CharField(_('name'), max_length=255, blank=True)
+    size = models.CharField(_('size'), max_length=255, blank=True)
+    def __str__(self):
+        return self.name
 
 """
 カスタムユーザーテーブル
@@ -169,27 +177,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 表示名
-    display_name = models.CharField('表示名', max_length=255)
+    display_name = models.CharField('表示名', max_length=30, blank=True, null=True)
     # メールアドレス
     email = models.CharField(_('email address'), unique=True, max_length=255)
     # サブドメイン
-    subdomain = models.CharField(_('subdomain'), max_length=255, blank=True)
+    subdomain = models.CharField(_('subdomain'), max_length=50, blank=True)
     # 姓
-    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    last_name = models.CharField(_('last name'), max_length=20, blank=True)
     # ミドルネーム
-    middle_name = models.CharField('ミドル', max_length=255, blank=True)
+    middle_name = models.CharField('ミドルネーム', max_length=20, blank=True)
     # 名
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    first_name = models.CharField(_('first name'), max_length=20, blank=True)
     # ふりがな表示名
-    p_display_name = models.CharField('ふりがな(表示名)', max_length=255, blank=True, null=True)
+    p_display_name = models.CharField('ふりがな(表示名)', max_length=50, blank=True, null=True)
     # ふりがな(姓)
-    p_last_name = models.CharField('ふりがな(姓)', max_length=255, blank=True, null=True)
+    p_last_name = models.CharField('ふりがな(姓)', max_length=30, blank=True, null=True)
     # ふりがな(名)
-    p_first_name = models.CharField('ふりがな(名)', max_length=255, blank=True, null=True)
+    p_first_name = models.CharField('ふりがな(名)', max_length=30, blank=True, null=True)
+    # ふりがな(ミドルネーム)
+    p_middle_name = models.CharField('ふりがな(ミドルネーム)', max_length=30, blank=True)
     # 所属グループ
     # group = models.ManyToManyField(CustomGroup, verbose_name="所属グループ", blank=True)
     # 説明
-    description = models.CharField('説明', max_length=30, blank=True)
+    description = models.CharField('メモ', max_length=30, blank=True)
     # 会社コード
     company = models.ForeignKey(Company, null=True, on_delete=models.PROTECT)
     # サービス
@@ -206,7 +216,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     # payjp_cus_id = models.CharField('PAY.JPのカスタマーID', max_length=35, blank=True, null=True)
     # メール送信可否
     is_send_mail = models.BooleanField(_('is_send_mail'), default=True)
-
+    # プロフィール写真
+    image = models.OneToOneField(File, on_delete=models.CASCADE,blank=True,null=True)
+    # ユーザーカラー
+    color_num = models.IntegerField("color_num", default=0,blank=True)
 
     is_activate = models.BooleanField(
         _('activate'),
@@ -288,21 +301,21 @@ class Messages(models.Model):
 
     class Meta:
         managed = False
-"""
-リマインダー
-"""
-class Notification(models.Model):
-    # ID
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
-    title = models.CharField(_('title'), max_length=255)
-    category = models.CharField(_('category'), max_length=255, default="お知らせ")
-    target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
-    is_read = models.BooleanField(_('is_read'), default=False)
-    # 通知開始日
-    start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
-    #内容
-    contents = models.TextField('内容', blank=True, null=True)
+# """
+# リマインダー
+# """
+# class Notification(models.Model):
+#     # ID
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
+#     title = models.CharField(_('title'), max_length=255)
+#     category = models.CharField(_('category'), max_length=255, default="お知らせ")
+#     target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+#     is_read = models.BooleanField(_('is_read'), default=False)
+#     # 通知開始日
+#     start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
+#     #内容
+#     contents = models.TextField('内容', blank=True, null=True)
 
 """
 Stripe情報

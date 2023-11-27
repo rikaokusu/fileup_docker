@@ -1,0 +1,109 @@
+{% extends "draganddrop/common//base.html" %}
+
+
+{% load static %}
+
+{% block content %}
+
+<div class="log-container">
+    <div class="log-title">
+        <p>
+            操作ログ一覧
+        </p>
+    </div>
+    <table class="table table-striped log-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" style="min-width:90px;">操作日時</th>
+                <th scope="col">操作した人</th>
+                <th scope="col" style="min-width:100px;">操作した<br>IPアドレス</th>
+                <th scope="col" style="min-width:120px;">カテゴリ</th>
+                <th scope="col" style="min-width:95px;">操作種別</th>
+                <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
+                <th scope="col" style="min-width:200px;">タイトル</th>
+                <th scope="col">ファイル名</th>
+                <th scope="col" style="min-width:155px;">共有種別</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td></td><!--counter-->
+                <td>{{ log.created_date }}</td>
+                <td>{{ log.operation_user }}</td>
+                <td>{{ log.client_addr }}</td>
+                <td>{{ log.get_category_display }}</td>
+                <td>{{ log.get_operation_display }}</td>
+                <td>
+                    {% comment %} {% for log_destuser in log_destusers %}
+                        {% if log_destuser.log == log %}
+                            {{ log_destuser.log_dest_user.email }}
+                        {% endif %}
+                    {% endfor %} {% endcomment %}
+                    {% comment %} {% for mail in log.destination_address%}
+                        {{ log.destination_address }}
+                    {% endfor %} {% endcomment %}
+                    {{ log.destination_address }}
+                </td>
+                <td>
+                    {{ log.file_title }}
+                </td>
+                <td>
+                    {% for log_file in log_files %}
+                        {% if log_file.log == log %}
+                            <p class="log-filename">
+                                {{ log_file.file.name }}<br>
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ log.get_upload_category_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+    {% comment %} <table class="table table-striped log-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">操作日時</th>
+                <th scope="col">操作したIPアドレス</th>
+                <th scope="col">操作内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>2023-10-30 06:57</td>
+                <td>127.0.0.1</td>
+                <td>hayashiがyano@yui.okinawa akamine@yui.okinawa宛の「スイッチ設定資料」のOTP共有を作成しました。</td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>2023-11-09 11:11</td>
+                <td>127.0.0.1</td>
+                <td>"ユーザー名"がログインしました。</td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>2023-11-11 11:11</td>
+                <td>127.0.0.1</td>
+                <td>"ユーザー名"が"共有名"のファイル"xxx"を削除しました。</td>
+            </tr>
+            <tr>
+                <th scope="row">4</th>
+                <td>2023-11-11 11:11</td>
+                <td>127.0.0.1</td>
+                <td>"ユーザー名"が"共有名"宛の「スイッチ設定資料２」のURL共有を作成しました。</td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td>2023-11-11 11:11</td>
+                <td>127.0.0.1</td>
+                <td>"ユーザー名"が"共有名"のファイル"xxx"を削除しました。</td>
+            </tr>
+        </tbody>
+    </table> {% endcomment %}
+</div>
+{% endblock %}

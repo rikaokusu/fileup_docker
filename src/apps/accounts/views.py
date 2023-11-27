@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 
 
-from accounts.forms import LoginForm, CompanyUpdateForm, MyUserCreationForm, MyUserChangeForm, CustomPasswordChangeForm, UserCompanyMultiForm, UserAddInfoForm,MyPasswordResetForm,MySetPasswordForm
+from accounts.forms import LoginForm, CompanyUpdateForm, MyUserCreationForm, MyUserChangeForm, CustomPasswordChangeForm, UserCompanyMultiForm, UserAddInfoForm,MyPasswordResetForm,MySetPasswordForm,MyPasswordChangeForm
 from django.urls import reverse_lazy
 
 # アクセスURL生成
@@ -42,7 +42,7 @@ from django.http import JsonResponse
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from lib.my_utils import check_session
+# from lib.my_utils import check_session
 
 
 # 逆参照のテーブルをフィルタやソートする
@@ -228,7 +228,30 @@ class Logout(LogoutView):
 
 
 
+"""
+ユーザーが自身のパスワード変更
+"""
+class PasswordChange(LoginRequiredMixin, PasswordChangeView, CommonView):
+    template_name = "accounts/password_change_for_self.html"
+    form_class = MyPasswordChangeForm
+    success_url = reverse_lazy('accounts:password_change_done')
+    login_url = '/login/'
 
+    def dispatch(self, request, *args, **kwargs):
+        # 不正遷移check
+        if not self.request.user.is_staff:
+            if self.request.user.company.pass_change == '2':
+                return render(request, '403.html', status=403)
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+"""
+ユーザー自身のパスワード変更完了
+"""
+class PasswordChangeDone(LoginRequiredMixin, PasswordChangeDoneView, CommonView):
+    template_name = 'accounts/password_change_done_for_self.html'
+    login_url = '/login/'
 """
 会社プロファイル
 """

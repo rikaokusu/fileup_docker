@@ -2,12 +2,13 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, OTPUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User
+from draganddrop.views.home.home_common import CommonView
 import datetime
 from django.db.models import Q
 from django.conf import settings
 import math
 
-class PersonalResourceManagementView(TemplateView):
+class PersonalResourceManagementView(TemplateView,CommonView):
     template_name = 'draganddrop/PersonalResourceManagement.html'
 
     def get_context_data(self, **kwargs):
