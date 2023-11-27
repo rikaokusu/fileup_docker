@@ -2,9 +2,8 @@ from django.urls import path, include
 from .views.home import send_table, download_table, home_common, file_download, url_access, otp_access
 from .views.admin import admin_personal, admin_company,log
 from .views.recipient import address, group
-from .views.upload import upload, url_share, duplicate, upload_common, otp_upload
-from .views.upload import upload, url_share, duplicate, upload_common
 from .views.approval import approval
+from .views.upload import upload, url_share, duplicate, upload_common, otp_upload, guest_upload
 from django.contrib.auth import views as auth_views
 
 app_name = 'draganddrop'
@@ -137,6 +136,18 @@ urlpatterns = [
      path('step2_otp_update/<uuid:pk>', otp_upload.Step2OTPUpdate.as_view(), name='step2_otp_update'),
      path('step3_otp_update/<uuid:pk>', otp_upload.Step3OTPUpdate.as_view(), name='step3_otp_update'),
      path('otp_return_update/<uuid:pk>',otp_upload.OTPReturnUpdateView.as_view(), name='otp_return_update'),
+     
+      ## guest_upload.py ##
+     # ゲストアップロード(作成・リクエスト)
+     path('step1_guest_upload/', guest_upload.Step1GuestUploadCreate.as_view(), name='step1_guest_upload'),
+     path('step2_guest_upload/<uuid:pk>', guest_upload.Step2GuestUploadCreate.as_view(), name='step2_guest_upload'),
+    #  path('guest_upload_return/<uuid:pk>', guest_upload.GuestReturnView.as_view(), name='guest_return'),
+
+     # ゲストアップロード(変更) 
+    #  path('otp_upload_manage_id/<uuid:pk>', otp_upload.Step1OTPUpdate.as_view(), name='step1_otp_update'),
+    #  path('step2_otp_update/<uuid:pk>', otp_upload.Step2OTPUpdate.as_view(), name='step2_otp_update'),
+    #  path('step3_otp_update/<uuid:pk>', otp_upload.Step3OTPUpdate.as_view(), name='step3_otp_update'),
+    #  path('otp_return_update/<uuid:pk>',otp_upload.OTPReturnUpdateView.as_view(), name='otp_return_update'),
 
      ## duplicate.py ##
      # ファイルアップロード(複製)  

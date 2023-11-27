@@ -1,0 +1,169 @@
+{% extends "draganddrop/common/base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+    <style>
+        .url_dl_page_wrapper .otp_btn {
+            width: 380px;
+            height:	50px;
+            border-radius: 8px;
+            color: #FFFFFF;
+            background-color:#005392 ;
+            border: 1px solid #005392;
+        }
+
+        .url_dl_page_wrapper .otp_btn:disabled {
+            width: 380px;
+            height:	50px;
+            border-radius: 8px;
+            color: #b6b2b2;
+            background-color:#EFEFEF ;
+            border: 1px solid #EFEFEF;
+        }
+        
+    </style>
+    <div class="url_dl_page_wrapper">
+
+        <h1><a href="#"><img src="../../../static/img/FileUP_Logo_Blue.svg" alt="FileUPロゴ"></a></h1>
+        <form action="" method="post">
+
+        {% if url_name == "otp_file_download_auth" %}
+            <div>
+                {% csrf_token %}
+                <h3>ワンタイムパスワード認証を行います</h3>
+                <br>
+                <h6 style="color: #005392; font-weight: bold;">このURLを受信したメールアドレスを入力し、「ワンタイムパスワードを送信」ボタンを押してください。</h6>
+                <div>
+                    {% render_field form.email class="form_auth" id="form_auth_mail" placeholder="メールアドレス" %}
+                </div>
+                <button type="button" id="otp_button" class="otp_btn my-3" disabled>ワンタイムパスワードを送信</button>
+                <br>
+                <h6 style="color: #005392; font-weight: bold;">メールアドレスに送信されたパスワードを入力し、「認証する」ボタンを押してください。</h6>
+                <div>
+                    {% render_field form.password class="form_auth" id="form_auth_pass" placeholder="パスワード" %}
+                    
+                </div>
+                <button type="submit" class="auth_btn mt-3" id="auth_button" disabled>認証する</button>
+                <div class="auth_error_message mt-3">
+                    {% if messages %}
+                        {% for message in messages %}
+                            {{message}}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="login_link">
+                <a href="{% url 'accounts:login' %}"
+                rel="noopener noreferrer">FileUPアカウントお持ちの方はこちら</a>
+                <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i>
+            </div>
+        
+        
+        {% else %}
+            <p class="unable_download_message">期限切れかリクエストが削除されているためダウンロードできません。</p>
+            <div class="url_close_btn_wrap" data-toggle="tooltip" title="ページを閉じる" data-placement="top">
+                <button  value="close" class="expired_page_close_btn" id="otp_dl_close_btn">閉じる
+                <i class="far fa-window-close"></i></button>
+            </div>
+    
+        {% endif %}
+
+        </form>
+    </div>
+
+    <!--汎用トーストメッセージ-->
+    <div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+        <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+            <div class="toast-body">
+                <div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+// -----------------------------------------
+//フォーム入力による認証ボタン制御 メールアドレスver
+// -----------------------------------------
+//ローディング
+function loadingView(flag) {
+    $('#loading-view').remove();
+    if (!flag) return;
+        $('<div id="loading-view" />').appendTo('body');
+}
+
+$(function () {
+    $("#form_auth_mail").on('input', function () { //メールアドレスフォームに入力されたら動く処理
+        if ($("#form_auth_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$')){
+            $("#otp_button").prop('disabled', false); //OTP送信ボタンを有効にさせる。
+        } else {
+            $("#otp_button").prop('disabled', true); //OTP送信ボタンを無効にさせる。
+        }
+        var mail = $('#form_auth_mail').val()
+    });
+    $('#otp_button').on('click', function () {
+        // ローディング
+        loadingView(true);
+        var mail = $('#form_auth_mail').val()
+        $.ajax({
+            type: "POST",
+            url: "{% url 'draganddrop:otp_send' %}",
+            data: {
+                'email': mail
+            },
+            dataType: 'json'
+        }).done(function (data, textStatus, jqXHR) {
+            console.log('データの中身',data)
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');//このクラスを付与して成功時の色を定義
+                toast.find('.toast-body').removeClass('alert-danger');//このクラスを付与して成功時の色を定義
+                toast.find('.toast-body').text(data["messages"]);//サーバ側から戻ってきたメッセージを表示
+            });
+            // ローディング画像止める
+            loadingView(false);
+            $('#result_toast').toast({ delay: 6000, animation: true }).toast('show'); //表示処理
+
+        }).fail(function(data, jqXHR, textStatus, errorThrown){
+            console.log('failにきた')
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-danger');//このクラスを付与して成功時の色を定義
+                toast.find('.toast-body').text('処理中にエラーが発生しました。再度送信ボタンを押してください。');
+            });
+            // ローディング画像止める
+            loadingView(false);
+            $('#result_toast').toast({ delay: 6000, animation: true }).toast('show'); //表示処理
+        });
+    });
+});
+
+    $(function () {
+        $("#form_auth_pass").on('input', function () { //パスワードフォームに入力されたら動く処理
+            if ($("#form_auth_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$')
+            && !$("#form_auth_pass").val() ==""){
+                $("#auth_button").prop('disabled', false); //認証ボタンを有効にさせる。
+            } else { 
+                $("#auth_button").prop('disabled', true); //認証ボタンを無効にさせる。
+            }
+        });
+
+    });
+
+    //閉じるボタン
+
+    let closebutton = document.getElementById('otp_dl_close_btn');
+                    closebutton.addEventListener('click', () => {
+        close();
+    });
+
+
+</script>
+{% endblock %}
