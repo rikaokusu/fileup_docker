@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address
 from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
-from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
+from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog,Notification
 # Register your models here.
 
 
@@ -56,7 +56,12 @@ class ApprovalOperationLogAdmin(admin.ModelAdmin):
 class ApprovalManageAdmin(admin.ModelAdmin):
     list_display = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
     list_display_links = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
+
 class OperationLogAdmin(admin.ModelAdmin):
+    list_display = ('id','release_date', 'title','category','target_user','start_date','contents','maintenance_start_date','maintenance_end_date','maintenance_contents','maintenance_targets','maintenance_affects','maintenance_cancel_reason')#表示したいやつ
+    list_display_links = ('id','release_date', 'title','category','target_user','start_date','contents','maintenance_start_date','maintenance_end_date','maintenance_contents','maintenance_targets','maintenance_affects','maintenance_cancel_reason')#クリックして変更したい時に
+
+class NotificationAdmin(admin.ModelAdmin):
     list_display = ('id','operation_user', 'operation',)#表示したいやつ
     list_display_links = ('id',)#クリックして変更したい時に
 
@@ -76,3 +81,4 @@ admin.site.register(SecondApproverRelation, SecondApproverRelationAdmin)
 admin.site.register(ApprovalOperationLog, ApprovalOperationLogAdmin)
 admin.site.register(ApprovalManage, ApprovalManageAdmin)
 admin.site.register(OperationLog)
+admin.site.register(Notification)

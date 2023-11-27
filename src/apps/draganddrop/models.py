@@ -510,7 +510,7 @@ class Notification(models.Model):
     category = models.CharField(_('category'), max_length=30, default="1", choices=CATEGORY_CHOICES, blank=True)
     # category = models.CharField(_('category'), max_length=255, default="お知らせ")
     target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
-    # 通知開始日
+    # 通知開始日(いつ通知したいかの予約、例：明日のAM9:00に通知だったらその日付入れる)
     start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
     #内容
     contents = models.TextField('内容', blank=True, null=True)
