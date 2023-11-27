@@ -443,11 +443,10 @@ class OperationLog(models.Model):
     )
     OPERATION_LOG_OPERATION = (
     (0, 'なし'),
-    (1, 'ログイン'),
-    (2, '作成'),
-    (3, '変更'),
-    (4, '削除'),
-    (5, '登録'),
+    (1, '作成'),
+    (2, '変更'),
+    (3, '削除'),
+    (4, '登録'),
     )
     UPLOAD_LOG_CATEGORY = (
     (0,'通常アップロード'),

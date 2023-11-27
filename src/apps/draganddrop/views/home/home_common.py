@@ -4,13 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
-from accounts.models import User
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File
 from draganddrop.models import Notification,Read
 from draganddrop.forms import UserChangeForm
-from datetime import datetime, date, timedelta, timezone
-from django.urls import reverse
+# from datetime import datetime, date, timedelta, timezone
+import datetime
 from django.urls import reverse
 from django.db.models import Q
 from django.conf import settings
@@ -24,7 +23,7 @@ class CommonView(ContextMixin):
 
     # ログインユーザーを返す
     def get_context_data(self, **kwargs):
-        today = datetime.now(timezone.utc)
+        today = datetime.datetime.now()
         context = super().get_context_data(**kwargs)
         current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         context["current_user"] = current_user
@@ -101,7 +100,7 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
             read.save()
             
             #追記
-            today = datetime.now(timezone.utc)
+            today = datetime.datetime.now()
 
             read2 = Read.objects.filter(read_user=user).count()
             if read2 > 0:
@@ -227,7 +226,7 @@ class UserUpdateInfoView(LoginRequiredMixin, UpdateView, CommonView):
         # target_user.is_updating = True
         # target_user.save()
 
-        today = datetime.now(timezone.utc)
+        today = datetime.datetime.now()
         
         context = super().get_context_data(**kwargs)
         #すでにそのユーザーのレコードが存在してたたら（すでに利用中）
