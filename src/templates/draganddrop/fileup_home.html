@@ -2845,9 +2845,8 @@ $('#dl_del_task_modal').on('show.bs.modal', function (event) {
 
     // 行のIDを取得
     var button = $(event.relatedTarget)
-    var delete_id = button.data('value')
-    var delete_name = button.data('del_name')
-
+    var delete_id = button.data('value') /* downloadtableのid */
+    var delete_name = button.data('del_name') /* ファイルタイトル */
     var modal = $(this);
     modal.find('.del-file-name-text').text(delete_name + "　" + "を削除します");
 

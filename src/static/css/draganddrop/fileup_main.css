@@ -3265,10 +3265,12 @@ DatePicker
 .log-table th{
     margin:0;
     padding:0;
+    padding-left: .6rem;
 }
 
 .log-table td{
     border: solid 2px #fff;
+    padding: .6rem;
 }
 .log-filename{
     margin: 0;

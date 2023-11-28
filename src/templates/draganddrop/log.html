@@ -31,7 +31,7 @@
             {% for log in logs %}
             <tr>
                 <td></td><!--counter-->
-                <td>{{ log.created_date }}</td>
+                <td>{{ log.created_date | date:'Y/m/d H:i:s' }}</td>
                 <td>{{ log.operation_user }}</td>
                 <td>{{ log.client_addr }}</td>
                 {% comment %} <td>{{ log.get_category_display }}</td> {% endcomment %}

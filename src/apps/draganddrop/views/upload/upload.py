@@ -435,7 +435,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
         upload_manage.save()
         # 操作ログ
-        add_log(2,2,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
 
         print("------------------- Step2")
 

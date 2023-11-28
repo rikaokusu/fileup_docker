@@ -3,26 +3,36 @@ from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
 from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable
 from django.http import JsonResponse
+from draganddrop.views.home.home_common import CommonView
 import urllib.parse
 import os
 from django.db.models import Q
 from django.conf import settings
 import zipfile
+#操作ログ関数
+from lib.my_utils import add_log
 
 ##################################
 # 受信テーブル単数削除  #
 ##################################
-class DownloadTableDeleteAjaxView(View):
-    def post(self, request):
-        delete_id = request.POST.get('delete_id')
-        delete_name = request.POST.get('delete_name')
+class DownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        delete_id = request.POST.get('delete_id') #downloadtableのid 
+        delete_name = request.POST.get('delete_name')#ファイルタイトル
 
         try:
             # ダウンロードテーブルに変更
             downloadtable = Downloadtable.objects.get(pk__exact=delete_id)
+            #↓二行操作ログ用
+            # filetable = Filemodel.objects.get(upload=delete_id)
+            print('でりーとこのファイル？？',downloadtable.upload_manage.file )
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()
+            # 操作ログ登録
+            # add_log(2,3,current_user,file_title,files,""," ",self.request.META.get('REMOTE_ADDR'))
 
             #メッセージを格納してJSONで返す
             data = {}
