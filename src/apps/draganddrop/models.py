@@ -543,14 +543,15 @@ class OperationLog(models.Model):
     # # 対象ファイル名
     # log_filename = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
     # 共有種別（通常、URL,OTP）
-    upload_category = models.IntegerField(_('共有種別'), default='0', choices=UPLOAD_LOG_CATEGORY)
+    upload_category = models.IntegerField(_('共有種別'), default='0', choices=UPLOAD_LOG_CATEGORY,null=True)
 
 # 操作ログ用のファイルテーブル
 class LogFile(models.Model):
     # 操作ログ紐づけ
     log = models.ForeignKey(OperationLog, on_delete=models.CASCADE, related_name='log_filename', null=True)
-    # 対象ファイル名
-    file = models.OneToOneField(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # 対象ファイル名/onetooneだと送るとき、それを消すときで重複してcreateできなかった
+    file = models.ForeignKey(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
+    # file = models.OneToOneField(Filemodel, on_delete=models.CASCADE, related_name='log_filename', null=True)
 
 # 操作ログ用の宛先メールテーブル
 class LogDestUser(models.Model):

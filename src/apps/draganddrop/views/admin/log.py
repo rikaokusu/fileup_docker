@@ -39,7 +39,7 @@ class LogView(CommonView,TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        logs =  OperationLog.objects.filter(category=2)
+        logs =  OperationLog.objects.filter(category=2).order_by('created_date').reverse
         log_files =  LogFile.objects.all()
         log_destusers = LogDestUser.objects.all()
         logsfirst =  OperationLog.objects.first()

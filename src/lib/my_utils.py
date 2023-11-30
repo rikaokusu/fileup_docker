@@ -81,12 +81,16 @@ def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_c
         upload_category = upload_category,
         client_addr = client_addr,
     )
-
+    print('add_logです',files)
     for file in files:
+        print('add_logのforのなか',operation_log_obj)
+        print('add_logのforのなか',file)
         LogFile.objects.create(
+            # file = file,
             log = operation_log_obj,
             file = file,
         )
+        print('add_logのforのうしろ',file)
 
     # for destuser in destusers:
     #     LogDestUser.objects.create(

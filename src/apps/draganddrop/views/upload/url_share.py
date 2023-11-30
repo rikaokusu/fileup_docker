@@ -474,6 +474,7 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
 
         url_upload_manage_obj.save()
         # 操作ログ
+        print("URLふぁいるずadd_log直前",files)
         add_log(2,1,current_user,file_title,files,dest_mail_log,1,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2_url_upload', kwargs={'pk': url_upload_manage_obj.id}))
