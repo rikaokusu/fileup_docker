@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import FormView, View, CreateView, TemplateView, UpdateView
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from draganddrop.views.home.home_common import CommonView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ApprovalWorkflowEditForm, FirstApproverSetForm, SecondApproverSetForm
@@ -81,6 +81,13 @@ class ApprovalWorkflowView(TemplateView,CommonView):
 
         context["second_approver_qs"] = second_approver_qs
 
+        # ログインユーザーが一次承認者、二次承認者に設定されているApprovalManageを取得
+        user_approval_manages = ApprovalManage.objects.filter(
+            Q(first_approver=user.id) | Q(second_approver=user.id)
+        ).distinct()
+        # print("---------- user_approval_manages ---------", user_approval_manages)
+
+        context["user_approval_manages"] = user_approval_manages
 
         return context
 
@@ -467,23 +474,70 @@ class ApprovalLogView(TemplateView,CommonView):
 """
 申請一覧
 """
-class ApprovalDetailView(TemplateView,CommonView):
+class ApprovalDetailView(TemplateView, CommonView):
     template_name = 'draganddrop/ApprovalDetailView.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         service = Service.objects.get(name="FileUP!")
-        # 管理テーブル情報取得
-        # resource_management = ResourceManagement.objects.filter(company=self.request.user.company.id)
-        # context["resource_management"] = resource_management
 
-        context["resource_management"] = "aaa"
+        approval_manage_pk = self.kwargs['pk']
+        # print("---------------- approval_manage_pk", approval_manage_pk)
+
+        # ApprovalManage情報取得
+        approval_manage_qs = ApprovalManage.objects.filter(id=approval_manage_pk)
+        context["approval_manage_qs"] = approval_manage_qs
 
         return context
 
 
 
+"""
+承認
+"""
+class ApproveView(View):
+
+    def post(self, request, *args, **kwargs):
+
+        approval_manage_id = self.kwargs['pk']
+
+        # ログインしているユーザーのApprovalManageのレコードを取得
+        approval_manage = ApprovalManage.objects.filter(id=approval_manage_id).first()
+
+        # ステータスを更新
+        approval_manage.approval_status = 2
+        approval_manage.approval_date = datetime.now()
+        approval_manage.save()
+
+        # メッセージを返す
+        message = f'承認しました'
+
+        messages.success(self.request, message)
+
+        return HttpResponseRedirect(reverse('draganddrop:approval_workflow'))
 
 
+"""
+差し戻し
+"""
+class DeclineApplicationView(View):
 
+    def post(self, request, *args, **kwargs):
+
+        approval_manage_id = self.kwargs['pk']
+
+        # ログインしているユーザーのApprovalManageのレコードを取得
+        approval_manage = ApprovalManage.objects.filter(id=approval_manage_id).first()
+
+        # ステータスを更新
+        approval_manage.approval_status = 3
+        approval_manage.approval_date = None
+        approval_manage.save()
+
+        # メッセージを返す
+        message = f'差戻しました'
+
+        messages.success(self.request, message)
+
+        return HttpResponseRedirect(reverse('draganddrop:approval_workflow'))

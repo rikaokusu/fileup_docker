@@ -446,7 +446,7 @@ class Step3(TemplateView, CommonView):
 
     def get_context_data(self, **kwargs):
 
-        print("------------------- Step3")
+        # print("------------------- Step3")
 
         context = super().get_context_data(**kwargs)
 
@@ -456,6 +456,9 @@ class Step3(TemplateView, CommonView):
 
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
         upload_manage.tmp_flag = 0
+
+        # 申請ステータスを「申請中」に設定
+        upload_manage.application_status = 1
 
         upload_manage.save()
 
@@ -516,18 +519,50 @@ class Step3(TemplateView, CommonView):
         resource_management_calculation_process(self.request.user.company.id)
 
 
+
         # ユーザーの承認ワークフロー設定を取得
-        # approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
         # print("------------------ approval_workflow step2", approval_workflow)
 
-        # # 承認ワークフローが「使用する」に設定されている場合
-        # if approval_workflow.is_approval_workflow:
-        #     # 一次承認者を取得
-        #     first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
-        #     print("------------------ first_approvers step2", first_approvers)
-        #     # 二次承認者を取得
-        #     second_approver = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
-        #     print("------------------ second_approver step2", second_approver)
+        # 承認ワークフローが「使用する」に設定されている場合
+        if approval_workflow.is_approval_workflow:
+            # 一次承認者を取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ first_approvers step2", first_approvers)
+            # 二次承認者を取得
+            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ second_approver step2", second_approvers)
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+                for first_approver in first_approvers:
+                    # print("------------------ first_approversがいます", first_approver.first_approver)
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_mange = upload_manage,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 1,
+                        first_approver = first_approver.first_approver
+                    )
+                    first_approver_approval_manage.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_mange = upload_manage,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 1,
+                        second_approver = second_approver.second_approver
+                    )
+                    second_approver_approval_manage.save()
 
         return context
 

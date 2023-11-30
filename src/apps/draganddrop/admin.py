@@ -8,7 +8,8 @@ from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, Downlo
 
 
 class UploadManageAdmin(admin.ModelAdmin):
-    list_display = ('title', '_file', '_dest_user', 'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8', 'created_user', 'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit')
+    list_display = ('title', '_file', '_dest_user', 'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8', 'created_user',
+                    'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit', 'application_status')
     list_display_links = ('title',)
 
     def _file(self, row):
@@ -54,8 +55,8 @@ class ApprovalOperationLogAdmin(admin.ModelAdmin):
 
 
 class ApprovalManageAdmin(admin.ModelAdmin):
-    list_display = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
-    list_display_links = ('upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'application_status', 'approval_date', 'first_approver', 'second_approver')
+    list_display = ('id', 'upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'approval_status', 'approval_date', 'first_approver', 'second_approver')
+    list_display_links = ('id', 'upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'approval_status', 'approval_date', 'first_approver', 'second_approver')
 
 class OperationLogAdmin(admin.ModelAdmin):
     list_display = ('id','release_date', 'title','category','target_user','start_date','contents','maintenance_start_date','maintenance_end_date','maintenance_contents','maintenance_targets','maintenance_affects','maintenance_cancel_reason')#表示したいやつ
@@ -64,6 +65,8 @@ class OperationLogAdmin(admin.ModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('id','operation_user', 'operation',)#表示したいやつ
     list_display_links = ('id',)#クリックして変更したい時に
+
+
 
 admin.site.register(Filemodel)
 admin.site.register(UploadManage, UploadManageAdmin)

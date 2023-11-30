@@ -223,8 +223,10 @@ urlpatterns = [
      ##################################
      # 承認ワークフロー 
      ##################################
-     # 基本設定
+     # 基本設定(承認一覧)
      path('approval_workflow/', approval.ApprovalWorkflowView.as_view(), name='approval_workflow'),
+     # 基本設定(申請一覧)
+     # path('application_workflow/', approval.ApplicationView.as_view(), name='application_workflow'),
      # 基本設定 編集画面
      path('approval_workflow_edit/<uuid:pk>/', approval.ApprovalWorkflowEditView.as_view(), name='approval_workflow_edit'),
      # 第一承認者設定
@@ -237,8 +239,14 @@ urlpatterns = [
      path('second_approver_delete/<uuid:pk>/',approval.SecondApproverDeleteView.as_view(),name='second_approver_delete'),
      # 操作ログ
      path('approval_log/', approval.ApprovalLogView.as_view(), name='approval_log'),
-     # 申請詳細
-     path('approval_detail/', approval.ApprovalDetailView.as_view(), name='approval_detail'),
+     # 承認詳細
+     path('approval_detail/<uuid:pk>/', approval.ApprovalDetailView.as_view(), name='approval_detail'),
+
+     # 承認
+     path('approve/<uuid:pk>/', approval.ApproveView.as_view(), name='approve'),
+     # 差し戻し
+     path('decline_application/<uuid:pk>/', approval.DeclineApplicationView.as_view(), name='decline_application'),
+
 
      ##################################
      # 操作ログ  

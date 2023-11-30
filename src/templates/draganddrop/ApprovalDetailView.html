@@ -1,19 +1,7 @@
 {% extends "draganddrop/common//base.html" %}
 
-{% load is_past_due %}
-{% load dl_file_count %}
-{% load url_dl_file_count %}
-{% load dl_count %}
-{% load url_dl_count %}
-{% load get_extention %}
-{% load get_group_download_status %}
-{% load url_get_group_download_status %}
-{% load get_download_status %}
-{% load url_get_download_status %}
-{% load get_direct_users %}
-{% load url_get_direct_users %}
-{% load get_display_name %}
-{% load mathfilters %}
+{% load get_user_invoice_dept_name %}
+{% load get_operation_user_name %}
 
 {% block content %}
 
@@ -140,48 +128,9 @@
 </div>
 
 <div class="">
-
-    {% comment %} <div class="box1-3 d-flex bd-highlight mb-3">
-        <div class="mr-auto p-2 bd-highlight zyushin-title-bar">
-            <h2 class="m-0 zyushin-title">操作履歴一覧</h2>
-        </div>
-	</div> {% endcomment %}
-
-	{% comment %} <table id="myTable" class="display" style="width:100%">
-		<thead>
-			<tr>
-				<th>No</th>
-				<th>操作日時</th>
-				<th>ユーザー名</th>
-				<th>部署名</th>
-				<th>操作内容</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>1</td>
-				<td>2023/11/07 10:00</td>
-				<td>山田 太郎</td>
-				<td>総務部</td>
-				<td>
-					一次承認者を変更
-				</td>
-			</tr>
-
-			<tr>
-				<td>2</td>
-				<td>2023/11/08 10:00</td>
-				<td>小林 太郎</td>
-				<td>営業部</td>
-				<td>
-					上長承認機能を無効に変更
-				</td>
-			</tr>
-		</tbody>
-	</table> {% endcomment %}
-
 	<table class="table_modal">
 		<tbody>
+			{% for approval_manage in approval_manage_qs %}
 			<tr>
 				<td rowspan="6" class="tr_head">
 					申請概要
@@ -189,28 +138,30 @@
 
 				<tr>
 					<td class="tr_head">申請件名</td>
-					<td>業務管理向けファイルの共有</td>
+					<td>{{ approval_manage.application_title }}</td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">申請者</td>
-					<td>山田 太郎</td>
+					<td>{{ approval_manage.application_user|get_operation_user_name }}</td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">申請日時</td>
-					<td>2023/11/07 10:00</td>
+					<td>{{ approval_manage.application_date }}</td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">コメント内容</td>
-					<td>テストコメントですテストコメントですテストコメントですテストコメントです</td>
+					<td>{{ approval_manage.upload_mange.message }}</td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">送付ファイル</td>
-					<td>ファイル1<br>
-						ファイル2
+					<td>
+						{% for file in approval_manage.upload_mange.file.all %}
+							{{ file }}<br>
+						{% endfor %}
 					</td>
 				</tr>
 			</tr>
@@ -222,7 +173,15 @@
 
 				<tr>
 					<td class="tr_head">ステータス</td>
-					<td>承認済み</td>
+					<td>
+						{% if approval_manage.approval_status == 1 %}
+                            未承認
+						{% elif approval_manage.approval_status == 2 %}
+                            承認済み
+						{% else %}
+                            差戻し
+						{% endif %}
+					</td>
 				</tr>
 
 				<tr>
@@ -232,117 +191,15 @@
 
 				<tr>
 					<td class="tr_head">承認日時</td>
-					<td>2023/11/22 15:00</td>
+					<td>{{ approval_manage.approval_date }}</td>
 				</tr>
 
-				<tr>
+				{% comment %} <tr>
 					<td class="tr_head">次の承認者</td>
 					<td>佐藤 勇作</td>
-				</tr>
+				</tr> {% endcomment %}
 			</tr>
-
-			<!-- ステータス -->
-			{% comment %} <tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">ステータス</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox_small" id="personal_info_chg_jumin">
-						<span>承認済み</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- 申請件名 -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">申請件名</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox_small" id="personal_info_chg_jumin">
-						<span>業務管理向けファイルの共有</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- 申請者 -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">申請者</div>
-					</div>
-				</th>
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox" id="personal_info_chg_c_jumin_type">
-						<span>山田 太郎</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- 申請日時 -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">申請日時</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox" id="personal_info_chg_c_jumin_condition">
-						<span>2023/11/07 10:00</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- 承認日時 -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">承認日時</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox_small" id="personal_info_chg_kana1">
-						<span>2023/11/22 15:00</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- コメント内容 -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">コメント内容</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox_small" id="personal_info_chg_name">
-						<span>テストコメントですテストコメントですテストコメントですテストコメントです</span>
-					</div>
-				</th>
-			</tr>
-
-			<!-- 送付ファイル -->
-			<tr>
-				<th class="tr_head">
-					<div class="box">
-						<div class="label title_label">送付ファイル</div>
-					</div>
-				</th>
-
-				<th colspan="8" class="title_label">
-					<div class="search_checkbox" id="personal_info_chg_c_label">
-					</div>
-				</th>
-			</tr> {% endcomment %}
+			{% endfor %}
 		</tbody>
 	</table>
 </div>

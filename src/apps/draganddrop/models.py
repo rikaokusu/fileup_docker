@@ -84,6 +84,14 @@ class Filemodel(models.Model):
         name = self.name
         return name
 
+
+APPLICATION_STATUS_CHOICE = (
+    (1, '申請中'),
+    (2, '一次承認待ち'),
+    (3, '最終承認待ち'),
+    (4, 'キャンセル'),
+)
+
 class UploadManage(models.Model):
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -108,6 +116,8 @@ class UploadManage(models.Model):
     dl_limit = models.IntegerField(verbose_name='ダウンロード回数', default=0, blank=True)
     file_del_flag = models.IntegerField(null=True, blank=True, default=0)
     message = models.CharField(max_length=140, null=True, blank=True)
+    # 申請ステータス
+    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
 
     @property
     def is_past_due(self):
@@ -474,16 +484,15 @@ class ApprovalOperationLog(models.Model):
 承認申請
 """
 
-APPLICATION_STATUS_CHOICE = (
-    (1, '申請中'),
-    (2, '一次承認待ち'),
-    (3, '最終承認待ち'),
-    (4, '承認済み'),
-    (5, '差戻し'),
-    (6, 'キャンセル'),
+APPLOVAL_STATUS_CHOICE = (
+    (1, '未承認'),
+    (2, '承認済み'),
+    (3, '差戻し'),
 )
 
 class ApprovalManage(models.Model):
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # ファイルアップロード
     upload_mange = models.ForeignKey(UploadManage, on_delete=models.CASCADE, null=True, related_name='upload_mange')
     # 申請件名
@@ -494,14 +503,16 @@ class ApprovalManage(models.Model):
     application_date = models.DateTimeField('申請日時', default=timezone.now)
     # 申請ユーザーの会社のID
     application_user_company_id = models.CharField('申請ユーザーの会社のID', max_length=500, null=True, blank=True)
-    # 申請ステータス
-    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 承認ステータス
+    approval_status = models.IntegerField('承認ステータス', choices=APPLOVAL_STATUS_CHOICE, default=1)
     # 一次承認者
-    first_approver = models.CharField('一次承認者', max_length=255, blank=True, null=True)
+    first_approver = models.CharField('一次承認者', max_length=500, blank=True, null=True)
     # 二次承認者
-    second_approver = models.CharField('二次承認者', max_length=255, blank=True, null=True)
+    second_approver = models.CharField('二次承認者', max_length=500, blank=True, null=True)
     # 承認日時
-    approval_date = models.DateTimeField('承認日時', default=timezone.now)
+    approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+
+
 ##############  操作ログ
 class OperationLog(models.Model):
     OPERATION_LOG_CATEGORY = (

@@ -6,6 +6,7 @@ from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File
 from draganddrop.models import Notification,Read
+from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
 import datetime
@@ -167,6 +168,18 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         """会社毎のレコード数取得"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
         context["number_of_company_upload_manage"] = number_of_company_upload_manage
+
+        # ユーザーのApprovalWorkflowを取得
+        user_approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        print("----------------------　TOPページ", user_approval_workflow)
+        # 存在しなければ作成
+        if not user_approval_workflow:
+            user_approval_workflow = ApprovalWorkflow.objects.create(
+                reg_user = self.request.user.id,
+                reg_user_company = self.request.user.company.id,
+                registration_date = datetime.datetime.now()
+            )
+            user_approval_workflow.save()
 
         # セッションに「_(アンダースコア)以外のセッション情報があった場合削除
         for key in list(self.request.session.keys()):
