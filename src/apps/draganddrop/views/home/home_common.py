@@ -115,8 +115,9 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
         context["info"] = info
         return context
 
-
-
+"""
+ホーム画面
+"""
 class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
     model = UploadManage
     template_name = 'draganddrop/fileup_home.html'
@@ -126,7 +127,7 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         context = super().get_context_data(**kwargs)
 
         """送信テーブル"""
-        # アップロード用
+        # 通常アップロード用
         user=self.request.user.id
         upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["upload_manages"] = upload_manages

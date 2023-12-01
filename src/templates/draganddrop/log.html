@@ -11,29 +11,30 @@
             操作ログ一覧
         </p>
     </div>
+    <h2 class="log-file-title">ファイル共有</h2>
     <table class="table table-striped log-table">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col" style="min-width:90px;">操作日時</th>
-                <th scope="col">操作した人</th>
-                <th scope="col" style="min-width:100px;">操作した<br>IPアドレス</th>
-                <th scope="col" style="min-width:120px;">カテゴリ</th>
-                <th scope="col" style="min-width:95px;">操作種別</th>
+                <th scope="col" style="min-width:90px;">日時</th>
+                <th scope="col">ユーザー</th>
+                <th scope="col" style="min-width:100px;">IPアドレス</th>
+                {% comment %} <th scope="col" style="min-width:120px;">カテゴリ</th> {% endcomment %}
+                <th scope="col" style="min-width:95px;">操作</th>
                 <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
                 <th scope="col" style="min-width:200px;">タイトル</th>
                 <th scope="col">ファイル名</th>
-                <th scope="col" style="min-width:155px;">共有種別</th>
+                <th scope="col" style="min-width:155px;">種別</th>
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
             <tr>
                 <td></td><!--counter-->
-                <td>{{ log.created_date }}</td>
+                <td>{{ log.created_date | date:'Y/m/d H:i:s' }}</td>
                 <td>{{ log.operation_user }}</td>
                 <td>{{ log.client_addr }}</td>
-                <td>{{ log.get_category_display }}</td>
+                {% comment %} <td>{{ log.get_category_display }}</td> {% endcomment %}
                 <td>{{ log.get_operation_display }}</td>
                 <td>
                     {% comment %} {% for log_destuser in log_destusers %}

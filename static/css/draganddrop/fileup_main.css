@@ -3265,10 +3265,12 @@ DatePicker
 .log-table th{
     margin:0;
     padding:0;
+    padding-left: .6rem;
 }
 
 .log-table td{
     border: solid 2px #fff;
+    padding: .6rem;
 }
 .log-filename{
     margin: 0;
@@ -3284,6 +3286,12 @@ DatePicker
 }
 .log-table > tbody > tr > td:first-child::before {
     content: counter(rowCount);
+}
+
+/* 操作ログ：ファイル共有 */
+.log-file-title{
+    margin-top:20px;
+    border-bottom: 3px solid #005392;
 }
 
 /********************　ログアウト　****************************/

@@ -1,28 +1,39 @@
 from django.shortcuts import render
 from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
-from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable
+from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable,OTPUploadManage
 from django.http import JsonResponse
+from draganddrop.views.home.home_common import CommonView
 import urllib.parse
 import os
 from django.db.models import Q
 from django.conf import settings
 import zipfile
+#操作ログ関数
+from lib.my_utils import add_log
 
 ##################################
 # 受信テーブル単数削除  #
 ##################################
-class DownloadTableDeleteAjaxView(View):
-    def post(self, request):
-        delete_id = request.POST.get('delete_id')
-        delete_name = request.POST.get('delete_name')
+class DownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        delete_id = request.POST.get('delete_id') #downloadtableのid 
+        delete_name = request.POST.get('delete_name')#ファイルタイトル
 
         try:
             # ダウンロードテーブルに変更
             downloadtable = Downloadtable.objects.get(pk__exact=delete_id)
+            #↓二行操作ログ用・ファイル名取得
+            uploadmanage = UploadManage.objects.get(id=downloadtable.upload_manage.id)
+            files = uploadmanage.file.all()
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()
+            # 操作ログ登録
+            print('もしかしてfileみえない？3',files)
+            add_log(2,3,current_user,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
 
             #メッセージを格納してJSONで返す
             data = {}
@@ -38,21 +49,29 @@ class DownloadTableDeleteAjaxView(View):
 ##################################
 # 受信テーブル URL共有 単数削除 #
 ##################################
-class UrlDownloadTableDeleteAjaxView(View):
-    def post(self, request):
-        url_delete_id = request.POST.get('url_delete_id')
-        url_delete_name = request.POST.get('url_delete_name')
+class UrlDownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        url_delete_id = request.POST.get('url_delete_id')#downloadtableのid 
+        url_delete_name = request.POST.get('url_delete_name')#ファイルタイトル
 
         try:
             # ダウンロードテーブルに変更
             urldownloadtable = UrlDownloadtable.objects.get(pk__exact=url_delete_id)
-
+            #↓二行操作ログ用・ファイル名取得
+            urluploadmanage = UrlUploadManage.objects.get(id=urldownloadtable.url_upload_manage.id)
+            print('urlもしかしてfileみえない？1',urluploadmanage)
+            files = urluploadmanage.file.all()
+            print('urlもしかしてfileみえない？2',files)
             # ダウンロードテーブルの削除フラグを立てる
             urldownloadtable.trash_flag = 1
 
             # その後保存する
             urldownloadtable.save()
-
+            # 操作ログ登録
+            print('urlもしかしてfileみえない？3',files)
+            add_log(2,3,current_user,url_delete_name,files,"",1,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = url_delete_name + 'を削除しました'
@@ -67,21 +86,30 @@ class UrlDownloadTableDeleteAjaxView(View):
 ##################################
 # 受信テーブル OTP 単数削除 #
 ##################################
-class OTPDownloadTableDeleteAjaxView(View):
-    def post(self, request):
+class OTPDownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         otp_delete_id = request.POST.get('otp_delete_id')
         otp_delete_name = request.POST.get('otp_delete_name')
 
         try:
             # ダウンロードテーブルに変更
             otpdownloadtable = OTPDownloadtable.objects.get(pk__exact=otp_delete_id)
-
+            #↓二行操作ログ用・ファイル名取得
+            otpuploadmanage = OTPUploadManage.objects.get(id=otpdownloadtable.otp_upload_manage.id)
+            print('otpもしかしてfileみえない？1',otpuploadmanage)
+            files = otpuploadmanage.file.all()
+            print('otpもしかしてfileみえない？2',files)
             # ダウンロードテーブルの削除フラグを立てる
             otpdownloadtable.trash_flag = 1
 
             # その後保存する
             otpdownloadtable.save()
-
+            # 操作ログ登録
+            print('urlもしかしてfileみえない？3',files)
+            # add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = otp_delete_name + 'を削除しました'

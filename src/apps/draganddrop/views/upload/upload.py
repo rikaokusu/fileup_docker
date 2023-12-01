@@ -251,7 +251,7 @@ class Step1(FormView, CommonView):
                 dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
             else:
                 dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
-        
+            print('だれいる？？？',dest_user_all_list)
         for group in dest_user_group_qs:
             dest_user_all_list.append(group.group_name + " " + "2")
 
@@ -289,10 +289,11 @@ class Step1(FormView, CommonView):
         self.request.session['dest_user_mail6'] = dest_user_mail6
         self.request.session['dest_user_mail7'] = dest_user_mail7
         self.request.session['dest_user_mail8'] = dest_user_mail8
-
+        print('宛先だれですか？？せーぶまえ',dest_user_all_list)
         # 保存
         upload_manage.save()
         upload_manage_id = str(upload_manage.id)
+        print('宛先だれですか？？せーぶあと',dest_user_all_list)
 
         # 生成されたDBの対象行のIDをセッションに保存しておく
         self.request.session['upload_manage_id'] = upload_manage_id
@@ -341,10 +342,10 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
         # 宛先メールアドレス('')を省くため文字列に変換
         dest_mail_log = ' '.join(dest_mail_ok)
-        print(dest_mail_log,"かっこけしたい")
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
+
 
         # ファイルの削除
         if self.del_file:
@@ -367,6 +368,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
             # オブジェクトの取得
             files = Filemodel.objects.filter(pk__in=up_file_id_int)
+            print("ふぁいるずpk__in=のやつ",files)
 
             # タスクとファイルを紐付ける
             for file in files:
@@ -387,10 +389,8 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                 # ファイルパスを分割してファイル名だけ取得
                 # file_name = file_path.split('/', 2)[2]
                 file_name = file_path.split('/', 3)[3]
-                print('ふぁいるめい',file_name)
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-                print('----pathはなに',path)
 
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
@@ -401,9 +401,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
                         # htmlファイルを生成して書き込む
                         upload_s = str(file.upload)
-                        print('----------uplod_sとは',upload_s)
                         upload_ss = upload_s.split('/')[0]
-                        print('----------uplod_ssとは',upload_ss)
 
                         file_path = urllib.parse.unquote(file.upload.url)
 
@@ -432,10 +430,11 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                         )
 
                         htmlfile.save()
-
+        
         upload_manage.save()
         # 操作ログ
-        add_log(2,2,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
+        print("ふぁいるずadd_log直前",files)
+        add_log(2,1,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
 
         print("------------------- Step2")
 

@@ -1,5 +1,6 @@
 from accounts.models import User
-from datetime import datetime,timezone
+import datetime
+# from datetime import datetime,timezone
 from django.contrib import messages
 from django.shortcuts import redirect
 from draganddrop.models import OperationLog,LogFile,LogDestUser
@@ -30,7 +31,7 @@ def check_session(self, request, instance):
                 change_user = str(user.display_name)
 
                 timestamp = instance.version
-                now = datetime.now(timezone.utc)
+                now = datetime.datetime.now()
 
                 diff = now - timestamp
 
@@ -48,13 +49,16 @@ def check_session(self, request, instance):
 
         else:
             # 変更フラグをセット
-            instance.version = datetime.now()
+            instance.version = datetime.datetime.now()
             # 変更者のIDをセット
             instance.change_user =  self.request.user.id
             # 保存
             instance.save()
 
 def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_category, client_addr):
+    # t_delta = datetime.timedelta(hours=9)
+    # JST = datetime.timezone(t_delta, 'JST')
+    # now = datetime.datetime.now(JST)
 
     logger.debug("operation")
     logger.debug(operation)
@@ -66,7 +70,8 @@ def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_c
     logger.debug(upload_category)
 
     operation_log_obj = OperationLog.objects.create(
-        created_date = datetime.now(),
+        # created_date = now.strftime('%Y/%m/%d %H:%M:%S'),
+        created_date = datetime.datetime.now(),
         operation_user = op_user,
         category = category,
         operation = operation,
@@ -76,12 +81,16 @@ def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_c
         upload_category = upload_category,
         client_addr = client_addr,
     )
-
+    print('add_logです',files)
     for file in files:
+        print('add_logのforのなか',operation_log_obj)
+        print('add_logのforのなか',file)
         LogFile.objects.create(
+            # file = file,
             log = operation_log_obj,
             file = file,
         )
+        print('add_logのforのうしろ',file)
 
     # for destuser in destusers:
     #     LogDestUser.objects.create(
