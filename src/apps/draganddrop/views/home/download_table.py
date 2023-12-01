@@ -124,11 +124,16 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
 ##################################
 # 受信テーブル一括削除 #
 ##################################
-class MultiDownloadTableDeleteAjaxView(View):
-    def post(self, request):
+class MultiDownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         multi_delete_id = request.POST.getlist('dest_user_ids[]')
         url_multi_delete_id = request.POST.getlist('url_dest_user_ids[]')
         otp_multi_delete_id = request.POST.getlist('otp_dest_user_ids[]')
+        print('ですとゆーざーにしてるのなんで1',multi_delete_id)
+        print('ですとゆーざーにしてるのなんで2',url_multi_delete_id)
+        print('ですとゆーざーにしてるのなんで3',otp_multi_delete_id)
 
         try:
             # ダウンロードテーブルに変更
@@ -140,26 +145,58 @@ class MultiDownloadTableDeleteAjaxView(View):
             
             otp_multi_tables = OTPDownloadtable.objects.filter(pk__in=otp_multi_delete_id)
             otp_multi_tables = otp_multi_tables.all()
+            #↓二行操作ログ用・ファイル名取得
+            print('通常一括削除かくにん1',multi_tables)
+            print('url一括削除かくにん1',url_multi_tables)
+            print('otp一括削除かくにん1',otp_multi_tables)
+            # for otp_multi_table in otp_multi_tables:
+            #     print('otp一括削除かくにん2',otp_multi_table)
+            # otpuploadmanage = OTPUploadManage.objects.filter(id=otpdownloadtable.otp_upload_manage.id)
+            # print('一括もしかしてfileみえない？1',otpuploadmanage)
+            # files = otpuploadmanage.file.all()
+            # print('一括もしかしてfileみえない？2',files)
 
             # ダウンロードテーブルに紐づいているファイルのQSを取得
             if multi_tables:
                 for multi_table in multi_tables:
                     multi_table.trash_flag = 1
-
+                    print('forの中マルチテーブル1',multi_table)
                     multi_table.save()
 
-            elif url_multi_tables:
+            if url_multi_tables:
                 for url_multi_table in url_multi_tables:
                     url_multi_table.trash_flag = 1
-
+                    print('forの中マルチテーブル2',multi_table)
                     url_multi_table.save()
             
-            else:
+            if otp_multi_tables:
                 for otp_multi_table in otp_multi_tables:
                     otp_multi_table.trash_flag = 1
-
+                    print('forの中マルチテーブル3',multi_table)
                     otp_multi_table.save()
+            # # ダウンロードテーブルに紐づいているファイルのQSを取得
+            # if multi_tables:
+            #     for multi_table in multi_tables:
+            #         multi_table.trash_flag = 1
+            #         print('forの中マルチテーブル1',multi_table)
+            #         multi_table.save()
 
+            # elif url_multi_tables:
+            #     for url_multi_table in url_multi_tables:
+            #         url_multi_table.trash_flag = 1
+
+            #         print('forの中マルチテーブル2',multi_table)
+            #         url_multi_table.save()
+            
+            # else:
+            #     for otp_multi_table in otp_multi_tables:
+            #         otp_multi_table.trash_flag = 1
+            #         print('forの中マルチテーブル3',multi_table)
+
+            #         otp_multi_table.save()
+            
+            # 操作ログ登録
+            # add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = '一括削除しました'
