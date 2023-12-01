@@ -77,6 +77,11 @@ class Step1GuestUploadCreate(FormView, CommonView):
         """ グループ一覧の情報"""
         group_lists = Group.objects.filter(created_user=self.request.user.id)
         context["group_lists"] = group_lists
+        
+        """ URL有効期限情報 """
+        seven_days = datetime.datetime.now() + datetime.timedelta(days=6)
+        context['seven_days'] = seven_days
+        
 
         # if文で適宜しないと一番最初のアップロード時エラーが出る。セッションにデータがある場合この処理をするという意味。
         if 'otp_upload_manage_id' in self.request.session:

@@ -796,12 +796,6 @@ $("#id_dest_user_mail2, #id_dest_user_mail3").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail2").val() == '') {
-    $('.row_3').attr('readonly', false);
-} else {
-    $('.row_3').attr('readonly', true);
-}
-
 // 3行目
 $("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
     if (!$("#id_dest_user_mail3").val() == ''|| (!$("#id_dest_user_mail4").val() == '')) {
@@ -810,12 +804,6 @@ $("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
         $('.row_4').attr('readonly', true);
     }
 });
-
-if (!$("#id_dest_user_mail3").val() == '') {
-    $('.row_4').attr('readonly', false);
-} else {
-    $('.row_4').attr('readonly', true);
-}
 
 // 4行目
 $("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
@@ -826,12 +814,6 @@ $("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail4").val() == '') {
-    $('.row_5').attr('readonly', false);
-} else {
-    $('.row_5').attr('readonly', true);
-}
-
 // 5行目
 $("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
     if (!$("#id_dest_user_mail5").val() == ''|| (!$("#id_dest_user_mail6").val() == '')) {
@@ -840,12 +822,6 @@ $("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
         $('.row_6').attr('readonly', true);
     }
 });
-
-if (!$("#id_dest_user_mail5").val() == '') {
-    $('.row_6').attr('readonly', false);
-} else {
-    $('.row_6').attr('readonly', true);
-}
 
 // 6行目
 $("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
@@ -856,11 +832,6 @@ $("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail6").val() == '') {
-    $('.row_7').attr('readonly', false);
-} else {
-    $('.row_7').attr('readonly', true);
-}
 
 // 7行目
 $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
@@ -871,11 +842,27 @@ $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail7").val() == '') {
-    $('.row_8').attr('readonly', false);
-} else {
-    $('.row_8').attr('readonly', true);
-}
+// -----------------
+// メールアドレス欄の空きを詰める処理
+// -----------------
+$("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
+    var m_list = []
+    var m_count = 0
+    var count = 1;
+    //8回回るまで処理を行う
+    while(count<=8){
+        var id_num = String(count)
+        var id_next = String(count + 1)
+        if($(`#id_dest_user_mail${id_num}`).val() == '' && !$(`#id_dest_user_mail${id_next}`).val() == ''){
+            $(`#id_dest_user_mail${id_num}`).val($(`#id_dest_user_mail${id_next}`).val())
+            $(`#id_dest_user_mail${id_next}`).val("")
+        }else if($(`#id_dest_user_mail${id_num}`).val() == '' && $(`#id_dest_user_mail${id_next}`).val() == ''){
+            $(`.row_${id_next}`).attr('readonly', true);
+        };
+        count++;
+    }
+});
+
 
 // -----------------
 // validate

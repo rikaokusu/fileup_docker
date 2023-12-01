@@ -7,12 +7,12 @@
 
 <div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar">
 
-    <div class="top">
+    <div class="top2">
         <div class="tate mr-4"></div>
         <h1>ゲストアップロード</h1><i class="fas fa-link fa-2x icon-link"></i>
     </div>
 
-    <div class="progressbar">
+    <div class="progressbar2">
         <div class="item active flex-fill">STEP1<br>情報入力</div>
         <div class="item flex-fill">STEP2<br>登録完了</div>
     </div>
@@ -54,15 +54,21 @@
                 </tr>
 
                 <tr>
-                    <td>
-                        <div class="step1_label_wrapper mb-1">
+                    <td class="step1_label_wrapper">
                             <h2>依頼先</h2><span class="required_label def">必須</span>
-                            <span class="required_label def"></span>
-                        </div>
-                        <h3>・ファイル共有を依頼したい宛先のメールアドレスを入力してください。</h3>
+                        {% comment %} <h3>・ファイル共有リクエスト先のメールアドレスを入力してください。</h3> {% endcomment %}
                     </td>
                         <td>
-                            {% comment %} {% render_field form.dl_limit class="form-control guest_mail" %} {% endcomment %}
+                            {% render_field form.guest_mail class="form-control step1_guest_mail" placeholder="ファイル共有リクエスト先のメールアドレス"  %}
+                            {% if form.title.errors %}
+                                {% for error in form.title.errors %}
+                                    <div class="guest_mail_error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                    <div class="step1-guest-mail-error" style="visibility:hidden"></div>
+                            {% endif %}
                         </td>
                 </tr>
             </table>
@@ -75,11 +81,10 @@
             <table class="table table-borderless step1_table">
                 <tr>
                     <td class="step1_label_wrapper">
-                        <h2>有効期限</h2>
-                        <h3>・依頼先へのリクエストURLは7日間有効です。</h3>
+                            <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
                     </td>
                     <td>
-                        {% comment %} <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div> {% endcomment %}
+                        <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
                     </td>
                 </tr>
                 <tr>
@@ -125,16 +130,16 @@
                             </div>
                             <div id="step1_upload_error_message" style="visibility:hidden"></div>
                             <div>
-                                {% render_field form.dest_user_mail1 class="form-control step1_mail step1_url_mail1" placeholder="1"%}
+                                {% render_field form.dest_user_mail1 class="form-control step1_guestul_mail step1_guestul_mail1 step1_mail" placeholder="1"%}
                             </div>
                             <div>
-                                {% render_field form.dest_user_mail2|append_attr:"readonly:readonly" class="form-control step1_mail row_2" placeholder="2"%}
+                                {% render_field form.dest_user_mail2|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_2" placeholder="2"%}
                             </div>
                             <div>
-                                {% render_field form.dest_user_mail3|append_attr:"readonly:readonly" class="form-control step1_mail row_3" placeholder="3"%}
+                                {% render_field form.dest_user_mail3|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_3" placeholder="3"%}
                             </div>
                             <div>
-                                {% render_field form.dest_user_mail4|append_attr:"readonly:readonly" class="form-control step1_mail row_4" placeholder="4"%}
+                                {% render_field form.dest_user_mail4|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_4" placeholder="4"%}
                             </div>
 
                         </div>
@@ -144,16 +149,16 @@
                     <td>
                         <!---mail6-8-->
                         <div>
-                            {% render_field form.dest_user_mail5|append_attr:"readonly:readonly" class="form-control step1_mail step1_upload_mail6 row_5" placeholder="5"%}
+                            {% render_field form.dest_user_mail5|append_attr:"readonly:readonly" class="form-control step1_guestul_mail step1_guestul_mail6 row_5" placeholder="5"%}
                         </div>
                         <div>
-                            {% render_field form.dest_user_mail6|append_attr:"readonly:readonly" class="form-control step1_mail  row_6" placeholder="6"%}
+                            {% render_field form.dest_user_mail6|append_attr:"readonly:readonly" class="form-control step1_guestul_mail  row_6" placeholder="6"%}
                         </div>
                         <div>
-                            {% render_field form.dest_user_mail7|append_attr:"readonly:readonly" class="form-control step1_mail row_7" placeholder="7"%}
+                            {% render_field form.dest_user_mail7|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_7" placeholder="7"%}
                         </div>
                         <div>
-                            {% render_field form.dest_user_mail8|append_attr:"readonly:readonly" class="form-control step1_mail row_8" placeholder="8"%}
+                            {% render_field form.dest_user_mail8|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_8" placeholder="8"%}
                         </div>
                     </td>
                 </tr>
@@ -706,7 +711,7 @@ $(function () {
 // ------------------------------------------
 // 次へボタンの制御
 // ------------------------------------------
-$("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_url_mail").on('input dp.change click keyup', function () { 
+$("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_guestul_mail").on('input dp.change click keyup', function () { 
     // 送信先の合計を取得
     all_dest_user_length = "";
     all_dest_user_length = user_lists.length + group_lists.length;
@@ -763,6 +768,8 @@ if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == 
     $('.row_2').attr('readonly', true);
     $(".step1_url_confirm_btn").css("display", "none")
 }
+
+
 // 2行目
 $("#id_dest_user_mail2, #id_dest_user_mail3").on('input', function () {
     if (!$("#id_dest_user_mail2").val() == ''|| (!$("#id_dest_user_mail3").val() == '')) {
@@ -771,12 +778,6 @@ $("#id_dest_user_mail2, #id_dest_user_mail3").on('input', function () {
         $('.row_3').attr('readonly', true);
     }
 });
-
-if (!$("#id_dest_user_mail2").val() == '') {
-    $('.row_3').attr('readonly', false);
-} else {
-    $('.row_3').attr('readonly', true);
-}
 
 // 3行目
 $("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
@@ -787,12 +788,6 @@ $("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail3").val() == '') {
-    $('.row_4').attr('readonly', false);
-} else {
-    $('.row_4').attr('readonly', true);
-}
-
 // 4行目
 $("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
     if (!$("#id_dest_user_mail4").val() == ''|| (!$("#id_dest_user_mail5").val() == '')) {
@@ -801,12 +796,6 @@ $("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
         $('.row_5').attr('readonly', true);
     }
 });
-
-if (!$("#id_dest_user_mail4").val() == '') {
-    $('.row_5').attr('readonly', false);
-} else {
-    $('.row_5').attr('readonly', true);
-}
 
 // 5行目
 $("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
@@ -817,12 +806,6 @@ $("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail5").val() == '') {
-    $('.row_6').attr('readonly', false);
-} else {
-    $('.row_6').attr('readonly', true);
-}
-
 // 6行目
 $("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
     if (!$("#id_dest_user_mail6").val() == ''|| (!$("#id_dest_user_mail7").val() == '')) {
@@ -831,12 +814,6 @@ $("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
         $('.row_7').attr('readonly', true);
     }
 });
-
-if (!$("#id_dest_user_mail6").val() == '') {
-    $('.row_7').attr('readonly', false);
-} else {
-    $('.row_7').attr('readonly', true);
-}
 
 // 7行目
 $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
@@ -847,11 +824,27 @@ $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
     }
 });
 
-if (!$("#id_dest_user_mail7").val() == '') {
-    $('.row_8').attr('readonly', false);
-} else {
-    $('.row_8').attr('readonly', true);
-}
+// -----------------
+// メールアドレス欄の空きを詰める処理
+// -----------------
+$("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
+    var m_list = []
+    var m_count = 0
+    var count = 1;
+    
+    //8回回るまで処理を行う
+    while(count<=8){
+        var id_num = String(count)
+        var id_next = String(count + 1)
+        if($(`#id_dest_user_mail${id_num}`).val() == '' && !$(`#id_dest_user_mail${id_next}`).val() == ''){
+            $(`#id_dest_user_mail${id_num}`).val($(`#id_dest_user_mail${id_next}`).val())
+            $(`#id_dest_user_mail${id_next}`).val("")
+        }else if($(`#id_dest_user_mail${id_num}`).val() == '' && $(`#id_dest_user_mail${id_next}`).val() == ''){
+            $(`.row_${id_next}`).attr('readonly', true);
+        };
+        count++;
+    }
+});
 
 // -----------------
 // validate
@@ -976,7 +969,7 @@ $(function () {
 //直接入力バリデーション
 
 $(document).ready(function() {
-  $('.step1_url_mail').on('input', function() {
+  $('.step1_guestul_mail').on('input', function() {
     var inputValue = $(this).val();
     var inputId = $(this).attr('id');
     if (checkDuplicate(inputId, inputValue)) {
@@ -994,7 +987,7 @@ $(document).ready(function() {
 
 function checkDuplicate(inputId, value) {
   var duplicate = false;
-  $('.step1_url_mail').not('#' + inputId).each(function() {
+  $('.step1_guestul_mail').not('#' + inputId).each(function() {
     var value_length = value.length
     if (value_length >= 1 && $(this).val() === value) {
       duplicate = true;
