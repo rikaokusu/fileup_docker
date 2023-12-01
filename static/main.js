@@ -9,8 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // BootstrapToggleのスタイルシート側の機能を読み込む
 // import "bootstrap4-toggle/css/bootstrap4-toggle.css";
 
-import '../static/accounts/css/sb-admin.css';
+import '../static/common/css/sb-admin.css';
 // import '../static/storage/css/sb-admin.css';
+//import '../static/accounts/css/jquery-linedtextarea';
 
 import 'datatables.net-dt';
 // import 'datatables.net-dt/css/jquery.dataTables.min.css';
@@ -36,7 +37,7 @@ import "bootstrap-datetimepicker-npm/build/css/bootstrap-datetimepicker.min.css"
 
 import '../static/common/css/validate.css';
 
-import '../static/accounts/css/accounts.css';
+// import '../static/accounts/css/accounts.css';
 
 // import '../static/bulk/css/bulk.css';
 
@@ -61,7 +62,7 @@ import 'toastr/build/toastr.css';
 // リセットなので一番下
 // import '../static/common/css/reset.css';
 
-
+// import '../static/css/draganddrop/fileup_main.css';
 
 // JavaScript用
 
@@ -86,10 +87,11 @@ import 'slick-carousel';
 import '@fortawesome/fontawesome-free/js/fontawesome';
 import '@fortawesome/fontawesome-free/js/solid';
 import '@fortawesome/fontawesome-free/js/regular';
+//import '../static/accounts/js/jquery-linedtextarea';
 
 import '../static/common/js/validate';
-import '../static/accounts/js/accounts';
-import '../static/accounts/js/sb-admin';
+// import '../static/accounts/js/accounts';
+// import '../static/accounts/js/sb-admin';
 // import '../static/storage/js/storage';
 // import '../static/bulk/js/bulk';
 // import '../static/task/js/task';
@@ -105,4 +107,5 @@ import toastr from 'toastr'
 window.toastr = toastr
 
 
-window.Dropzone = require('dropzone/dist/min/dropzone.min');
+import 'dropzone/dist/dropzone-amd-module';
+// window.Dropzone = require('dropzone/dist/min/dropzone.min');

@@ -1,0 +1,62 @@
+/* パスワード強度チェック */
+
+#pm-indicator {
+  /* margin: 0 0 20px 0; */
+  padding:0.5em;
+  color:#2c3e50;
+  font-size:12px;
+  text-align:center;
+  border:1px solid #ccc;
+  border-radius:2px;
+  background:#e4e4e4;
+  text-shadow:1px 1px 0 rgba(255,255,255,.8);
+  -webkit-transition:all .2s ease-in-out;
+          transition:all .2s ease-in-out;
+}
+
+#pm-indicator.very-weak,
+#pm-indicator.not-match {
+  border-color:#be1d30;
+  background-color:#ffc3cf;
+}
+
+#pm-indicator.weak {
+  border-color:#ff787d;
+  background-color:#ffe6e5;
+}
+
+#pm-indicator.strong {
+  border-color:#78bc42;
+  background-color:#bceea6;
+}
+
+#pm-indicator.very-strong {
+  border-color:#4f85a7;
+  background-color:#68c6d7;
+}
+
+
+/* フロントエンドバリデーション */
+
+#user-email-error {
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}
+#user-email_err {
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}
+
+#company-pic_company_name-error {
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}
+
+.error {
+  margin-top: .25rem;
+  font-size: 80%;
+  color: #dc3545;
+}

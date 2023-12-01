@@ -8,7 +8,7 @@ var BundleTracker = require('webpack-bundle-tracker');
 
 // モード値を production に設定すると最適化された状態で、
 // development に設定するとソースマップ有効でJSファイルが出力される
-const MODE = "production";
+const MODE = "development";
 
 // ソースマップの利用有無(productionのときはソースマップを利用しない)
 const enabledSourceMap = MODE === "development";
@@ -27,6 +27,7 @@ module.exports = {
       path: path.resolve('./static/'),
       // filename: "bundle-[hash].js",
       filename: "bundle.js",
+      assetModuleFilename: 'webfont/[hash][ext][query]'
   },
   module: {
     rules: [
@@ -53,13 +54,15 @@ module.exports = {
             options: {
               // PostCSS側でもソースマップを有効にする
               sourceMap: true,
-              plugins: [
-                // Autoprefixerを有効化
-                // ベンダープレフィックスを自動付与する
-                require("autoprefixer")({
-                  grid: true
-                })
-              ]
+              postcssOptions: {
+                plugins: [
+                  // Autoprefixerを有効化
+                  // ベンダープレフィックスを自動付与する
+                  require("autoprefixer")({
+                    grid: true
+                  })
+                ]
+              }
             }
           }
         ]
@@ -83,42 +86,79 @@ module.exports = {
           }
         ]
       },
+      // {
+      //   // Fontを扱う処理
+      //   test: /\.(woff(2)?|ttf|woff|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+      //   use: [{
+      //     loader: 'file-loader',
+      //     options: {
+      //       name: '[name].[ext]',
+      //       outputPath: './webfonts',
+      //       // ここをDjangoのStatic配下のディレクトリに合わせる必要がある
+      //       publicPath: '/static/webfonts',
+      //     }
+      //   }]
+      // },
       {
-        // Fontを扱う処理
-        test: /\.(woff(2)?|ttf|woff|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [{
-          loader: 'file-loader',
+        test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)(\?.*$|$)/i,
+         // More information here https://webpack.js.org/guides/asset-modules/
+        type: "asset",
+      },      // {
+      //   // imageをバンドルする
+      //   test: /\.(jpg|png|gif|woff|ttf)$/,
+      //   loaders: 'url-loader'
+      // },
+
+      // {
+      //   // imageをバンドルする
+      //   test: /\.(jpg|png|gif)$/,
+      //   use: [{
+      //       loader: 'url-loader',
+      //   }]
+      // },
+
+      // {
+      //   // jqueryを$またはjQueryで利用するため
+      //   test: require.resolve('jquery'),
+      //   use: [{
+      //       loader: 'expose-loader',
+      //       options: 'jQuery'
+      //   }, {
+      //       loader: 'expose-loader',
+      //       options: '$'
+      //   }]
+      // },
+      // {
+      //   // momentをmoment()で利用するため
+      //   test: require.resolve('moment'),
+      //   use: [{
+      //       loader: 'expose-loader',
+      //       options: 'moment'
+      //   }]
+      // },
+      {
+      // jqueryを$またはjQueryで利用するため
+      test: require.resolve("jquery"),
+        loader: "expose-loader",
+        options: {
+          exposes: ["$", "jQuery"],
+        },
+      },
+      {
+      // momentをmoment()で利用するため
+      test: require.resolve("moment"),
+        loader: "expose-loader",
+        options: {
+          exposes: ["moment"],
+        },
+      },
+      {
+      // DropzoneをDropzone()で利用するため
+      test: require.resolve('Dropzone'),
+          loader: 'expose-loader',
           options: {
-            name: '[name].[ext]',
-            outputPath: './webfonts',
-            // ここをDjangoのStatic配下のディレクトリに合わせる必要がある
-            publicPath: '/static/webfonts',
-          }
-        }]
-      },
-      {
-        // imageをバンドルする
-        test: /\.(jpg|png|gif|woff|ttf)$/,
-        loaders: 'url-loader'
-      },
-      {
-        // jqueryを$またはjQueryで利用するため
-        test: require.resolve('jquery'),
-        use: [{
-            loader: 'expose-loader',
-            options: 'jQuery'
-        }, {
-            loader: 'expose-loader',
-            options: '$'
-        }]
-      },
-      {
-        // momentをmoment()で利用するため
-        test: require.resolve('moment'),
-        use: [{
-            loader: 'expose-loader',
-            options: 'moment'
-        }]
+            exposes: ["Dropzone", "dropzone"],
+        },
       },
       // {
       //   // DropzoneをDropzone()で利用するため
@@ -134,7 +174,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new BundleTracker({filename: './webpack-stats.json'}),
+    // new BundleTracker({filename: './webpack-stats.json'}),
     // jqueryを$またはjQueryで利用するため
     new webpack.ProvidePlugin({
         $: 'jquery',
@@ -142,6 +182,7 @@ module.exports = {
         'window.jQuery': 'jquery',
         moment: 'moment',
         Popper: ['popper.js', 'default'],
-    })
+        process: 'process/browser',
+      }),
   ]
 }

@@ -86,6 +86,17 @@ services:
       # (上原)追加
         networks:
           - shared-network
+    
+    webpack_fileup:
+        # ビルド時のパス起点が.(docker-compose.ymlと同じ階層)となる。
+        # DockerfileでCOPYする時、起点からの相対パスで指定可能となる。
+        # 「build: ./webpack」の記載だと、Dockerfileが存在するディレクトリ配下しか参照できない。
+        build:
+            context: .
+            dockerfile: ./webpack/Dockerfile
+        volumes:
+            # Webpackの対象を設定
+            - ./src:/my_webpack
 
 volumes:
   db-store:
