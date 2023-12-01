@@ -43,6 +43,15 @@
     .top h1 {
         margin-top: 20px;
     }
+    /* STEP2つの場合 */
+    .top2 {
+        display: inline-flex;
+        width: 30%;
+    }
+
+    .top2 h1 {
+        margin-top: 20px;
+    }
 
     .container {
         /* width: 1336px; */
@@ -763,7 +772,7 @@ common class
     font-weight   : 500;
 }
 /*---------------
-    prpgressbar
+    prpgressbar(3STEPの場合)
 ----------------*/
 
     .progressbar {
@@ -835,6 +844,84 @@ common class
     .progressbar .item.active:not(:last-child)::before {
         border-left: none;
     }
+
+/*---------------
+    prpgressbar2(2STEPの場合)
+----------------*/
+
+.progressbar2 {
+    display: flex;
+    flex-wrap: wrap;
+    /* width: 100% !important; */
+    width: 680px !important;
+    height:74px;
+    margin-left: 30%;
+}
+
+.progressbar2 .item {
+    position: relative;
+    /* width: 460px; */
+    text-align: center;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 0;
+    line-height: 1.5;
+    background: #F5F5F5;
+    color: #999999;
+    /* margin-top: 10px; */
+    /* margin:3em 0; */
+}
+
+.progressbar2 .item:not(:last-child)::before,
+.progressbar2 .item:not(:last-child)::after {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    content: '';
+    border: 37px solid transparent;
+    border-left: 20px solid #F5F5F5;
+    margin: auto;
+}
+
+.progressbar2 .item:not(:last-child)::before {
+    margin-left: 1px;
+    border-left-color: #F5F5F5;
+}
+
+@media screen and (max-width: 767px) {
+    .progressbar2 .item {
+        font-size: 11px;
+        line-height: 1.4;
+        padding: 10px 0;
+    }
+
+    .progressbar2 .item:not(:last-child)::before,
+    .progressbar2 .item:not(:last-child)::after {
+        border-width: 25px;
+        border-left-width: 12px;
+    }
+}
+
+/* active */
+
+.progressbar2 .item.active {
+    z-index: 1;
+    background: #005392;
+    color: #FFF;
+    clear: left;
+}
+
+.progressbar2 .item.active:not(:last-child)::after {
+    border-left-color: #005392;
+}
+
+.progressbar2 .item.active:not(:last-child)::before {
+    border-left: none;
+}
+
 
     /*---------------
     box
@@ -1814,7 +1901,7 @@ ul.sample1 li{
         border-bottom: solid 2px #999999;
     }
 
-    .step1_upload_title {
+    .step1_upload_title,.step1_guest_mail {
         width: 80%;
         margin-right: 240px;
     }
@@ -1921,6 +2008,12 @@ ul.sample1 li{
     #step1_dest_user_number { counter-reset: step1_dest_user_number }
     #step1_dest_user_number > div { counter-increment: step1_dest_user_number }
     #step1_dest_user_number > div::before { content: counter( step1_dest_user_number ) "." }
+
+    .step1-guest-mail-error {
+        margin-top: 7px;
+        font-size: 12px;
+        height: 35px;
+    }
     /*---------------
     step2
 ----------------*/
@@ -2318,6 +2411,24 @@ font-family: 'Font Awesome 5 Free';
     #step1_url_user_number > div { counter-increment: step1_url_user_number }
     #step1_url_user_number > div::before { content: counter( step1_url_user_number ) "." }
     
+
+    /*--------------------
+    step1_guest_upload
+    ---------------------*/
+    .step1_guestul_mail {
+        margin-top: 22px;
+        margin-left: -10px;
+        width: 340px;
+    }
+
+    input[aria-invalid="true"].step1_guestul_mail {
+        margin-bottom: 0px;
+    }
+
+    .step1_guestul_mail6 {
+        margin-top: 60px;
+    }
+
     /*--------------------
     group_list
     ---------------------*/

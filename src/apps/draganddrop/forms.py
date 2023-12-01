@@ -457,6 +457,8 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
     message = forms.CharField(
         widget=forms.Textarea(attrs={"rows":3}), required=False)
 
+    guest_mail = forms.CharField(widget=forms.EmailInput, required=True)
+    
     class Meta:
         model = GuestUploadManage
         fields = (
