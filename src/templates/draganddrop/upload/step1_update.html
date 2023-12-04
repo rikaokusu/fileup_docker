@@ -213,13 +213,17 @@
 
             <div class="ml-1 mr-1">
                 <button type="button" class="cancel btn-cancel" data-toggle="modal" id="cancel_btn"
-                    data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+                    data-target="#CancelModal">
+                    キャンセル
+                    {% comment %} <i class="fas fa-times"></i> {% endcomment %}
+                </button>
             </div>
 
             <div class="ml-2 mr-1">
                 <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
                     data-target="#send_data_modal" disabled>次へ
-                    <i class="fa-solid fa-angle-right ml-2"></i></button>
+                    <i class="fas fa-angle-right"></i>
+                </button>
             </div>
         </div>
     </div>

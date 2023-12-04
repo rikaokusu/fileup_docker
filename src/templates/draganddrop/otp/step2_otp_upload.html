@@ -144,21 +144,21 @@
         {% if url_name == "step2_otp_upload"%}
         <button type="button" class="btn-default"
           onclick="location.href='{% url 'draganddrop:otp_return' otp_upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
+          <i class="fas fa-angle-left mr-2"></i></i>戻る</button>
         {% else %}
         <button type="button" class="btn-default"
           onclick="location.href='{% url 'draganddrop:otp_return_update' otp_upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
+          <i class="fas fa-angle-left mr-2"></i></i>戻る</button>
         {% endif %}
       </div>
 
       <div class="ml-1 mr-1">
         {% if url_name == "step2_otp_upload"%}
         <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+          disabled>確認<i class="fas fa-angle-right ml-2"></i></button>
         {% else %}
         <button type="button" class="btn-default" data-toggle="modal" data-target="#update_confirm_modal" id="update_confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+          disabled>確認<i class="fas fa-angle-right ml-2"></i></button>
         {% endif %}
         </div>
     </div>

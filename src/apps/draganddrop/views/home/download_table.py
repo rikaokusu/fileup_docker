@@ -128,7 +128,7 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
     def post(self, request,**kwargs):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
-        multi_delete_id = request.POST.getlist('dest_user_ids[]')
+        multi_delete_id = request.POST.getlist('dest_user_ids[]')#downloadテーブルのid(int)
         url_multi_delete_id = request.POST.getlist('url_dest_user_ids[]')
         otp_multi_delete_id = request.POST.getlist('otp_dest_user_ids[]')
         print('ですとゆーざーにしてるのなんで1',multi_delete_id)
@@ -149,12 +149,6 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
             print('通常一括削除かくにん1',multi_tables)
             print('url一括削除かくにん1',url_multi_tables)
             print('otp一括削除かくにん1',otp_multi_tables)
-            # for otp_multi_table in otp_multi_tables:
-            #     print('otp一括削除かくにん2',otp_multi_table)
-            # otpuploadmanage = OTPUploadManage.objects.filter(id=otpdownloadtable.otp_upload_manage.id)
-            # print('一括もしかしてfileみえない？1',otpuploadmanage)
-            # files = otpuploadmanage.file.all()
-            # print('一括もしかしてfileみえない？2',files)
 
             # ダウンロードテーブルに紐づいているファイルのQSを取得
             if multi_tables:
@@ -162,17 +156,15 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
                     multi_table.trash_flag = 1
                     print('forの中マルチテーブル1',multi_table)
                     multi_table.save()
-
+                    
             if url_multi_tables:
                 for url_multi_table in url_multi_tables:
                     url_multi_table.trash_flag = 1
-                    print('forの中マルチテーブル2',multi_table)
                     url_multi_table.save()
             
             if otp_multi_tables:
                 for otp_multi_table in otp_multi_tables:
                     otp_multi_table.trash_flag = 1
-                    print('forの中マルチテーブル3',multi_table)
                     otp_multi_table.save()
             # # ダウンロードテーブルに紐づいているファイルのQSを取得
             # if multi_tables:

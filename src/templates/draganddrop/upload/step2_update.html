@@ -145,22 +145,26 @@
         {% if url_name == "step2"%}
         <button type="button" class="btn-default"
           onclick="location.href='{% url 'draganddrop:return' upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る
+          <i class="fas fa-angle-left mr-2"></i></i>戻る
           </button>
         {% else %}
         <button type="button" class="btn-default"
           onclick="location.href='{% url 'draganddrop:return_update' upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
+          <i class="fas fa-angle-left mr-2"></i></i>戻る</button>
         {% endif %}
       </div>
       
       <div class="ml-1 mr-1">
         {% if url_name == "step2"%}
         <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+          disabled>確認
+          <i class="fas fa-angle-right ml-2"></i>
+          {% comment %} <i class="fa-solid fa-angle-right ml-2"></i> {% endcomment %}
+        </button>
         {% else %}
         <button type="button" class="btn-default" data-toggle="modal" data-target="#update_confirm_modal" id="update_confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+          disabled>確認
+          <i class="fas fa-angle-right ml-2"></i></button>
         {% endif %}
       </div>
 
