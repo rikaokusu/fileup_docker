@@ -534,6 +534,7 @@ class OperationLog(models.Model):
     (0,'通常アップロード'),
     (1,'URL共有'),
     (2,'OTP共有'),
+    (3,'一括'),
     )
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

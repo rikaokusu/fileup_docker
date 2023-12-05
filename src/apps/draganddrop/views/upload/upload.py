@@ -333,18 +333,41 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
     def form_valid(self, form,**kwargs):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
+
+        # dest_user_all_list = self.request.session['dest_user_all_list']
+        # print('これでアドレスとれる？',dest_user_all_list)
+        
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-        # 操作ログ用
-        # 宛先メールアドレス
-        dest_mails = [upload_manage.dest_user_mail1,upload_manage.dest_user_mail2,upload_manage.dest_user_mail3,upload_manage.dest_user_mail4,upload_manage.dest_user_mail5,upload_manage.dest_user_mail6,upload_manage.dest_user_mail7,upload_manage.dest_user_mail8]
-        # 宛先メールアドレスNoneのやつを省く
-        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # 宛先メールアドレス('')を省くため文字列に変換
-        dest_mail_log = ' '.join(dest_mail_ok)
+        #操作ログ用
+        #送信先アドレス帳取得
+        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        dest_user_list = ' '.join(dest_user_list)
+        print('これでアドレスとれる？００００アドレス帳だけ',dest_user)
+        print('これでアドレスとれる？００００アドレス帳だけリスト変換＞＞＞',dest_user_list)
+        #送信先グループ取得　OTPとかにも対応
+        dest_group = upload_manage.dest_user_group
+        # dest_group = upload_manage.dest_user_group.address.values_list('email', flat=True)
+        print('ぐるーぷのemail',dest_group)
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
+
+
+        
+        # #get_direct_userのコピー
+        # upload_manage_dest_user_all = upload_manage.dest_user.all()
+        # # 操作ログ用
+        # # 宛先メールアドレス
+        # dest_mails = [upload_manage.dest_user_mail1,upload_manage.dest_user_mail2,upload_manage.dest_user_mail3,upload_manage.dest_user_mail4,upload_manage.dest_user_mail5,upload_manage.dest_user_mail6,upload_manage.dest_user_mail7,upload_manage.dest_user_mail8]
+        # # 宛先メールアドレスNoneのやつを省く
+        # dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
+        # # 宛先メールアドレス('')を省くため文字列に変換
+        # dest_mail_log = ' '.join(dest_mail_ok)
+        # # ファイルタイトル
+        # file_title = upload_manage.title
+        # # 操作ログ終わり
 
 
         # ファイルの削除
@@ -434,7 +457,9 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         upload_manage.save()
         # 操作ログ
         print("ふぁいるずadd_log直前",files)
-        add_log(2,1,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
+        # add_log(2,1,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,file_title,files,dest_user_list,0,self.request.META.get('REMOTE_ADDR'))
+
 
         print("------------------- Step2")
 

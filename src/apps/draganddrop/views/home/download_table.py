@@ -125,7 +125,9 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
 # 受信テーブル一括削除 #
 ##################################
 class MultiDownloadTableDeleteAjaxView(View,CommonView):
+    print('一括削除かくにん繰り返してる？')
     def post(self, request,**kwargs):
+        print('一括削除かくにん繰り返してる？２２２２')
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         multi_delete_id = request.POST.getlist('dest_user_ids[]')#downloadテーブルのid(int)
@@ -166,29 +168,8 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
                 for otp_multi_table in otp_multi_tables:
                     otp_multi_table.trash_flag = 1
                     otp_multi_table.save()
-            # # ダウンロードテーブルに紐づいているファイルのQSを取得
-            # if multi_tables:
-            #     for multi_table in multi_tables:
-            #         multi_table.trash_flag = 1
-            #         print('forの中マルチテーブル1',multi_table)
-            #         multi_table.save()
-
-            # elif url_multi_tables:
-            #     for url_multi_table in url_multi_tables:
-            #         url_multi_table.trash_flag = 1
-
-            #         print('forの中マルチテーブル2',multi_table)
-            #         url_multi_table.save()
-            
-            # else:
-            #     for otp_multi_table in otp_multi_tables:
-            #         otp_multi_table.trash_flag = 1
-            #         print('forの中マルチテーブル3',multi_table)
-
-            #         otp_multi_table.save()
-            
-            # 操作ログ登録
-            # add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
+            # 操作ログ登録-------操作ログには3レコード作成されてしまう。
+            add_log(2,3,current_user,"","","",3,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = '一括削除しました'
