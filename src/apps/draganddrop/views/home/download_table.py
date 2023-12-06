@@ -25,9 +25,10 @@ class DownloadTableDeleteAjaxView(View,CommonView):
         try:
             # ダウンロードテーブルに変更
             downloadtable = Downloadtable.objects.get(pk__exact=delete_id)
-            #↓二行操作ログ用・ファイル名取得
+            #操作ログ用・ファイル名取得
             uploadmanage = UploadManage.objects.get(id=downloadtable.upload_manage.id)
             files = uploadmanage.file.all()
+            #操作ログ終わり
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()

@@ -245,6 +245,12 @@ common class
         padding-top: 1px;
         font-size: 47px;
     }
+    .icon-address-group {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 1px;
+        font-size: 47px;
+    }
 
     .icon_delete_box {
         padding-left: 15px;

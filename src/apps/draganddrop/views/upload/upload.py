@@ -333,43 +333,30 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
     def form_valid(self, form,**kwargs):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
-
-        # dest_user_all_list = self.request.session['dest_user_all_list']
-        # print('これでアドレスとれる？',dest_user_all_list)
         
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
+
         #操作ログ用
-        #送信先アドレス帳取得
+        #送信先取得,アドレス帳＆直接入力
         dest_user =  upload_manage.dest_user.values_list('email', flat=True)
         dest_user_list = list(dest_user)
-        dest_user_list = ' '.join(dest_user_list)
-        print('これでアドレスとれる？００００アドレス帳だけ',dest_user)
-        print('これでアドレスとれる？００００アドレス帳だけリスト変換＞＞＞',dest_user_list)
-        #送信先グループ取得　OTPとかにも対応
-        dest_group = upload_manage.dest_user_group
-        # dest_group = upload_manage.dest_user_group.address.values_list('email', flat=True)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
         print('ぐるーぷのemail',dest_group)
+        print('ぐるーぷのemail',dest_group_list)
+        print('宛先ぜんぶ',dest_users)
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
-
-
         
         # #get_direct_userのコピー
-        # upload_manage_dest_user_all = upload_manage.dest_user.all()
-        # # 操作ログ用
-        # # 宛先メールアドレス
-        # dest_mails = [upload_manage.dest_user_mail1,upload_manage.dest_user_mail2,upload_manage.dest_user_mail3,upload_manage.dest_user_mail4,upload_manage.dest_user_mail5,upload_manage.dest_user_mail6,upload_manage.dest_user_mail7,upload_manage.dest_user_mail8]
-        # # 宛先メールアドレスNoneのやつを省く
-        # dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # # 宛先メールアドレス('')を省くため文字列に変換
-        # dest_mail_log = ' '.join(dest_mail_ok)
-        # # ファイルタイトル
-        # file_title = upload_manage.title
-        # # 操作ログ終わり
-
-
+        upload_manage_dest_user_all = upload_manage.dest_user.all()
         # ファイルの削除
         if self.del_file:
             del_file_pk = self.del_file
@@ -457,8 +444,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         upload_manage.save()
         # 操作ログ
         print("ふぁいるずadd_log直前",files)
-        # add_log(2,1,current_user,file_title,files,dest_mail_log,0,self.request.META.get('REMOTE_ADDR'))
-        add_log(2,1,current_user,file_title,files,dest_user_list,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
 
         print("------------------- Step2")
@@ -1003,7 +989,28 @@ class Step2Update(FormView, CommonView):
         self.del_file = request.POST.getlist('del_file')
         return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
+    def form_valid(self, form,**kwargs):
+        #操作ログ用
+        print('ふぉーむばりっど起きてる')
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
+        print('ぐるーぷのemail',dest_group)
+        print('ぐるーぷのemail',dest_group_list)
+        print('宛先ぜんぶ',dest_users)
+        # ファイルタイトル
+        file_title = upload_manage.title
+        # 操作ログ終わり
 
         # セッションの対象IDからDBオブジェクトを生成
         upload_manage_id = self.kwargs['pk']
@@ -1124,6 +1131,7 @@ class Step2Update(FormView, CommonView):
 
         # 保存
         upload_manage.save()
+        add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
 
         return HttpResponseRedirect(reverse('draganddrop:step2_update', kwargs={'pk': upload_manage_id}))

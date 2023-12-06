@@ -364,17 +364,33 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
         current_user = self.request.user
         otp_upload_manage_id = self.kwargs['pk']
         otp_upload_manage_obj = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).first()
-        # 操作ログ用
-        # 宛先メールアドレス
-        dest_mails = [otp_upload_manage_obj.dest_user_mail1,otp_upload_manage_obj.dest_user_mail2,otp_upload_manage_obj.dest_user_mail3,otp_upload_manage_obj.dest_user_mail4,otp_upload_manage_obj.dest_user_mail5,otp_upload_manage_obj.dest_user_mail6,otp_upload_manage_obj.dest_user_mail7,otp_upload_manage_obj.dest_user_mail8]
-        # 宛先メールアドレスNoneのやつを省く
-        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # 宛先メールアドレス('')を省くため文字列に変換
-        dest_mail_log = ' '.join(dest_mail_ok)
-        print(dest_mail_log,"かっこけしたい")
+        
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  otp_upload_manage_obj.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = otp_upload_manage_obj.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        otp_dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        otp_dest_users = ' '.join(otp_dest_users)
         # ファイルタイトル
         file_title = otp_upload_manage_obj.title
         # 操作ログ終わり
+
+        # # 操作ログ用
+        # # 宛先メールアドレス
+        # dest_mails = [otp_upload_manage_obj.dest_user_mail1,otp_upload_manage_obj.dest_user_mail2,otp_upload_manage_obj.dest_user_mail3,otp_upload_manage_obj.dest_user_mail4,otp_upload_manage_obj.dest_user_mail5,otp_upload_manage_obj.dest_user_mail6,otp_upload_manage_obj.dest_user_mail7,otp_upload_manage_obj.dest_user_mail8]
+        # # 宛先メールアドレスNoneのやつを省く
+        # dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
+        # # 宛先メールアドレス('')を省くため文字列に変換
+        # dest_mail_log = ' '.join(dest_mail_ok)
+        # print(dest_mail_log,"かっこけしたい")
+        # # ファイルタイトル
+        # file_title = otp_upload_manage_obj.title
+        # # 操作ログ終わり
 
         # ファイルの削除
         if self.del_file:
@@ -470,7 +486,7 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
 
         otp_upload_manage_obj.save()
         # 操作ログ
-        add_log(2,1,current_user,file_title,files,dest_mail_log,2,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2_otp_upload', kwargs={'pk': otp_upload_manage_obj.id}))
 

@@ -368,17 +368,33 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
         current_user = self.request.user
         url_upload_manage_id = self.kwargs['pk']
         url_upload_manage_obj = UrlUploadManage.objects.filter(pk=url_upload_manage_id).first()
-        # 操作ログ用
-        # 宛先メールアドレス
-        dest_mails = [url_upload_manage_obj.dest_user_mail1,url_upload_manage_obj.dest_user_mail2,url_upload_manage_obj.dest_user_mail3,url_upload_manage_obj.dest_user_mail4,url_upload_manage_obj.dest_user_mail5,url_upload_manage_obj.dest_user_mail6,url_upload_manage_obj.dest_user_mail7,url_upload_manage_obj.dest_user_mail8]
-        # 宛先メールアドレスNoneのやつを省く
-        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # 宛先メールアドレス('')を省くため文字列に変換
-        dest_mail_log = ' '.join(dest_mail_ok)
-        print(dest_mail_log,"かっこけしたい")
+
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  url_upload_manage_obj.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = url_upload_manage_obj.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        url_dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        url_dest_users = ' '.join(url_dest_users)
         # ファイルタイトル
         file_title = url_upload_manage_obj.title
         # 操作ログ終わり
+
+        # # 操作ログ用
+        # # 宛先メールアドレス
+        # dest_mails = [url_upload_manage_obj.dest_user_mail1,url_upload_manage_obj.dest_user_mail2,url_upload_manage_obj.dest_user_mail3,url_upload_manage_obj.dest_user_mail4,url_upload_manage_obj.dest_user_mail5,url_upload_manage_obj.dest_user_mail6,url_upload_manage_obj.dest_user_mail7,url_upload_manage_obj.dest_user_mail8]
+        # # 宛先メールアドレスNoneのやつを省く
+        # dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
+        # # 宛先メールアドレス('')を省くため文字列に変換
+        # dest_mail_log = ' '.join(dest_mail_ok)
+        # print(dest_mail_log,"かっこけしたい")
+        # # ファイルタイトル
+        # file_title = url_upload_manage_obj.title
+        # # 操作ログ終わり
 
         # ファイルの削除
         if self.del_file:
@@ -475,7 +491,7 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
         url_upload_manage_obj.save()
         # 操作ログ
         print("URLふぁいるずadd_log直前",files)
-        add_log(2,1,current_user,file_title,files,dest_mail_log,1,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,file_title,files,url_dest_users,1,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2_url_upload', kwargs={'pk': url_upload_manage_obj.id}))
 
