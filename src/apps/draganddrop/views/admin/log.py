@@ -40,6 +40,7 @@ class LogView(CommonView,TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         logs =  OperationLog.objects.filter(category=2).order_by('created_date').reverse
+        logs_address =  OperationLog.objects.filter(category=3).order_by('created_date').reverse
         log_files =  LogFile.objects.all()
         log_destusers = LogDestUser.objects.all()
         logsfirst =  OperationLog.objects.first()
@@ -47,6 +48,7 @@ class LogView(CommonView,TemplateView):
         print('ろぐですーーーーーーー',logsfirst)
 
         context['logs'] = logs
+        context['logs_address'] = logs_address
         context['logsfirst'] = logsfirst
         context['log_files'] = log_files
         context['log_destusers'] = log_destusers

@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from ...serializers import GetUpdateModalSerializer, GetGroupUpdateModalSerializer
+#操作ログ関数
+from lib.my_utils import add_log
 
 """
 グループ一覧表示
@@ -82,23 +84,34 @@ class GroupListView(FormView, CommonView):
         # 選択した宛先ユーザーを取得する。
         return super().form_valid(form)
 
+#グループ登録
+class GroupCreateAjaxView(View,CommonView):
 
-class GroupCreateAjaxView(View):
-
-    def post(self, request):
-
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         try:
             address_list = request.POST.getlist('address_list[]')
             address_list = [int(s) for s in address_list]
             group_name = request.POST.get('group_name')
             group_obj = Group.objects.create(group_name=group_name)
             group_obj.created_user = self.request.user.id
-
+            #操作ログ用
+            group_name = group_obj.group_name
+            log_users = []
+            for address in address_list:
+                print('あどれすforきてる')
+                log_users1 = Address.objects.get(id=address)
+                log_users1 = log_users1.company_name + log_users1.last_name + log_users1.first_name + "\r\n"
+                log_users.append(log_users1)
+            log_users = ' '.join(log_users)
+            #操作ログ終わり
             group_obj.save()
 
             group_obj.address.set(address_list)
             group_obj.save()
-            
+            # 操作ログ登録
+            add_log(3,1,current_user,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
         #     # メッセージを格納してJSONで返す
             return JsonResponse({"status": "ok",})
            
@@ -170,9 +183,10 @@ class GroupUpdateAjaxView(View):
 グループ一覧個別削除
 """
 
-class GroupDeleteAjaxView(View):
-    def post(self, request):
-
+class GroupDeleteAjaxView(View, CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         # ダウンロードされたファイルが単体か複数か判断するための変数
         # is_type = request.POST.get('is_type')
 
@@ -180,6 +194,22 @@ class GroupDeleteAjaxView(View):
             group_delete_id = request.POST.get('group_delete_id')
             group_delete_name = request.POST.get('group_delete_name')
             group_obj = Group.objects.filter(pk=group_delete_id).first()
+            #操作ログ用
+            group_address = group_obj.address.all()
+            
+            group_users = []
+            for user in group_address:
+                g_c = user.company_name
+                g_l = user.last_name
+                g_f = user.first_name
+                user = g_c + g_l + g_f + "\r\n"
+                print('ゆーざーできてる？',user)
+                group_users.append(user)
+            group_users = ' '.join(group_users)
+            group_name = group_obj.group_name
+            add_log(3,3,current_user,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
+            #操作ログ終わり
+
             group_obj.delete()
 
             # メッセージを格納してJSONで返す

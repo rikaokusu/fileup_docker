@@ -24,32 +24,31 @@
                 <th scope="col" style="min-width:200px;">宛先メールアドレス</th>
                 <th scope="col" style="min-width:200px;">タイトル</th>
                 <th scope="col">ファイル名</th>
-                <th scope="col" style="min-width:155px;">種別</th>
+                <th scope="col" style="min-width:155px;">共有種別</th>
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
             <tr>
                 <td></td><!--counter-->
+                <!--日時-->
                 <td>{{ log.created_date | date:'Y/m/d H:i:s' }}</td>
+                <!--ユーザー-->
                 <td>{{ log.operation_user }}</td>
+                <!--IPアドレス-->
                 <td>{{ log.client_addr }}</td>
                 {% comment %} <td>{{ log.get_category_display }}</td> {% endcomment %}
+                <!--操作-->
                 <td>{{ log.get_operation_display }}</td>
+                <!--宛先メールアドレス-->
                 <td>
-                    {% comment %} {% for log_destuser in log_destusers %}
-                        {% if log_destuser.log == log %}
-                            {{ log_destuser.log_dest_user.email }}
-                        {% endif %}
-                    {% endfor %} {% endcomment %}
-                    {% comment %} {% for mail in log.destination_address%}
-                        {{ log.destination_address }}
-                    {% endfor %} {% endcomment %}
                     {{ log.destination_address }}
                 </td>
+                <!--タイトル-->
                 <td>
                     {{ log.file_title }}
                 </td>
+                <!--ファイル名-->
                 <td>
                     {% for log_file in log_files %}
                         {% if log_file.log == log %}
@@ -59,55 +58,56 @@
                         {% endif %}
                     {% endfor %}
                 </td>
+                <!--共有種別-->
                 <td>{{ log.get_upload_category_display }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table> 
-    {% comment %} <table class="table table-striped log-table">
+
+    <h2 class="log-file-title">アドレス帳管理</h2>
+    <table class="table table-striped log-table">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">操作日時</th>
-                <th scope="col">操作したIPアドレス</th>
-                <th scope="col">操作内容</th>
+                <th scope="col" style="min-width:90px;">日時</th>
+                <th scope="col">ユーザー</th>
+                <th scope="col" style="min-width:100px;">IPアドレス</th>
+                {% comment %} <th scope="col" style="min-width:120px;">カテゴリ</th> {% endcomment %}
+                <th scope="col" style="min-width:155px;">対象</th>
+                <th scope="col" style="min-width:95px;">操作</th>
+                <th scope="col" style="min-width:200px;">グループ名</th>
+                <th scope="col" style="min-width:200px; max-width:200px;">会社名　氏名</th>
             </tr>
         </thead>
         <tbody>
+            {% for log_address in logs_address %}
             <tr>
-                <th scope="row">1</th>
-                <td>2023-10-30 06:57</td>
-                <td>127.0.0.1</td>
-                <td>hayashiがyano@yui.okinawa akamine@yui.okinawa宛の「スイッチ設定資料」のOTP共有を作成しました。</td>
+                <td></td><!--counter-->
+                <!--日時-->
+                <td>{{ log_address.created_date | date:'Y/m/d H:i:s' }}</td>
+                <!--ユーザー-->
+                <td>{{ log_address.operation_user }}</td>
+                <!--IPアドレス-->
+                <td>{{ log_address.client_addr }}</td>
+                <!--対象-->
+                <td>{{ log_address.get_upload_category_display }}</td>
+                <!--操作-->
+                <td>{{ log_address.get_operation_display }}</td>
+                <!--グループ名-->
+                <td>
+                    {{ log_address.file_title }}
+                </td>
+                <!--会社名氏名-->
+                <td>
+                    {{ log_address.destination_address | linebreaksbr }}
+                </td>
             </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>2023-11-09 11:11</td>
-                <td>127.0.0.1</td>
-                <td>"ユーザー名"がログインしました。</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>2023-11-11 11:11</td>
-                <td>127.0.0.1</td>
-                <td>"ユーザー名"が"共有名"のファイル"xxx"を削除しました。</td>
-            </tr>
-            <tr>
-                <th scope="row">4</th>
-                <td>2023-11-11 11:11</td>
-                <td>127.0.0.1</td>
-                <td>"ユーザー名"が"共有名"宛の「スイッチ設定資料２」のURL共有を作成しました。</td>
-            </tr>
-            <tr>
-                <th scope="row">5</th>
-                <td>2023-11-11 11:11</td>
-                <td>127.0.0.1</td>
-                <td>"ユーザー名"が"共有名"のファイル"xxx"を削除しました。</td>
-            </tr>
+            {% endfor %}
         </tbody>
-    </table> {% endcomment %}
-    <!--戻るボタン-->
-<div class="d-flex flex-row justify-content-center">
+    </table> 
+
+<div class="d-flex flex-row justify-content-center mt-5">
     <a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fas fa-angle-left mr-2"></i>トップ画面に戻る</a>
 </div>
 </div>

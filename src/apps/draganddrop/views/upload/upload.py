@@ -622,7 +622,6 @@ class Step1Update(FormView, CommonView):
     model = UploadManage
     template_name = 'draganddrop/upload/step1_update.html'
     form_class = ManageTasksStep1Form
-
     # フォームに対してログインユーザーを渡す
     def get_form_kwargs(self):
         kwargs = super(Step1Update, self).get_form_kwargs()
@@ -765,7 +764,7 @@ class Step1Update(FormView, CommonView):
     # フォームが有効な場合指定されたURLへダイレクトする。
     # データがポストされた時に呼ばれるメソッド
     def form_valid(self, form):
-
+        print('あっぷでーとstep1-2')
         if 'upload_manage_id' in self.request.session:
             upload_manage = UploadManage.objects.filter(pk=self.request.session['upload_manage_id']).first()
 
@@ -940,7 +939,7 @@ class Step1Update(FormView, CommonView):
 
         # 生成されたDBの対象行のIDをセッションに保存しておく
         self.request.session['upload_manage_id'] = upload_manage_id
-
+        print('あっぷでーとstep1-3')
         upload_manage_id_old = self.kwargs['pk']
 
         # ステップ2へ遷移
@@ -950,7 +949,6 @@ class Step2Update(FormView, CommonView):
     model = UploadManage
     template_name = "draganddrop/upload/step2_update.html"
     form_class = DistFileUploadForm
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         upload_manage_id = self.kwargs['pk']
@@ -982,35 +980,38 @@ class Step2Update(FormView, CommonView):
         context["url_name"] = url_name
 
         context["files"] = files
+        print('あっぷでーとstep2-2')
 
         return context
 
     def post(self, request, *args, **kwargs):
         self.del_file = request.POST.getlist('del_file')
+        print('あっぷでーとstep2-4')       
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form,**kwargs):
         #操作ログ用
-        print('ふぉーむばりっど起きてる')
-        context = super().get_context_data(**kwargs)
-        current_user = self.request.user
-        upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-        #送信先取得,アドレス帳＆直接入力
-        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
-        dest_user_list = list(dest_user)
-        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
-        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
-        dest_group_list = list(dest_group)
-        #送信先　直接入力＆アドレス帳＆グループ list型
-        dest_users = dest_user_list + dest_group_list
-        # ↑の('')を省くため文字列に変換
-        dest_users = ' '.join(dest_users)
-        print('ぐるーぷのemail',dest_group)
-        print('ぐるーぷのemail',dest_group_list)
-        print('宛先ぜんぶ',dest_users)
-        # ファイルタイトル
-        file_title = upload_manage.title
-        # 操作ログ終わり
+        print('あっぷでーとstep2-3')
+        print('ふぉーむばりっど起きてる1')
+        # context = super().get_context_data(**kwargs)
+        # current_user = self.request.user
+        # upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
+        # #送信先取得,アドレス帳＆直接入力
+        # dest_user =  upload_manage.dest_user.values_list('email', flat=True)
+        # dest_user_list = list(dest_user)
+        # #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        # dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
+        # dest_group_list = list(dest_group)
+        # #送信先　直接入力＆アドレス帳＆グループ list型
+        # dest_users = dest_user_list + dest_group_list
+        # # ↑の('')を省くため文字列に変換
+        # dest_users = ' '.join(dest_users)
+        # print('ぐるーぷのemail',dest_group)
+        # print('ぐるーぷのemail',dest_group_list)
+        # print('宛先ぜんぶ',dest_users)
+        # # ファイルタイトル
+        # file_title = upload_manage.title
+        # # 操作ログ終わり
 
         # セッションの対象IDからDBオブジェクトを生成
         upload_manage_id = self.kwargs['pk']
@@ -1131,7 +1132,7 @@ class Step2Update(FormView, CommonView):
 
         # 保存
         upload_manage.save()
-        add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+        # add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
 
         return HttpResponseRedirect(reverse('draganddrop:step2_update', kwargs={'pk': upload_manage_id}))

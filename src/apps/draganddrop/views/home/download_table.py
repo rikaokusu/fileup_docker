@@ -126,9 +126,8 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
 # 受信テーブル一括削除 #
 ##################################
 class MultiDownloadTableDeleteAjaxView(View,CommonView):
-    print('一括削除かくにん繰り返してる？')
     def post(self, request,**kwargs):
-        print('一括削除かくにん繰り返してる？２２２２')
+        # print('一括削除かくにん繰り返してる？２２２２')
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         multi_delete_id = request.POST.getlist('dest_user_ids[]')#downloadテーブルのid(int)
