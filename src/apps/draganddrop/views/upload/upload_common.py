@@ -24,10 +24,18 @@ from django.core.signing import TimestampSigner, dumps, SignatureExpired
 class FileUpload(View, CommonView):
 
     def post(self, request, *args, **kwargs):
+        print('ふぁいるもらってきた～～～～～～～～～～～')
         context = super().get_context_data(**kwargs)
-        current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
-        context["current_user"] = current_user
-        
+        if self.request.user:
+            print('ゆーざーある＿＿nikita？？？')
+            print('ゆーざーある＿＿？？？',self.request.user)
+            current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
+            context["current_user"] = current_user
+        else:
+            print('せっしょんある＿＿？？？',self.request.session['guest_upload_manage'])
+            guest_upload_manage = self.request.session['guest_upload_manage']
+            current_user = User.objects.filter(pk=guest_upload_manage.user.id).select_related().get()
+
         print('FileUploadにはいった')
         up_file_id = []
         up_file_name = []

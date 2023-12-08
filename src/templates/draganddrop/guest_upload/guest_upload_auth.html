@@ -26,7 +26,7 @@
         <h1><a href="#"><img src="../../../static/img/FileUP_Logo_Blue.svg" alt="FileUPロゴ"></a></h1>
         <form action="" method="post">
 
-        {% if url_name == "otp_file_download_auth" %}
+        {% if url_name == "guest_file_upload_auth" %}
             <div>
                 {% csrf_token %}
                 <h3>ワンタイムパスワード認証を行います</h3>
@@ -35,7 +35,7 @@
                 <div>
                     {% render_field form.email class="form_auth" id="form_auth_mail" placeholder="メールアドレス" %}
                 </div>
-                <button type="button" id="otp_button" class="otp_btn my-3" disabled>ワンタイムパスワードを送信</button>
+                <button type="button" id="guest_button" class="otp_btn my-3" disabled>ワンタイムパスワードを送信</button>
                 <br>
                 <h6 style="color: #005392; font-weight: bold;">メールアドレスに送信されたパスワードを入力し、「認証する」ボタンを押してください。</h6>
                 <div>
@@ -60,12 +60,11 @@
         
         
         {% else %}
-            <p class="unable_download_message">期限切れかリクエストが削除されているためダウンロードできません。</p>
+            <p class="unable_download_message">期限切れかリクエストが削除されているためアップロードできません。</p>
             <div class="url_close_btn_wrap" data-toggle="tooltip" title="ページを閉じる" data-placement="top">
                 <button  value="close" class="expired_page_close_btn" id="otp_dl_close_btn">閉じる
                 <i class="far fa-window-close"></i></button>
             </div>
-    
         {% endif %}
 
         </form>
@@ -102,19 +101,19 @@ function loadingView(flag) {
 $(function () {
     $("#form_auth_mail").on('input', function () { //メールアドレスフォームに入力されたら動く処理
         if ($("#form_auth_mail").val().match('^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$')){
-            $("#otp_button").prop('disabled', false); //OTP送信ボタンを有効にさせる。
+            $("#guest_button").prop('disabled', false); //OTP送信ボタンを有効にさせる。
         } else {
-            $("#otp_button").prop('disabled', true); //OTP送信ボタンを無効にさせる。
+            $("#guest_button").prop('disabled', true); //OTP送信ボタンを無効にさせる。
         }
         var mail = $('#form_auth_mail').val()
     });
-    $('#otp_button').on('click', function () {
+    $('#guest_button').on('click', function () {
         // ローディング
         loadingView(true);
         var mail = $('#form_auth_mail').val()
         $.ajax({
             type: "POST",
-            url: "{% url 'draganddrop:otp_send' %}",
+            url: "{% url 'draganddrop:guest_send' %}",
             data: {
                 'email': mail
             },

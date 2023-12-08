@@ -435,14 +435,13 @@ class OTPDistFileUploadForm(forms.ModelForm):
 """
 class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
 
+    # dest_user = forms.ModelMultipleChoiceField(
+    #     queryset=Address.objects.all(),
+    #     widget=User_Checkbox, required=False)
 
-    dest_user = forms.ModelMultipleChoiceField(
-        queryset=Address.objects.all(),
-        widget=User_Checkbox, required=False)
-
-    dest_user_group = forms.ModelMultipleChoiceField(
-            queryset=Group.objects.all(),
-            widget=User_Checkbox, required=False)
+    # dest_user_group = forms.ModelMultipleChoiceField(
+    #         queryset=Group.objects.all(),
+    #         widget=User_Checkbox, required=False)
 
     # end_date = forms.DateTimeField(required=True, label="URL有効期間", widget=datetimepicker.DateTimePickerInput(format='%Y/%m/%d %H:%M:%S',
     #     options={
@@ -456,8 +455,8 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
 
     message = forms.CharField(
         widget=forms.Textarea(attrs={"rows":3}), required=False)
-
     guest_mail = forms.CharField(widget=forms.EmailInput, required=True)
+    guest_name = forms.CharField(widget=forms.TextInput, required=True)
     
     class Meta:
         model = GuestUploadManage
@@ -485,6 +484,7 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
         # Viewからログインユーザーを取得
         self.user = kwargs.pop('user', None)
         self.url = kwargs.pop('url', None)
+        self.dest_user_mail1 = kwargs.pop('dest_user_mail1')
         super(ManageTasksGuestUploadCreateStep1Form, self).__init__(*args, **kwargs)
 
     def clean_title(self):
@@ -494,7 +494,7 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
         users = User.objects.filter(company=self.user.company.id)
         for user in users:
            created_user.append(user.id)
-        
+
         # formに入力された値を取得
         title = self.cleaned_data['title']
         # タイトル制限
@@ -549,7 +549,7 @@ class OTPFileDownloadAuthForm(forms.Form):
 """
 ゲストアップロードのOTP認証用のフォーム
 """
-class GuestUploadFileDownloadAuthForm(forms.Form):
+class GuestFileUploadAuthForm(forms.Form):
     email = forms.CharField(widget=forms.EmailInput, required=False)
     password = forms.CharField(widget=forms.PasswordInput, required=False)
 

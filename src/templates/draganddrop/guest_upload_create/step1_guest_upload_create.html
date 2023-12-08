@@ -81,7 +81,24 @@
             <table class="table table-borderless step1_table">
                 <tr>
                     <td class="step1_label_wrapper">
-                            <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
+                            <h2>依頼先氏名</h2><span class="required_label def">必須</span>
+                    </td>
+                        <td>
+                            {% render_field form.guest_name class="form-control step1_guest_name" placeholder="ファイル共有リクエスト先の方の氏名"  %}
+                            {% if form.guest_name.errors %}
+                                {% for error in form.guest_name.errors %}
+                                    <div class="guest_name_error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                    <div class="step1-guest-name-error" style="visibility:hidden"></div>
+                            {% endif %}
+                        </td>
+                </tr>
+                <tr>
+                    <td class="step1_label_wrapper">
+                            <h2 data-toggle="tooltip" data-placement="top" title="依頼先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
                     </td>
                     <td>
                         <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
@@ -98,7 +115,7 @@
 
             </table>
         </div>
-        <!---step3_upload 閉じタグ--->
+        <!---step2_upload 閉じタグ--->
 
         <!----------------------------------受信者---------------------------------------->
 
@@ -107,10 +124,11 @@
                 <div class="step1_label_wrapper mb-3">
                     <h2 class="text-left step1_upload_box_title_2">2 受信ユーザー</h2>
                     <span class="required_label def">必須</span>
-                    <h3>・受信ユーザーをアドレス帳から選択するか、メールアドレスを直接入力して下さい。</h3>
+                    {% comment %} <h3>・受信ユーザーをアドレス帳から選択するか、メールアドレスを直接入力して下さい。</h3> {% endcomment %}
+                    <h3>・現在ログイン中のユーザーが対象です。</h3>
                 </div>
             </div>
-            
+
             <table class="table table-borderless">
                 <tr>
                     <td class="td_step1_upload_mail">
@@ -120,16 +138,16 @@
                                 <div>
                                     <button type="button" id="address_book_modal_btn"
                                     class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
-                                    data-target="#address_book_modal">アドレス帳</button>
+                                    data-target="#address_book_modal" style="pointer-events: none;" readonly>アドレス帳</button>
                                 </div>
                                 <div class="ml-3">
                                     <button type="button" id="group_book_modal_btn"
                                     class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
-                                    data-target="#group_book_modal">グループ</button>
+                                    data-target="#group_book_modal" style="pointer-events: none;" readonly>グループ</button>
                                 </div>
                             </div>
                             <div id="step1_upload_error_message" style="visibility:hidden"></div>
-                            <div>
+                            <div class="mail-data" data-mail="{{ user_mail }}">
                                 {% render_field form.dest_user_mail1 class="form-control step1_guestul_mail step1_guestul_mail1 step1_mail" placeholder="1"%}
                             </div>
                             <div>
@@ -170,7 +188,7 @@
         <!----------------------------受信者表示・全受信者確認ボタン-------------------------------------->
         <div class="box5_upload">
             <div class="box6_upload">
-                <h3>アドレス帳から選択された受信ユーザー上位10件まで表示されます。</h3>
+                {% comment %} <h3>アドレス帳から選択された受信ユーザー上位10件まで表示されます。</h3> {% endcomment %}
                 <div>
                     <div id="all_dest_user_lists"></div>
                 </div>
@@ -195,9 +213,8 @@
             </div>
 
             <div class="ml-2 mr-1">
-                <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
-                    data-target="#send_data_modal" disabled>次へ
-                    <i class="fa-solid fa-angle-right ml-2"></i></button>
+                <button type="button" class="btn-default" data-toggle="modal" data-target="#req_confirm_modal" id="confirm_button"
+                    disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
             </div>
         </div>
     </div>
@@ -210,7 +227,7 @@
 
 <!------------------------------アドレス帳モーダル------------------------------>
 
-<div class="modal fade" id="address_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+{% comment %} <div class="modal fade" id="address_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content center-modal address_lists_modal">
             
@@ -293,12 +310,12 @@
             </div>
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 <!--アドレス帳モーダル閉じタグ-->
 
 <!--グループ一覧モーダル-->
 
-<div class="modal fade" id="group_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+{% comment %} <div class="modal fade" id="group_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content center-modal address_lists_modal">
                 <div class="modal-header address_lists_modal_header d-flex justify-content-center">
@@ -365,7 +382,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 
 <!----------------------------------もっと見るモーダル-------------------------------------->
 {% for group_list in group_lists %}
@@ -424,6 +441,133 @@
 </div>
 <!--受信ユーザー確認モーダル閉じタグ-->
 
+<!-------------------------------------確認モーダル---------------------------------------->
+<div class="modal fade" id="req_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-content center-modal confirm_modal">
+        
+        <div class="modal-header default_modal_header">
+          <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+        </div>
+        <div class="ml-4 mt-3">
+            <h2>&nbsp;&nbsp;以下の内容で依頼先ユーザーへファイル共有リクエストを送信します。ご確認の上「登録」ボタンを押してください。</h2>
+        </div>
+        <div class="modal-body confirm_modal_body">
+          <div class="modal_box2">
+            <table class="table confirm_modal_table">
+              <tbody>
+                <tr>
+                  <th>
+                    <h2>タイトル</h2>
+                  </th>
+                  <td id="title_name">{{request.session.title}}</td>
+                  <td rowspan="5" class="confirm_modal_update_button">
+                    <button type="button" onfocus="this.blur();"
+                      class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0" data-dismiss="modal">step1を編集</button>
+                  </td>
+                </tr>
+                <tr>
+                    <th>
+                      <h2>依頼先</h2>
+                    </th>
+                    <td id="guest_mail"></td>
+                </tr>
+                <tr>
+                    <th>
+                      <h2>依頼先氏名
+                      </h2>
+                    </th>
+                    <td id="guest_name"></td>
+                </tr>
+  
+                <tr class="confirm_modal_dest_user">
+                  <th>
+                    <h2>送り先</h2>
+                  </th>
+                  <td class="vertical_align_top">
+                    {% if request.session.dest_user_all_list|length >= 6 %}
+                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
+                        {% if dest_user_all|slice:"-1:" == "1" %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}.</div>
+                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% else %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}</div>
+                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      <div class="dest_user_list_wrap">
+                        {% comment %} 送り先 合計 {{request.session.dest_user_all_list|length}}件 {% endcomment %}
+                        送り先 合計 １件
+                        <div>
+                          <a class="triangle step3_dest_user_confirm_btn ml-3" data-toggle="modal"
+                            data-target="#url_all_dest_user_confirm_modal">全送信先確認</a>
+                        </div>
+                      </div>
+                    {% else %}
+                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
+                        {% if dest_user_all|slice:"-1:" == "1" %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}.</div>
+                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% else %}
+                          <div class="d-flex">
+                            <div class="w_20">{{ forloop.counter }}</div>
+                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                      <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{ user_mail }}<br></div>
+                      <div class="dest_user_list_wrap">
+                        {% comment %} 送り先 合計 {{request.session.dest_user_all_list|length}}件 {% endcomment %}
+                        送り先 合計 １件
+                      </div>
+                    {% endif %}
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>
+                    <h2>依頼先へ送付したURLの有効期限</h2>
+                  </th>
+                  <td>{{ seven_days|date:"Y年n月j日" }}23時59分</td>
+                </tr>
+
+                <tr>
+                  <th>
+                    <h2>DL回数</h2>
+                  </th>
+                  <td>無期限</td>
+                </tr>
+
+                <tr>
+                  <th>
+                    <h2>依頼先ユーザーの認証方法</h2>
+                  </th>
+                  <td>ワンタイムパスワード</td>
+
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer confirm_modal_footer">
+          <button type="button"
+          class="register_btn btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 blue_btn rounded-0">登録</button>
+          <button type="button" onfocus="this.blur();"
+            class="btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 rounded-0" data-dismiss="modal">キャンセル</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
 
 
@@ -477,7 +621,7 @@ $(document).ready(function () {
 //  アドレス帳モーダル 動作制御
 // ---------------------------------------
 
-$(function () {
+{% comment %} $(function () {
 
 // 全選択ボタンがクリックされた時
 $("#all_address_list").on('click', function () {
@@ -503,11 +647,11 @@ $("input[name='address_list_ids']").on('change', function () {
     });
 });
 
-});
+}); {% endcomment %}
 
 
 //モーダル内ページを変更した時全選択checkboxの状態を判断する。
-$(function () {
+{% comment %} $(function () {
     var table = $('#address_book_list_table').DataTable();
 
     table.on('page.dt', function () {
@@ -522,21 +666,21 @@ $(function () {
                 .length));
         }, 10);
     });
-})
+}) {% endcomment %}
 
 
 // アドレス帳モーダルを開いた時、1ユーザー以上チェックがついていれば選択ボタンを有効にする。
-$(function () {
+{% comment %} $(function () {
     $("#address_book_modal_btn").on('click', function () {
         var address_list = [];
         $('#address_book_modal input[name = address_list_ids]:checked').each(function () {
             address_list.push($(this).val()); // 配列に値を追加
         });
     });
-});
+}); {% endcomment %}
 
 // モーダルを開いた時
-$("#address_book_modal").on('shown.bs.modal', function () {
+{% comment %} $("#address_book_modal").on('shown.bs.modal', function () {
     if ($("input[name='address_list_ids']:checked").length == $("input[name='address_list_ids']").length) {
         // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
         $('#all_address_list').prop('checked', true);
@@ -544,7 +688,7 @@ $("#address_book_modal").on('shown.bs.modal', function () {
         // 1つでもチェックが入っていたら、「全選択」 = checked
         $('#all_address_list').prop('checked', false);
     }
-});
+}); {% endcomment %}
 
 // ---------------------------------------
 //  グループモーダル 動作制御
@@ -579,7 +723,7 @@ $("input[name='group_list_ids']").on('change', function () {
 });
 
 //モーダル内ページを変更した時全選択checkboxの状態を判断する。
-$(function () {
+{% comment %} $(function () {
 var table = $('#group_book_list_table').DataTable();
 
 table.on('page.dt', function () {
@@ -604,7 +748,7 @@ $("#group_book_modal_btn").on('click', function () {
         group_checked_list.push($(this).val()); // 配列に値を追加
     });
 });
-});
+}); {% endcomment %}
 
 // モーダルを開いた時
 $("#group_book_modal").on('shown.bs.modal', function () {
@@ -630,22 +774,22 @@ $('#confirm_modal').on('show.bs.modal', function () {
     //mail_listに1-10のメールを格納する。
     var mail_address = {};
     var dest_user_mail1 = $('#id_dest_user_mail1').val()
-    var dest_user_mail2 = $('#id_dest_user_mail2').val()
+    /*var dest_user_mail2 = $('#id_dest_user_mail2').val()
     var dest_user_mail3 = $('#id_dest_user_mail3').val()
     var dest_user_mail4 = $('#id_dest_user_mail4').val()
     var dest_user_mail5 = $('#id_dest_user_mail5').val()
     var dest_user_mail6 = $('#id_dest_user_mail6').val()
     var dest_user_mail7 = $('#id_dest_user_mail7').val()
-    var dest_user_mail8 = $('#id_dest_user_mail8').val()
+    var dest_user_mail8 = $('#id_dest_user_mail8').val()*/
 
     if (dest_user_mail1) {mail_lists.push(dest_user_mail1)} 
-    if (dest_user_mail2) {mail_lists.push(dest_user_mail2)} 
+    /*if (dest_user_mail2) {mail_lists.push(dest_user_mail2)} 
     if (dest_user_mail3) {mail_lists.push(dest_user_mail3)} 
     if (dest_user_mail4) {mail_lists.push(dest_user_mail4)} 
     if (dest_user_mail5) {mail_lists.push(dest_user_mail5)} 
     if (dest_user_mail6) {mail_lists.push(dest_user_mail6)} 
     if (dest_user_mail7) {mail_lists.push(dest_user_mail7)} 
-    if (dest_user_mail8) {mail_lists.push(dest_user_mail8)}
+    if (dest_user_mail8) {mail_lists.push(dest_user_mail8)}*/
     
     //初期化
     var all_mail_address = '';
@@ -677,7 +821,7 @@ $('#confirm_modal').on('show.bs.modal', function () {
 // ------------------------------------------
 // URLがstep1の場合デフォルトで7日後を表示させる。
 // ------------------------------------------
-$(function () {
+{% comment %} $(function () {
 
     var url_name = $('#url_name').data("url_name")
 
@@ -706,22 +850,36 @@ $(function () {
             $('#id_end_date').val(a_7d_day_str)
         }
     }
-});
+}); {% endcomment %}
 
 // ------------------------------------------
 // 次へボタンの制御
 // ------------------------------------------
-$("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_guestul_mail").on('input dp.change click keyup', function () { 
+{% comment %} $("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_guestul_mail").on('input dp.change click keyup', function () {  {% endcomment %}
+$("#id_title, #id_dest_user_mail1, #id_guest_mail, #id_guest_name").on('input dp.change click keyup', function () { 
     // 送信先の合計を取得
     all_dest_user_length = "";
     all_dest_user_length = user_lists.length + group_lists.length;
     var count = $('.help-inline:visible').length + $('.dest_user_duplicate_error').length;
-    if (!$("#id_title").val() == '' && (!$("#id_dest_user_mail1").val() == '') && (!$("#id_end_date").val() == '') && count == 0) { 
-        $("#next_btn").prop('disabled', false); 
-    }else if (!$("#id_title").val() == '' && all_dest_user_length >= 1 && (!$("#id_end_date").val() == '') && count == 0) { 
-        $("#next_btn").prop('disabled', false); 
+    //if (!$("#id_title").val() == '' && (!$("#id_dest_user_mail1").val() == '') && (!$("#id_end_date").val() == '') && count == 0) { 
+    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && !$("#id_guest_name").val() == '' && (!$("#id_dest_user_mail1").val() == '') && count == 0) {
+        var title_name = $('#id_title').val()
+        var guest_mail = $('#id_guest_mail').val()
+        var guest_name = $('#id_guest_name').val()
+        $('#title_name').text(title_name)
+        $('#guest_mail').text(guest_mail)
+        $('#guest_name').text(guest_name)
+        $("#confirm_button").prop('disabled', false);
+    }else if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && !$("#id_guest_name").val() == '' && all_dest_user_length >= 1 && count == 0) { 
+        var title_name = $('#id_title').val()
+        var guest_mail = $('#id_guest_mail').val()
+        var guest_name = $('#id_guest_name').val()
+        $('#title_name').text(title_name)
+        $('#guest_mail').text(guest_mail)
+        $('#guest_name').text(guest_name)
+        $("#confirm_button").prop('disabled', false); 
     } else {
-        $("#next_btn").prop('disabled', true); 
+        $("#confirm_button").prop('disabled', true); 
     }
 });
 
@@ -731,9 +889,9 @@ $(function(){
     all_dest_user_length = "";
     all_dest_user_length = user_lists.length + group_lists.length;
     var count = $('.help-inline:visible').length + $('.dest_user_duplicate_error').length;
-    if (!$("#id_title").val() == '' && (!$("#id_dest_user_mail1").val() == '') && (!$("#id_end_date").val() == '') && count == 0) { 
+    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && (!$("#id_dest_user_mail1").val() == '') && count == 0) { 
         $("#next_btn").prop('disabled', false); 
-    }else if (!$("#id_title").val() == '' && all_dest_user_length >= 1 && (!$("#id_end_date").val() == '') && count == 0) { 
+    }else if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && all_dest_user_length >= 1 && count == 0) { 
         $("#next_btn").prop('disabled', false); 
     } else {
         $("#next_btn").prop('disabled', true); 
@@ -743,11 +901,13 @@ $(function(){
 // ------------------------------------------
 // メールアドレス入力フォームを有効にさせる処理。
 // ------------------------------------------
+var user_mail = $('.mail-data').data('mail')
+$('#id_dest_user_mail1').val(user_mail)
 
 // 1行目
 $("#id_dest_user_mail1, #id_dest_user_mail2").on('input', function () { //id_dest_user_mail1に入力されたら動く処理
     if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) { //id_dest_user_mail1か2に値が入っていた場合
-        $('.row_2').attr('readonly', false);
+        //$('.row_2').attr('readonly', false);
         $(".step1_url_confirm_btn").css("display", "block")
     
     }else if ($("#id_dest_user_mail1").val() == ''&& user_lists.length >= 11) { ////id_dest_user_mail1は空だがアドレス帳選択ユーザーが11名以上選択された場合
@@ -760,7 +920,7 @@ $("#id_dest_user_mail1, #id_dest_user_mail2").on('input', function () { //id_des
     }
 });
 
-if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) {
+{% comment %} if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) {
     $('.row_2').attr('readonly', false);
     $(".step1_url_confirm_btn").css("display", "block")
 
@@ -822,12 +982,12 @@ $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
     } else {
         $('.row_8').attr('readonly', true);
     }
-});
+}); {% endcomment %}
 
 // -----------------
 // メールアドレス欄の空きを詰める処理
 // -----------------
-$("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
+{% comment %} $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
     var m_list = []
     var m_count = 0
     var count = 1;
@@ -844,7 +1004,7 @@ $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_ma
         };
         count++;
     }
-});
+}); {% endcomment %}
 
 // -----------------
 // validate
@@ -1002,7 +1162,7 @@ function checkDuplicate(inputId, value) {
 // --------------------
 
 //step1URLが読み込まれ認証方法がメールアドレスの時入力フォームを無効にする。
-$(function () {
+{% comment %} $(function () {
 
     var url_name = $('#url_name').data("url_name")
     if (url_name == "step1_url_upload" || url_name == "step1_url_update") {
@@ -1013,7 +1173,7 @@ $(function () {
             $('#auth_pass').attr('readonly', false); //有効
         }
     }
-});
+}); {% endcomment %}
 
 //ラジオボタンを選択する度に入力フォームの有効無効を切り替える。
 $(function () {
@@ -1034,13 +1194,21 @@ $(function () {
 // --------------------------------------
 // ページのリロード時に確認ダイアログが表示される
 // --------------------------------------
+//ローディング
+function loadingView(flag) {
+    $('#loading-view').remove();
+    if (!flag) return;
+        $('<div id="loading-view" />').appendTo('.modal');
+}
 $(function () {
     $(window).on('beforeunload', function (event) {
         event.preventDefault();
         return '作成中のデータは全て削除されます。よろしいですか？';
     });
-    $('#next_btn').on('click', function (e, data) {
+    $('.register_btn').on('click', function (e, data) {
+        loadingView(true);
         $(window).off('beforeunload');
+        $('#postForm').submit();
     });
     $('#cancel_btn').on('click', function (e, data) {
         $(window).off('beforeunload');

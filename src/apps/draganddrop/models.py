@@ -308,6 +308,7 @@ class GuestUploadManage(models.Model):
     file_del_flag = models.IntegerField(null=True, blank=True, default=0)
     message = models.CharField(max_length=140, blank=True, null=True)
     url_invalid_flag = models.IntegerField(verbose_name='ゲストへのURL招待無効フラグ',null=True, blank=True, default=0)
+    created_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
 
     @property
     def is_past_due(self):

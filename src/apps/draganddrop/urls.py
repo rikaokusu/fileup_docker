@@ -139,15 +139,20 @@ urlpatterns = [
      
       ## guest_upload.py ##
      # ゲストアップロード(作成・リクエスト)
-     path('step1_guest_upload/', guest_upload.Step1GuestUploadCreate.as_view(), name='step1_guest_upload'),
-     path('step2_guest_upload/<uuid:pk>', guest_upload.Step2GuestUploadCreate.as_view(), name='step2_guest_upload'),
+     path('step1_guest_upload_create/', guest_upload.Step1GuestUploadCreate.as_view(), name='step1_guest_upload_create'),
+     path('step2_guest_upload_create/<uuid:pk>', guest_upload.Step2GuestUploadCreate.as_view(), name='step2_guest_upload_create'),
     #  path('guest_upload_return/<uuid:pk>', guest_upload.GuestReturnView.as_view(), name='guest_return'),
-
-     # ゲストアップロード(変更) 
+     # ゲストアップロード(作成・リクエスト変更) 
     #  path('otp_upload_manage_id/<uuid:pk>', otp_upload.Step1OTPUpdate.as_view(), name='step1_otp_update'),
     #  path('step2_otp_update/<uuid:pk>', otp_upload.Step2OTPUpdate.as_view(), name='step2_otp_update'),
     #  path('step3_otp_update/<uuid:pk>', otp_upload.Step3OTPUpdate.as_view(), name='step3_otp_update'),
-    #  path('otp_return_update/<uuid:pk>',otp_upload.OTPReturnUpdateView.as_view(), name='otp_return_update'),
+     # ゲストアップロード（ファイルアップロード）
+     path('guest_check/<str:token>/', guest_upload.GuestApproveView.as_view(), name='guestapprove'),
+     path('guest_file_upload_auth/<uuid:pk>', guest_upload.GuestFileUploadAuth.as_view(), name='guest_file_upload_auth'),
+     path('guest_send/', guest_upload.GuestSendAjaxView.as_view(),name='guest_send'),
+     path('step1_guest_upload/<uuid:pk>', guest_upload.Step1GuestUpload.as_view(), name='step1_guest_upload'),
+     path('step2_guest_upload/<uuid:pk>', guest_upload.Step2GuestUpload.as_view(), name='step2_guest_upload'),
+    
 
      ## duplicate.py ##
      # ファイルアップロード(複製)  

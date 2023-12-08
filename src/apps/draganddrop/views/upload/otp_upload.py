@@ -63,7 +63,6 @@ class Step1OTPUpload(FormView, CommonView):
                 'dest_user_mail8': otp_upload_manage.dest_user_mail8,
                 'end_date': otp_upload_manage.end_date,
                 'message': otp_upload_manage.message,
-                # 'password': otp_upload_manage.password,
                 'dl_limit': str(otp_upload_manage.dl_limit),
             }
 
@@ -123,7 +122,6 @@ class Step1OTPUpload(FormView, CommonView):
         title = form.cleaned_data['title']
         end_date = form.cleaned_data['end_date']
         dl_limit = form.cleaned_data['dl_limit']
-        # password = form.cleaned_data['password']
         message = form.cleaned_data['message']
 
 
@@ -131,7 +129,6 @@ class Step1OTPUpload(FormView, CommonView):
         otp_upload_manage_obj.end_date = end_date
         otp_upload_manage_obj.title = title
         otp_upload_manage_obj.dl_limit = dl_limit
-        # otp_upload_manage_obj.password = password
         otp_upload_manage_obj.message = message
 
         # 保存
@@ -303,7 +300,6 @@ class Step1OTPUpload(FormView, CommonView):
         self.request.session['dest_user_all_list'] = dest_user_all_list
         self.request.session['title'] = title
         self.request.session['dl_limit'] = dl_limit
-        # self.request.session['password'] = password
         self.request.session['message'] = message
         self.request.session['dest_user_mail1'] = dest_user_mail1
         self.request.session['dest_user_mail2'] = dest_user_mail2
@@ -418,28 +414,22 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 2)[2]
                 # file_name = file_path.split('/', 3)[3]
-                print('----urlのfile_nameはなに',file_name)
 
 
                 # パスを取得
                 # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
-                print('----urlのpathはなに',path)
-
 
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
                 if file_name_without_dot == "txt":
-                    # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                     path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
-                    print('txtふぁいるにすすんだ',path)
                     with open(path) as f:
                         s = f.read()
 
                         # htmlファイルを生成して書き込む
                         upload_s = str(file.upload)
                         upload_ss = upload_s.split('/')[0]
-                        print('upload_ssとは',upload_ss)
                         file_path = urllib.parse.unquote(file.upload.url)
 
                         upload = file_path[1:]
@@ -619,7 +609,6 @@ class Step1OTPUpdate(FormView, CommonView):
             title = otp_upload_manage.title
             dl_limit = otp_upload_manage.dl_limit
             end_date = otp_upload_manage.end_date
-            # password = otp_upload_manage.password
             message = otp_upload_manage.message
 
             if otp_upload_manage.dest_user.all().count() == 0:
@@ -660,7 +649,6 @@ class Step1OTPUpdate(FormView, CommonView):
                         'dest_user_mail8': dest_user_mail8,
                         'dl_limit': dl_limit,
                         'end_date': end_date,
-                        # 'password': password,
                         'message': message
                     }
 
@@ -681,7 +669,6 @@ class Step1OTPUpdate(FormView, CommonView):
                         'dest_user_mail8': otp_upload_manage_old.dest_user_mail8,
                         'end_date': otp_upload_manage_old.end_date,
                         'dl_limit': otp_upload_manage_old.dl_limit,
-                        # 'password': otp_upload_manage_old.password,
                         'message': otp_upload_manage_old.message,
                         }
 
@@ -740,7 +727,6 @@ class Step1OTPUpdate(FormView, CommonView):
         title = form.cleaned_data['title']
         end_date = form.cleaned_data['end_date']
         dl_limit = form.cleaned_data['dl_limit']
-        # password = form.cleaned_data['password']
         message = form.cleaned_data['message']
         dest_user_qs = form.cleaned_data['dest_user']
         dest_user_group_qs = form.cleaned_data['dest_user_group']
@@ -760,8 +746,6 @@ class Step1OTPUpdate(FormView, CommonView):
         otp_upload_manage.end_date = end_date
         # ダウンロード回数をセット
         otp_upload_manage.dl_limit = dl_limit
-        # # パスワードをセット
-        # otp_upload_manage.password = password
         # メッセージをセット
         otp_upload_manage.message = message
 
@@ -881,7 +865,6 @@ class Step1OTPUpdate(FormView, CommonView):
         self.request.session['title'] = title
         self.request.session['end_date'] = end_date
         self.request.session['dl_limit'] = dl_limit
-        # self.request.session['password'] = password
         self.request.session['message'] = message
         self.request.session['dest_user_all_list'] = dest_user_all_list
 
@@ -1006,9 +989,6 @@ class Step2OTPUpdate(FormView, CommonView):
         # 保存
         otp_upload_manage.save()
 
-        # 保存
-        # upload_manage_tmp.delete()
-
         if 'up_file_id' in self.request.session:
 
             # ファイルとタスクを紐付ける
@@ -1089,8 +1069,6 @@ class Step2OTPUpdate(FormView, CommonView):
 
         otp_upload_manage.save()
 
-        # upload_manage_id_old = self.kwargs['pk']
-
         return HttpResponseRedirect(reverse('draganddrop:step2_otp_update', kwargs={'pk': otp_upload_manage_id}))
 
 class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの処理
@@ -1141,7 +1119,6 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         otp_upload_manage.title = otp_upload_manage_tmp.title
         otp_upload_manage.end_date = otp_upload_manage_tmp.end_date
         otp_upload_manage.dl_limit = otp_upload_manage_tmp.dl_limit
-        # otp_upload_manage.password = otp_upload_manage_tmp.password
         otp_upload_manage.message = otp_upload_manage_tmp.message
         otp_upload_manage.dest_user_mail1 = otp_upload_manage_tmp.dest_user_mail1
         otp_upload_manage.dest_user_mail2 = otp_upload_manage_tmp.dest_user_mail2
@@ -1290,4 +1267,3 @@ class OTPReturnUpdateView(View):
             # ページ情報をセッションに保存しておく
             self.request.session['page_num'] = 3
             return HttpResponseRedirect(reverse('draganddrop:step3_otp_update', kwargs={'pk': otp_upload_manage_id_old}))
-

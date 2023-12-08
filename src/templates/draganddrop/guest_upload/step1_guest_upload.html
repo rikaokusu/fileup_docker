@@ -4,13 +4,13 @@
 
 <div class="d-flex flex-row bd-highlight mt-4 mb-2 top_bar">
 
-  <div class="top">
+  <div class="top2">
     <div class="tate mr-2"></div>
     <h1>ゲストアップロード</h1><i class="fas fa-link fa-2x icon-link"></i>
   </div>
 
 
-  <div class="progressbar">
+  <div class="progressbar2">
     <div class="item active flex-fill">STEP1<br>ファイルを選択</div>
     <div class="item flex-fill">STEP2<br>登録完了</div>
 
@@ -24,7 +24,11 @@
   <!-- Dropzone エラーメッセージ表示場所 -->
   <div class="error_msg_place" style="height: 50px;"></div>
   <div id="validation-error"></div>
-
+  <div id="upload-info">
+    <h2>アップロード方法</h2>
+    <p>下部枠内の「ファイルアップロード」に共有したいファイルをドラッグアンドドロップまたは枠内をクリックして<br>
+    ファイルを選択後、「確認」ボタンを押してください。</p>
+  </div>
   <div class="box1 box1_step2">
     <div class="d-flex">
       <!-- ファイルのドラッグアンドドロップ部 -->
@@ -60,11 +64,7 @@
             <div class="preview-button preview-text button_colum">
               <div class="del_file_btn"></div>
               <div>
-                {% if url_name == "step2_otp_upload"%}                
                 <button type="button" data-toggle="modal" data-target="#fileDelModal" class="btn-danger dropzone_btn_size del_btn">削除</button>
-                {% else %}
-                <button type="button" data-toggle="modal" data-target="#updateFileDelModal" class="btn-danger dropzone_btn_size del_btn">削除</button>
-                {% endif %}
               </div>
             </div>
 
@@ -74,7 +74,7 @@
             </div>
           </div>
           
-          <!--OTPStep2 ファイル削除確認モーダル -->
+          <!-- GuestStep1 ファイル削除確認モーダル -->
           <div class="modal fade" id="fileDelModal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content center-modal">
@@ -84,24 +84,6 @@
                 <div class="modal-body" style="font-weight: 100;">ファイルを削除しますか？</div>
                 <div class="modal-footer">
                   <button type="button" name="checked_del_file" class="btn btn_size delete_btn rounded-0">削除</button>
-                  <button type="button" class="btn btn_size btn-secondary rounded-0" data-dismiss="modal">キャンセル</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!--OTPStep2update ファイル削除確認モーダル -->
-          <div class="modal fade" id="updateFileDelModal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content center-modal">
-                <div class="modal-header delete_modal_header">
-                  <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
-                </div>
-                <div class="modal-body" style="font-weight: 100;">
-                  ファイルを本当に削除しますか？<br>キャンセルをしてもファイルが削除された状態で保存されます。
-                </div>
-                <div class="modal-footer">
-                  <button type="button" name="checked_updated_del_file" class="btn btn_size delete_btn rounded-0" data-dismiss="modal">削除</button>
                   <button type="button" class="btn btn_size btn-secondary rounded-0" data-dismiss="modal">キャンセル</button>
                 </div>
               </div>
@@ -139,26 +121,15 @@
         data-toggle="modal" data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
       </div>
       
-      <div class="ml-1 mr-1">
-        {% if url_name == "step2_otp_upload"%}
+      {% comment %} <div class="ml-1 mr-1">
         <button type="button" class="btn-default"
-          onclick="location.href='{% url 'draganddrop:otp_return' otp_upload_manage_id %}'">
+          onclick="location.href='{% url 'draganddrop:guest_return' guest_upload_manage_id %}'">
           <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
-        {% else %}
-        <button type="button" class="btn-default"
-          onclick="location.href='{% url 'draganddrop:otp_return_update' otp_upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
-        {% endif %}
-      </div>
+      </div> {% endcomment %}
 
       <div class="ml-1 mr-1">
-        {% if url_name == "step2_otp_upload"%}
         <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
           disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
-        {% else %}
-        <button type="button" class="btn-default" data-toggle="modal" data-target="#update_confirm_modal" id="update_confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
-        {% endif %}
         </div>
     </div>
 
@@ -166,9 +137,6 @@
 
 
   <!------確認用モーダル------>
-
-  <!--step2_url_upload-->
-  {% if url_name == "step2_otp_upload" %}
   <div class="modal fade" id="confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
       <div class="modal-content center-modal confirm_modal">
@@ -185,12 +153,12 @@
                   <th>
                     <h2>タイトル</h2>
                   </th>
-                  <td>{{request.session.title}}</td>
-                  <td rowspan="4" class="confirm_modal_update_button">
+                  <td>{{guest_upload_manage.title}}</td>
+                  {% comment %} <td rowspan="4" class="confirm_modal_update_button">
                     <button type="button" onfocus="this.blur();"
                       class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0" data-dismiss="modal"
-                      onclick="location.href='{% url 'draganddrop:otp_return' otp_upload_manage_id %}'">step1を編集</button>
-                  </td>
+                      onclick="location.href='{% url 'draganddrop:guest_return' guest_upload_manage_id %}'">step1を編集</button> 
+                  </td>{% endcomment %}
                 </tr>
 
                 <tr class="confirm_modal_dest_user">
@@ -198,7 +166,7 @@
                     <h2>送り先</h2>
                   </th>
                   <td class="vertical_align_top">
-                    {% if request.session.dest_user_all_list|length >= 6 %}
+                    {% comment %} {% if request.session.dest_user_all_list|length >= 6 %}
                       {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
                         {% if dest_user_all|slice:"-1:" == "1" %}
                           <div class="d-flex">
@@ -216,11 +184,11 @@
                         送り先 合計 {{request.session.dest_user_all_list|length}}件
                         <div>
                           <a class="triangle step3_dest_user_confirm_btn ml-3" data-toggle="modal"
-                            data-target="#otp_all_dest_user_confirm_modal">全送信先確認</a>
+                            data-target="#guest_all_dest_user_confirm_modal">全送信先確認</a>
                         </div>
                       </div>
-                    {% else %}
-                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
+                    {% else %} {% endcomment %}
+                      {% comment %} {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
                         {% if dest_user_all|slice:"-1:" == "1" %}
                           <div class="d-flex">
                             <div class="w_20">{{ forloop.counter }}.</div>
@@ -232,22 +200,27 @@
                             <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
                           </div>
                         {% endif %}
-                      {% endfor %}
-                      <div class="dest_user_list_wrap">
-                        送り先 合計 {{request.session.dest_user_all_list|length}}件
+                      {% endfor %} {% endcomment %}
+                      <div class="d-flex">
+                        <div class="w_20">{{ forloop.counter }}</div>
+                        <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{guest_upload_manage.guest_user_mail}}</div>
                       </div>
-                    {% endif %}
+                      <div class="dest_user_list_wrap">
+                        {% comment %} 送り先 合計 {{request.session.dest_user_all_list|length}}件 {% endcomment %}
+                        送り先 合計 1件
+                      </div>
+                    {% comment %} {% endif %} {% endcomment %}
                   </td>
                 </tr>
 
-                <tr>
+                {% comment %} <tr>
                   <th>
                     <h2>保存期日</h2>
                   </th>
                   <td>{{request.session.end_date}}</td>
-                </tr>
+                </tr> {% endcomment %}
 
-                <tr>
+                {% comment %} <tr>
                   <th>
                     <h2>DL回数</h2>
                   </th>
@@ -257,7 +230,7 @@
                   <td>無期限</td>
                   {% endif %}
                 </tr>
-                
+                 {% endcomment %}
                 <tr class="confirm_modal_file_name">
                   <th>
                     <h2>ファイル</h2>
@@ -270,7 +243,7 @@
                   <td class="confirm_modal_update_button">
                     <button type="button" onfocus="this.blur();"
                       class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0"
-                      data-dismiss="modal">step2を編集</button>
+                      data-dismiss="modal">step1を編集</button>
                   </td>
                 </tr>
 
@@ -280,7 +253,7 @@
         </div>
 
         <div class="modal-footer confirm_modal_footer">
-          <button type="button" onclick="location.href='{% url 'draganddrop:step3_otp_upload' otp_upload_manage_id %}'"
+          <button type="button" onclick="location.href='{% url 'draganddrop:step2_guest_upload' guest_upload_manage_id %}'"
           class="register_btn btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 blue_btn rounded-0" data-toggle="modal"
           data-target="#modal3">登録</button>
           <button type="button" onfocus="this.blur();"
@@ -291,197 +264,9 @@
     </div>
   </div>
 
-  {% else %}
-
-
-  <!------確認用モーダル update------>
-
-  <div class="modal fade" id="update_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-      <div class="modal-content center-modal confirm_modal">
-        
-        <div class="modal-header default_modal_header">
-          <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
-        </div>
-        
-        <div class="modal-body confirm_modal_body">
-          <div class="modal_box2">
-            <table class="table  confirm_modal_table">
-              <tbody>
-                <tr>
-                  <th>
-                    <h2>タイトル</h2>
-                  </th>
-                  <td>{{request.session.title}}</td>
-                  <td rowspan="5" class="confirm_modal_update_button">
-                    <button type="button" onfocus="this.blur();"
-                      class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0" data-dismiss="modal"
-                      onclick="location.href='{% url 'draganddrop:otp_return_update' otp_upload_manage_id %}'">STEP1を編集</button>
-                  </td>
-                </tr>
-
-                <tr class="confirm_modal_dest_user">
-                  <th>
-                    <h2>送り先</h2>
-                  </th>
-                  <td class="vertical_align_top">
-                    {% if request.session.dest_user_all_list|length >= 6 %}
-                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
-                        {% if dest_user_all|slice:"-1:" == "1" %}
-                          <div class="d-flex">
-                            <div class="w_20">{{ forloop.counter }}.</div>
-                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                          </div>
-                        {% else %}
-                          <div class="d-flex">
-                            <div class="w_20">{{ forloop.counter }}</div>
-                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                          </div>
-                        {% endif %}
-                      {% endfor %}
-                      <div class="dest_user_list_wrap">
-                        送り先 合計 {{request.session.dest_user_all_list|length}}件
-                        <div>
-                          <a class="triangle step3_dest_user_confirm_btn ml-3" data-toggle="modal"
-                            data-target="#otp_update_all_dest_user_confirm_modal">全送信先確認</a>
-                        </div>
-                      </div>
-                    {% else %}
-                      {% for dest_user_all in request.session.dest_user_all_list|slice:"5" %}
-                        {% if dest_user_all|slice:"-1:" == "1" %}
-                          <div class="d-flex">
-                            <div class="w_20">{{ forloop.counter }}.</div>
-                            <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                          </div>
-                        {% else %}
-                          <div class="d-flex">
-                            <div class="w_20">{{ forloop.counter }}.</div>
-                            <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                          </div>
-                        {% endif %}
-                      {% endfor %}
-                      <div class="dest_user_list_wrap">
-                        送り先 合計 {{request.session.dest_user_all_list|length}}件
-                      </div>
-                    {% endif %}
-                  </td>
-                </tr>
-
-                <tr>
-                  <th>
-                    <h2>保存期日</h2>
-                  </th>
-                  <td>{{request.session.end_date}}</td>
-                </tr>
-
-                <tr>
-                  <th>
-                    <h2>DL回数</h2>
-                  </th>
-                  {% if request.session.dl_limit <= "5" %}
-                  <td>{{request.session.dl_limit}}回</td>
-                  {% else %}
-                  <td>無期限</td>
-                  {% endif %}
-                </tr>
-                <tr>
-                  <th>
-                    <h2>認証方法</h2>
-                  </th>
-                  {% if request.session.auth_meth %}
-                  <td>メールアドレス</td>
-                  {% else %}
-                  <td>メールアドレスとパスワード<br></td>
-                  {% endif %}
-                </tr>
-
-                <tr class="confirm_modal_file_name">
-                  <th>
-                    <h2>ファイル</h2>
-                  </th>
-                  <td class="vertical_align_top">
-                    {% for file in files %}
-                    {{file.name}}<br>
-                    {% endfor %}
-                  </td>
-                  <td class="confirm_modal_update_button">
-                    <button type="button" onfocus="this.blur();"
-                      class="btn btn_size my-btn-w8 my-btn-h4 update_btn ml-2 rounded-0"
-                      data-dismiss="modal">STEP2を編集</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        
-        </div>
-        <div class="modal-footer confirm_modal_footer">
-          <button type="button" onclick="location.href='{% url 'draganddrop:step3_otp_update' otp_upload_manage_id %}'"
-          class="register_btn btn btn_size my-btn-w8 my-btn-h4 btn-secondary ml-2 blue_btn rounded-0" data-toggle="modal"
-          data-target="#modal3">登録</button>
-          <button type="button" onfocus="this.blur();" class="btn btn_size my-btn-w8 btn-secondary ml-2 rounded-0 "
-            data-dismiss="modal">キャンセル</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  {% endif %}
-
   <!--全送信先確認モーダル-->
-  <div class="modal fade" id="otp_all_dest_user_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+  <div class="modal fade" id="guest_all_dest_user_confirm_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content center-modal dest_user_confirm_modal">
-        
-        <div class="modal-header default_modal_header">
-          <span class="modal-title home_modal_title">全送信先<i class="fas fa-address-book ml-1"></i></i></span>
-        </div>
-
-        <div class="modal-body">
-          {% for dest_user_all in request.session.dest_user_all_list %}
-            <!--ナンバリングが9以下の時-->
-            {% if forloop.counter <= 9 %}
-              {% if dest_user_all|slice:"-1:" == "1" %}
-                <div class="d-flex">
-                  <div class="w_25">{{ forloop.counter }}.</div>
-                  <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                </div>
-              {% else %}
-              <div class="d-flex">
-                <div class="w_25">{{ forloop.counter }}</div>
-                <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-              </div>
-              {% endif %}
-            <!--ナンバリングが10以上の時-->
-            {% else %}
-              {% if dest_user_all|slice:"-1:" == "1" %}
-                <div class="d-flex">
-                  <div class="w_25">{{ forloop.counter }}.</div>
-                  <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-                </div>
-              {% else %}
-              <div class="d-flex">
-                <div class="w_25">{{ forloop.counter }}</div>
-                <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_all|slice:":-1"}}<br></div>
-              </div>
-              {% endif %}
-            {% endif %}
-          {% endfor %}
-        </div>
-
-        <div class="modal-footer all_send_user_confirm_modal_footer">
-          <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
-            data-dismiss="modal">閉じる</button>
-
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--Update全送信先確認モーダル-->
-  <div class="modal fade" id="otp_update_all_dest_user_confirm_modal" tabindex="-1" role="dialog"
-    aria-labelledby="label1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content center-modal dest_user_confirm_modal">
         
@@ -1059,20 +844,6 @@
   }, 0);
   
   });
-    
-  $('#update_confirm_modal').on('show.bs.modal', function (event) {
-  const $currentModal = $(event.currentTarget);
-  var zIndex = 1040 + (10 * $('.modal:visible').length);
-  $currentModal.css('z-index', zIndex);
-  setTimeout(function () {
-    $('.modal-backdrop')
-      .not('.modal-stack')
-      .css('z-index', zIndex - 1)
-      .addClass('modal-stack');
-  }, 0);
-  
-  });
-  
   
   </script>
   
