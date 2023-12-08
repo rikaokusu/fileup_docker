@@ -365,33 +365,6 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
         otp_upload_manage_id = self.kwargs['pk']
         otp_upload_manage_obj = OTPUploadManage.objects.filter(pk=otp_upload_manage_id).first()
         
-        #操作ログ用
-        #送信先取得,アドレス帳＆直接入力
-        dest_user =  otp_upload_manage_obj.dest_user.values_list('email', flat=True)
-        dest_user_list = list(dest_user)
-        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
-        dest_group = otp_upload_manage_obj.dest_user_group.values_list('group_name', flat=True)
-        dest_group_list = list(dest_group)
-        #送信先　直接入力＆アドレス帳＆グループ list型
-        otp_dest_users = dest_user_list + dest_group_list
-        # ↑の('')を省くため文字列に変換
-        otp_dest_users = ' '.join(otp_dest_users)
-        # ファイルタイトル
-        file_title = otp_upload_manage_obj.title
-        # 操作ログ終わり
-
-        # # 操作ログ用
-        # # 宛先メールアドレス
-        # dest_mails = [otp_upload_manage_obj.dest_user_mail1,otp_upload_manage_obj.dest_user_mail2,otp_upload_manage_obj.dest_user_mail3,otp_upload_manage_obj.dest_user_mail4,otp_upload_manage_obj.dest_user_mail5,otp_upload_manage_obj.dest_user_mail6,otp_upload_manage_obj.dest_user_mail7,otp_upload_manage_obj.dest_user_mail8]
-        # # 宛先メールアドレスNoneのやつを省く
-        # dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # # 宛先メールアドレス('')を省くため文字列に変換
-        # dest_mail_log = ' '.join(dest_mail_ok)
-        # print(dest_mail_log,"かっこけしたい")
-        # # ファイルタイトル
-        # file_title = otp_upload_manage_obj.title
-        # # 操作ログ終わり
-
         # ファイルの削除
         if self.del_file:
             del_file_pk = self.del_file
@@ -485,8 +458,6 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
                         htmlfile.save()
 
         otp_upload_manage_obj.save()
-        # 操作ログ
-        add_log(2,1,current_user,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2_otp_upload', kwargs={'pk': otp_upload_manage_obj.id}))
 
@@ -495,7 +466,8 @@ class Step3OTPupload(TemplateView, CommonView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        current_user = self.request.user
+        
         otp_upload_manage_id = self.kwargs['pk']
 
         context["otp_upload_manage_id"] = otp_upload_manage_id
@@ -555,6 +527,31 @@ class Step3OTPupload(TemplateView, CommonView):
             # otp_download_file_tableのレコード数を取得
             for otpdownloadtable in OTPDownloadtable.objects.filter(otp_upload_manage=personal_user_otp_upload_manage).all():
                 download_file_table += int(otpdownloadtable.otp_download_table.all().count())
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  otp_upload_manage_obj.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = otp_upload_manage_obj.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        otp_dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        otp_dest_users = ' '.join(otp_dest_users)
+        # ファイルタイトル
+        file_title = otp_upload_manage_obj.title
+        # ファイル名
+        otp_upload_files = otp_upload_manage_obj.file.all()
+        files = []
+        for file in otp_upload_files:
+            print('ふぁいるかくにん1111',file.name)           
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        print('ふぁいるかくにん',files)
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,1,current_user,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         # 個人管理テーブルの作成・更新
         total_data_usage(otp_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)
@@ -1114,6 +1111,7 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        current_user = self.request.user
 
         otp_upload_manage_id = self.kwargs['pk']
         otp_upload_manage_id_tmp = self.request.session['otp_upload_manage_id']
@@ -1261,6 +1259,30 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         download_table = personal_resource_manage.number_of_otp_download_table
         download_file_table = personal_resource_manage.number_of_otp_download_file_table
         total_file_size = personal_resource_manage.total_file_size
+
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  otp_upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = otp_upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
+        # ファイルタイトル
+        file_title = otp_upload_manage.title
+        # ファイル名
+        otp_upload_files = otp_upload_manage.file.all()
+        files = []
+        for file in otp_upload_files:         
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,2,current_user,file_title,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         # 個人管理テーブルの作成・更新
         total_data_usage(otp_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)

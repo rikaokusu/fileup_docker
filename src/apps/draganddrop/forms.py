@@ -221,8 +221,6 @@ class AddressForm(forms.ModelForm):
             'company_name': {
                 'required': '必須です!',
             }}
-
-
 # データ管理
 class Group_Checkbox(forms.CheckboxSelectMultiple):
     input_type = 'checkbox'

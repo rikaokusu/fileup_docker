@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from ...serializers import GetUpdateModalSerializer, GetGroupUpdateModalSerializer
+#操作ログ関数
+from lib.my_utils import add_log
 
 ###########################
 # アドレス帳管理  #
@@ -46,7 +48,10 @@ class AddressListView(FormView, CommonView):
             return self.form_invalid(form)
 
 
-    def form_valid(self, form):
+    def form_valid(self, form,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        print('犯人はお前だ＝＝＝＝＝＝＝＝＝＝')
         address = form.save(commit=False)
         legal_or_individual = form.cleaned_data['legal_or_individual']
         company_name = form.cleaned_data['company_name']
@@ -56,6 +61,13 @@ class AddressListView(FormView, CommonView):
             first_name = form.cleaned_data['first_name']
             address.full_name_preview = company_name + " " + last_name + " " + first_name
         address.save()
+        # #操作ログ用
+        email = address.email
+        log_user = address.company_name + address.last_name + address.first_name
+        # #操作ログ終わり
+        # # 操作ログ登録
+        add_log(3,1,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+        # print('アドレス帳ユーザー4')
 
         return super().form_valid(form)
 
@@ -73,18 +85,18 @@ class GetUpdateModalAjaxView(APIView):
 
 
 """
-編集モーダル(登録)
+編集モーダル（変更）新規登録は一覧表示のform_valid
 """
-class UpdateAddressAjaxView(APIView):
+class UpdateAddressAjaxView(APIView,CommonView):
     model = Address
 
     def post(self, request, *args, **kwargs):
-
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         try:
             # address_list_idを取得
             address_list_id = kwargs['pk']
             address_obj = Address.objects.filter(pk=address_list_id).first()
-
             data = request.data
             address_obj.legal_or_individual = data.get('legal_or_individual')
             address_obj.legal_personality = data.get('legal_personality')
@@ -96,8 +108,14 @@ class UpdateAddressAjaxView(APIView):
             address_obj.first_name = data.get('first_name')
             address_obj.email = data.get('email')
             address_obj.created_user = self.request.user.id
-
             address_obj.save()
+            #操作ログ用
+            email = address_obj.email
+            log_user = address_obj.company_name + address_obj.last_name + address_obj.first_name
+            #操作ログ終わり
+            # 操作ログ登録
+            add_log(3,2,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+
 
         # JSONで返す
             return JsonResponse({"status": "ok",})
@@ -111,9 +129,10 @@ class UpdateAddressAjaxView(APIView):
 """
 アドレス帳一覧個別削除
 """
-class AddressDeleteAjaxView(View):
-    def post(self, request):
-
+class AddressDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         # ダウンロードされたファイルが単体か複数か判断するための変数
         # is_type = request.POST.get('is_type')
 
@@ -121,8 +140,12 @@ class AddressDeleteAjaxView(View):
             address_delete_id = request.POST.get('address_delete_id')
             address_delete_name = request.POST.get('address_delete_name')
             address_list = Address.objects.filter(pk=address_delete_id).first()
+            #操作ログ用
+            email = address_list.email
+            log_user = address_list.company_name + address_list.last_name + address_list.first_name
+            add_log(3,3,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+            #操作ログ終わり
             address_list.delete()
-
             # メッセージを格納してJSONで返す
             data = {}
             data['message'] = address_delete_name + 'を削除しました'
@@ -138,14 +161,31 @@ class AddressDeleteAjaxView(View):
 """
 アドレス帳一覧複数削除
 """
-class AddressMultiDeleteAjaxView(View):
-    def post(self, request):
-
+class AddressMultiDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         address_delete_ids = request.POST.getlist('address_delete_ids[]')
 
         try:
             address_lists = Address.objects.filter(pk__in=address_delete_ids)
+            #操作ログ用
+            users = []
+            for user in address_lists:
+                u_c = user.company_name
+                u_l = user.last_name
+                u_f = user.first_name
+                user = u_c + u_l + u_f + "\r\n"
+                users.append(user)
+            users = ' '.join(users)
 
+            email= []
+            for user in address_lists:
+                u_e = user.email + "\r\n"
+                email.append(u_e)
+            email = ' '.join(email)
+            add_log(3,3,current_user,email,"",users,5,self.request.META.get('REMOTE_ADDR'))
+            #操作ログ終わり
             for address_list in address_lists:
                 address_list.delete()
 

@@ -153,10 +153,11 @@ class GetGroupUpdateModalAjaxView(APIView):
         serializer = GetGroupUpdateModalSerializer(instance=group_obj)
         return Response(serializer.data, status.HTTP_200_OK)
 
-class GroupUpdateAjaxView(View):
+class GroupUpdateAjaxView(View,CommonView):
 
     def post(self, request, *args, **kwargs):
-
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         try:
             group_list_id = request.POST.get('group_list_id')
             group_obj = Group.objects.filter(pk=group_list_id).first()
@@ -168,7 +169,18 @@ class GroupUpdateAjaxView(View):
             address_list = [int(s) for s in address_list]
             group_obj.address.set(address_list)
             group_obj.save()
-            
+            #操作ログ用
+            group_name = group_obj.group_name
+            log_users = []
+            for address in address_list:
+                print('あどれすforきてる')
+                log_users1 = Address.objects.get(id=address)
+                log_users1 = log_users1.company_name + log_users1.last_name + log_users1.first_name + "\r\n"
+                log_users.append(log_users1)
+            log_users = ' '.join(log_users)
+            #操作ログ終わり
+            # 操作ログ登録
+            add_log(3,2,current_user,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
             # JSONで返す
             return JsonResponse({"status": "ok",})
             print("成功")
@@ -203,7 +215,6 @@ class GroupDeleteAjaxView(View, CommonView):
                 g_l = user.last_name
                 g_f = user.first_name
                 user = g_c + g_l + g_f + "\r\n"
-                print('ゆーざーできてる？',user)
                 group_users.append(user)
             group_users = ' '.join(group_users)
             group_name = group_obj.group_name
@@ -227,17 +238,30 @@ class GroupDeleteAjaxView(View, CommonView):
 """
 アドレス帳一覧複数削除
 """
-class GroupMultiDeleteAjaxView(View):
-    def post(self, request):
-
+class GroupMultiDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
         group_delete_ids = request.POST.getlist('group_delete_ids[]')
 
         try:
             group_lists_qs = Group.objects.filter(pk__in=group_delete_ids)
-
             for group_list in group_lists_qs:
+                #操作ログ用
+                group_address = group_list.address.all()
+            
+                group_users = []
+                for user in group_address:
+                    g_c = user.company_name
+                    g_l = user.last_name
+                    g_f = user.first_name
+                    user = g_c + g_l + g_f + "\r\n"
+                    group_users.append(user)
+                group_users = ' '.join(group_users)
+                group_name = group_list.group_name
+                add_log(3,3,current_user,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
+                #操作ログ終わり
                 group_list.delete()
-
             # メッセージを格納してJSONで返す
             data = {}
             data['message'] = '削除しました'

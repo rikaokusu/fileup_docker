@@ -7,7 +7,7 @@
 
   <div class="top">
     <div class="tate mr-2"></div>
-    <h1>複製</h1><i class="fa-solid fa-copy fa-2x icon-globe"></i>
+    <h1>複製</h1><i class="fas fa-copy fa-2x icon-globe"></i>
   </div>
 
 
@@ -114,18 +114,18 @@
 
       <div class="ml-1 mr-4">
         <button type="button" class="cancel btn-cancel" 
-        data-toggle="modal" data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+        data-toggle="modal" data-target="#CancelModal">キャンセル</button>
       </div>
 
       <div class="ml-1 mr-1">
         <button type="button" class="btn-default"
           onclick="location.href='{% url 'draganddrop:duplicate_return' upload_manage_id %}'">
-          <i class="fa-solid fa-angle-left mr-2"></i>戻る</button>
+          <i class="fas fa-angle-left mr-2"></i>戻る</button>
       </div>
       
       <div class="ml-1 mr-1">
         <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
-          disabled>確認<i class="fa-solid fa-angle-right ml-2"></i></button>
+          disabled>確認<i class="fas fa-angle-right ml-2"></i></button>
       </div>
 
     </div>
@@ -141,7 +141,7 @@
       <div class="modal-content center-modal confirm_modal">
         
         <div class="modal-header default_modal_header">
-          <span class="modal-title big_modal_title">確認画面<i class="fa-solid fa-circle-check ml-1"></i></span>
+          <span class="modal-title big_modal_title">確認画面<i class="fas fa-check-circle ml-1"></i></span>
         </div>
 
         <div class="modal-body confirm_modal_body">

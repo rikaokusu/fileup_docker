@@ -336,24 +336,6 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-
-        #操作ログ用
-        #送信先取得,アドレス帳＆直接入力
-        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
-        dest_user_list = list(dest_user)
-        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
-        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
-        dest_group_list = list(dest_group)
-        #送信先　直接入力＆アドレス帳＆グループ list型
-        dest_users = dest_user_list + dest_group_list
-        # ↑の('')を省くため文字列に変換
-        dest_users = ' '.join(dest_users)
-        print('ぐるーぷのemail',dest_group)
-        print('ぐるーぷのemail',dest_group_list)
-        print('宛先ぜんぶ',dest_users)
-        # ファイルタイトル
-        file_title = upload_manage.title
-        # 操作ログ終わり
         
         # #get_direct_userのコピー
         upload_manage_dest_user_all = upload_manage.dest_user.all()
@@ -442,10 +424,6 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                         htmlfile.save()
         
         upload_manage.save()
-        # 操作ログ
-        print("ふぁいるずadd_log直前",files)
-        add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
-
 
         print("------------------- Step2")
 
@@ -459,7 +437,8 @@ class Step3(TemplateView, CommonView):
         # print("------------------- Step3")
 
         context = super().get_context_data(**kwargs)
-
+        current_user = self.request.user
+        
         upload_manage_id = self.kwargs['pk']
 
         context["upload_manage_id"] = upload_manage_id
@@ -509,6 +488,32 @@ class Step3(TemplateView, CommonView):
         upload_manage_file_size = 0
         download_table = 0
         download_file_table = 0
+        
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
+        # ファイル名
+        upload_files = upload_manage.file.all()
+        files = []
+        for file in upload_files:
+            print('ふぁいるかくにん1',file.name)           
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        print('ふぁいるかくにん',files)
+        # ファイルタイトル
+        file_title = upload_manage.title
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
         for personal_user_upload_manage in personal_user_upload_manages:
 
@@ -1142,6 +1147,7 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        current_user = self.request.user
 
         upload_manage_id = self.kwargs['pk']
         upload_manage_id_tmp = self.request.session['upload_manage_id']
@@ -1285,6 +1291,37 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
         download_table = personal_resource_manage.number_of_download_table
         download_file_table = personal_resource_manage.number_of_download_file_table
         total_file_size = personal_resource_manage.total_file_size
+
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
+        print('ぐるーぷのemail',dest_group)
+        print('ぐるーぷのemail',dest_group_list)
+        print('宛先ぜんぶ',dest_users)
+        # ファイルタイトル
+        file_title = upload_manage.title
+        # ファイル名
+        upload_files = upload_manage.file.all()
+        files = []
+        for file in upload_files:
+            print('ふぁいるかくにん1111',file.name)           
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        print('ふぁいるかくにん',files)
+        # 操作ログ終わり
+        # 操作ログ
+        print("ふぁいるずadd_log直前")
+        add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+
         
         # 個人管理テーブルの作成・更新
         total_data_usage(upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, upload_manage_file_size, 1)

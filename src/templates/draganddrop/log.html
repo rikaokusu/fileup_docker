@@ -50,13 +50,14 @@
                 </td>
                 <!--ファイル名-->
                 <td>
-                    {% for log_file in log_files %}
+                    {% comment %} {% for log_file in log_files %}
                         {% if log_file.log == log %}
                             <p class="log-filename">
                                 {{ log_file.file.name }}<br>
                             </p>
                         {% endif %}
-                    {% endfor %}
+                    {% endfor %} {% endcomment %}
+                    {{ log.file_name | linebreaksbr }}
                 </td>
                 <!--共有種別-->
                 <td>{{ log.get_upload_category_display }}</td>
@@ -66,47 +67,84 @@
     </table> 
 
     <h2 class="log-file-title">アドレス帳管理</h2>
-    <table class="table table-striped log-table">
+    <!--ユーザー-->
+    <h3 class="log-address-title">ユーザー</h3>
+    <table class="table table-striped log-table" style="margin-top:0;">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col" style="min-width:90px;">日時</th>
                 <th scope="col">ユーザー</th>
                 <th scope="col" style="min-width:100px;">IPアドレス</th>
-                {% comment %} <th scope="col" style="min-width:120px;">カテゴリ</th> {% endcomment %}
-                <th scope="col" style="min-width:155px;">対象</th>
                 <th scope="col" style="min-width:95px;">操作</th>
-                <th scope="col" style="min-width:200px;">グループ名</th>
                 <th scope="col" style="min-width:200px; max-width:200px;">会社名　氏名</th>
+                <th scope="col" style="min-width:200px;">メールアドレス</th>
             </tr>
         </thead>
         <tbody>
-            {% for log_address in logs_address %}
+            {% for a_u in logs_address_user %}
             <tr>
                 <td></td><!--counter-->
                 <!--日時-->
-                <td>{{ log_address.created_date | date:'Y/m/d H:i:s' }}</td>
+                <td>{{ a_u.created_date | date:'Y/m/d H:i:s' }}</td>
                 <!--ユーザー-->
-                <td>{{ log_address.operation_user }}</td>
+                <td>{{ a_u.operation_user }}</td>
                 <!--IPアドレス-->
-                <td>{{ log_address.client_addr }}</td>
-                <!--対象-->
-                <td>{{ log_address.get_upload_category_display }}</td>
+                <td>{{ a_u.client_addr }}</td>
                 <!--操作-->
-                <td>{{ log_address.get_operation_display }}</td>
-                <!--グループ名-->
-                <td>
-                    {{ log_address.file_title }}
-                </td>
+                <td>{{ a_u.get_operation_display }}</td>
                 <!--会社名氏名-->
                 <td>
-                    {{ log_address.destination_address | linebreaksbr }}
+                    {{ a_u.destination_address | linebreaksbr }}
+                </td>
+                <!--メールアドレス-->
+                <td>
+                    {{ a_u.file_title }}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table> 
 
+
+    <!--グループ-->
+    <h3 class="log-address-title">グループ</h3>
+    <table class="table table-striped log-table" style="margin-top:0;">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" style="min-width:90px;">日時</th>
+                <th scope="col">ユーザー</th>
+                <th scope="col" style="min-width:100px;">IPアドレス</th>
+                <th scope="col" style="min-width:95px;">操作</th>
+                <th scope="col" style="min-width:200px;">グループ名</th>
+                <th scope="col" style="min-width:200px; max-width:200px;">メンバー</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a_g in logs_address_group %}
+            <tr>
+                <td></td><!--counter-->
+                <!--日時-->
+                <td>{{ a_g.created_date | date:'Y/m/d H:i:s' }}</td>
+                <!--ユーザー-->
+                <td>{{ a_g.operation_user }}</td>
+                <!--IPアドレス-->
+                <td>{{ a_g.client_addr }}</td>
+                <!--操作-->
+                <td>{{ a_g.get_operation_display }}</td>
+                <!--グループ名-->
+                <td>
+                    {{ a_g.file_title }}
+                </td>
+                <!--会社名氏名-->
+                <td>
+                    {{ a_g.destination_address | linebreaksbr }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
 <div class="d-flex flex-row justify-content-center mt-5">
     <a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fas fa-angle-left mr-2"></i>トップ画面に戻る</a>
 </div>

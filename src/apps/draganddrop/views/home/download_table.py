@@ -27,7 +27,15 @@ class DownloadTableDeleteAjaxView(View,CommonView):
             downloadtable = Downloadtable.objects.get(pk__exact=delete_id)
             #操作ログ用・ファイル名取得
             uploadmanage = UploadManage.objects.get(id=downloadtable.upload_manage.id)
-            files = uploadmanage.file.all()
+            # ファイル名
+            upload_files = uploadmanage.file.all()
+            files = []
+            for file in upload_files:
+                print('ふぁいるかくにん1',file.name)           
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = uploadmanage.file.all()
             #操作ログ終わり
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
@@ -63,8 +71,14 @@ class UrlDownloadTableDeleteAjaxView(View,CommonView):
             #↓二行操作ログ用・ファイル名取得
             urluploadmanage = UrlUploadManage.objects.get(id=urldownloadtable.url_upload_manage.id)
             print('urlもしかしてfileみえない？1',urluploadmanage)
-            files = urluploadmanage.file.all()
-            print('urlもしかしてfileみえない？2',files)
+            # ファイル名
+            url_upload_files = urluploadmanage.file.all()
+            files = []
+            for file in url_upload_files:       
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = urluploadmanage.file.all()
             # ダウンロードテーブルの削除フラグを立てる
             urldownloadtable.trash_flag = 1
 
@@ -99,9 +113,14 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
             otpdownloadtable = OTPDownloadtable.objects.get(pk__exact=otp_delete_id)
             #↓二行操作ログ用・ファイル名取得
             otpuploadmanage = OTPUploadManage.objects.get(id=otpdownloadtable.otp_upload_manage.id)
-            print('otpもしかしてfileみえない？1',otpuploadmanage)
-            files = otpuploadmanage.file.all()
-            print('otpもしかしてfileみえない？2',files)
+            # ファイル名
+            otp_upload_files = otpuploadmanage.file.all()
+            files = []
+            for file in otp_upload_files:         
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = otpuploadmanage.file.all()
             # ダウンロードテーブルの削除フラグを立てる
             otpdownloadtable.trash_flag = 1
 
