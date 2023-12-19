@@ -202,8 +202,7 @@
                         {% endif %}
                       {% endfor %} {% endcomment %}
                       <div class="d-flex">
-                        <div class="w_20">{{ forloop.counter }}</div>
-                        <div><i class="fas fa-users fa-fw fa-1x" style="color:#161718;"></i>{{guest_upload_manage.guest_user_mail}}</div>
+                        <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{guest_upload_manage.dest_user_mail1}}</div>
                       </div>
                       <div class="dest_user_list_wrap">
                         {% comment %} 送り先 合計 {{request.session.dest_user_all_list|length}}件 {% endcomment %}
@@ -358,7 +357,7 @@
     }
     
     $("div#myDropzone").dropzone({
-      url: "{% url 'draganddrop:file_upload' %}",
+      url: "{% url 'draganddrop:guest_file_upload' %}",
       params: {
         'csrfmiddlewaretoken': getCookie('csrftoken')
       },

@@ -672,8 +672,9 @@ class Step1GuestUpload(CreateView, FormView):
         self.del_file = request.POST.getlist('del_file')
         return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
-
+    def form_valid(self, form,**kwargs):
+        print('ふぉーむばりっどにきてる')
+        context = super().get_context_data(**kwargs)
         guest_upload_manage_id = self.kwargs['pk']
         guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).first()
 
@@ -766,179 +767,10 @@ class Step1GuestUpload(CreateView, FormView):
                         htmlfile.save()
 
         guest_upload_manage_obj.save()
-
+        print('ふぉーむおわり')
         return HttpResponseRedirect(reverse('draganddrop:step2_guest_upload', kwargs={'pk': guest_upload_manage_obj.id}))
 
 
-# class Step2GuestUpdate(FormView, CommonView):
-#     model = GuestUploadManage
-#     template_name = "draganddrop/guest/step2_guest_upload.html"
-#     form_class = DistFileUploadForm
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-
-#         guest_upload_manage_id = self.kwargs['pk']
-#         context["guest_upload_manage_id"] = guest_upload_manage_id
-
-#         guest_upload_manages = GuestUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
-#         context["guest_upload_manages"] = guest_upload_manages
-
-#         # ページ情報をセッションに保存しておく
-#         self.request.session['page_num'] = 2
-
-#         guest_upload_manage_id_tmp = self.request.session['guest_upload_manage_id']
-
-#         guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
-#         files = guest_upload_manage.file.all()
-#         guest_upload_manage_tmp = GuestUploadManage.objects.filter(pk=guest_upload_manage_id_tmp).prefetch_related('file').first()
-#         files_tmp = guest_upload_manage_tmp.file.all()
-
-#         files = files | files_tmp
-
-#         guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file', 'dest_user').first()
-#         guest_upload_manage_tmp = GuestUploadManage.objects.filter(pk=guest_upload_manage_id_tmp).prefetch_related('file', 'dest_user').first()
-
-#         file = serializers.serialize("json", files, fields=('name', 'size', 'upload', 'id'))
-#         context["dist_file"] = file
-
-
-#         # URLを返す
-#         url_name = self.request.resolver_match.url_name
-#         context["url_name"] = url_name
-
-#         context["files"] = files
-
-#         return context
-
-
-
-#     def post(self, request, *args, **kwargs):
-#         self.del_file = request.POST.getlist('del_file')
-#         return super().post(request, *args, **kwargs)
-
-#     def form_valid(self, form):
-
-#         # セッションの対象IDからDBオブジェクトを生成
-#         guest_upload_manage_id = self.kwargs['pk']
-#         guest_upload_manage_id_tmp = self.request.session['guest_upload_manage_id']
-#         guest_upload_manage = GuestUploadManage.objects.get(pk=guest_upload_manage_id)
-#         guest_upload_manage_tmp = GuestUploadManage.objects.get(pk=guest_upload_manage_id_tmp)
-
-
-#         # 作成日を更新
-#         guest_upload_manage.created_date = datetime.datetime.now()
-
-
-#         # # ファイルの削除
-#         if 'del_file_pk' in self.request.session:
-#             del_file_pk = self.request.session['del_file_pk']
-
-#             files = Filemodel.objects.filter(pk__in=del_file_pk)
-
-#             for file in files:
-#                 # 実ファイル名を文字列にデコード
-#                 file_path = urllib.parse.unquote(file.upload.url)
-#                 # ファイルパスを分割してファイル名だけ取得
-#                 file_name = file_path.split('/', 3)[3]
-#                 # パスを取得
-#                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-#                 # パスの存在確認
-#                 result = os.path.exists(path)
-#                 if result:
-#                     # 絶対パスでファイル実体を削除
-#                     os.remove(os.path.join(
-#                         settings.FULL_MEDIA_ROOT, file_name))
-#                 # DBの対象行を削除
-#                 file.delete()
-
-#         # 保存
-#         guest_upload_manage.save()
-
-#         # 保存
-#         # upload_manage_tmp.delete()
-
-#         if 'up_file_id' in self.request.session:
-
-#             # ファイルとタスクを紐付ける
-#             # ファイル情報をセッションから取得
-#             up_file_id_str = self.request.session['up_file_id'].replace(" ", "").replace("[", "").replace("]", "")
-
-#             # リストに変換
-#             up_file_id_list = up_file_id_str.split(',')
-
-#             # リストのInt型に変換
-#             up_file_id_int = [int(s) for s in up_file_id_list]
-
-#             # オブジェクトの取得
-#             files = Filemodel.objects.filter(pk__in=up_file_id_int)
-#             # タスクとファイルを紐付ける
-#             for file in files:
-#                 guest_upload_manage_tmp.file.add(file)
-                
-#                 t = threading.Thread
-
-#                 # PDF変換
-#                 # ①ファイル名から拡張子のみ取得
-#                 file_name = file.name
-
-#                 file_name_without_dot = os.path.splitext(file_name)[1][1:]
-#                 file_name_no_extention = os.path.splitext(file_name)[0]
-
-#                 # 実ファイル名を文字列にデコード
-#                 file_path = urllib.parse.unquote(file.upload.url)
-
-#                 # ファイルパスを分割してファイル名だけ取得
-#                 file_name = file_path.split('/', 3)[3]
-
-#                 # パスを取得
-#                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-
-
-#                 # .txtファイルをHTMLファイルへ変換
-#                 # テキストファイルを一括で読み込む
-#                 if file_name_without_dot == "txt":
-#                     path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-#                     with open(path) as f:
-#                         s = f.read()
-
-#                         # htmlファイルを生成して書き込む
-#                         upload_s = str(file.upload)
-#                         upload_ss = upload_s.split('/')[0]
-
-#                         file_path = urllib.parse.unquote(file.upload.url)
-
-#                         upload = file_path[1:]
-#                         upload_path = upload.split('.')
-#                         path_html = upload_path[0] + ".html"
-#                         with open(path_html, mode='w') as f:
-#                             f.write("<html>\n")
-#                             f.write("<head>\n")
-#                             f.write("</head>\n")
-#                             f.write("<body>\n")
-#                             f.write("<pre>\n")
-#                             f.write(s)
-#                             f.write("</pre>\n")
-#                             f.write("</body>\n")
-#                             f.write("</html>\n")
-#                         htmlfilename = path_html
-#                         htmlname = os.path.basename(htmlfilename)
-#                         path_html_s = upload_ss + "/" + htmlname
-#                         htmlfile, created = PDFfilemodel.objects.get_or_create(
-#                             name=htmlname,
-#                             size=file.size,
-#                             upload=path_html_s,
-#                             file=file
-#                         )
-
-#                         htmlfile.save()
-
-
-#         guest_upload_manage.save()
-
-#         # upload_manage_id_old = self.kwargs['pk']
-
-#         return HttpResponseRedirect(reverse('draganddrop:step2_guest_update', kwargs={'pk': guest_upload_manage_id}))
 
 class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
     template_name = 'draganddrop/guest_upload/step2_guest_upload.html'
@@ -947,127 +779,101 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         context = super().get_context_data(**kwargs)
 
         guest_upload_manage_id = self.kwargs['pk']
-        guest_upload_manage_id_tmp = self.request.session['guest_upload_manage_id']
+        # guest_upload_manage_id_tmp = self.request.session['guest_upload_manage_id']
 
         guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
-        guest_upload_manage_tmp = GuestUploadManage.objects.filter(pk=guest_upload_manage_id_tmp).prefetch_related('file').first()
+        # guest_upload_manage_tmp = GuestUploadManage.objects.filter(pk=guest_upload_manage_id_tmp).prefetch_related('file').first()
 
         # 旧guest_download_tableの取得(新に変更される前に)
-        number_of_guest_download_table_old =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
+        # number_of_guest_download_table_old =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
 
         # 旧guest_download_file_tableの取得
-        number_of_guest_download_file_table_old = 0
-        for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
-                number_of_guest_download_file_table_old += int(guestdownloadtable.guest_download_table.all().count())
+        # number_of_guest_download_file_table_old = 0
+        # for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
+        #         number_of_guest_download_file_table_old += int(guestdownloadtable.guest_download_table.all().count())
 
         # 旧ファイルの合計サイズ
         guest_upload_manage_file_size_old = 0
         for file in guest_upload_manage.file.all():
             guest_upload_manage_file_size_old = guest_upload_manage_file_size_old + int(file.size)
 
-        #削除対象の送信先を取得・削除
-
-        # アドレス帳から選択したユーザーと直接入力
-        dest_user = guest_upload_manage.dest_user.all() #旧データ
-        dest_user_tmp = guest_upload_manage_tmp.dest_user.all() #新データ
-        delete_dest_users=set(dest_user).difference(set(dest_user_tmp)) #差分の値を取得(新データには含まれていない送信先を特定する)
-        for delete_dest_user in delete_dest_users: #set型の要素を個別に取り出す
-            guest_downloadtable = GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage, dest_user=delete_dest_user.id) #削除対象の値を取得
-            guest_downloadtable.delete()
-
-        # グループ
-        dest_user_group = guest_upload_manage.dest_user_group.all() #旧データ
-        dest_user_group_tmp = guest_upload_manage_tmp.dest_user_group.all() #新データ
-        delete_dest_user_groups=set(dest_user_group).difference(set(dest_user_group_tmp)) #差分の値を取得(新データには含まれていない送信先を特定する)
-        for group in delete_dest_user_groups: #set型の要素を個別に取り出す
-            for delete_dest_user_group in group.address.all():
-                guest_downloadtable = GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage, dest_user=delete_dest_user_group.id) #削除対象の値を取得
-                guest_downloadtable.delete()
 
         #更新データをGuestUploadManageに保存
-        guest_upload_manage.title = guest_upload_manage_tmp.title
-        guest_upload_manage.end_date = guest_upload_manage_tmp.end_date
-        guest_upload_manage.message = guest_upload_manage_tmp.message
-        guest_upload_manage.dest_user_mail1 = guest_upload_manage_tmp.dest_user_mail1
-        guest_upload_manage.dest_user_mail2 = guest_upload_manage_tmp.dest_user_mail2
-        guest_upload_manage.dest_user_mail3 = guest_upload_manage_tmp.dest_user_mail3
-        guest_upload_manage.dest_user_mail4 = guest_upload_manage_tmp.dest_user_mail4
-        guest_upload_manage.dest_user_mail5 = guest_upload_manage_tmp.dest_user_mail5
-        guest_upload_manage.dest_user_mail6 = guest_upload_manage_tmp.dest_user_mail6
-        guest_upload_manage.dest_user_mail7 = guest_upload_manage_tmp.dest_user_mail7
-        guest_upload_manage.dest_user_mail8 = guest_upload_manage_tmp.dest_user_mail8
+        # guest_upload_manage.title = guest_upload_manage_tmp.title
+        # guest_upload_manage.end_date = guest_upload_manage_tmp.end_date
+        # guest_upload_manage.message = guest_upload_manage_tmp.message
 
         guest_upload_manage.save()
 
         # 既存ファイルと新ファイルを結合
-        guest_upload_manage_file = guest_upload_manage.file.all() | guest_upload_manage_tmp.file.all()
+        # guest_upload_manage_file = guest_upload_manage.file.all() | guest_upload_manage_tmp.file.all()
 
         # Downloadtableへ保存
 
         # グループに紐付くdownloadtableの作成
-        dest_user_groups = guest_upload_manage_tmp.dest_user_group.all()
-        for dest_user_group in dest_user_groups:
-            for download_user in dest_user_group.address.all():
-                guest_downloadtable, created = GuestUploadDownloadtable.objects.get_or_create(guest_upload_manage=guest_upload_manage, dest_user=download_user)
-                guest_downloadtable.save()
+        # dest_user_groups = guest_upload_manage_tmp.dest_user_group.all()
+        # for dest_user_group in dest_user_groups:
+        #     for download_user in dest_user_group.address.all():
+        #         guest_downloadtable, created = GuestUploadDownloadtable.objects.get_or_create(guest_upload_manage=guest_upload_manage, dest_user=download_user)
+        #         guest_downloadtable.save()
 
-                # Downloadfiletableへ保存
-                for file in guest_upload_manage_file.all():
-                    guest_downloadfiletable, created = GuestUploadDownloadFiletable.objects.get_or_create(guest_download_table=guest_downloadtable, download_file = file )
-                    guest_downloadfiletable.save()
+        #         # Downloadfiletableへ保存
+        #         for file in guest_upload_manage_file.all():
+        #             guest_downloadfiletable, created = GuestUploadDownloadFiletable.objects.get_or_create(guest_download_table=guest_downloadtable, download_file = file )
+        #             guest_downloadfiletable.save()
 
 
         # アドレス帳から選択したユーザーと直接入力に紐付くdownloadtableの作成
-        for download_user in guest_upload_manage_tmp.dest_user.all():
-            guest_downloadtable, created = GuestUploadDownloadtable.objects.get_or_create(guest_upload_manage=guest_upload_manage, dest_user=download_user)
-            guest_downloadtable.save()
+        # for download_user in guest_upload_manage_tmp.dest_user.all():
+        #     guest_downloadtable, created = GuestUploadDownloadtable.objects.get_or_create(guest_upload_manage=guest_upload_manage, dest_user=download_user)
+        #     guest_downloadtable.save()
 
-            # Downloadfiletableへ保存
-            for file in guest_upload_manage_file.all():
-                guest_downloadfiletable, created = GuestUploadDownloadFiletable.objects.get_or_create(guest_download_table=guest_downloadtable, download_file=file)
-                guest_downloadfiletable.save()
+        #     # Downloadfiletableへ保存
+        #     for file in guest_upload_manage_file.all():
+        #         guest_downloadfiletable, created = GuestUploadDownloadFiletable.objects.get_or_create(guest_download_table=guest_downloadtable, download_file=file)
+        #         guest_downloadfiletable.save()
 
-        guest_downloadfiletables = GuestUploadDownloadFiletable.objects.filter(guest_download_table=guest_downloadtable).count()
-        guest_downloadfiletables_true = GuestUploadDownloadFiletable.objects.filter(
-            guest_download_table=guest_downloadtable, is_downloaded=True).count()
+        # guest_downloadfiletables = GuestUploadDownloadFiletable.objects.filter(guest_download_table=guest_downloadtable).count()
+        # guest_downloadfiletables_true = GuestUploadDownloadFiletable.objects.filter(
+        #     guest_download_table=guest_downloadtable, is_downloaded=True).count()
 
-        if guest_downloadfiletables == guest_downloadfiletables_true:
-            guest_downloadtable.is_downloaded = True
+        # if guest_downloadfiletables == guest_downloadfiletables_true:
+        #     guest_downloadtable.is_downloaded = True
 
-        else:
-            guest_downloadtable.is_downloaded = False
-            guest_downloadtable.save()
+        # else:
+        #     guest_downloadtable.is_downloaded = False
+        #     guest_downloadtable.save()
 
-        guest_file_number = GuestUploadDownloadtable.objects.filter(
-            guest_upload_manage=guest_downloadtable.guest_upload_manage).count()
-        guest_downloaded_file_number = GuestUploadDownloadtable.objects.filter(
-            guest_upload_manage=guest_downloadtable.guest_upload_manage, is_downloaded=True).count()
+        # guest_file_number = GuestUploadDownloadtable.objects.filter(
+        #     guest_upload_manage=guest_downloadtable.guest_upload_manage).count()
+        # guest_downloaded_file_number = GuestUploadDownloadtable.objects.filter(
+        #     guest_upload_manage=guest_downloadtable.guest_upload_manage, is_downloaded=True).count()
 
-        if guest_file_number == guest_downloaded_file_number:
-            guest_downloadtable.guest_upload_manage.is_downloaded = True  # 対応完了
+        # if guest_file_number == guest_downloaded_file_number:
+        #     guest_downloadtable.guest_upload_manage.is_downloaded = True  # 対応完了
 
-        else:
-            guest_upload_manage = guest_downloadtable.guest_upload_manage
-            guest_upload_manage.is_downloaded = False
-            guest_upload_manage.save()
+        # else:
+        #     guest_upload_manage = guest_downloadtable.guest_upload_manage
+        #     guest_upload_manage.is_downloaded = False
+        #     guest_upload_manage.save()
 
-        guest_downloadtable.save()
+        # guest_downloadtable.save()
 
-        for file in guest_upload_manage_tmp.file.all():
-            guest_upload_manage.file.add(file)
+        # for file in guest_upload_manage_tmp.file.all():
+        #     guest_upload_manage.file.add(file)
 
         guest_upload_manage.save()
 
         #全送信先の旧データをremoveして新データをaddする。
-        guest_upload_manage.dest_user_group.set(guest_upload_manage_tmp.dest_user_group.all())
-        guest_upload_manage.dest_user.set(guest_upload_manage_tmp.dest_user.all())
+        # guest_upload_manage.dest_user_group.set(guest_upload_manage_tmp.dest_user_group.all())
+        # guest_upload_manage.dest_user.set(guest_upload_manage_tmp.dest_user.all())
 
         # PersonalResourceManagement更新処理
         personal_resource_manage = PersonalResourceManagement.objects.filter(user=self.request.user.id).first()
 
         # download_tableのレコード数を更新
-        number_of_guest_download_table_tmp =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
-        personal_resource_manage.number_of_guest_download_table += (number_of_guest_download_table_tmp - number_of_guest_download_table_old)
+        # number_of_guest_download_table_tmp =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
+        # personal_resource_manage.number_of_guest_download_table += (number_of_guest_download_table_tmp - number_of_guest_download_table_old)
 
         # 新ファイルの合計サイズ
         guest_upload_manage_file_size = 0
@@ -1076,10 +882,10 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         personal_resource_manage.guest_upload_manage_file_size += (guest_upload_manage_file_size - guest_upload_manage_file_size_old)
 
         # download_file_tableのレコード数を更新
-        number_of_guest_download_file_table_tmp = 0
-        for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
-            number_of_guest_download_file_table_tmp += int(guestdownloadtable.guest_download_table.all().count())
-        personal_resource_manage.number_of_guest_download_file_table += (number_of_guest_download_file_table_tmp - number_of_guest_download_file_table_old)
+        # number_of_guest_download_file_table_tmp = 0
+        # for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
+        #     number_of_guest_download_file_table_tmp += int(guestdownloadtable.guest_download_table.all().count())
+        # personal_resource_manage.number_of_guest_download_file_table += (number_of_guest_download_file_table_tmp - number_of_guest_download_file_table_old)
 
         personal_resource_manage.save()
 

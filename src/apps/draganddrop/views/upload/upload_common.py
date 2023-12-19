@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import View
-from draganddrop.views.home.home_common import CommonView
+from draganddrop.views.home.home_common import CommonView,TemplateView
 from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement,GuestUploadManage
 from accounts.models import User
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
 from django.http import JsonResponse
@@ -26,15 +26,9 @@ class FileUpload(View, CommonView):
     def post(self, request, *args, **kwargs):
         print('ふぁいるもらってきた～～～～～～～～～～～')
         context = super().get_context_data(**kwargs)
-        if self.request.user:
-            print('ゆーざーある＿＿nikita？？？')
-            print('ゆーざーある＿＿？？？',self.request.user)
-            current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
-            context["current_user"] = current_user
-        else:
-            print('せっしょんある＿＿？？？',self.request.session['guest_upload_manage'])
-            guest_upload_manage = self.request.session['guest_upload_manage']
-            current_user = User.objects.filter(pk=guest_upload_manage.user.id).select_related().get()
+            
+        current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
+        context["current_user"] = current_user
 
         print('FileUploadにはいった')
         up_file_id = []
@@ -51,6 +45,53 @@ class FileUpload(View, CommonView):
                 size=upload_file.size,
                 upload=upload_file,
                 created_user=self.request.user.id
+            )
+            print('ファイル途中',file)
+            file.save()
+
+            up_file_id.append(file.id)
+            up_file_name.append(file.name)
+
+        # 保存したファイルをセッションへ保存
+        up_file_id_json = json.dumps(up_file_id)
+        self.request.session['up_file_id'] = up_file_id_json
+        self.request.session['up_file_name'] = up_file_name
+        
+        # 操作ログの登録(登録#2 口座情報#5)
+        # add_log("2", "2", current_user,"file-nameが入ります","1", self.request.META.get('REMOTE_ADDR'))
+
+        # 何も返したくない場合、HttpResponseで返す
+        return HttpResponse("OK")
+
+
+################################################
+# ファイルアップロード直後にFilemodelオブジェクト作成 #
+################################################
+class GuestFileUpload(TemplateView):
+    template_name = None
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        guest_upload_manage_id = self.request.session['guest_upload_manage_id']
+        guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
+        
+        # current_user = User.objects.filter(pk=guest_upload_manage_id).select_related().get()
+        # context["current_user"] = current_user
+
+        up_file_id = []
+        up_file_name = []
+
+        # １回目の処理を保存
+        if 'up_file_name' in self.request.session:
+            up_file_name.extend(self.request.session['up_file_name'])
+
+        for upload_file in self.request.FILES.values():
+
+            file, created = Filemodel.objects.get_or_create(
+                name=upload_file.name,
+                size=upload_file.size,
+                upload=upload_file,
+                created_user=guest_upload_manage.created_user
             )
             print('ファイル途中',file)
             file.save()

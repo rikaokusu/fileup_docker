@@ -178,6 +178,7 @@ urlpatterns = [
      path('cancel/', upload_common.CancelView.as_view(), name='cancel'),
      # Filemodelオブジェクト作成
      path('file_upload/', upload_common.FileUpload.as_view(), name='file_upload'),
+     path('guest_file_upload/', upload_common.GuestFileUpload.as_view(), name='guest_file_upload'),
      # Dropzone アップロードファイルの削除 
      path('dropzonefiledelete/', upload_common.DropZoneFileDeleteView.as_view(),name='dropzonefiledelete'),
 
