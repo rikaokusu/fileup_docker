@@ -56,23 +56,23 @@
           {% if current_user.is_authenticated and current_user.is_active and current_user.is_staff %}
             <div class="nav-flex">
               <!-- ヘッダーアイコン -->
-              <div class="d-none d-inline-block form-inline icon_set">
+              <div class="d-none d-inline-block form-inline info_icon position-relative mr-2">
                   {% comment %} <a href="{% url 'accounts:contact' %}" style="font-size:1.5rem;"><img src="{% static 'common/img/contact_po.svg' %}" alt="お問い合わせ" style="width:35px; height:35px;" class="mr-2 mt-1"></a> {% endcomment %}
-                  <img src="{% static 'img/info_fi2.svg' %}" alt="お知らせ" style="width:35px; height:35px;" class="info_icon mb-1">
+                  <img src="{% static 'img/info_fi2.svg' %}" alt="お知らせ" style="width:35px; height:35px;" class="mb-1">
                   
                   {% if no_read > 0 %}
-                  <h6 class="badge badge-warning">
+                  <h6 class="badge badge-warning position-absolute info_number">
                       {{ no_read }}
                   </h6>
                   {% endif %} 
               </div>
 
               <!-- 会社名とメアド -->
-              <div class=" p-1 login_user">
+              <div class=" p-1 login_user mr-3">
                   <div class="pl-1">
                       <!-- ユーザーアカウントのトグルメニュー -->
-                      <ul class="navbar-nav ml-auto ml-0" style="position:relative;">
-                          <li class="nav-item no-arrow" style="background-color:#fff; position:absolute; top:0;">
+                      <ul class="navbar-nav ml-auto ml-0">
+                          <li class="nav-item no-arrow">
                               <a class="nav-link" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   {% if current_user.image %}
                                       <img src="/media/{{ current_user.image.file }}" class="user_icon_mini"/>
@@ -84,8 +84,9 @@
                                       </div>
                                   {% endif %}
                               </a>
-                              <div style="width: 400px;">
-                              {% comment %} <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown" style="width: 400px;"> {% endcomment %}
+                              <div>
+                                <!--ここ-->
+                              <div class="dropdown-menu dropdown_menu_end" aria-labelledby="userDropdown" style="width: 400px;">
                                   {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
                                       <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
                                   {% else %}
@@ -296,14 +297,76 @@
   <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content info-modal-content">
-            <ul class="tab clearfix info_tab">
-                <li class="active">全て表示</li>
-                <li>お知らせ</li>
-                <li>メンテナンス</li>
-            </ul>
+            {% comment %} <ul class="tab nav nav-tabs clearfix info_tab">
+              <li class="nav-item">
+                <a class="nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="info_2" data-toggle="tab" href="#info2" role="tab" aria-controls="item2" aria-selected="false">お知らせ</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
+              </li>
+            </ul> {% endcomment %}
             <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
-            <div class="area">
-                <ul class="show">
+            <div class="area tab-content">
+              <nav>
+                <div class="nav nav-tabs info_tab" id="nav-tab" role="tablist">
+                  <a class="nav-item nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
+                  <a class="nav-item nav-link" id="info_2" data-toggle="tab" href="#info2" role="tab" aria-controls="item2" aria-selected="false">お知らせ</a>
+                  <a class="nav-item nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">
+                <!--数字だけなら正常。-->
+                <div class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
+                  1111111111111111111111111111111111111
+                  {% for all in all_informations %}
+                      <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                      {% if not all.id in read_info %}
+                          <span class="bg-warning">{{ all.category }}</span>
+                      {% else %}
+                          <span>{{ all.category }}</span>
+                      {% endif %}
+                      </b><span class="newsList-title">{{ all.title }}</span></a></li>
+                  {% empty %}
+                      <li><span class="newsList-empty">お知らせはありません</span></li>
+                  {% endfor %} 
+                </div>
+                <div class="tab-pane fade" id="info2" role="tabpanel" aria-labelledby="info_2">
+                  2222222222222222222222222222222222222
+                  {% for notice in notice_informations %}
+                      <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                      {% if not notice.id in read_info %}
+                          <span class="bg-warning">{{ notice.category }}</span>
+                      {% else %}
+                          <span>{{ notice.category }}</span>
+                      {% endif %}
+                      </b><span class="newsList-title">{{ notice.title }}</span></a></li>
+                  {% empty %}
+                      <li><span class="newsList-empty">お知らせはありません</span></li>
+                  {% endfor %}
+                </div>
+                <div class="tab-pane fade" id="info3" role="tabpanel" aria-labelledby="info_3">
+                  333333333333333333333333
+                  {% for mainte in maintenance_informations %}
+                      <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                      {% if not mainte.id in read_info %}              
+                          <span class="bg-warning">{{ mainte.category }}</span>
+                      {% else %}
+                          <span>{{ mainte.category }}</span>
+                      {% endif %}
+                      </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
+                  {% empty %}
+                      <li><span class="newsList-empty">お知らせはありません</span></li> 
+                  {% endfor %} 
+                </div>
+              </div> 
+
+
+              {% comment %} portalとやり方そろっているけど数字すら表示おかしい
+                <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
+                  11111111
                     {% for all in all_informations %}
                         <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not all.id in read_info %}
@@ -314,9 +377,10 @@
                         </b><span class="newsList-title">{{ all.title }}</span></a></li>
                     {% empty %}
                         <li><span class="newsList-empty">お知らせはありません</span></li>
-                    {% endfor %}
+                    {% endfor %} 
                 </ul>
-                <ul>
+                <ul class="tab-pane fade show active" id="info2" role="tabpanel" aria-labelledby="info_2">
+                  22222
                     {% for notice in notice_informations %}
                         <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not notice.id in read_info %}
@@ -329,7 +393,8 @@
                         <li><span class="newsList-empty">お知らせはありません</span></li>
                     {% endfor %}
                 </ul>
-                <ul>
+                <ul class="tab-pane fade show active" id="info3" role="tabpanel" aria-labelledby="info_3">
+                  33333334
                     {% for mainte in maintenance_informations %}
                         <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not mainte.id in read_info %}              
@@ -341,7 +406,7 @@
                     {% empty %}
                         <li><span class="newsList-empty">お知らせはありません</span></li> 
                     {% endfor %}
-                </ul>
+                </ul> {% endcomment %}
             </div>
             <div class="modal-footer justify-content-center bg-white">
                 <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();">閉じる</button>
