@@ -1412,7 +1412,7 @@ for Login Page
 
     .address_lists_modal_header {
         background-color: #005392 !important;
-        width: 1138px;
+        /* width: 1138px; */
         margin-bottom: 1rem;
         color: #FFF;
     }
@@ -1794,7 +1794,7 @@ ul.sample1 li{
 
     .box1_upload {
         width: 1336px;
-        height: 650px;
+        /* height: 650px; */
         padding: 10px 10px;
         margin: 0 0;
         font-weight: bold;
@@ -1813,16 +1813,21 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         float: left;
         border-color: #999999;
-        height: 35%
+        /* height: 35% */
     }
 
-    .box2_upload,
+    /* .box2_upload,
     .box3_upload {
         border-bottom: dotted;
         border-color: #999999;
+    } */
+    .box_top_upload{
+        border-bottom: dotted;
+        border-color: #999999;
+        height:250px;
     }
 
     .box2_upload {
@@ -1841,7 +1846,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         width: 60%;
         float: left;
     }
@@ -1852,7 +1857,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         /* clear: both; */
         height: 65%;
         width: 40%;
@@ -1865,7 +1870,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         width: 100%;
         height: 90%;
         margin-left: auto;
@@ -2182,7 +2187,7 @@ font-family: 'Font Awesome 5 Free';
 
     .box1_url {
         width: 1336px;
-        height: 650px;
+        /* height: 650px; */
         padding: 10px 10px;
         margin: 0 0;
         font-weight: bold;
@@ -2202,12 +2207,12 @@ font-family: 'Font Awesome 5 Free';
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px; /* span必須・任意用*/
         float: left;
         border-color: #999999;
         padding-bottom: 5px;
         width: 50%;
-        height: 45%
+        /* height: 45% */
     }
 
     .box11 {
@@ -2247,7 +2252,7 @@ font-family: 'Font Awesome 5 Free';
         text-align: center;
         /* line-height: 100px; */
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         clear: both;
         height: 55%;
         width: 60%;
@@ -2442,7 +2447,7 @@ font-family: 'Font Awesome 5 Free';
     }
 
     .step1_guestul_mail6 {
-        margin-top: 60px;
+        margin-top: 86px;
     }
 
     /*--------------------
@@ -3120,10 +3125,10 @@ DatePicker
     color: #FFF;
     }
 
-.address_sign_up_modal {
+/* .address_sign_up_modal {
     width: 750px;
     overflow-x: auto;
-}
+} */
 .address_sign_up_modal_body {
     width: 750px;
 }
@@ -3197,6 +3202,28 @@ DatePicker
     content: '\f071';
     font-family: 'Font Awesome 5 Free';
 } 
+
+/*----------------------------------------------------------------------------------------
+ホーム・メニュー
+------------------------------------------------------------------------------------------*/
+.home_menu{
+    width:1260px;
+    margin: 0 auto;
+    margin-top: 20px;
+    min-width: 1260px;
+}
+
+.home_menu_btn{
+    font-size: 20px;
+    width: 30%;
+    border-radius: 0;
+    background-color: #005392;
+    color: #fff;
+    font-weight: bold;
+}
+.home_menu_btn:hover{
+    color: #fff;
+}
 
 /*---------------------------------
 管理画面
@@ -3436,6 +3463,11 @@ DatePicker
 }
 
 /**********************  お知らせ  ****************************/
+.info_tab .nav-link{
+    padding: 0 !important;
+    font-size: 14px;
+}
+
 .tab > li.active {
     color: #fff;
     background: #008080;

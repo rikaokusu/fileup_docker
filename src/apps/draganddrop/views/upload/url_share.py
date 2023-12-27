@@ -548,12 +548,10 @@ class Step3URLupload(TemplateView, CommonView):
         # ファイル名
         url_upload_files = url_upload_manage_obj.file.all()
         files = []
-        for file in url_upload_files:
-            print('ふぁいるかくにん1111',file.name)           
+        for file in url_upload_files:          
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
-        print('ふぁいるかくにん',files)
         # 操作ログ終わり
         # 操作ログ
         add_log(2,1,current_user,file_title,files,url_dest_users,1,self.request.META.get('REMOTE_ADDR'))

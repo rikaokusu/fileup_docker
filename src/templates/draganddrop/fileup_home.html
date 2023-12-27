@@ -21,7 +21,19 @@
 
 
 {% block content %}
-
+<div class="home_menu">
+    <div class="dropdown">
+        <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            ファイル共有
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">通常アップロード</a>
+            <a class="dropdown-item" href="#">URL共有</a>
+            <a class="dropdown-item" href="#">OTP共有</a>
+            <a class="dropdown-item" href="#">ゲストアップロード</a>
+        </div>
+    </div>
+</div><!--home_menu終わり-->
 <div class="box2 d-flex justify-content-center">
     {% if plan == "free" and number_of_company_upload_manage >= 5 %}
     <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i

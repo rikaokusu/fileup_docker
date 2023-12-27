@@ -26,79 +26,81 @@
     {% csrf_token %}
 
     <div class="box1_upload">
-        <!-----------------------------------タイトル DL回数-------------------------------------->
-        <div class="box2_upload">
-            <table class="table table-borderless">
-                <tr>
-                    <th>
-                        <h2 class="step1_upload_box_title">1 基本情報</h2>
-                    </th>
-                </tr>
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>タイトル</h2><span class="required_label def">必須</span>
-                    </td>
-                    <td>
-                        {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
-                        {% if form.title.errors %}
-                            {% for error in form.title.errors %}
-                                <div class="title_duplicate_error">
-                                    {{ error }}
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="step1-title-error" style="visibility:hidden"></div>
-                      {% endif %}
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                            <h2>依頼先</h2><span class="required_label def">必須</span>
-                        {% comment %} <h3>・ファイル共有リクエスト先のメールアドレスを入力してください。</h3> {% endcomment %}
-                    </td>
+        <div class="box_top_upload">
+            <!-----------------------------------タイトル DL回数-------------------------------------->
+            <div class="box2_upload">
+                <table class="table table-borderless">
+                    <tr>
+                        <th>
+                            <h2 class="step1_upload_box_title">1 基本情報</h2>
+                        </th>
+                    </tr>
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>タイトル</h2><span class="required_label def">必須</span>
+                        </td>
                         <td>
-                            {% render_field form.guest_mail class="form-control step1_guest_mail" placeholder="ファイル共有リクエスト先のメールアドレス"  %}
+                            {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
                             {% if form.title.errors %}
                                 {% for error in form.title.errors %}
-                                    <div class="guest_mail_error">
+                                    <div class="title_duplicate_error">
                                         {{ error }}
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                    <div class="step1-guest-mail-error" style="visibility:hidden"></div>
-                            {% endif %}
+                                <div class="step1-title-error" style="visibility:hidden"></div>
+                          {% endif %}
                         </td>
-                </tr>
-            </table>
+                    </tr>
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                                <h2>依頼先</h2><span class="required_label def">必須</span>
+                            {% comment %} <h3>・ファイル共有リクエスト先のメールアドレスを入力してください。</h3> {% endcomment %}
+                        </td>
+                            <td>
+                                {% render_field form.guest_mail class="form-control step1_guest_mail" placeholder="ファイル共有リクエスト先のメールアドレス"  %}
+                                {% if form.title.errors %}
+                                    {% for error in form.title.errors %}
+                                        <div class="guest_mail_error">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                        <div class="step1-guest-mail-error" style="visibility:hidden"></div>
+                                {% endif %}
+                            </td>
+                    </tr>
+                </table>
+            </div>
+            <!---box2_upload 閉じタグ-->
+    
+            <!--有効期限, メッセージ-->
+    
+            <div class="box3_upload">
+                <table class="table table-borderless step1_table">
+                    <tr>
+                        <td class="step1_label_wrapper">
+                                <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
+                        </td>
+                        <td>
+                            <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>メッセージ</h2><span class="optional_label def">任意</span>
+                        </td>
+                        <td>
+                            {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
+                        </td>
+                    </tr>
+    
+                </table>
+            </div>
+            <!---step3_upload 閉じタグ--->
         </div>
-        <!---box2_upload 閉じタグ-->
-
-        <!--有効期限, メッセージ-->
-
-        <div class="box3_upload">
-            <table class="table table-borderless step1_table">
-                <tr>
-                    <td class="step1_label_wrapper">
-                            <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
-                    </td>
-                    <td>
-                        <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>メッセージ</h2><span class="optional_label def">任意</span>
-                    </td>
-                    <td>
-                        {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
-                    </td>
-                </tr>
-
-            </table>
-        </div>
-        <!---step3_upload 閉じタグ--->
 
         <!----------------------------------受信者---------------------------------------->
 

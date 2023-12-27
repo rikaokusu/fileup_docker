@@ -78,7 +78,7 @@
                                       <img src="/media/{{ current_user.image.file }}" class="user_icon_mini"/>
                                       <!--ユーザのアイコン画像が存在しない-->
                                   {% else %}
-                                      <div class="maru size_s c{{current_user.color_num}} ml-1 mt-1">
+                                      <div class="maru size_s c{{current_user.color_num}} ml-1 ">
                                           <div class="letter_two_company_s">{{current_user.company.pic_company_name|get_first_char}}</div>
                                           <div class="letter_two_personal_s">{{current_user.display_name|get_first_char}}</div>
                                       </div>
@@ -297,7 +297,8 @@
   <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content info-modal-content">
-            {% comment %} <ul class="tab nav nav-tabs clearfix info_tab">
+          <!--ポータル版-->
+            <ul class="tab nav nav-tabs clearfix info_tab">
               <li class="nav-item">
                 <a class="nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
               </li>
@@ -307,9 +308,11 @@
               <li class="nav-item">
                 <a class="nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
               </li>
-            </ul> {% endcomment %}
+            </ul>
             <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
+            <!--bootstrap版-->
             <div class="area tab-content">
+              {% comment %} 
               <nav>
                 <div class="nav nav-tabs info_tab" id="nav-tab" role="tablist">
                   <a class="nav-item nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
@@ -317,9 +320,9 @@
                   <a class="nav-item nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
                 </div>
               </nav>
-              <div class="tab-content" id="nav-tabContent">
+              <div class="tab-content" id="nav-tabContent"> {% endcomment %}
                 <!--数字だけなら正常。-->
-                <div class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
+                {% comment %} <div class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
                   1111111111111111111111111111111111111
                   {% for all in all_informations %}
                       <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
@@ -361,12 +364,12 @@
                       <li><span class="newsList-empty">お知らせはありません</span></li> 
                   {% endfor %} 
                 </div>
-              </div> 
+              </div>  {% endcomment %}
 
 
-              {% comment %} portalとやり方そろっているけど数字すら表示おかしい
+              <!--portalとやり方そろっているけど数字すら表示おかしい-->
                 <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
-                  11111111
+                  
                     {% for all in all_informations %}
                         <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not all.id in read_info %}
@@ -406,7 +409,7 @@
                     {% empty %}
                         <li><span class="newsList-empty">お知らせはありません</span></li> 
                     {% endfor %}
-                </ul> {% endcomment %}
+                </ul> 
             </div>
             <div class="modal-footer justify-content-center bg-white">
                 <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();">閉じる</button>
