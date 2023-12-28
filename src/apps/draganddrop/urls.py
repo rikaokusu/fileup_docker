@@ -9,7 +9,12 @@ from django.contrib.auth import views as auth_views
 app_name = 'draganddrop'
 
 urlpatterns = [
-
+     ############
+     # 運営用ページ  #
+     ############
+     ## fileup_admin.py ##
+     # 運営用ページトップ画面 
+     path('cl_management/', home_common.ClManagementView.as_view(), name='cl_management'),
 
      ############
      # home  #

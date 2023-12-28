@@ -22,19 +22,72 @@
 
 {% block content %}
 <div class="home_menu">
-    <div class="dropdown">
-        <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <!--ファイル共有-->
+    {% if plan == "free" and number_of_company_upload_manage >= 5 %}
+        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限数を超えています" data-placement="top" data-toggle="tooltip" role="button">
+            <i class="fas fa-file-alt"></i>
             ファイル共有
         </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#">通常アップロード</a>
-            <a class="dropdown-item" href="#">URL共有</a>
-            <a class="dropdown-item" href="#">OTP共有</a>
-            <a class="dropdown-item" href="#">ゲストアップロード</a>
+    {% elif plan == "free" and total_data_usage >= 3221225472 %}
+        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
+            <i class="fas fa-file-alt"></i>
+            ファイル共有
+        </button>
+    {% else %}
+        <div class="dropdown home_menu_wrap">
+            <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% comment %} <i class="fas fa-file-upload"></i> {% endcomment %}
+                <i class="fas fa-file-alt"></i>
+                ファイル共有
+            </button>
+            <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
+                {% if plan == "free" %}
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
+                {% else %}
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_url_upload' %}">URL共有</a>
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_otp_upload' %}">OTP共有</a>
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_guest_upload' %}">ゲストアップロード</a>
+                {% endif %}
+            </div>
+        </div><!--home_menu_wrap閉じタグ-->
+    {% endif %}
+    <!--ファイル共有終わり-->
+    <!--アドレス帳-->
+    <div class="home_menu_wrap">
+        <a class="btn home_menu_btn" href="{% url 'draganddrop:address_list' %}">
+            <i class="fas fa-address-book"></i>
+            アドレス帳
+        </a>
+    </div>
+    <!--アドレス帳終わり-->
+    <!--その他-->
+    <div class="dropdown home_menu_wrap">
+        <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="far fa-chart-bar"></i>
+            {% comment %} <i class="fas fa-ellipsis-h"></i> {% endcomment %}
+            その他
+        </button>
+        <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:personal_resource_management' %}">個人管理画面</a>
+            {% if plan == "free" %}
+                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">会社管理画面</button>
+                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">承認ワークフロー設定</button>
+                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">操作ログ</button>
+            {% else %}
+                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:resource_management'%}">会社管理画面</a>
+                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:approval_workflow' %}">承認ワークフロー設定</a>
+                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:log' %}">操作ログ</a>
+            {% endif %}
         </div>
     </div>
+    <!--その他終わり-->
 </div><!--home_menu終わり-->
-<div class="box2 d-flex justify-content-center">
+
+<!--旧メニュー-->
+{% comment %} <div class="box2 d-flex justify-content-center">
     {% if plan == "free" and number_of_company_upload_manage >= 5 %}
     <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
         class="fas fa-globe fa-1x icon-home" ></i></button>
@@ -57,13 +110,7 @@
     <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:address_list' %}" role="button">アドレス帳<i
         class="fas fa-address-book fa-1x icon-address-book-home"></i></a>
     <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:approval_workflow' %}" role="button">承認ワークフロー</a>
-
-    {% comment %} <a class="btn uploadbtn ml-3 rounded-0" href=""  role="button" style="background-color=gray:">承認ワークフロー</a> {% endcomment %}
-    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_guest_upload' %}" role="button">ゲストアップロード</a>
-
-</div>
-
-<p class="box"></p>
+</div> {% endcomment %}
 
 <!-------------------------------------------------------受信データ ------------------------------------------------------->
 <div class="box1-1 zhushin_table">

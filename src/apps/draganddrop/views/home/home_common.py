@@ -7,15 +7,26 @@ from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, Url
 from accounts.models import User, File
 from draganddrop.models import Notification,Read
 from draganddrop.models import ApprovalWorkflow
-from draganddrop.forms import UserChangeForm
+from draganddrop.forms import UserChangeForm, NotificationForm
 # from datetime import datetime, date, timedelta, timezone
 import datetime
 from django.urls import reverse
 from django.db.models import Q
 from django.conf import settings
 import math
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
+
+"""
+CL運営用管理画面
+CLの運営のみ入れる画面
+"""
+class ClManagementView(LoginRequiredMixin,TemplateView):
+    form_class = NotificationForm
+    model = Notification
+    template_name = 'draganddrop/common/fileup_admin.html'
+    login_url = '/login/'
+    
 
 # Token_LENGTH = 5  # ランダムURLを作成するためのTOKEN
 

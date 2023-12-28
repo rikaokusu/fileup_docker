@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage, GuestUploadManage
+from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage, GuestUploadManage,Notification
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
@@ -13,6 +13,17 @@ import datetime
 # 逆参照のテーブルをフィルタやソートする
 from django.db.models import Prefetch
 from django.db.models import Q
+
+
+"""
+fileup運営用ページ・通知設定
+"""
+class NotificationForm(forms.ModelForm):
+    class Meta:
+        model = Notification
+        fields = ("__all__")
+
+
 
 
 class FileForm(ModelForm):

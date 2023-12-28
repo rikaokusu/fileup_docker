@@ -178,7 +178,7 @@ common class
 .required_label {
     width: 37px;
     height: 20px;
-    padding: 3px;
+    line-height: 20px;
     background: #307db8;
     /* background: #005392; */
     color: #fff;
@@ -190,7 +190,7 @@ common class
     .optional_label {
     width: 37px;
     height: 20px;
-    padding: 3px;
+    line-height:20px;
     background: #bbbbbb;
     /* background: #005392; */
     color: #fff;
@@ -427,28 +427,6 @@ common class
         color: #FFF;
         background-color: #005392;
         border: solid 2px #005392;
-    }
-
-    .uploadbtn {
-        background-color: #005392;
-        color: #FFF !important;
-        font-size: 30px;
-        font-weight: bold;
-        text-align: center;
-        width: 30%;
-        display: flex;
-        justify-content: center;
-    }
-    .uploadbtn_disabled {
-        background-color: #005392;
-        color: #FFF !important;
-        font-size: 30px;
-        font-weight: bold;
-        text-align: center;
-        width: 30%;
-        display: flex;
-        justify-content: center;
-        opacity: 0.3;
     }
 
     .my-btn {
@@ -967,12 +945,6 @@ common class
         /* padding: 1em 1em; */
         margin: 0 0;
         border: solid 1px #FFF;
-    }
-
-    p.box {
-        border-bottom: 2px solid #D9D9D9;
-        margin: 0px 0px 16px 0px;
-        width: 1340px;
     }
 
     .box_progressbar {
@@ -3208,21 +3180,60 @@ DatePicker
 ------------------------------------------------------------------------------------------*/
 .home_menu{
     width:1260px;
-    margin: 0 auto;
-    margin-top: 20px;
+    margin: 20px auto;
     min-width: 1260px;
+    display:flex;
+    justify-content: space-between;
 }
 
-.home_menu_btn{
-    font-size: 20px;
+.home_menu .home_menu_wrap{
     width: 30%;
+}
+
+/* homeドロップダウン中身 */
+.home_menu_btn{
+    width: 100%;
+    font-size: 20px;
     border-radius: 0;
     background-color: #005392;
     color: #fff;
     font-weight: bold;
+    padding:10px;
 }
+.home_menu_btn_disabled{
+    width: 100%;
+    font-size: 20px;
+    border-radius: 0;
+    background-color: #005392;
+    color: #fff;
+    font-weight: bold;
+    opacity:0.3;
+}
+
 .home_menu_btn:hover{
     color: #fff;
+}
+
+.home_menu .home_menu_drop{
+    width: 100%;
+    background-color: #005CA2;
+}
+/* クリック時 */
+.home_menu_item:active {
+    text-decoration: none;
+    background-color: #fff;
+}
+.home_menu .home_menu_drop_disabled{
+    width: 100%;
+    background-color: #005CA2;
+    opacity:0.3;
+}
+.home_menu_item{
+    color:#fff;
+    padding: .4rem 1.5rem;
+}
+.home_menu_item:hover{
+    color:#005CA2;
 }
 
 /*---------------------------------
@@ -3339,7 +3350,7 @@ DatePicker
     width: 1336px;
     display: flex;
     justify-content: space-between;
-    margin: 150px 0;
+    margin-bottom: 150px;
 }
 
 
