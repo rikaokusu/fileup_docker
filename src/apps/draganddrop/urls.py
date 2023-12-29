@@ -152,6 +152,7 @@ urlpatterns = [
      path('guest_send/', guest_upload.GuestSendAjaxView.as_view(),name='guest_send'),
      path('step1_guest_upload/<uuid:pk>', guest_upload.Step1GuestUpload.as_view(), name='step1_guest_upload'),
      path('step2_guest_upload/<uuid:pk>', guest_upload.Step2GuestUpload.as_view(), name='step2_guest_upload'),
+     path('guest_file_unable_upload/', guest_upload.GuestFileUnableUpload.as_view(),name='guest_file_unable_upload'),
     
 
      ## duplicate.py ##

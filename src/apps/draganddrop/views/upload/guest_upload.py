@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksguestStep1Form, guestDistFileUploadForm, guestFileDownloadAuthForm, ManageTasksGuestUploadCreateStep1Form
 from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksGuestUploadCreateStep1Form,GuestFileUploadAuthForm,GuestUploadDistFileUploadForm
 from draganddrop.models import Filemodel, PDFfilemodel, Address, Group, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from accounts.models import User, Company, Messages, Service,FileupPermissions
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -623,10 +624,12 @@ class GuestSendAjaxView(View):
 
 class GuestFileUnableUpload(ListView):
     model = GuestUploadManage
-    template_name = 'draganddrop/guest_upload/guest_upload_error.html'
+    # template_name = 'draganddrop/guest_upload/guest_upload_error.html'
+    template_name = 'draganddrop/guest_upload/guest_file_upload_auth.html'
 
     def index(request):
-        return render(request, 'draganddrop/guest_upload/guest_upload_error.html')
+        # return render(request, 'draganddrop/guest_upload/guest_upload_error.html')
+        return render(request, 'draganddrop/guest_file_upload_auth.html')
 
 ###########################
 # ゲストアップロード１  #
@@ -793,9 +796,9 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         #         number_of_guest_download_file_table_old += int(guestdownloadtable.guest_download_table.all().count())
 
         # 旧ファイルの合計サイズ
-        guest_upload_manage_file_size_old = 0
-        for file in guest_upload_manage.file.all():
-            guest_upload_manage_file_size_old = guest_upload_manage_file_size_old + int(file.size)
+        # guest_upload_manage_file_size_old = 0
+        # for file in guest_upload_manage.file.all():
+        #     guest_upload_manage_file_size_old = guest_upload_manage_file_size_old + int(file.size)
 
 
         #更新データをGuestUploadManageに保存
@@ -803,7 +806,6 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         # guest_upload_manage.end_date = guest_upload_manage_tmp.end_date
         # guest_upload_manage.message = guest_upload_manage_tmp.message
 
-        guest_upload_manage.save()
 
         # 既存ファイルと新ファイルを結合
         # guest_upload_manage_file = guest_upload_manage.file.all() | guest_upload_manage_tmp.file.all()
@@ -869,7 +871,7 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         # guest_upload_manage.dest_user.set(guest_upload_manage_tmp.dest_user.all())
 
         # PersonalResourceManagement更新処理
-        personal_resource_manage = PersonalResourceManagement.objects.filter(user=self.request.user.id).first()
+        personal_resource_manage = PersonalResourceManagement.objects.filter(user=guest_upload_manage.created_user).first()
 
         # download_tableのレコード数を更新
         # number_of_guest_download_table_tmp =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
@@ -879,7 +881,7 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         guest_upload_manage_file_size = 0
         for file in guest_upload_manage.file.all():
             guest_upload_manage_file_size = guest_upload_manage_file_size + int(file.size)
-        personal_resource_manage.guest_upload_manage_file_size += (guest_upload_manage_file_size - guest_upload_manage_file_size_old)
+        personal_resource_manage.guest_upload_manage_file_size += guest_upload_manage_file_size
 
         # download_file_tableのレコード数を更新
         # number_of_guest_download_file_table_tmp = 0
@@ -893,14 +895,18 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         guest_tmp_flag_1 = GuestUploadManage.objects.filter(tmp_flag=1).all()
         guest_tmp_flag_1.delete()
 
-        download_table = personal_resource_manage.number_of_guest_download_table
-        download_file_table = personal_resource_manage.number_of_guest_download_file_table
+        download_table = personal_resource_manage.number_of_guest_upload_download_table
+        # download_table = personal_resource_manage.number_of_guest_download_table
+        download_file_table = personal_resource_manage.number_of_guest_upload_download_file_table
         total_file_size = personal_resource_manage.total_file_size
-
+        user = User.objects.filter(email=guest_upload_manage.dest_user_mail1).prefetch_related('company').first()
+        print('userとは～～～～～',user)
+        print('comapnyidとは～～～～～',user.company)
+        
         # 個人管理テーブルの作成・更新
-        total_data_usage(guest_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, guest_upload_manage_file_size, 3)
+        total_data_usage(guest_upload_manage, user.company.id, user.id, download_table, download_file_table, guest_upload_manage_file_size, 3)
         # 会社管理テーブルの作成・更新
-        resource_management_calculation_process(self.request.user.company.id)
+        resource_management_calculation_process(user.company.id)
         # this_personal_resource_manage.save()
 
         return context
