@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage, GuestUploadManage,Notification
+from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage, GuestUploadManage
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
@@ -13,36 +13,6 @@ import datetime
 # 逆参照のテーブルをフィルタやソートする
 from django.db.models import Prefetch
 from django.db.models import Q
-
-
-"""
-fileup運営用ページ・通知設定
-"""
-class NotificationForm(forms.ModelForm):
-    class Meta:
-        model = Notification
-
-        fields = ('release_date','title','category','contents',
-                # 'maintenance_start_date','maintenance_end_date','maintenance_contents','maintenance_targets','maintenance_affects','maintenance_cancel_reason'
-                )
-        labels = {'release_date':"通知日",
-                'title':"タイトル",
-                'category':"カテゴリ",
-                'contents':"メッセージ内容",
-                # 'maintenance_start_date': "作業開始日",
-                # 'maintenance_end_date':"作業終了日",
-                # 'maintenance_contents':"作業内容",
-                # 'maintenance_targets':"作業対象",
-                # 'maintenance_affects':"作業影響",
-                # 'maintenance_cancel_reason':"作業中止理由"
-        }
-    # Name = forms.CharField(label="名前")                    
-    # Tell = forms.IntegerField(label="電話番号")
-    # Mail = forms.EmailField(label="メールアドレス")
-    # Birthday = forms.DateField(label="生年月日")
-    # Website = forms.URLField(label="Webサイト")
-    # FreeText = forms.CharField(widget=forms.Textarea,label="備考")
-
 
 #File
 class FileForm(ModelForm):

@@ -7,7 +7,7 @@ from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, Url
 from accounts.models import User, File
 from draganddrop.models import Notification,Read
 from draganddrop.models import ApprovalWorkflow
-from draganddrop.forms import UserChangeForm, NotificationForm
+from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
 import datetime
 from django.urls import reverse
@@ -16,41 +16,6 @@ from django.conf import settings
 import math
 from django.shortcuts import redirect, render
 from django.http import JsonResponse
-
-"""
-CL運営用管理画面
-CLの運営のみ入れる画面
-"""
-# class ClManagementView(LoginRequiredMixin,TemplateView):
-#     form_class = NotificationForm
-#     model = Notification
-#     template_name = 'draganddrop/common/fileup_admin.html'
-#     login_url = '/login/'
-    
-class ClManagementView(TemplateView):
-
-    # 初期変数定義
-    def __init__(self):
-        self.params = {"Message":"情報を入力してください。",
-                    "form":NotificationForm(),
-                    }
-
-    # GET時の処理を記載
-    def get(self,request):
-        return render(request, "draganddrop/common/fileup_admin.html",context=self.params)
-
-    # POST時の処理を記載
-    def post(self,request):
-        if request.method == "POST":
-            self.params["form"] = NotificationForm(request.POST)
-            
-            # フォーム入力が有効な場合
-            if self.params["form"].is_valid():
-                #入力項目をデータベースに保存
-                self.params["form"].save(commit=True)
-                self.params["Message"] = "入力情報が送信されました。"
-
-        return render(request, "draganddrop/common/fileup_admin.html",context=self.params)
 
 # Token_LENGTH = 5  # ランダムURLを作成するためのTOKEN
 
