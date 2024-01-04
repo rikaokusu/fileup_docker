@@ -4,13 +4,39 @@
 
     {% block content %}
     
-    <form class="" action="" method="post" enctype="multipart/form-data">
+    <!-- フォームを定義 -->
+    {% comment %} <form action="{% url 'draganddrop:cl_management' %}" method="POST" class="mt-5">
+        {{ form.as_p }}
         {% csrf_token %}
-        <form method="post" id="myform">
-            {{ form.as_p }}
-        </form>
-        <button type="submit" name="submit">Submit</button>
-    </form>
+        <input type="submit" value="送信">
+    </form>  {% endcomment %}
+    
+
+    {% comment %} <table> {% endcomment %}
+        {% comment %} <form action="{% url 'draganddrop:cl_management' %}" method="POST" class="mt-5"> {% endcomment %}
+        <div class="mt-5">
+            {% for field in form %}
+                {% comment %} <tr> {% endcomment %}
+                    {% comment %} <th>{{ field.label }}:</th> {% endcomment %}
+                        <p>{{ field.label }}
+                            {% if field.field.required %}
+                                <span class="required_label def">必須</span>
+                            {% else %}
+                                <span class="optional_label def">任意</span>
+                            {% endif %}
+                            :{{ field }}
+
+                        </p>
+                    {% comment %} <td>{{ field }}</td>
+                    <td>{% if field.field.required %}必須{% endif %}</td> {% endcomment %}
+                </tr>
+            {% endfor %}
+
+            <input type="submit" value="送信">
+            
+        </div>
+        {% comment %} </form> {% endcomment %}
+    {% comment %} </table> {% endcomment %}
     
     {% endblock %}
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
