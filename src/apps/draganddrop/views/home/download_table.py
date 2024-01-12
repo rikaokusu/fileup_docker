@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
-from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable,OTPUploadManage
+from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable, OTPUploadManage, ApprovalManage, ApprovalLog
 from django.http import JsonResponse
 from draganddrop.views.home.home_common import CommonView
 import urllib.parse
@@ -12,15 +12,26 @@ import zipfile
 #操作ログ関数
 from lib.my_utils import add_log
 
+# 時刻取得
+from datetime import datetime, timedelta
+
 ##################################
 # 受信テーブル単数削除  #
 ##################################
 class DownloadTableDeleteAjaxView(View,CommonView):
     def post(self, request,**kwargs):
+
+        print('----------------- DownloadTableDeleteAjaxView')
+
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
-        delete_id = request.POST.get('delete_id') #downloadtableのid 
+        delete_id = request.POST.get('delete_id') #downloadtableのid
         delete_name = request.POST.get('delete_name')#ファイルタイトル
+        # print('----------------- delete_id', delete_id)
+        # print('----------------- delete_name', delete_name)
+
+        cancel_comment = request.POST.get('cancel_comment')
+        # print("----------------- cancel_comment", cancel_comment)
 
         try:
             # ダウンロードテーブルに変更
@@ -34,6 +45,28 @@ class DownloadTableDeleteAjaxView(View,CommonView):
             # 操作ログ登録
             print('もしかしてfileみえない？3',files)
             add_log(2,3,current_user,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
+
+            # UploadManageのステータスをキャンセルに更新
+            uploadmanage.application_status = 6 # キャンセル
+            uploadmanage.save()
+
+            # ApprovalManageのステータスをキャンセルに更新
+            approval_manages = ApprovalManage.objects.filter(upload_mange=uploadmanage)
+            for approval_manage in approval_manages:
+                # ステータスをキャンセルに更新
+                approval_manage.approval_status = 5 # キャンセル
+                approval_manage.save()
+
+            # 承認履歴を残す
+            approval_log = ApprovalLog.objects.create(
+                approval_manage = ApprovalManage.objects.filter(upload_mange=uploadmanage).first(),
+                approval_operation_user = self.request.user.id,
+                approval_operation_user_company_id = self.request.user.company.id,
+                approval_operation_date = datetime.now(),
+                approval_operation_content = 5, # キャンセル
+                message = cancel_comment,
+            )
+            approval_log.save()
 
             #メッセージを格納してJSONで返す
             data = {}

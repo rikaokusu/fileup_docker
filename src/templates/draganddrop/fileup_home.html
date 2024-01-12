@@ -23,7 +23,8 @@
 {% block content %}
 
 <div class="box2 d-flex justify-content-center">
-    {% if plan == "free" and number_of_company_upload_manage >= 5 %}
+
+    {% comment %} {% if plan == "free" and number_of_company_upload_manage >= 5 %}
     <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
         class="fas fa-globe fa-1x icon-home" ></i></button>
     {% elif plan == "free" and total_data_usage >= 3221225472 %}
@@ -32,11 +33,42 @@
     {% else %}
     <a class="btn uploadbtn rounded-0" href="{% url 'draganddrop:step1' %}" role="button">アップロード<i
         class="fas fa-globe fa-1x icon-home"></i></a>
+    {% endif %} {% endcomment %}
+
+    {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
+        {% if first_approver %}<!-- 一次承認者が登録されている -->
+            {% if plan == "free" and number_of_company_upload_manage >= 5 %}
+                <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+                    class="fas fa-globe fa-1x icon-home" ></i></button>
+            {% elif plan == "free" and total_data_usage >= 3221225472 %}
+                <button data-toggle="tooltip" title="アップロード制限サイズを超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+                    class="fas fa-globe fa-1x icon-home" ></i></button>
+            {% else %}
+                <a class="btn uploadbtn rounded-0" href="{% url 'draganddrop:step1' %}" role="button">アップロード<i
+                    class="fas fa-globe fa-1x icon-home"></i></a>
+            {% endif %}
+        {% else %}<!-- 一次承認者が登録されていなければボタンを無効化 -->
+            <button data-toggle="tooltip" title="承認ワークフローから一次承認者を登録してください" data-placement="top" class="uploadbtn_disabled rounded-0" role="button" style="align-items: center; padding: 6px 12px;">
+                アップロード<i class="fas fa-globe fa-1x icon-home"></i>
+            </button>
+        {% endif %}
+    {% else %}
+        {% if plan == "free" and number_of_company_upload_manage >= 5 %}
+            <button data-toggle="tooltip" title="アップロード制限数を超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+                class="fas fa-globe fa-1x icon-home" ></i></button>
+        {% elif plan == "free" and total_data_usage >= 3221225472 %}
+            <button data-toggle="tooltip" title="アップロード制限サイズを超えています" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">アップロード<i
+                class="fas fa-globe fa-1x icon-home" ></i></button>
+        {% else %}
+            <a class="btn uploadbtn rounded-0" href="{% url 'draganddrop:step1' %}" role="button">アップロード<i
+                class="fas fa-globe fa-1x icon-home"></i></a>
+        {% endif %}
     {% endif %}
+
+
     {% if plan == "free" %}
     <button data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top" class="uploadbtn_disabled ml-3 rounded-0" role="button" style="align-items: center">URL共有<i
             class="fas fa-link fa-1x icon-home" ></i></button>
-    
     {% else %}
     <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_url_upload' %}" role="button" style="background-color=gray:">URL共有<i
         class="fas fa-link fa-1x icon-home" ></i></a>
@@ -48,6 +80,7 @@
 
     {% comment %} <a class="btn uploadbtn ml-3 rounded-0" href=""  role="button" style="background-color=gray:">承認ワークフロー</a> {% endcomment %}
     <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_guest_upload_create' %}" role="button">ゲストアップロード</a>
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_guest_upload' %}" role="button">ゲストアップロード</a>
 
 </div>
 
@@ -828,16 +861,22 @@
 
                         <!-- 変更ボタン -->
                         <td class="updateIcon">
-                            {% if upload_manage.file_del_flag == 1 %}
-                                <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                            {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
+                                <span data-toggle="tooltip" title="承認済みのファイルは編集できません" data-placement="top">
                                     <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
                                 </span>
                             {% else %}
-                                <span data-toggle="tooltip" title="データの編集" data-placement="top">
-                                    <a href="{% url 'draganddrop:step1_update' upload_manage.pk %}">
-                                        <button class="fas_button_edit" ></button>
-                                    </a>
-                                </span>
+                                {% if upload_manage.file_del_flag == 1 %}
+                                    <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                                        <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                                    </span>
+                                {% else %}
+                                    <span data-toggle="tooltip" title="データの編集" data-placement="top">
+                                        <a href="{% url 'draganddrop:step1_update' upload_manage.pk %}">
+                                            <button class="fas_button_edit" ></button>
+                                        </a>
+                                    </span>
+                                {% endif %}
                             {% endif %}
                         </td>
 
@@ -860,6 +899,11 @@
                         
                         <!-- 削除ボタン -->
                         <td class="deleteIcon">
+                        {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
+                            <span data-toggle="tooltip" title="承認済みのファイルは削除できません" data-placement="top">
+                                <button class="fas_button_delete" style="background-color: #C0C0C0;"></button>
+                            </span>
+                        {% else %}
                             {% if upload_manage.file_del_flag == 0 %}
                             <span data-toggle="tooltip" title="削除" data-placement="top">
                                 <button class="fas_button_delete"
@@ -877,6 +921,7 @@
                                 data-target="#file_deleted_task_modal"></button>
                             </span>
                             {% endif %}
+                        {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

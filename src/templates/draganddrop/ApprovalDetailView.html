@@ -2,6 +2,7 @@
 
 {% load get_user_invoice_dept_name %}
 {% load get_operation_user_name %}
+{% load get_extention %}
 
 {% block content %}
 
@@ -31,6 +32,7 @@
     .table_modal {
         width: 100%;
         table-layout: fixed;
+        background-color: #f8f9fa;
     }
 
     .table_modal td {
@@ -66,8 +68,8 @@
 
     /* 見出しセルの色 */
     .tr_head {
-        background-color: #e9ecef;
-        {% comment %} width: 125px; {% endcomment %}
+        {% comment %} background-color: #e9ecef; {% endcomment %}
+        background-color: #d3e4f5;
     }
 
     /* 見出しセルの色 審査結果通知書 */
@@ -159,9 +161,31 @@
 				<tr>
 					<td class="tr_head">送付ファイル</td>
 					<td>
-						{% for file in approval_manage.upload_mange.file.all %}
+						{% comment %} {% for file in approval_manage.upload_mange.file.all %}
 							{{ file }}<br>
-						{% endfor %}
+						{% endfor %} {% endcomment %}
+
+                        {% for file in approval_manage.upload_mange.file.all %}
+                            {% with extention=file.name|get_extention %}
+                                <a href="{{ file.upload.url }}" id="{{ file.id }}" class="urldownloadtable"
+                                    download="{{ file.name }}" data-toggle="tooltip"
+                                    data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
+                                    title="{{ file.name }}">{{ file.name | truncatechars:16 }}
+            
+                                    {% if extention == ".pdf" %}
+                                    <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                            class="fas fa-search"></i></a>
+            
+                                    {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
+                                    <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+            
+                                    {% elif extention == ".txt" %}
+                                    <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+                                    {%endif%}
+                                </a>
+                                <br>
+                            {%endwith%}
+                        {% endfor %}
 					</td>
 				</tr>
 			</tr>
@@ -178,20 +202,28 @@
                             未承認
 						{% elif approval_manage.approval_status == 2 %}
                             承認済み
+                        {% elif approval_manage.approval_status == 5 %}
+                            取り消し
 						{% else %}
                             差戻し
 						{% endif %}
 					</td>
 				</tr>
 
-				<tr>
+				{% comment %} <tr>
 					<td class="tr_head">承認者</td>
 					<td>山田 太郎</td>
-				</tr>
+				</tr> {% endcomment %}
 
 				<tr>
 					<td class="tr_head">承認日時</td>
-					<td>{{ approval_manage.approval_date }}</td>
+					<td>
+						{% if not approval_manage.approval_date %}
+							--------------
+						{% else %}
+							{{ approval_manage.approval_date }}
+						{% endif %}
+                    </td>
 				</tr>
 
 				{% comment %} <tr>

@@ -456,11 +456,6 @@ class Step3(TemplateView, CommonView):
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
         upload_manage.tmp_flag = 0
 
-        # 申請ステータスを「申請中」に設定
-        upload_manage.application_status = 1
-
-        upload_manage.save()
-
         context["upload_manage"] = upload_manage
 
         # Downloadtableへ保存
@@ -525,6 +520,11 @@ class Step3(TemplateView, CommonView):
 
         # 承認ワークフローが「使用する」に設定されている場合
         if approval_workflow.is_approval_workflow:
+
+            # 申請ステータスを「申請中」に設定
+            upload_manage.application_status = 1
+            upload_manage.save()
+
             # 一次承認者を取得
             first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
             # print("------------------ first_approvers step2", first_approvers)

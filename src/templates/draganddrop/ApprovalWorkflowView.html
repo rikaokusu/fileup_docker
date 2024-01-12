@@ -3,6 +3,8 @@
 
 {% load get_operation_user_name %}
 {% load get_user_invoice_dept_name %}
+{% load get_approval_log %}
+{% load get_download_table %}
 
 {% block content %}
 
@@ -95,24 +97,6 @@
 
     ---------------------------------*/
 
-	.application_approval_zyushin-title-bar {
-		position: relative;
-		background-color: #005392;
-		width: 35%;
-	}
-
-	.application_approval_zyushin-title-bar:after {
-		position: absolute;
-		content: "";
-		right: -60px;
-		bottom: 0px;
-		width: 0;
-		height: 0;
-		border-style: solid;
-		border-width: 58px 0 0 60px;
-		border-color: transparent transparent transparent #005392;
-	}
-
 	/* 承認済み */
 	.approved {
 		margin: 0 5%;
@@ -120,31 +104,41 @@
 	.approved {
 		background: #F6C6A2;
 		border-radius: 14px;
-		width: 6em;
+		width: 7.5em;
 		text-align: center;
 		margin: 0;
 	}
 
 	/* 申請中 */
-	.application  {
+	.application {
 		margin: 0 5%;
 	}
-
 	.application {
 		background: #a2d1f6;
 		border-radius: 14px;
-		width: 6em;
+		width: 7.5em;
 		text-align: center;
 		margin: 0;
 	}
 
 	/* 一次承認待ち */
-	.first_approver  {
+	.awaiting_first_approval  {
 		margin: 0 5%;
 	}
+	.awaiting_first_approval {
+		background: #a1eb75;
+		border-radius: 14px;
+		width: 7.5em;
+		text-align: center;
+		margin: 0;
+	}
 
-	.first_approver {
-		background: #acef96;
+	/* 一次承認済み */
+	.first_approved {
+		margin: 0 5%;
+	}
+	.first_approved {
+		background: #a1eb75;
 		border-radius: 14px;
 		width: 7.5em;
 		text-align: center;
@@ -152,11 +146,23 @@
 	}
 
 	/* 最終承認待ち */
-	.final_approver  {
+	.awaiting_final_approval  {
 		margin: 0 5%;
 	}
-	.final_approver {
-		background: #c9b8f6;
+	.awaiting_final_approval {
+		background: #ffd148;
+		border-radius: 14px;
+		width: 7.5em;
+		text-align: center;
+		margin: 0;
+	}
+
+	/* 最終承認済み */
+	.final_approved  {
+		margin: 0 5%;
+	}
+	.final_approved {
+		background: #ffd148;
 		border-radius: 14px;
 		width: 7.5em;
 		text-align: center;
@@ -164,30 +170,90 @@
 	}
 
 	/* 差戻し */
-	.decline_application  {
+	.returned  {
 		margin: 0 5%;
 	}
-
-	.decline_application {
-		background: #f3e969;
+	.returned {
+		background: #c9b8f6;
 		border-radius: 14px;
-		width: 6em;
+		width: 7.5em;
 		text-align: center;
 		margin: 0;
 	}
 
-	/* キャンセル */
-	.cancel_application  {
+	/* 取り消し */
+	.canceled  {
 		margin: 0 5%;
 	}
-	.cancel_application {
+	.canceled {
 		background: #ffa8ad;
 		border-radius: 14px;
-		width: 6em;
+		width: 7.5em;
 		text-align: center;
 		margin: 0;
 	}
+
+	/*---------------------------------
+
+    承認、差戻しテーブル
+
+    ---------------------------------*/
+
+	textarea {
+		resize: none;
+	}
+
+	/*---------------------------------
+
+    disabled_button
+
+    ---------------------------------*/
+	button:disabled {
+		cursor: not-allowed;
+		pointer-events: none !important;
+	}
+
+	/*---------------------------------
+
+    申請履歴モーダル
+
+    ---------------------------------*/
+	.bd-example {
+		padding: 0.5rem;
+		margin-right: 0;
+		margin-left: 0;
+		border-width: 0.2rem;
+	}
+
+	.approval_log_table {
+		display: table;
+		width: 100%;
+		border-collapse: collapse; /*隣接する要素のborderを共有*/
+		margin:0;
+	}
+
+	.d_thead  {
+		display: table-header-group;
+		background: #eeeeee;
+	}
+
+	.d_tbody {
+		display: table-row-group;
+	}
+
+	.d_tr {/* trタグ */
+		display: table-row;
+	}
+
+	.d_th,.d_td {/* td, thタグ */
+		display: table-cell;
+		border: 1px solid #ccc;
+		vertical-align: middle;
+		padding: 5px;
+	}
+
 </style>
+
 
 <div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar">
     <div class="top">
@@ -196,44 +262,27 @@
     </div>
 </div>
 
-<!-- messages.succes や messages.errorにて利用 -->
-{% comment %} {% if messages %}
-<div class="messages">
-	{% for message in messages %}
-	<p {% if message.tags %} class="{{ message.tags }} mb-3"{% endif %}>{{ message }}</p>
-	{% endfor %}
-</div>
-{% endif %} {% endcomment %}
 
-{% comment %} <div class="d-flex"> {% endcomment %}
+<div class="d-flex mb-5">
 	<!---------------------------- 基本情報 ------------------------------>
-	<div class="box1-1 zhushin_table">
-	{% comment %} <div class="approval_workflow_box1 zhushin_table"> {% endcomment %}
+	<div class="card mr-3">
+		<div class="card-header d-flex align-items-center mb-3">
 
-		<div class="box1-3 d-flex bd-highlight mb-3">
-			<div class="mr-auto p-2 bd-highlight approval_workflow_zyushin_title_bar">
-				<h2 class="m-0 zyushin-title">基本情報</h2>
+			<div>
+				<h2 class="m-0">基本情報</h2>
 			</div>
 
-			<div class="del-btn p-2 bd-highlight">
+			<div class="mr-3 ml-auto bd-highlight">
 				<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_workflow_edit' user_approval_workflow_id %}" role="button">編集</a>
 			</div>
 
-			{% comment %} <div class="del-btn p-2 bd-highlight">
-				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:first_approver_set' %}" role="button">第一承認者設定</a>
-			</div> {% endcomment %}
-
-			{% comment %} <div class="del-btn p-2 bd-highlight">
-				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="" role="button">第二承認者設定</a>
-			</div> {% endcomment %}
-
-			<div class="del-btn p-2 bd-highlight">
+			<div class="bd-highlight">
 				<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_log' %}" role="button">操作履歴</a>
 			</div>
+
 		</div>
 
 		<div class="card-body">
-
 			<table class="approval_workflow_table">
 				<tbody>
 					{% for user_approval_workflow in user_approval_workflow_qs %}
@@ -284,282 +333,517 @@
 
 
 	<!---------------------------- 承認者情報覧 ------------------------------>
-	<div class="box1-1 zhushin_table">
-	{% comment %} <div class="approval_workflow_box1 zhushin_table"> {% endcomment %}
+	<div class="card">
 
-		<div class="box1-3 d-flex bd-highlight mb-3">
-			<div class="mr-auto p-2 bd-highlight approval_workflow_zyushin_title_bar">
-				<h2 class="m-0 zyushin-title">承認者情報</h2>
+		<div class="card-header d-flex align-items-center mb-3">
+
+			<div>
+				<h2 class="m-0">承認者情報</h2>
 			</div>
 
-			<div class="del-btn p-2 bd-highlight">
+			<div class="mr-3 ml-auto  bd-highlight">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:first_approver_set' %}" role="button">第一承認者設定</a>
 			</div>
 
-			<div class="del-btn p-2 bd-highlight">
+			<div class="bd-highlight">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:second_approver_set' %}" role="button">第二承認者設定</a>
 			</div>
 		</div>
 
 		<div class="card-body">
-
 			<table class="first_and_second_approver_table">
 				<tbody>
-					{% comment %} {% for user_approval_workflow in user_approval_workflow_qs %} {% endcomment %}
-						<!-- 第一承認者 -->
-						<tr>
-							<th class="tr_head">
-								<div class="box">
-									<div class="label title_label">第一承認者</div>
-								</div>
-							</th>
-							<td colspan="8" class="title_label">
-								<div class="">
-									<ul>
-										{% for first_approver in first_approver_qs %}
-											{% if first_approver %}
-												<li class="member m-0">{{ first_approver }}</li>
-											{% else %}
-												--------------
-											{% endif %}
-										{% endfor %}
-									</ul>
-								</div>
-							</td>
-						</tr>
-			
-						<!-- 第二承認者 -->
-						<tr>
-							<th class="tr_head">
-								<div class="box">
-									<div class="label title_label">第二承認者</div>
-								</div>
-							</th>
-			
-							<td colspan="8" class="title_label">
-								<div class="">
-									<ul>
-										{% for second_approver in second_approver_qs %}
-											{% if second_approver %}
-												<li class="member m-0">{{ second_approver }}</li>
-											{% else %}
-												--------------
-											{% endif %}
-										{% endfor %}
-									</ul>
-								</div>
-							</td>
-						</tr>
-					{% comment %} {% endfor %} {% endcomment %}
+					<!-- 第一承認者 -->
+					<tr>
+						<th class="tr_head">
+							<div class="box">
+								<div class="label title_label">第一承認者</div>
+							</div>
+						</th>
+						<td colspan="8" class="title_label">
+							<div class="">
+								<ul>
+									{% for first_approver in first_approver_qs %}
+										{% if first_approver %}
+											<li class="member m-0">{{ first_approver }}</li>
+										{% else %}
+											--------------
+										{% endif %}
+									{% endfor %}
+								</ul>
+							</div>
+						</td>
+					</tr>
+		
+					<!-- 第二承認者 -->
+					<tr>
+						<th class="tr_head">
+							<div class="box">
+								<div class="label title_label">第二承認者</div>
+							</div>
+						</th>
+		
+						<td colspan="8" class="title_label">
+							<div class="">
+								<ul>
+									{% for second_approver in second_approver_qs %}
+										{% if second_approver %}
+											<li class="member m-0">{{ second_approver }}</li>
+										{% else %}
+											--------------
+										{% endif %}
+									{% endfor %}
+								</ul>
+							</div>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
-{% comment %} </div> {% endcomment %}
+</div>
 
-
-<!---------------------------- 申請・承認一覧 ------------------------------>
+<!---------------------------- 承認一覧 ------------------------------>
 <div class="box1-1 zhushin_table">
 
     <div class="box1-3 d-flex bd-highlight mb-3">
-        <div class="mr-auto p-2 bd-highlight application_approval_zyushin-title-bar">
-            <h2 class="m-0 zyushin-title">申請・承認一覧</h2>
+        <div class="mr-auto p-2 bd-highlight zyushin-title-bar">
+            <h2 class="m-0 zyushin-title">承認一覧</h2>
+        </div>
+	</div>
+
+	<table id="myTable" class="display" style="width:100%">
+		<thead>
+			<tr>
+				{% comment %} <th><input type="checkbox" id="checkall"></th><!-- チェック --> {% endcomment %}
+				<th>No</th>
+				<th>申請件名</th>
+				<th>申請者名</th>
+				<th>部署名</th>
+				<th>申請日時</th>
+				<th>承認日時</th>
+				<th>ステータス</th>
+				<th></th><!-- ボタン -->
+			</tr>
+		</thead>
+		<tbody>
+			{% for user_approval_manage in user_approval_manages %}
+				<tr>
+					<!-- チェックボックス -->
+					{% comment %} <td><input type="checkbox" value="{{ user_approval_manage.id }}" name="check[]"></td> {% endcomment %}
+					<td>{{forloop.counter}}</td>
+					<td>
+						<a class="" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}">{{ user_approval_manage.upload_mange.title }}</a>
+					</td>
+					<td>{{ user_approval_manage.application_user|get_operation_user_name }}</td>
+					<td>{{ user_approval_manage.application_user|get_user_invoice_dept_name }}</td>
+					<td>
+						{{ user_approval_manage.application_date }}
+					</td>
+					<td>
+						{% if not user_approval_manage.approval_date %}
+							--------------
+						{% else %}
+							{{ user_approval_manage.approval_date }}
+						{% endif %}
+					</td>
+					<td>
+						{% if user_approval_manage.first_approver %}
+							<!-- 一次承認者 -->
+							{% if user_approval_manage.approval_status == 1 %}
+								<p class="application">未承認</p>
+							{% elif user_approval_manage.approval_status == 2 %}
+								<p class="first_approved">一次承認済み</p>
+							{% elif user_approval_manage.approval_status == 5 %}
+								<p class="canceled">取り消し</p>
+							{% else %}
+								<p class="returned">差戻し</p>
+							{% endif %}
+						{% else %}
+							<!-- 二次承認者 -->
+							{% if user_approval_manage.approval_status == 1 %}
+								<p class="application">未承認</p>
+							{% elif user_approval_manage.approval_status == 3 %}
+								<p class="final_approved">最終承認済み</p>
+							{% elif user_approval_manage.approval_status == 5 %}
+								<p class="canceled">取り消し</p>
+							{% else %}
+								<p class="returned">差戻し</p>
+							{% endif %}
+						{% endif %}
+					</td>
+					<td class="text-right">
+						{% if user_approval_manage.first_approver %}
+						<!-- 一次承認者 -->
+							{% if user_approval_manage.approval_status == 2 %}<!-- 一次承認済み -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2" disabled>
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+									差戻し
+								</button>
+
+							{% elif user_approval_manage.approval_status == 4 %}<!-- 差戻し -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2 approve_toggle" data-toggle="modal" data-target="#approve_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+									差戻し
+								</button>
+
+							{% elif user_approval_manage.approval_status == 5 %}<!-- キャンセル -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2" disabled>
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+									差戻し
+								</button>
+
+							{% else %}<!-- 未承認 -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2 approve_toggle" data-toggle="modal" data-target="#approve_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2 returned_application_toggle" data-toggle="modal" data-target="#returned_application_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+									差戻し
+								</button>
+							{% endif %}
+
+						{% else %}
+						<!-- 二次承認者 -->
+							{% if user_approval_manage.approval_status == 3 %}<!-- 最終承認済み -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2" disabled>
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+									差戻し
+								</button>
+
+							{% elif user_approval_manage.approval_status == 4 %}<!-- 差戻し -->
+								<button type="button" class="btn btn-primary my-btn-w7 mb-2 approve_toggle" data-toggle="modal" data-target="#approve_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+									承認
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+									差戻し
+								</button>
+
+							{% else %}
+								<!-- UploadManageのステータスが一次承認済みor最終承認待ちの場合はボタンを有効化 -->
+								{% if user_approval_manage.upload_mange.application_status == 3 or user_approval_manage.upload_mange.application_status == 4 %}
+									<button type="button" class="btn btn-primary my-btn-w7 mb-2 approve_toggle" data-toggle="modal" data-target="#approve_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+										承認
+									</button>
+
+									<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2 returned_application_toggle" data-toggle="modal" data-target="#returned_application_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}" data-element="{{forloop.counter}}">
+										差戻し
+									</button>
+								{% elif user_approval_manage.upload_mange.application_status == 6 %}<!-- キャンセル -->
+									<button type="button" class="btn btn-primary my-btn-w7 mb-2" disabled>
+										承認
+									</button>
+
+									<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled>
+										差戻し
+									</button>
+								{% else %}
+									<button type="button" class="btn btn-primary my-btn-w7 mb-2" title='一次承認が完了したらボタンが有効になります' disabled>
+										承認
+									</button>
+
+									<button type="button" class="btn btn-outline-secondary my-btn-w7 mb-2" disabled
+										title='一次承認が完了したらボタンが有効になります'>
+										差戻し
+									</button>
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					</td>
+				</tr>
+
+
+				<!-- 承認モーダル -->
+				<div class="modal fade" id="approve_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+					<div class="modal-dialog modal-lg modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="approve_myModalLabel" style="font-weight: bold; text">承認確認</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+
+							<div class="modal-body">
+								<div class="mb-3">
+									<h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>「{{ user_approval_manage.upload_mange.title }}」を承認しますか？</h6>
+								</div>
+
+								<form action="{% url 'draganddrop:approve' user_approval_manage.id %}" method="POST" id="delete-form">
+									{% csrf_token %}
+									<div class="form-group">
+										<label class="mb-2" style="font-weight:bold;">コメント(任意)</label>
+										<textarea class="form-control" id="approve_comment{{forloop.counter}}" name="approve_comment" cols="60" rows="4" placeholder="コメントを入力してください"></textarea>
+									</div>
+	
+									<div class="alert alert-info">
+										入力したコメントは申請一覧の申請履歴に表示されます。
+									</div>
+								</form>
+							</div>
+
+							<div class="modal-footer d-flex justify-content-center align-items-center">
+								<div class="btn_group">
+									<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+									<button type="button" class="my-btn my-btn-egypt-1 my-btn-w7 applove_button">承認</button>
+								</div>
+							</div><!-- /.modal-footer -->
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-card -->
+				</div><!-- /.modal -->
+
+
+				<!-- 差戻しモーダル -->
+				<div class="modal" id="returned_application_modal{{forloop.counter}}">
+					<div class="modal-dialog modal-lg modal-dialog-centered">
+						<div class="modal-content">
+
+							<div class="modal-header">
+								<h5 class="modal-title" id="myModalLabel" style="font-weight: bold; text">差戻し確認</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div class="mb-3">
+									<h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i> 差戻しを行います。よろしいですか？</h6>
+								</div>
+								<form action="{% url 'draganddrop:returned_application' user_approval_manage.id %}" method="POST">
+									{% csrf_token %}
+									<div class="form-group">
+										<label class="mb-2" style="font-weight:bold;">コメント(任意)</label>
+										<textarea class="form-control" id="returned_comment{{forloop.counter}}" name="returned_comment" cols="60" rows="4" placeholder="コメントを入力してください"></textarea>
+									</div>
+
+									<div class="alert alert-info">
+										入力したコメントは申請一覧の申請履歴に表示されます。
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer d-flex justify-content-center align-items-center">
+								<div class="btn_group">
+									<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+									<button type="button" class="my-btn my-btn-egypt-1 my-btn-w7 returned_application_button">差戻す</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</tbody>
+	</table>
+
+</div>
+
+
+
+<!---------------------------- 申請一覧 ------------------------------>
+<div class="box1-2 zhushin_table">
+
+    <div class="box1-3 d-flex bd-highlight mb-3">
+        <div class="mr-auto p-2 bd-highlight send-title-bar">
+            <h2 class="m-0 send-title">申請一覧</h2>
         </div>
 	</div>
 
 
-	<div id="tabArea">
+	<table id="shinsei_table" class="display" style="width:100%">
+		<thead>
+			<tr>
+				{% comment %} <th><input type="checkbox" id="checkall"></th><!-- チェック --> {% endcomment %}
+				<th>No</th>
+				<th>申請件名</th>
+				<th>受信データ</th>
+				<th>申請日時</th>
+				<th>ステータス</th>
+				<th></th><!-- ボタン -->
+			</tr>
+		</thead>
+		<tbody>
+			{% for user_upload_manage in user_upload_manages %}
+				<tr>
+					<!-- チェックボックス -->
+					{% comment %} <td><input type="checkbox" value="{{ user_upload_manage.id }}" name="check[]"></td> {% endcomment %}
+					<td>{{forloop.counter}}</td>
+					<td>
+						{{ user_upload_manage.title }}
+					</td>
+					<td>
+						{% for file in user_upload_manage.file.all %}
+							{{ file.name | truncatechars:16 }}<br>
+						{% endfor %}
+					</td>
+					<td>{{ user_upload_manage.created_date }}</td>
+					<td>
+						{% if user_upload_manage.application_status == 1 %}
+							<p class="application">申請中</p>
+						{% elif user_upload_manage.application_status == 2 %}
+							<p class="awaiting_first_approval">一次承認待ち</p>
+						{% elif user_upload_manage.application_status == 3 %}
+							<p class="first_approved">一次承認済み</p>
+						{% elif user_upload_manage.application_status == 4 %}
+							<p class="awaiting_final_approval">最終承認待ち</p>
+						{% elif user_upload_manage.application_status == 5 %}
+							<p class="final_approved">最終承認済み</p>
+						{% elif user_upload_manage.application_status == 6 %}
+							<p class="canceled">取り消し</p>
+						{% else %}
+							<p class="returned">差戻し</p>
+						{% endif %}
+					</td>
+					<td>
+						<div class="d-flex justify-content-center align-items-center">
 
-		<input type="radio" name="tab" id="tab1" onclick="tabClick(1)" checked>
-		<label for="tab1">承認一覧
-			{% comment %} <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i> {% endcomment %}
-		</label>
-	
-		<input type="radio" name="tab" id="tab2" onclick="tabClick(2)">
-		<label for="tab2">
-			<a href="{% url 'draganddrop:group_list' %}" role="button" style="color:#666;">
-				申請一覧
-				{% comment %} <i class="fas fa-users fa-fw fa-lg" style="color:#666666;"></i></a> {% endcomment %}
-		</label>
+							<!-- ステータスが申請中、差戻し以外はボタンを無効化 -->
+							{% if user_upload_manage.application_status == 1 or user_upload_manage.application_status == 7 %}
+								<div class="mr-2 ml-auto bd-highlight">
+									<a class="btn my-btn-w7 btn-primary rounded-4" href="{% url 'draganddrop:step1_update' user_upload_manage.pk %}" role="button">
+										編集
+									</a>
+								</div>
+							{% else %}
+								<div class="mr-2 ml-auto bd-highlight">
+									<a class="btn my-btn-w7 btn-primary rounded-4" href="" role="button" style="pointer-events: none; opacity: 0.2;">
+										編集
+									</a>
+								</div>
+							{% endif %}
 
+							<!-- ステータスがキャンセル、一次承認済み、最終承認済みの場合はボタンを無効化 -->
+							{% if user_upload_manage.application_status == 6 or user_upload_manage.application_status == 3 or user_upload_manage.application_status == 5 %}
+								<button type="button" class="btn my-btn-w7 btn-outline-secondary mr-2" disabled>
+									取り消し
+								</button>
+							{% else %}
+								<button type="button" class="btn my-btn-w7 btn-outline-secondary mr-2" data-toggle="modal" data-target="#dl_del_task_modal" data-del_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk|get_download_table }}">
+									取り消し
+								</button>
+							{% endif %}
 
-
-		<div class="tabBody">
-			<p>
-				<div class="address_list_table">
-
-					{% comment %} <header class="address_lists_header d-flex">
-
-						<div class="mr-auto p-2 bd-highlight title_address_lists">
+							<button type="button" class="btn my-btn-w7 btn-outline-secondary" data-toggle="modal" data-target="#approval_log_modal{{forloop.counter}}" data-pk="{{ user_upload_manage.id }}">
+								申請履歴
+							</button>
 						</div>
 
-						<button type="button" class="btn my-btn-w9 my-btn-h4 mr-2 blue_btn rounded-0 sign_up_btn"
-							data-toggle="modal" data-target="#sign_up_modal">
-							アドレス帳登録
-						</button>
+					</td>
+				</tr>
 
-						<button type="button"
-							class="btn my-btn-w9 my-btn-h4 rounded-0 mr-2 sign_up_delete_btn"
-							data-toggle="modal" data-target="#address_multi_delete_modal" id="address_multi_delete_button"
-							disabled>一括削除
-						</button>
+				<!-- 取り消しモーダル -->
+				<div class="modal fade" id="dl_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+					<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+						<div class="modal-content center-modal">
+							<div class="modal-header">
+								<span class="modal-title home_modal_title">取り消し確認<i class="fa-solid fa-trash-can ml-1"></i></span>
+							</div>
+							<div class="modal-body">
 
-					</header> {% endcomment %}
+								<div class="mb-3 del-file-name-text">
+									<p>申請を取り消します。よろしいですか？</p>
+								</div>
 
-					<table id="myTable" class="display" style="width:100%">
-						<thead>
-							<tr>
-								<th><input type="checkbox" id="checkall"></th><!-- チェック -->
-								<th>申請件名</th>
-								<th>申請者名</th>
-								<th>部署名</th>
-								<th>申請日時</th>
-								<th>承認日時</th>
-								{% comment %} <th>次の承認者</th> {% endcomment %}
-								<th>ステータス</th>
-								<th></th><!-- ボタン -->
-							</tr>
-						</thead>
-						<tbody>
-							{% for user_approval_manage in user_approval_manages %}
-								<tr>
-									<!-- チェックボックス -->
-									<td><input type="checkbox" value="{{ user_approval_manage.id }}" name="check[]"></td>
-									<td>
-										<a class="" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}">{{ user_approval_manage.upload_mange.title }}</a>
-									</td>
-									<td>{{ user_approval_manage.application_user|get_operation_user_name }}</td>
-									<td>{{ user_approval_manage.application_user|get_user_invoice_dept_name }}</td>
-									<td>{{ user_approval_manage.application_date }}</td>
-									<td>{{ user_approval_manage.approval_date }}</td>
-									{% comment %} <td>佐藤 勇作</td> {% endcomment %}
-									<td>
-										{% if user_approval_manage.approval_status == 1 %}
-											<p class="application">未承認</p>
-										{% elif user_approval_manage.approval_status == 2 %}
-											<p class="first_approver">承認済み</p>
-										{% else %}
-											<p class="cancel_application">差戻し</p>
-										{% endif %}
-									</td>
-									<td class="text-right">
-										{% if user_approval_manage.approval_status == 2 %}
-											<button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="" data-pk="" disabled>
-												承認
-											</button>
-										{% else %}
-											<button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#approve_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}">
-												承認
-											</button>
-										{% endif %}
+								<div class="form-group">
+									<label class="mb-2" style="font-weight:bold;">コメント(任意)</label>
+									<textarea class="form-control cancel_comment" id="" cols="60" rows="4" placeholder="コメントを入力してください"></textarea>
+								</div>
 
-										{% if user_approval_manage.approval_status == 3 %}
-											<button type="button" class="btn btn-outline-secondary mb-2" data-toggle="modal" data-target="" data-pk="" disabled>
-												差戻し
-											</button>
-										{% else %}
-											<button type="button" class="btn btn-outline-secondary mb-2" data-toggle="modal" data-target="#decline_application_modal{{forloop.counter}}" data-pk="{{ user_approval_manage.id }}">
-												差戻し
-											</button>
-										{% endif %}
-									</td>
-								</tr>
+								<div class="alert alert-info">
+									入力したコメントは申請一覧の申請履歴に表示されます。
+								</div>
 
-
-									<!-- 承認モーダル -->
-									<div class="modal fade" id="approve_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-
-										<div class="modal-dialog modal-dialog-centered">
-
-											<div class="modal-content">
-
-												<div class="modal-header">
-
-													<h5 class="modal-title" id="myModalLabel" style="font-weight: bold; text">承認確認</h5>
-
-													<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-														<span aria-hidden="true">&times;</span>
-													</button>
-
-												</div>
-
-												<div class="modal-body">
-
-													<h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>「{{ user_approval_manage.upload_mange.title }}」を承認しますか？</h6>
-
-												</div>
-
-												<div class="modal-footer justify-content-center">
-
-													<form action="{% url 'draganddrop:approve' user_approval_manage.id %}" method="POST" id="delete-form">
-														{% csrf_token %}
-
-														<div class="btn_group">
-															<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
-															<button type="submit" class="my-btn my-btn-egypt-1 my-btn-w7">承認</button>
-														</div>
-
-													</form>
-
-												</div><!-- /.modal-footer -->
-
-											</div><!-- /.modal-content -->
-
-										</div><!-- /.modal-card -->
-
-									</div><!-- /.modal -->
-
-
-									<!-- 差戻しモーダル -->
-									<div class="modal fade" id="decline_application_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-
-										<div class="modal-dialog modal-dialog-centered">
-
-											<div class="modal-content">
-
-												<div class="modal-header">
-
-													<h5 class="modal-title" id="myModalLabel" style="font-weight: bold; text">差戻し確認</h5>
-
-													<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-														<span aria-hidden="true">&times;</span>
-													</button>
-
-												</div>
-
-												<div class="modal-body">
-
-													<h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>「{{ user_approval_manage.upload_mange.title }}」を差戻しますか？</h6>
-
-												</div>
-
-												<div class="modal-footer justify-content-center">
-
-													<form action="{% url 'draganddrop:decline_application' user_approval_manage.id %}" method="POST" id="delete-form">
-														{% csrf_token %}
-
-														<div class="btn_group">
-															<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
-															<button type="submit" class="my-btn my-btn-egypt-1 my-btn-w7">差戻す</button>
-														</div>
-
-													</form>
-
-												</div><!-- /.modal-footer -->
-
-											</div><!-- /.modal-content -->
-
-										</div><!-- /.modal-card -->
-
-									</div><!-- /.modal -->
-							{% endfor %}
-						</tbody>
-					</table>
+							</div>
+							<div class="modal-footer">
+								<button id="dl_del_task_modal_btn" type="button" class="del_task_button btn my-btn-w7 my-btn-h4 delete_btn rounded-0"
+									data-dismiss="modal">取り消す</button>
+								<button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+									data-dismiss="modal">キャンセル</button>
+							</div>
+						</div>
+					</div>
 				</div>
-			</p>
-		</div>
-	</div>
+
+
+				<!-- 申請履歴モーダル -->
+				<div class="modal fade" id="approval_log_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+					<div class="modal-dialog modal-xl modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="" style="font-weight: bold; text">申請履歴</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div class="bd-example">
+									<div class="approval_log_table">
+										<div class="d_thead">
+											<div class="d_tr">
+												<div class="d_th" style="width: 5px">No</div>
+												<div class="d_th" style="width: 50px">操作ユーザー</div>
+												<div class="d_th" style="width: 30px">操作</div>
+												<div class="d_th" style="width: 150px">メッセージ</div>
+												<div class="d_th" style="width: 20px">日時</div>
+											</div>
+										</div>
+										<div class="d_tbody">
+											{% for approval_log in user_upload_manage|get_approval_log %}
+												<div class="d_tr">
+													<div class="d_td">{{forloop.counter}}</div>
+													<div class="d_td">{{approval_log.approval_operation_user|get_operation_user_name}}</div>
+													<div class="d_td">
+														{% if approval_log.approval_operation_content == 1 %}
+															申請
+														{% elif approval_log.approval_operation_content == 2 %}
+															一次承認
+														{% elif approval_log.approval_operation_content == 3 %}
+															最終承認
+														{% elif approval_log.approval_operation_content == 4 %}
+															差戻し
+														{% else %}
+															取り消し
+														{% endif %}
+													</div>
+													<div class="d_td">
+														{% if approval_log.message %}
+															{{approval_log.message}}
+														{% else %}
+															--------------
+														{% endif %}
+													</div>
+													<div class="d_td">{{approval_log.approval_operation_date}}</div>
+												</div>
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer d-flex justify-content-center align-items-center">
+								<div class="btn_group">
+									<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+								</div>
+							</div><!-- /.modal-footer -->
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-card -->
+				</div><!-- /.modal -->
+			{% endfor %}
+		</tbody>
+	</table>
 </div>
+
+
+
 
 <!--戻るボタン-->
 <div class="d-flex flex-row mt-5 justify-content-center">
@@ -609,10 +893,22 @@
 
 <script>
 // -----------------
-// Data table
+//　承認一覧テーブル
 // -----------------
 $(document).ready(function(){
     $('#myTable').DataTable({
+        "language": {
+			url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
+        }
+    });
+});
+
+
+// -----------------
+// 申請一覧テーブル
+// -----------------
+$(document).ready(function(){
+    $('#shinsei_table').DataTable({
         "language": {
 			url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",
         }
@@ -622,40 +918,177 @@ $(document).ready(function(){
 
 
 <script>
-    // -----------------
-    // bootstrap-duallistbox
-    // -----------------
-    var demo1 = $('select[name="co_admin_user"]').bootstrapDualListbox({
-        moveOnSelect: true,
-        //sortByInputOrder: false,
-        filterTextClear:'全件表示',
-        filterPlaceHolder:'検索',
-        nonSelectedListLabel: 'ユーザー一覧',
-        selectedListLabel: '選択済みユーザー一覧',
-        preserveSelectionOnMove: 'moved',
-        moveAllLabel: '選択済みに全て移動',
-        removeAllLabel: '選択を全て解除',
-        infoText:'{0}件',
-        infoTextEmpty:'0件',
-        infoTextFiltered:'{1}件中{0}件表示',
+	// -----------------
+	// 承認モーダル
+	// -----------------
+    $(function() {
 
+		// ボタンをクリック
+		$('.approve_toggle').on('click', function(e) {
+			console.log("承認モーダルを開いたよ")
+
+			// クリックしたボタンのモーダルを開く
+			var elementID = $(this).attr("data-element");
+			$('#approve_modal' + elementID ).toggleClass('is-visible');
+
+            //モーダルを開いたボタンのdata-pkを取得
+			var approval_manage_id = $(this).attr("data-pk");
+			console.log("approval_manage_id", approval_manage_id)
+
+            // ボタンが押されたときの処理
+            $('.applove_button').off('click') //onイベントの重複イベントを削除
+            $('.applove_button').on('click', function() {
+
+                // モーダルを閉じる
+                $('#approve_modal' + elementID ).modal('hide');
+				$('#approve_modal' + elementID ).removeClass("is-visible");
+
+				// textarea入力された差戻しコメント取得
+				var approve_comment = $('#approve_comment' + elementID ).val();
+				console.log("承認コメント", approve_comment)
+
+
+                $.ajax({
+                    type:'POST',
+                    url:'/approve/' + approval_manage_id + '/',// 通信先のURL
+                    dataType: 'json',
+                    data: {
+						'approval_manage_id' : approval_manage_id,
+                        'approve_comment' : approve_comment,
+                    },
+
+                    // 処理が成功したときの処理
+                    success: function(data) {
+                        // reloadメソッドによりページをリロード
+						console.log("承認処理成功")
+						location.reload();
+					},
+					error: function () {
+						console.log('エラーが起きました');
+					},
+                });
+            });
+		});
     });
 
-    // 共同管理者権限 移動アイコン変更
-    $(function() {
-        var customSettings = $('select[name="co_admin_user"]').bootstrapDualListbox('getContainer');
-        // >>を削除
-        customSettings.find('.moveall').text('');
-        customSettings.find('.moveall').append('<i class="fas fa-long-arrow-alt-right"></i> <i class="fas fa-long-arrow-alt-right"></i>')
-        // <<を削除
-        customSettings.find('.removeall').text('');
-        customSettings.find('.removeall').append('<i class="fas fa-long-arrow-alt-left"></i> <i class="fas fa-long-arrow-alt-left"></i>')
+</script>
 
-        // 全ユーザー追加 / 削除ボタンを無効化
-        $(".btn.moveall").prop('disabled', true);
-        $(".btn.removeall").prop('disabled', true);
+
+<script>
+	// -----------------
+	// 差戻しモーダル
+	// -----------------
+    $(function() {
+
+		// ボタンをクリック
+		$('.returned_application_toggle').on('click', function(e) {
+			console.log("差戻しモーダルを開いたよ")
+
+			// クリックしたボタンのモーダルを開く
+			var elementID = $(this).attr("data-element");
+			$('#returned_application_modal' + elementID ).toggleClass('is-visible');
+
+            //モーダルを開いたボタンのdata-pkを取得
+			var approval_manage_id = $(this).attr("data-pk");
+			console.log("approval_manage_id", approval_manage_id)
+
+            // ボタンが押されたときの処理
+            $('.returned_application_button').off('click') //onイベントの重複イベントを削除
+            $('.returned_application_button').on('click', function() {
+
+                // モーダルを閉じる
+                $('#returned_application_modal' + elementID ).modal('hide');
+				$('#returned_application_modal' + elementID ).removeClass("is-visible");
+
+				// textarea入力された差戻しコメント取得
+				var returned_comment = $('#returned_comment' + elementID ).val();
+				console.log("差戻しコメント", returned_comment)
+
+
+                $.ajax({
+                    type:'POST',
+                    url:'/returned_application/' + approval_manage_id + '/',// 通信先のURL
+                    dataType: 'json',
+                    data: {
+						'approval_manage_id' : approval_manage_id,
+                        'returned_comment' : returned_comment,
+                    },
+
+                    // 処理が成功したときの処理
+                    success: function(data) {
+                        // reloadメソッドによりページをリロード
+						console.log("差戻し処理成功")
+						location.reload();
+					},
+					error: function () {
+						console.log('エラーが起きました');
+					},
+                });
+            });
+		});
     });
 </script>
 
+
+<script>
+	// -----------------
+	// 取り消しモーダル
+	// -----------------
+
+	var delete_id = ""
+	var delete_name = ""
+
+	$('#dl_del_task_modal').off('show.bs.modal');
+	$('#dl_del_task_modal').on('show.bs.modal', function (event) {
+
+		console.log("取り消しモーダル開いたよ")
+
+		// 行のIDを取得
+		var button = $(event.relatedTarget)
+		var delete_id = button.data('value') /* downloadtableのid */
+		var delete_name = button.data('del_name') /* ファイルタイトル */
+		console.log("delete_id", delete_id)
+		console.log("delete_name", delete_name)
+
+		{% comment %} var elementID = $(this).attr("data-element");
+		console.log("elementID", elementID) {% endcomment %}
+
+		var modal = $(this);
+		modal.find('.del-file-name-text').text(delete_name + "　" + "の申請を取り消します。よろしいですか？");
+
+		$('#dl_del_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+		$('#dl_del_task_modal_btn').on('click', function () {
+
+			// textarea入力された差戻しコメント取得
+			var cancel_comment = modal.find('.cancel_comment').val();
+			console.log("取り消しコメント", cancel_comment)
+
+			$.ajax({
+				type: "POST",
+				url: '{% url "draganddrop:downloadtabledelete" %}',
+				data: {
+					'delete_id': delete_id,
+					'delete_name': delete_name,
+					'cancel_comment': cancel_comment
+				},
+				dataType: 'json',
+				success: function (data) {
+					console.log("差戻し処理成功")
+					$('#result_toast').on('show.bs.toast', function (e) {
+					var toast = $(this);
+					toast.find('.toast-body').addClass('alert-success');
+					toast.find('.toast-body').text("申請を取り消しました");
+					});
+					$('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+					setTimeout(function(){
+						window.location.href = "./";},1*1000);
+				},
+				error: function () {
+					console.log('エラーが起きました');
+				},
+			});
+		});
+	});
+</script>
 
 {% endblock %}

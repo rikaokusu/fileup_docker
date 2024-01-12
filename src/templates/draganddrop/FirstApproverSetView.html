@@ -271,12 +271,14 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
         {% comment %} <p class="cp_p_title mb-0">・共同管理者権限を他のユーザーに割り当てることができます。</p>
         <p class="cp_p_title mb-3">・共同管理者に設定できるユーザー数は3名までです。</p> {% endcomment %}
 
-        {% if first_approver_count < 3 or first_approver_count == 0 %}
+        {% comment %} {% if first_approver_count < 3 or first_approver_count == 0 %} {% endcomment %}
+        {% if first_approver_count < 10 or first_approver_count == 0 %}
             <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2">
                 <span>第一承認者を設定する</span>
             </button>
         {% else %}
-            <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2" style="opacity: 0.33;" title="第一承認者に設定できるユーザー数は3名までです。" disabled>
+            {% comment %} <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2" style="opacity: 0.33;" title="第一承認者に設定できるユーザー数は3名までです。" disabled> {% endcomment %}
+            <button type="button" class="btn01 dropdown-item" data-toggle="modal" data-target="#exampleModal_2" style="opacity: 0.33;" title="第一承認者に設定できるユーザー数は10名までです。" disabled>
                 <span>第一承認者を設定する</span>
             </button>
         {% endif %}
@@ -408,7 +410,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         <div class="d-flex">
                             <p style="font-size: 16px; margin-right: auto;">
                                 ・第一承認者に設定したいユーザーを選択してください。<br>
-                                ・選択できる第一承認者は最大3人までです<br>
+                                {% comment %} ・選択できる第一承認者は最大3人までです<br> {% endcomment %}
+                                ・選択できる第一承認者は最大10人までです<br>
                                 ・第二承認者に設定されたユーザーを第一承認者に設定することはできません。
                             </p>
 
@@ -539,6 +542,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             $(".items").html(colCount);
 
             // 選択可能な共同管理者の人数
+            {% comment %} var i = 3; {% endcomment %}
             var i = 3;
             $(".number").html(i - colCount);
 

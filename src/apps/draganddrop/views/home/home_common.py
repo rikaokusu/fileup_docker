@@ -6,7 +6,7 @@ from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File
 from draganddrop.models import Notification,Read
-from draganddrop.models import ApprovalWorkflow
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
 from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
 import datetime
@@ -126,29 +126,72 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        """承認ワークフロー設定"""
+        # ユーザーのApprovalWorkflowを取得
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+
+        # 存在しなければ作成　※デフォルトの設定は承認ワークフローを"使用しない"
+        if not approval_workflow:
+            approval_workflow = ApprovalWorkflow.objects.create(
+                reg_user = self.request.user.id,
+                reg_user_company = self.request.user.company.id,
+                registration_date = datetime.datetime.now()
+            )
+            approval_workflow.save()
+
+        context["is_approval_workflow"] = approval_workflow.is_approval_workflow
+
+        """一次承認者"""
+        first_approver = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id).first()
+        context["first_approver"] = first_approver
+
+        """二次承認者"""
+        second_approver = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id).first()
+
         """送信テーブル"""
         # 通常アップロード用
         user=self.request.user.id
-        upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+
+        # 承認ワークフローを使用する場合
+        if approval_workflow.is_approval_workflow == 1:
+            # print("------------------- 承認ワークフローを使用する")
+            # 一次承認者と二次承認者が設定されている場合
+            if first_approver and second_approver:
+                # print("------------------- 一次承認者と二次承認者が設定されている")
+                upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
+            # 一次承認者しか設定されていない場合
+            else:
+                # print("------------------- 一次承認者しか設定されていない")
+                upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
+        else:
+            # print("------------------- 承認ワークフローを使用しない")
+            upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
+
         context["upload_manages"] = upload_manages
 
         # URLアップロード用
         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["url_upload_manages"] = url_upload_manages
-        
+
         # OTPアップロード用
         otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["otp_upload_manages"] = otp_upload_manages
 
         """受信テーブル"""
         # ダウンロード用
-        upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+        if approval_workflow.is_approval_workflow == 1:
+            if first_approver and second_approver:
+                upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=5)
+            else:
+                upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=3)
+        else:
+            upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["upload_manage_for_dest_users"] = upload_manage_for_dest_users
 
         # URLダウンロード用
         url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["url_upload_manage_for_dest_users"] = url_upload_manage_for_dest_users
-        
+
         # OTPダウンロード用
         otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["otp_upload_manage_for_dest_users"] = otp_upload_manage_for_dest_users
@@ -169,18 +212,6 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         """会社毎のレコード数取得"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
         context["number_of_company_upload_manage"] = number_of_company_upload_manage
-
-        # ユーザーのApprovalWorkflowを取得
-        user_approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
-        print("----------------------　TOPページ", user_approval_workflow)
-        # 存在しなければ作成
-        if not user_approval_workflow:
-            user_approval_workflow = ApprovalWorkflow.objects.create(
-                reg_user = self.request.user.id,
-                reg_user_company = self.request.user.company.id,
-                registration_date = datetime.datetime.now()
-            )
-            user_approval_workflow.save()
 
         # セッションに「_(アンダースコア)以外のセッション情報があった場合削除
         for key in list(self.request.session.keys()):

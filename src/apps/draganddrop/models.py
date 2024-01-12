@@ -88,8 +88,11 @@ class Filemodel(models.Model):
 APPLICATION_STATUS_CHOICE = (
     (1, '申請中'),
     (2, '一次承認待ち'),
-    (3, '最終承認待ち'),
-    (4, 'キャンセル'),
+    (3, '一次承認済み'),
+    (4, '最終承認待ち'),
+    (5, '最終承認済み'),
+    (6, 'キャンセル'),
+    (7, '差戻し')
 )
 
 class UploadManage(models.Model):
@@ -107,7 +110,7 @@ class UploadManage(models.Model):
     dest_user_mail7 = models.EmailField(max_length=100, null=True, blank=True)
     dest_user_mail8 = models.EmailField(max_length=100, null=True, blank=True)
     dest_user_group = models.ManyToManyField(Group, blank=True)
-    company = models.CharField(max_length=245, blank=True, null=True) 
+    company = models.CharField(max_length=245, blank=True, null=True)
     created_user = models.CharField(max_length=245, blank=True, null=True)
     created_date = models.DateTimeField(verbose_name='開始日時', blank=True, null=True,)
     end_date = models.DateTimeField(verbose_name='終了日時', blank=False, null=True)
@@ -118,6 +121,10 @@ class UploadManage(models.Model):
     message = models.CharField(max_length=140, null=True, blank=True)
     # 申請ステータス
     application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 承認日時
+    approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+    # 論理削除
+    is_rogical_deleted = models.BooleanField('論理削除', default=False)
 
     @property
     def is_past_due(self):
@@ -431,7 +438,7 @@ class ApprovalWorkflow(models.Model):
     registration_date = models.DateTimeField('登録日', default=timezone.now)
     # 承認ワークフロー
     is_approval_workflow = models.IntegerField(
-        verbose_name='承認ワークフロー', default=0, null=True, blank=True, choices=IS_APPROVA_WORKFLOW)
+        verbose_name='承認ワークフロー', default=2, null=True, blank=True, choices=IS_APPROVA_WORKFLOW)
     # 承認形式
     approval_format = models.IntegerField(
         verbose_name='承認形式', default=0, null=True, blank=True, choices=APPROVAL_FORMAT)
@@ -487,8 +494,10 @@ class ApprovalOperationLog(models.Model):
 
 APPLOVAL_STATUS_CHOICE = (
     (1, '未承認'),
-    (2, '承認済み'),
-    (3, '差戻し'),
+    (2, '一次承認済み'),
+    (3, '最終承認済み'),
+    (4, '差戻し'),
+    (5, 'キャンセル'),
 )
 
 class ApprovalManage(models.Model):
@@ -512,6 +521,37 @@ class ApprovalManage(models.Model):
     second_approver = models.CharField('二次承認者', max_length=500, blank=True, null=True)
     # 承認日時
     approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+    # 差戻し日時
+    returned_date = models.DateTimeField('差戻し日時',  blank=True, null=True)
+
+
+APPROVAL_OPERATION_CONTENT = (
+    (1, '申請'),
+    (2, '一次承認'),
+    (3, '最終承認'),
+    (4, '差戻し'),
+    (5, 'キャンセル'),
+)
+
+"""
+承認履歴
+"""
+class ApprovalLog(models.Model):
+    # ApprovalManage
+    approval_manage = models.ForeignKey(ApprovalManage, on_delete=models.CASCADE, null=True, related_name='approval_manage')
+    # 操作ユーザー
+    approval_operation_user = models.CharField('操作ユーザー', max_length=255, blank=True, null=True)
+    # 操作ユーザーの会社のID
+    approval_operation_user_company_id = models.CharField(max_length=500, verbose_name="操作ユーザーの会社のID", null=True, blank=True)
+    # 操作日時
+    approval_operation_date = models.DateTimeField('操作日時', default=timezone.now)
+    # 操作
+    approval_operation_content = models.IntegerField(
+        verbose_name='操作', default=0, null=True, blank=True, choices=APPROVAL_OPERATION_CONTENT)
+    # メッセージ
+    message = models.TextField('メッセージ', blank=True, null=True)
+
+
 
 
 ##############  操作ログ

@@ -192,6 +192,7 @@ for btn
             </div>
 
             <p class="cp_p_title m-0 pb-3">・【必須】がついている項目は必須です。必ず入力してください。</p>
+            <p class="cp_p_title m-0 pb-3">・申請中のファイルがある状態で承認ワークフローを「使用する」から「使用しない」に変更した場合、申請中のファイルのステータスは承認済みに変更されます。</p>
 
             <!-- 存在確認のエラー -->
             <div>
@@ -238,7 +239,7 @@ for btn
                                     </div>
                                 </th>
                                 <td colspan="5">
-                                    {% render_field form.approval_format class="form-control"  placeholder="" %}
+                                    {% render_field form.approval_format class="form-control" placeholder="" %}
                                 </td>
                             </tr>
 

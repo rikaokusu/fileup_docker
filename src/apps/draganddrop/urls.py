@@ -252,7 +252,7 @@ urlpatterns = [
      # 承認
      path('approve/<uuid:pk>/', approval.ApproveView.as_view(), name='approve'),
      # 差し戻し
-     path('decline_application/<uuid:pk>/', approval.DeclineApplicationView.as_view(), name='decline_application'),
+     path('returned_application/<uuid:pk>/', approval.DeclineApplicationView.as_view(), name='returned_application'),
 
 
      ##################################
