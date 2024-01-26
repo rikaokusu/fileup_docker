@@ -124,64 +124,13 @@
                 <div class="step1_label_wrapper mb-3">
                     <h2 class="text-left step1_upload_box_title_2">2 受信ユーザー</h2>
                     <span class="required_label def">必須</span>
-                    {% comment %} <h3>・受信ユーザーをアドレス帳から選択するか、メールアドレスを直接入力して下さい。</h3> {% endcomment %}
                     <h3>・現在ログイン中のユーザーが対象です。</h3>
                 </div>
+            </div>            
+            <div class="mail-data" data-mail="{{ user_mail }}">
+                {% render_field form.dest_user class="form-control step1_guestul_mail step1_guestul_mail step1_mail" placeholder="1"%}
             </div>
-
-            <table class="table table-borderless">
-                <tr>
-                    <td class="td_step1_upload_mail">
-                        <!---mail1-5-->
-                        <div>
-                            <div class="d-flex">
-                                <div>
-                                    <button type="button" id="address_book_modal_btn"
-                                    class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
-                                    data-target="#address_book_modal" style="pointer-events: none;" readonly>アドレス帳</button>
-                                </div>
-                                <div class="ml-3">
-                                    <button type="button" id="group_book_modal_btn"
-                                    class="btn btn-secondary rounded-0 step1_dest_user_select_btn step1_url_sign_btn" data-toggle="modal"
-                                    data-target="#group_book_modal" style="pointer-events: none;" readonly>グループ</button>
-                                </div>
-                            </div>
-                            <div id="step1_upload_error_message" style="visibility:hidden"></div>
-                            <div class="mail-data" data-mail="{{ user_mail }}">
-                                {% render_field form.dest_user_mail1 class="form-control step1_guestul_mail step1_guestul_mail1 step1_mail" placeholder="1"%}
-                            </div>
-                            <div>
-                                {% render_field form.dest_user_mail2|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_2" placeholder="2"%}
-                            </div>
-                            <div>
-                                {% render_field form.dest_user_mail3|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_3" placeholder="3"%}
-                            </div>
-                            <div>
-                                {% render_field form.dest_user_mail4|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_4" placeholder="4"%}
-                            </div>
-
-                        </div>
-                    </td>
-
-
-                    <td>
-                        <!---mail6-8-->
-                        <div>
-                            {% render_field form.dest_user_mail5|append_attr:"readonly:readonly" class="form-control step1_guestul_mail step1_guestul_mail6 row_5" placeholder="5"%}
-                        </div>
-                        <div>
-                            {% render_field form.dest_user_mail6|append_attr:"readonly:readonly" class="form-control step1_guestul_mail  row_6" placeholder="6"%}
-                        </div>
-                        <div>
-                            {% render_field form.dest_user_mail7|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_7" placeholder="7"%}
-                        </div>
-                        <div>
-                            {% render_field form.dest_user_mail8|append_attr:"readonly:readonly" class="form-control step1_guestul_mail row_8" placeholder="8"%}
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
+            </h3>
         </div>
         <!---box4_upload閉じタグ--->
 
@@ -773,23 +722,12 @@ $('#confirm_modal').on('show.bs.modal', function () {
 
     //mail_listに1-10のメールを格納する。
     var mail_address = {};
-    var dest_user_mail1 = $('#id_dest_user_mail1').val()
-    /*var dest_user_mail2 = $('#id_dest_user_mail2').val()
-    var dest_user_mail3 = $('#id_dest_user_mail3').val()
-    var dest_user_mail4 = $('#id_dest_user_mail4').val()
-    var dest_user_mail5 = $('#id_dest_user_mail5').val()
-    var dest_user_mail6 = $('#id_dest_user_mail6').val()
-    var dest_user_mail7 = $('#id_dest_user_mail7').val()
-    var dest_user_mail8 = $('#id_dest_user_mail8').val()*/
+    var dest_user = $('#id_dest_user').val()
+    //var dest_user_mail2 = $('#id_dest_user_mail2').val()
 
-    if (dest_user_mail1) {mail_lists.push(dest_user_mail1)} 
-    /*if (dest_user_mail2) {mail_lists.push(dest_user_mail2)} 
-    if (dest_user_mail3) {mail_lists.push(dest_user_mail3)} 
-    if (dest_user_mail4) {mail_lists.push(dest_user_mail4)} 
-    if (dest_user_mail5) {mail_lists.push(dest_user_mail5)} 
-    if (dest_user_mail6) {mail_lists.push(dest_user_mail6)} 
-    if (dest_user_mail7) {mail_lists.push(dest_user_mail7)} 
-    if (dest_user_mail8) {mail_lists.push(dest_user_mail8)}*/
+    if (dest_user) {mail_lists.push(dest_user)} 
+    //if (dest_user_mail2) {mail_lists.push(dest_user_mail2)} 
+
     
     //初期化
     var all_mail_address = '';
@@ -856,13 +794,13 @@ $('#confirm_modal').on('show.bs.modal', function () {
 // 次へボタンの制御
 // ------------------------------------------
 {% comment %} $("#id_title, #id_dest_user_mail1, #id_end_date, #dest_user_select_button, #dest_user_group_select_button, .step1_guestul_mail").on('input dp.change click keyup', function () {  {% endcomment %}
-$("#id_title, #id_dest_user_mail1, #id_guest_mail, #id_guest_name").on('input dp.change click keyup', function () { 
+$("#id_title, #id_dest_user, #id_guest_mail, #id_guest_name").on('input dp.change click keyup', function () { 
     // 送信先の合計を取得
     all_dest_user_length = "";
     all_dest_user_length = user_lists.length + group_lists.length;
     var count = $('.help-inline:visible').length + $('.dest_user_duplicate_error').length;
     //if (!$("#id_title").val() == '' && (!$("#id_dest_user_mail1").val() == '') && (!$("#id_end_date").val() == '') && count == 0) { 
-    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && !$("#id_guest_name").val() == '' && (!$("#id_dest_user_mail1").val() == '') && count == 0) {
+    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && !$("#id_guest_name").val() == '' && (!$("#id_dest_user").val() == '') && count == 0) {
         var title_name = $('#id_title').val()
         var guest_mail = $('#id_guest_mail').val()
         var guest_name = $('#id_guest_name').val()
@@ -889,7 +827,7 @@ $(function(){
     all_dest_user_length = "";
     all_dest_user_length = user_lists.length + group_lists.length;
     var count = $('.help-inline:visible').length + $('.dest_user_duplicate_error').length;
-    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && (!$("#id_dest_user_mail1").val() == '') && count == 0) { 
+    if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && (!$("#id_dest_user").val() == '') && count == 0) { 
         $("#next_btn").prop('disabled', false); 
     }else if (!$("#id_title").val() == '' && !$("#id_guest_mail").val() == '' && all_dest_user_length >= 1 && count == 0) { 
         $("#next_btn").prop('disabled', false); 
@@ -902,15 +840,15 @@ $(function(){
 // メールアドレス入力フォームを有効にさせる処理。
 // ------------------------------------------
 var user_mail = $('.mail-data').data('mail')
-$('#id_dest_user_mail1').val(user_mail)
+$('#id_dest_user').val(user_mail)
 
 // 1行目
-$("#id_dest_user_mail1, #id_dest_user_mail2").on('input', function () { //id_dest_user_mail1に入力されたら動く処理
-    if (!$("#id_dest_user_mail1").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) { //id_dest_user_mail1か2に値が入っていた場合
+$("#id_dest_user, #id_dest_user_mail2").on('input', function () { //id_dest_userに入力されたら動く処理
+    if (!$("#id_dest_user").val() == ''|| (!$("#id_dest_user_mail2").val() == '')) { //id_dest_user_mail1か2に値が入っていた場合
         //$('.row_2').attr('readonly', false);
         $(".step1_url_confirm_btn").css("display", "block")
     
-    }else if ($("#id_dest_user_mail1").val() == ''&& user_lists.length >= 11) { ////id_dest_user_mail1は空だがアドレス帳選択ユーザーが11名以上選択された場合
+    }else if ($("#id_dest_user").val() == ''&& user_lists.length >= 11) { ////id_dest_user_mail1は空だがアドレス帳選択ユーザーが11名以上選択された場合
         $('.row_2').attr('readonly', true); //2行目の入力フォームを編集不可にする
         $(".step1_url_confirm_btn").css("display", "block"); //全送信先確認モーダルを表示させる     
 
@@ -928,83 +866,6 @@ $("#id_dest_user_mail1, #id_dest_user_mail2").on('input', function () { //id_des
     $('.row_2').attr('readonly', true);
     $(".step1_url_confirm_btn").css("display", "none")
 }
-
-
-// 2行目
-$("#id_dest_user_mail2, #id_dest_user_mail3").on('input', function () {
-    if (!$("#id_dest_user_mail2").val() == ''|| (!$("#id_dest_user_mail3").val() == '')) {
-        $('.row_3').attr('readonly', false);
-    } else {
-        $('.row_3').attr('readonly', true);
-    }
-});
-
-// 3行目
-$("#id_dest_user_mail3, #id_dest_user_mail4").on('input', function () {
-    if (!$("#id_dest_user_mail3").val() == ''|| (!$("#id_dest_user_mail4").val() == '')) {
-        $('.row_4').attr('readonly', false);
-    } else {
-        $('.row_4').attr('readonly', true);
-    }
-});
-
-// 4行目
-$("#id_dest_user_mail4, #id_dest_user_mail5").on('input', function () {
-    if (!$("#id_dest_user_mail4").val() == ''|| (!$("#id_dest_user_mail5").val() == '')) {
-        $('.row_5').attr('readonly', false);
-    } else {
-        $('.row_5').attr('readonly', true);
-    }
-});
-
-// 5行目
-$("#id_dest_user_mail5, #id_dest_user_mail6").on('input', function () {
-    if (!$("#id_dest_user_mail5").val() == ''|| (!$("#id_dest_user_mail6").val() == '')) {
-        $('.row_6').attr('readonly', false);
-    } else {
-        $('.row_6').attr('readonly', true);
-    }
-});
-
-// 6行目
-$("#id_dest_user_mail6, #id_dest_user_mail7").on('input', function () {
-    if (!$("#id_dest_user_mail6").val() == ''|| (!$("#id_dest_user_mail7").val() == '')) {
-        $('.row_7').attr('readonly', false);
-    } else {
-        $('.row_7').attr('readonly', true);
-    }
-});
-
-// 7行目
-$("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
-    if (!$("#id_dest_user_mail7").val() == ''|| (!$("#id_dest_user_mail8").val() == '')) {
-        $('.row_8').attr('readonly', false);
-    } else {
-        $('.row_8').attr('readonly', true);
-    }
-}); {% endcomment %}
-
-// -----------------
-// メールアドレス欄の空きを詰める処理
-// -----------------
-{% comment %} $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
-    var m_list = []
-    var m_count = 0
-    var count = 1;
-    
-    //8回回るまで処理を行う
-    while(count<=8){
-        var id_num = String(count)
-        var id_next = String(count + 1)
-        if($(`#id_dest_user_mail${id_num}`).val() == '' && !$(`#id_dest_user_mail${id_next}`).val() == ''){
-            $(`#id_dest_user_mail${id_num}`).val($(`#id_dest_user_mail${id_next}`).val())
-            $(`#id_dest_user_mail${id_next}`).val("")
-        }else if($(`#id_dest_user_mail${id_num}`).val() == '' && $(`#id_dest_user_mail${id_next}`).val() == ''){
-            $(`.row_${id_next}`).attr('readonly', true);
-        };
-        count++;
-    }
-}); {% endcomment %}
 
 // -----------------
 // validate
@@ -1059,36 +920,6 @@ $(function () {
 
             },
             dest_user_mail2: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail3: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail4: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail5: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail6: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail7: {
-                email: '正しいメールアドレスを入力してください。',
-                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
-            },
-            dest_user_mail8: {
                 email: '正しいメールアドレスを入力してください。',
                 CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
 
@@ -1356,20 +1187,20 @@ function showDestUserAtBox() {
     // 受信ユーザーの合計を取得
     all_dest_user_length = user_lists.length + group_lists.length
     // 合計の数ごとにboxの表示件数と全受信ユーザーモーダルの表示を制御
-    if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && $("#id_dest_user_mail1").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っていない時
+    if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && $("#id_dest_user").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っていない時
         $("#all_dest_user_lists").html(checked_user);
         $(".step1_url_confirm_btn").css("display", "none"); //全受信ユーザー確認モーダルを表示させない
         
-    }else if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && !$("#id_dest_user_mail1").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っている時
+    }else if (all_dest_user_length >= 1 && all_dest_user_length <= 5 && !$("#id_dest_user").val() == '') { //アドレス帳からの選択数が1以上5以下で直接入力に値が入っている時
         $("#all_dest_user_lists").html(checked_user);
         $(".step1_url_confirm_btn").css("display", "block");//全受信ユーザー確認モーダルを表示させる
 
         //10以下の場合
-    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 8 && $("#id_dest_user_mail1").val() == '') {
+    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 8 && $("#id_dest_user").val() == '') {
         $("#all_dest_user_lists").html(checked_user);
         $(".step1_url_confirm_btn").css("display", "none");
         
-    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 8 && !$("#id_dest_user_mail1").val() == '') {
+    } else if (all_dest_user_length >= 1 && all_dest_user_length <= 8 && !$("#id_dest_user").val() == '') {
         $("#all_dest_user_lists").html(checked_user);
         $(".step1_url_confirm_btn").css("display", "block");
 
@@ -1379,7 +1210,7 @@ function showDestUserAtBox() {
         $(".step1_url_confirm_btn").css("display", "block");
 
         //受信ユーザーが0の場合全受信ユーザー確認モーダルを非表示にする。
-    } else if (all_dest_user_length == 0 && $("#id_dest_user_mail1").val() == '') {
+    } else if (all_dest_user_length == 0 && $("#id_dest_user").val() == '') {
         $(".step1_url_confirm_btn").css("display", "none");
     }
 }; 

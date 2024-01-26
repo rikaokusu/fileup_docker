@@ -251,7 +251,6 @@ class Step1(FormView, CommonView):
                 dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
             else:
                 dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
-            print('だれいる？？？',dest_user_all_list)
         for group in dest_user_group_qs:
             dest_user_all_list.append(group.group_name + " " + "2")
 
@@ -289,11 +288,9 @@ class Step1(FormView, CommonView):
         self.request.session['dest_user_mail6'] = dest_user_mail6
         self.request.session['dest_user_mail7'] = dest_user_mail7
         self.request.session['dest_user_mail8'] = dest_user_mail8
-        print('宛先だれですか？？せーぶまえ',dest_user_all_list)
         # 保存
         upload_manage.save()
         upload_manage_id = str(upload_manage.id)
-        print('宛先だれですか？？せーぶあと',dest_user_all_list)
 
         # 生成されたDBの対象行のIDをセッションに保存しておく
         self.request.session['upload_manage_id'] = upload_manage_id
@@ -323,7 +320,7 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
             context["del_file_pk"] = self.request.session['del_file_pk']
         else:
             context["del_file_pk"] = None
-        
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -368,7 +365,6 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
             # オブジェクトの取得
             files = Filemodel.objects.filter(pk__in=up_file_id_int)
-            print("ふぁいるずpk__in=のやつ",files)
 
             # タスクとファイルを紐付ける
             for file in files:
@@ -387,15 +383,14 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                 file_path = urllib.parse.unquote(file.upload.url)
                 print('ふぁいるぱす',file_path)
                 # ファイルパスを分割してファイル名だけ取得
-                # file_name = file_path.split('/', 2)[2]
                 file_name = file_path.split('/', 3)[3]
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-
+                print('パス取れた？？？',path)
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
                 if file_name_without_dot == "txt":
-                    path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                    # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                     with open(path) as f:
                         s = f.read()
 

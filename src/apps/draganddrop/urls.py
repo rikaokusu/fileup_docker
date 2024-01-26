@@ -37,11 +37,13 @@ urlpatterns = [
      path('file_download_zip/<int:pk>/', file_download.FileDownloadZipView.as_view(), name='file_download_zip'),
      path('url_file_download_zip/<int:pk>/', file_download.UrlFileDownloadZipView.as_view(), name='url_file_download_zip'),
      path('otp_file_download_zip/<int:pk>/', file_download.OTPFileDownloadZipView.as_view(), name='otp_file_download_zip'),
+     path('guest_file_download_zip/<int:pk>/', file_download.GuestFileDownloadZipView.as_view(), name='guest_file_download_zip'),
 
      # ファイルダウンロード時にテーブルを更新する処理
      path('filedownloadstatus/', file_download.FileDownloadStatus.as_view(), name='filedownloadstatus'),
      path('url_file_download_status/', file_download.UrlFileDownloadStatus.as_view(), name='url_file_download_status'),
      path('otp_file_download_status/', file_download.OTPFileDownloadStatus.as_view(), name='otp_file_download_status'),
+     path('guest_file_download_status/', file_download.GuestFileDownloadStatus.as_view(), name='guest_file_download_status'),
 
      ## send_table.py ##
      # 送信テーブルファイルアップロード単数削除 
@@ -68,6 +70,8 @@ urlpatterns = [
      path('urldownloadtabledelete/', download_table.UrlDownloadTableDeleteAjaxView.as_view(), name='urldownloadtabledelete'),
      # 受信テーブル OTP単数削除(ゴミ箱へ)
      path('otpdownloadtabledelete/', download_table.OTPDownloadTableDeleteAjaxView.as_view(), name='otpdownloadtabledelete'),
+     # 受信テーブル ゲストアップロード単数削除(ゴミ箱へ)
+     path('guestdownloadtabledelete/', download_table.GuestDownloadTableDeleteAjaxView.as_view(), name='guestdownloadtabledelete'),
      # 受信テーブル 一括削除(ゴミ箱へ)  
      path('multi_dl_delete/', download_table.MultiDownloadTableDeleteAjaxView.as_view(), name='multi_dl_delete'),
      # ゴミ箱 復元 
@@ -78,6 +82,8 @@ urlpatterns = [
      path('urltrashdelete/', download_table.UrlTrashDeleteAjaxView.as_view(),name='urltrashdelete'),
      # ゴミ箱 OTP 単数削除
      path('otptrashdelete/', download_table.OTPTrashDeleteAjaxView.as_view(),name='otptrashdelete'),
+     # ゴミ箱 ゲストアップロード 単数削除
+     path('guesttrashdelete/', download_table.GuestTrashDeleteAjaxView.as_view(),name='guesttrashdelete'),
      # ゴミ箱 一括削除
      path('multidelete/', download_table.MultiDeleteAjaxView.as_view(), name='multidelete'),
      

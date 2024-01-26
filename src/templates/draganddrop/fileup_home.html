@@ -580,7 +580,7 @@
 
                     {% else %}
                     <span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="top">
-                        <a button type="button" class="menu_btn_color menu_btn url_zip_download"
+                        <a button type="button" class="menu_btn_color menu_btn otp_zip_download"
                             data-downloadtable_id="{{ otp_dest_user_data.id }}"
                             onclick="window.location.href='{% url 'draganddrop:otp_file_download_zip' otp_dest_user_data.id %}'">
                             <button class="fas_button_download"></button>
@@ -662,6 +662,200 @@
 
 
             <!-------------------------OTP共有 閉じ---------------------------------->
+
+            <!-------------------------受信テーブル ゲストアップロード---------------------------------->
+            {% if guest_upload_manage_for_dest_users %}
+
+            {% for guest_dest_user_data in guest_upload_manage_for_dest_users %}
+            <tr {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"
+            {% elif not guest_dest_user_data.guest_upload_manage.uploaded_date %} style="background-color:#efefef;" {% endif %}>
+
+                <!-- チェックボックス -->
+                <td>
+                    <input type="checkbox" name="url_dest_user_ids" value="{{guest_dest_user_data.id}}" id="url_dest_data" class="url_dest_data">
+                </td>
+
+                <!-- タイトル -->
+                <td>
+                    {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="file_del_tag">ファイル削除済み</p>
+                    {% comment %} {% elif  guest_dest_user_data.guest_upload_manage.end_date|is_past_due %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
+                    <a >URL</a>
+                    <p class="expired_tag">期限切れ</p> {% endcomment %}
+                    {% else %}
+                    <span class="file_title" data-toggle="tooltip" data-placement="right"
+                        title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
+                    {% comment %} <a href="{{guest_dest_user_data.guest_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a> {% endcomment %}
+                    {% comment %} <span class="material-icons copy_button" data-url="{{guest_dest_user_data.guest_upload_manage.url}}" style="font-size:15px;">content_copy</span> {% endcomment %}
+                    {% endif %}
+                </td>
+
+
+                <!-- 受信データ -->
+                <td>
+                    {% for file in guest_dest_user_data.guest_upload_manage.file.all %}
+                        {% comment %} {% if guest_dest_user_data.guest_upload_manage.end_date|is_past_due %}
+                            <span class="past_file" data-toggle="tooltip" data-guest_downloadtable_id="{{ guestdownloadtable.id }}"
+                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br> {% endcomment %}
+                        {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}
+                            <del class="past_file" data-toggle="tooltip" data-guest_downloadtable_id="{{ guestdownloadtable.id }}"
+                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+                        {% elif not guest_dest_user_data.guest_upload_manage.uploaded_date %}
+                            <span class="past_file" data-toggle="tooltip"
+                                data-placement="right" title="アップロード前です">アップロード前</span><br>        
+                        {% elif guest_dest_user_data.guest_upload_download_table.all|url_dl_count:file.id >= guest_dest_user_data.guest_upload_manage.dl_limit %}
+                            <span class="past_file" data-toggle="tooltip" data-guest_downloadtable_id="{{ guestdownloadtable.id }}"
+                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</span><br>
+                        
+                        {% else %}
+
+                            {% with extention=file.name|get_extention %}
+                            <a href="{{ file.upload.url }}" id="{{ file.id }}" class="guestdownloadtable"
+                                download="{{ file.name }}" data-toggle="tooltip"
+                                data-guest_downloadtable_id="{{ guest_dest_user_data.id }}" data-placement="right"
+                                title="{{ file.name }}">{{ file.name | truncatechars:16 }}
+
+                                {% if extention == ".pdf" %}
+                                    <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                            class="fas fa-search"></i></a>
+                                {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
+                                    <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+                                {% elif extention == ".txt" %}
+                                    <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+
+                                {% endif %}
+                            </a><br>
+
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+
+                <!-- 受信日 -->
+                <td>
+                    {{guest_dest_user_data.guest_upload_manage.uploaded_date | date:'Y/m/d'}}
+                    {{guest_dest_user_data.guest_upload_manage.uploaded_date | date:'H:i'}}
+                </td>
+
+                <!-- 保存期限 -->
+                <td>
+                    無期限
+                </td>
+
+                <!-- 送信者 -->
+                <td>
+                    {{guest_dest_user_data.guest_upload_manage.guest_user_mail}}
+                </td>
+
+                <!-- 一括ダウンロードボタン ゲスト-->
+                <td class="zipDlIcon">
+                    {% comment %} {% if guest_dest_user_data.guest_upload_manage.end_date|is_past_due %}
+                    <span data-toggle="tooltip" title="期限切れのためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button></span> 
+
+                    <!-- zipファイルDL回数制限制御 guest-->
+                    {% elif guest_dest_user_data.guest_download_table.all|url_dl_file_count:guest_dest_user_data.guest_upload_manage.dl_limit == 0 %}
+                    <span data-toggle="tooltip" title="DL回数制限を超えたためダウンロードできません。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button></span>{% endcomment %}
+
+                    {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}
+                    <span data-toggle="tooltip" title="ファイルが削除されました。" data-placement="top">
+                        <button class="fas_button_download past_due_download"></button>
+                    </span>
+
+                    {% elif not guest_dest_user_data.guest_upload_manage.uploaded_date %}
+                        <span data-toggle="tooltip" title="アップロード前です" data-placement="top">
+                            <button class="fas_button_download past_due_download"></button>
+                        </span>
+                    {% else %}
+                    <span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="top">
+                        <a button type="button" class="menu_btn_color menu_btn guest_zip_download"
+                            data-downloadtable_id="{{ guest_dest_user_data.id }}"
+                            onclick="window.location.href='{% url 'draganddrop:guest_file_download_zip' guest_dest_user_data.id %}'">
+                            <button class="fas_button_download"></button>
+                        </a>
+                    </span>
+                    {% endif %}
+                </td>
+
+                <!-- メッセージボタン -->
+                <td class="homeIcon">
+                    {% comment %} {% if guest_dest_user_data.guest_upload_manage.message %}
+                        <span data-toggle="tooltip" title="メッセージ" data-placement="top">
+                            <button class="fas_button_message"
+                            data-value="{{guest_dest_user_data.pk}}"
+                            data-dl_message="{{guest_dest_user_data.guest_upload_manage.message|linebreaksbr}}"
+                            data-target="#dl_message_modal"
+                            data-toggle="modal"></button>
+                        </span>
+                    {% else %} {% endcomment %}
+                        <span data-toggle="tooltip" title="メッセージはありません。" data-placement="top">
+                            <button class="fas_button_message" style="background-color: #C0C0C0;"></button>
+                        </span>
+                    {% comment %} {% endif %} {% endcomment %}
+                </td>
+                
+                <!-- 削除(ゴミ箱)ボタン -->
+                <td class="deleteIcon">
+                    <span data-toggle="tooltip" title="削除" data-placement="top">
+                        <button class="fas_button_delete" 
+                        data-value="{{guest_dest_user_data.pk}}"
+                        data-guest_del_name="{{guest_dest_user_data.guest_upload_manage.title}}"
+                        data-toggle="modal"
+                        data-target="#guest_dl_del_task_modal"></button>
+                    </span>
+                </td>
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+            
+            <!------- メッセージモーダル ゲストアップロード受信用 ------->
+            <div class="modal fade" id="dl_guest_message_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header message_modal_header">
+                            <span class="modal-title home_modal_title">メッセージ<i class="fa-solid fa-comment-dots ml-1"></i></span>
+                        </div>
+                        <div class="modal-body">
+                            <p class="guest_dl_message"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-------- 削除モーダル ゲストアップロード受信用 ------->
+            <div class="modal fade" id="guest_dl_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content center-modal">
+                        <div class="modal-header delete_modal_header">
+                            <span class="modal-title home_modal_title">削除<i class="fa-solid fa-trash-can ml-1"></i></span>
+                        </div>
+                        <div class="modal-body guest-del-file-name-text">
+                            <p>選択したファイルを削除します</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="guest_dl_del_task_modal_btn" type="button"
+                                class="del_task_button btn my-btn-w7 my-btn-h4 delete_btn rounded-0" data-dismiss="modal">削除</button>
+                            <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
+                                data-dismiss="modal">キャンセル</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-------------------------ゲストアップロード 閉じ---------------------------------->
 
         </tbody>
     </table>
@@ -2334,12 +2528,14 @@ $(function (){
         var all_user = $("#download_table input[class='dest_data']")  //全ユーザー数
         var all_url_user = $("#download_table input[class='url_dest_data']")
         var all_otp_user = $("#download_table input[class='otp_dest_data']")
-        var total_all_user = all_user.length + all_url_user.length + all_otp_user.length
+        var all_guest_user = $("#download_table input[class='guest_dest_data']")
+        var total_all_user = all_user.length + all_url_user.length + all_otp_user.length + all_guest_user.length
 
         var all_checked_user = $("#download_table input[class='dest_data']:checked") //チェック済みユーザー数
         var all_url_checked_user = $("#download_table input[class='url_dest_data']:checked")
         var all_otp_checked_user = $("#download_table input[class='otp_dest_data']:checked")
-        var total_all_checked_user = all_checked_user.length + all_url_checked_user.length + all_otp_checked_user.length
+        var all_guest_checked_user = $("#download_table input[class='guest_dest_data']:checked")
+        var total_all_checked_user = all_checked_user.length + all_url_checked_user.length + all_otp_checked_user.length + all_guest_checked_user.length
 
        $("#download_table #all").prop('checked', (total_all_user == total_all_checked_user));
         // 一括削除ボタンチェックされている場合は有効、チェックされていない場合は無効化
@@ -2604,6 +2800,45 @@ $('.otp_zip_download').on('click', function () {
     $.ajax({
         type: 'POST',
         url: "{% url 'draganddrop:otp_file_download_status' %}",
+        data: data,
+        dataType: 'json',
+        success: function (data) {
+            if (data.status == 'ok') {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ダウンロードが成功しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1500);
+            } else {
+                window.location.href = "./";
+
+            }
+        }
+    });
+});
+
+///////////////
+//Zipファイルダウンロード時にダウンロード管理テーブルを更新する処理 ゲストアップロード ver
+///////////////
+$('.guest_zip_download').on('click', function () {
+
+    var is_type = "multiple"
+    var file_id = $(this).attr('id');
+    var guest_downloadtable_id = $(this).data('downloadtable_id');
+
+    // 送信データとして保存
+    var data = {
+        'guest_downloadtable_id': guest_downloadtable_id,
+        'is_type': is_type
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'draganddrop:guest_file_download_status' %}",
         data: data,
         dataType: 'json',
         success: function (data) {
@@ -2963,6 +3198,50 @@ $('#otp_dl_del_task_modal').on('show.bs.modal', function (event) {
 
 });
 
+//単数削除モーダル 受信データ ゲストアップロード用
+
+var guest_delete_id = ""
+var guest_delete_name = ""
+
+$('#guest_dl_del_task_modal').off('show.bs.modal');
+$('#guest_dl_del_task_modal').on('show.bs.modal', function (event) {
+
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var guest_delete_id = button.data('value')
+    console.log('ゲストデリートIDとは',guest_delete_id)
+    var guest_delete_name = button.data('guest_del_name')
+
+    var modal = $(this);
+    modal.find('.guest-del-file-name-text').text(guest_delete_name + "　" + "を削除します");
+
+    $('#guest_dl_del_task_modal_btn').off('click'); //onイベントの重複イベントを削除
+    $('#guest_dl_del_task_modal_btn').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:guestdownloadtabledelete" %}',
+            data: {
+                'guest_delete_id': guest_delete_id,
+                'guest_delete_name': guest_delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+
+            }
+        });
+    });
+
+});
+
 
 //一括削除モーダル 受信データ用
 
@@ -3071,6 +3350,46 @@ $('#multi_del_task_modal_btn').on('click', function () {
 
         data: {
             'otp_dest_user_ids': vals
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+        }
+    });
+});
+
+//一括削除モーダル 受信データ ゲストアップロード用
+
+// 削除ボタンをクリックした時の処理
+$('#multi_del_task_modal_btn').on('click', function () {
+
+    var vals = [];
+    //テンプレートのnameを指定してvalueの値を取得
+    // 取得した値をeachで回してlist型の値を作る
+
+    $('input[name = guest_dest_user_ids]:checked').each(function () {
+        vals.push($(this).val());
+
+    });
+
+    $.ajax({
+        type: "POST",
+
+        //views.pyとurls.pyで定義したURLのnameを指定
+        url: '{% url "draganddrop:multi_dl_delete" %}',
+
+        //サーバーに送るための値を設定する。
+        // 左がサーバーで受け取る時の値、右が上で生成したlist型の値の変数
+
+        data: {
+            'guest_dest_user_ids': vals
         },
         dataType: 'json',
         success: function (data) {
@@ -3438,6 +3757,21 @@ $('#dl_otp_message_modal').on('show.bs.modal', function (event) {
     str = otp_dl_message.replace(/\r?\n/g, '<br>');
     var modal = $(this);
     modal.find('.otp_dl_message').html(str);
+});
+
+//ゲストアップロード 受信用
+var guest_dl_message_id = ""
+var guest_dl_message = ""
+
+$('#dl_guest_message_modal').off('show.bs.modal');
+$('#dl_guest_message_modal').on('show.bs.modal', function (event) {
+    // 行のIDを取得
+    var button = $(event.relatedTarget)
+    var guest_dl_message_id = button.data('value')
+    var guest_dl_message = button.data('guest_dl_message')
+    str = guest_dl_message.replace(/\r?\n/g, '<br>');
+    var modal = $(this);
+    modal.find('.guest_dl_message').html(str);
 });
 
 //送信用

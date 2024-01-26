@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
-from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable,OTPUploadManage
+from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable,OTPUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, GuestUploadManage
 from django.http import JsonResponse
 from draganddrop.views.home.home_common import CommonView
 import urllib.parse
@@ -120,6 +120,42 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
             data = {}
             data['message'] = str(e)
             return JsonResponse(data)
+        
+##################################
+# 受信テーブル ゲストアップロード 単数削除 #
+##################################
+class GuestDownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        guest_delete_id = request.POST.get('guest_delete_id')
+        guest_delete_name = request.POST.get('guest_delete_name')
+
+        try:
+            # ダウンロードテーブルに変更
+            guestdownloadtable = GuestUploadDownloadtable.objects.get(pk__exact=guest_delete_id)
+            #↓二行操作ログ用・ファイル名取得
+            guestuploadmanage = GuestUploadManage.objects.get(id=guestdownloadtable.guest_upload_manage.id)
+            files = guestuploadmanage.file.all()
+            # ダウンロードテーブルの削除フラグを立てる
+            guestdownloadtable.trash_flag = 1
+            guestuploadmanage.file_del_flag = 1
+            
+            # その後保存する
+            guestdownloadtable.save()
+            guestuploadmanage.save()
+            # 操作ログ登録
+            add_log(2,3,current_user,guest_delete_name,files,"",3,self.request.META.get('REMOTE_ADDR'))
+            #メッセージを格納してJSONで返す
+            data = {}
+            data['message'] = guest_delete_name + 'を削除しました'
+            return JsonResponse(data)
+
+        except Exception as e:
+            #失敗時のメッセージを格納してJASONで返す
+            data = {}
+            data['message'] = str(e)
+            return JsonResponse(data)
 
 ##################################
 # 受信テーブル一括削除 #
@@ -129,6 +165,7 @@ class MultiDownloadTableDeleteAjaxView(View):
         multi_delete_id = request.POST.getlist('dest_user_ids[]')
         url_multi_delete_id = request.POST.getlist('url_dest_user_ids[]')
         otp_multi_delete_id = request.POST.getlist('otp_dest_user_ids[]')
+        guest_multi_delete_id = request.POST.getlist('guest_dest_user_ids[]')
 
         try:
             # ダウンロードテーブルに変更
@@ -140,6 +177,11 @@ class MultiDownloadTableDeleteAjaxView(View):
             
             otp_multi_tables = OTPDownloadtable.objects.filter(pk__in=otp_multi_delete_id)
             otp_multi_tables = otp_multi_tables.all()
+            
+            guest_multi_tables = GuestUploadDownloadtable.objects.filter(pk__in=guest_multi_delete_id)
+            lst = [gtable for gtable in guest_multi_tables]
+            guest_multi_manages = GuestUploadManage.objects.filter(pk__in=lst).all()
+            guest_multi_tables = guest_multi_tables.all()
 
             # ダウンロードテーブルに紐づいているファイルのQSを取得
             if multi_tables:
@@ -154,11 +196,21 @@ class MultiDownloadTableDeleteAjaxView(View):
 
                     url_multi_table.save()
             
-            else:
+            elif otp_multi_tables:
                 for otp_multi_table in otp_multi_tables:
                     otp_multi_table.trash_flag = 1
 
                     otp_multi_table.save()
+            
+            else:
+                for guest_multi_table in guest_multi_tables:
+                    guest_multi_table.trash_flag = 1
+
+                    guest_multi_table.save()
+
+                for guest_multi_manage in guest_multi_manages:
+                    guest_multi_manage.file_del_flag = 1
+                    guest_multi_manage.save()
 
             #メッセージを格納してJSONで返す
             data = {}
@@ -188,6 +240,9 @@ class RestoreAjaxView(View):
             
             otp_download_tables = OTPDownloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
             otp_download_tables = otp_download_tables.all()
+            
+            guest_download_tables = GuestUploadDownloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
+            guest_download_tables = guest_download_tables.all()
 
             for download_table in download_tables:
 
@@ -207,6 +262,13 @@ class RestoreAjaxView(View):
 
                 otp_download_table.trash_flag = 0
                 otp_download_table.save()
+                
+            for guest_download_table in guest_download_tables:
+                guest_download_file_tables = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_download_table)
+                files = guest_download_file_tables.all()
+
+                guest_download_table.trash_flag = 0
+                guest_download_table.save()
 
             # メッセージを格納してJSONで返す
             data = {}
@@ -298,6 +360,31 @@ class OTPTrashDeleteAjaxView(View):
             return JsonResponse(data)
 
 ##################################
+# ゲストアップロード ゴミ箱 単数削除  #
+##################################
+class GuestTrashDeleteAjaxView(View):
+    def post(self, request):
+        guest_delete_id = request.POST.get('guest_delete_id')
+        guest_delete_name = request.POST.get('guest_delete_name')
+
+        try:
+            guestdownloadtable = GuestUploadDownloadtable.objects.get(pk__exact=guest_delete_id)
+            guestdownloadtable.trash_flag = True
+            guestdownloadtable.save()
+
+            #メッセージを格納してJSONで返す
+            data = {}
+            data['message'] = guest_delete_name + 'を削除しました'
+            return JsonResponse(data)
+
+        except Exception as e:
+
+            #失敗時のメッセージを格納してJASONで返す
+            data = {}
+            data['message'] = '削除に失敗しました'
+            return JsonResponse(data)
+
+##################################
 # ゴミ箱 一括削除  #
 ##################################
 
@@ -309,6 +396,7 @@ class MultiDeleteAjaxView(View):
             download_tables = Downloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
             url_download_tables = UrlDownloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
             otp_download_tables = OTPDownloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
+            guest_download_tables = GuestUploadDownloadtable.objects.filter(pk__in=deleted_ids, trash_flag=1)
 
             # Downloadfiletableの該当する行も削除する
             for download_table in download_tables:
@@ -327,6 +415,12 @@ class MultiDeleteAjaxView(View):
 
                 otp_download_table.trash_flag = 2
                 otp_download_table.save()
+            
+            for guest_download_table in guest_download_tables:
+                guest_download_file_tables = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_download_table)
+
+                guest_download_table.trash_flag = 2
+                guest_download_table.save()
 
             # メッセージを格納してJSONで返す
             data = {}
@@ -339,4 +433,3 @@ class MultiDeleteAjaxView(View):
             # data ['message'] = '削除に失敗しました'
             data['error'] = str(e)
             return JsonResponse(data)
-

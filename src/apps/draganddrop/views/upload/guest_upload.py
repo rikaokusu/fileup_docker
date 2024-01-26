@@ -45,7 +45,7 @@ class Step1GuestUploadCreate(FormView, CommonView):
     def get_form_kwargs(self):
         kwargs = super(Step1GuestUploadCreate, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
-        kwargs.update({'dest_user_mail1': self.request.user.email})
+        kwargs.update({'dest_user': self.request.user.email})
         kwargs.update({'url': self.request.resolver_match.url_name})
         return kwargs
 
@@ -62,40 +62,26 @@ class Step1GuestUploadCreate(FormView, CommonView):
 
             initial = {
                 'title': guest_upload_manage.title,
-                'dest_user_mail1': guest_upload_manage.dest_user_mail1,
+                'dest_user': guest_upload_manage.dest_user,
                 'end_date': guest_upload_manage.end_date,
                 'message': guest_upload_manage.message,
                 'guest_user_mail':guest_upload_manage.guest_user_mail,
                 'guest_user_name':guest_upload_manage.guest_user_name,
             }
-            # initial = {
-            #     'title': guest_upload_manage.title,
-            #     'dest_user': guest_upload_manage.dest_user.all(),
-            #     'dest_user_group': guest_upload_manage.dest_user_group.all(),
-            #     'dest_user_mail1': guest_upload_manage.dest_user_mail1,
-            #     'dest_user_mail2': guest_upload_manage.dest_user_mail2,
-            #     'dest_user_mail3': guest_upload_manage.dest_user_mail3,
-            #     'dest_user_mail4': guest_upload_manage.dest_user_mail4,
-            #     'dest_user_mail5': guest_upload_manage.dest_user_mail5,
-            #     'dest_user_mail6': guest_upload_manage.dest_user_mail6,
-            #     'dest_user_mail7': guest_upload_manage.dest_user_mail7,
-            #     'dest_user_mail8': guest_upload_manage.dest_user_mail8,
-            #     'end_date': guest_upload_manage.end_date,
-            #     'message': guest_upload_manage.message,
-            # }
 
             # 返す
             return initial
 
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # """ アドレス帳の情報"""
+        # """ アドレス帳の情報 """
         # address_lists = Address.objects.filter(created_user=self.request.user.id, is_direct_email=False)
         # context["address_lists"] = address_lists
 
-        # """ グループ一覧の情報"""
+        # """ グループ一覧の情報 """
         # group_lists = Group.objects.filter(created_user=self.request.user.id)
         # context["group_lists"] = group_lists
 
@@ -127,9 +113,12 @@ class Step1GuestUploadCreate(FormView, CommonView):
 
 
     def form_valid(self, form):
-        print('フォームきたーーーーーーーーーーーーー')
+        print('hfwoehfowefhosehfh')
+        user = self.request.user
+        print('userきてる？？＞＜',user)
         if 'guest_upload_manage_id' in self.request.session:
-            guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=self.request.session['guest_upload_manage_id']).prefetch_related('dest_user').first()
+            # guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=self.request.session['guest_upload_manage_id']).prefetch_related('dest_user').first()
+            guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=self.request.session['guest_upload_manage_id']).first()
 
         else:
             # フォームからDBのオブジェクトを仮生成（未保存）
@@ -164,8 +153,7 @@ class Step1GuestUploadCreate(FormView, CommonView):
         guest_upload_manage_obj.save()
 
         # メールアドレス直接入力DBへ保存
-        dest_user_mail1 = form.cleaned_data['dest_user_mail1']
-
+        # dest_user = form.cleaned_data['dest_user']
 
         # if dest_user_mail1:
         #     address1, created = Address.objects.update_or_create(
@@ -173,69 +161,6 @@ class Step1GuestUploadCreate(FormView, CommonView):
         #     address1.is_direct_email = True
         #     address1.full_name_preview = dest_user_mail1
         #     address1.save()
-
-        # dest_user_mail2 = form.cleaned_data['dest_user_mail2']
-
-        # if dest_user_mail2:
-        #     address2, created = Address.objects.update_or_create(
-        #         email=dest_user_mail2)
-        #     address2.is_direct_email = True
-        #     address2.full_name_preview = dest_user_mail2
-        #     address2.save()
-
-        # dest_user_mail3 = form.cleaned_data['dest_user_mail3']
-
-        # if dest_user_mail3:
-        #     address3, created = Address.objects.update_or_create(
-        #         email=dest_user_mail3)
-        #     address3.is_direct_email = True
-        #     address3.full_name_preview = dest_user_mail3
-        #     address3.save()
-
-        # dest_user_mail4 = form.cleaned_data['dest_user_mail4']
-
-        # if dest_user_mail4:
-        #     address4, created = Address.objects.update_or_create(
-        #         email=dest_user_mail4)
-        #     address4.is_direct_email = True
-        #     address4.full_name_preview = dest_user_mail4
-        #     address4.save()
-
-        # dest_user_mail5 = form.cleaned_data['dest_user_mail5']
-
-        # if dest_user_mail5:
-        #     address5, created = Address.objects.update_or_create(
-        #         email=dest_user_mail5)
-        #     address5.is_direct_email = True
-        #     address5.full_name_preview = dest_user_mail5
-        #     address5.save()
-
-        # dest_user_mail6 = form.cleaned_data['dest_user_mail6']
-
-        # if dest_user_mail6:
-        #     address6, created = Address.objects.update_or_create(
-        #         email=dest_user_mail6)
-        #     address6.is_direct_email = True
-        #     address6.full_name_preview = dest_user_mail6
-        #     address6.save()
-
-        # dest_user_mail7 = form.cleaned_data['dest_user_mail7']
-
-        # if dest_user_mail7:
-        #     address7, created = Address.objects.update_or_create(
-        #         email=dest_user_mail7)
-        #     address7.is_direct_email = True
-        #     address7.full_name_preview = dest_user_mail7
-        #     address7.save()
-
-        # dest_user_mail8 = form.cleaned_data['dest_user_mail8']
-
-        # if dest_user_mail8:
-        #     address8, created = Address.objects.update_or_create(
-        #         email=dest_user_mail8)
-        #     address8.is_direct_email = True
-        #     address8.full_name_preview = dest_user_mail8
-        #     address8.save()
 
         #URLの作成
         #ランダムな文字列を作る
@@ -254,20 +179,13 @@ class Step1GuestUploadCreate(FormView, CommonView):
         protocol = self.request.scheme
         guest_upload_manage_obj.url = protocol + "://" + domain + "/" + "guest_check" + "/" + token_signed
 
-        # upload_manageに追加する。データを追加し、戻った際にデータを反映させるため）
-        guest_upload_manage_obj.dest_user_mail1 = dest_user_mail1
-        # guest_upload_manage_obj.dest_user_mail2 = dest_user_mail2
-        # guest_upload_manage_obj.dest_user_mail3 = dest_user_mail3
-        # guest_upload_manage_obj.dest_user_mail4 = dest_user_mail4
-        # guest_upload_manage_obj.dest_user_mail5 = dest_user_mail5
-        # guest_upload_manage_obj.dest_user_mail6 = dest_user_mail6
-        # guest_upload_manage_obj.dest_user_mail7 = dest_user_mail7
-        # guest_upload_manage_obj.dest_user_mail8 = dest_user_mail8
-
+        # upload_manageに追加する。データを追加し、戻った際にデータを反映させるため）      
+        guest_upload_manage_obj.dest_user = self.request.user.email
+            
         # # POSTで送信された設定された宛先ユーザーを取得
-        dest_user_qs = form.cleaned_data['dest_user']
+        # dest_user_qs = form.cleaned_data['dest_user']
         # # MonyToMonyの値はquerysetとして取得するので、set関数を使ってセット
-        guest_upload_manage_obj.dest_user.set(dest_user_qs)
+        # guest_upload_manage_obj.dest_user.set(dest_user_qs)
 
         # dest_user_group_qs = form.cleaned_data['dest_user_group']
         # guest_upload_manage_obj.dest_user_group.set(dest_user_group_qs)
@@ -292,21 +210,21 @@ class Step1GuestUploadCreate(FormView, CommonView):
         # # dest_userをsessionに追加するためQSをリスト化して保存。
         dest_user_all_list = []
 
-        for user in dest_user_qs:
-            if user.company_name:
-                dest_user_all_list.append(user.company_name +" " + user.last_name + "" + user.first_name + " " + "1")
-            elif user.company_name == None:
-                dest_user_all_list.append( user.last_name + "" + user.first_name + " " + "1")
-            elif user.trade_name:
-                dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
-            else:
-                dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
+        # for user in dest_user_qs:
+        #     if user.company_name:
+        #         dest_user_all_list.append(user.company_name +" " + user.last_name + "" + user.first_name + " " + "1")
+        #     elif user.company_name == None:
+        #         dest_user_all_list.append( user.last_name + "" + user.first_name + " " + "1")
+        #     elif user.trade_name:
+        #         dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
+        #     else:
+        #         dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
         
         # for group in dest_user_group_qs:
         #     dest_user_all_list.append(group.group_name + " " + "2")
 
-        if dest_user_mail1:
-            dest_user_all_list.append(dest_user_mail1 + " " + "1")
+        # if dest_user_mail1:
+        #     dest_user_all_list.append(dest_user_mail1 + " " + "1")
         # if dest_user_mail2:
         #     dest_user_all_list.append(dest_user_mail2 + " " + "1")
         # if dest_user_mail3:
@@ -329,16 +247,9 @@ class Step1GuestUploadCreate(FormView, CommonView):
         self.request.session['dest_user_all_list'] = dest_user_all_list
         self.request.session['title'] = title
         self.request.session['message'] = message
-        self.request.session['dest_user_mail1'] = dest_user_mail1
+        self.request.session['dest_user'] = guest_upload_manage_obj.dest_user
         self.request.session['guest_mail'] = guest_mail
         self.request.session['guest_name'] = guest_name
-        # self.request.session['dest_user_mail2'] = dest_user_mail2
-        # self.request.session['dest_user_mail3'] = dest_user_mail3
-        # self.request.session['dest_user_mail4'] = dest_user_mail4
-        # self.request.session['dest_user_mail5'] = dest_user_mail5
-        # self.request.session['dest_user_mail6'] = dest_user_mail6
-        # self.request.session['dest_user_mail7'] = dest_user_mail7
-        # self.request.session['dest_user_mail8'] = dest_user_mail8
 
 
         # 保存
@@ -396,6 +307,7 @@ class Step2GuestUploadCreate(TemplateView, CommonView):
 
         context["guest_upload_manage_obj"] = guest_upload_manage_obj
 
+
         # guest_upload_manageに紐付くグループを取得
         # dest_user_groups = guest_upload_manage_obj.dest_user_group.all()
         # for group in dest_user_groups:
@@ -422,8 +334,12 @@ class Step2GuestUploadCreate(TemplateView, CommonView):
         #         guest_downloadfiletable, created = GuestUploadDownloadFiletable.objects.get_or_create(guest_download_table=guest_downloadtable, download_file=file)
         #         guest_downloadfiletable.download_file = file
         #         guest_downloadfiletable.save()
+        
+        
+        # ファイル毎のダウンロード状況を管理するテーブルを作成
+        guest_downloadtable, created = GuestUploadDownloadtable.objects.get_or_create(guest_upload_manage=guest_upload_manage_obj, dest_user=guest_upload_manage_obj.dest_user)
+        guest_downloadtable.save()
 
-        # PersonalResourceManagementへ保存
         
         # ログインユーザーが作成したguest_upload_manageを取得
         personal_user_guest_upload_manages = GuestUploadManage.objects.filter(created_user=self.request.user.id).all()
@@ -442,10 +358,10 @@ class Step2GuestUploadCreate(TemplateView, CommonView):
 
             # guest_download_file_tableのレコード数を取得
             for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=personal_user_guest_upload_manage).all():
-                download_file_table += int(guestdownloadtable.guest_download_table.all().count())
+                download_file_table += int(guestdownloadtable.guest_upload_download_table.all().count())
 
         # 個人管理テーブルの作成・更新
-        total_data_usage(guest_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, guest_upload_manage_file_size, 3)
+        total_data_usage(guest_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, guest_upload_manage_file_size, 4)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
             
@@ -470,18 +386,6 @@ class Step2GuestUploadCreate(TemplateView, CommonView):
 #         if page_num == 1:
 #             return HttpResponseRedirect(reverse('draganddrop:step1_guest_upload_create'))
 
-#         # 3ページから2ページに戻る時の処理
-#         if page_num == 2:
-#             # ページ情報をセッションに保存しておく
-#             self.request.session['page_num'] = 1
-#             return HttpResponseRedirect(reverse('draganddrop:step2_guest_upload', kwargs={'pk': guest_upload_manage_id}))
-
-#         # 4ページから3ページに戻る時の処理
-#         if page_num == 3:
-#             # ページ情報をセッションに保存しておく
-#             self.request.session['page_num'] = 2
-#             return HttpResponseRedirect(reverse('draganddrop:step3_guest_upload', kwargs={'pk': guest_upload_manage_id}))
-
 ###########################
 # ゲストによるファイル共有#
 ###########################
@@ -499,23 +403,22 @@ class GuestApproveView(TemplateView):
         return context
 
     def get(self, request, token):
-        # timestamp_signer = TimestampSigner()
         if token:
             try:
                 # TOKENが有効なら
                 unsigned_token = loads(token)
-                # unsigned_token = timestamp_signer.unsign(unsigned_token)
                 guest_upload_manage = GuestUploadManage.objects.get(pk=unsigned_token)
                 end_date = guest_upload_manage.end_date
                 current_time = datetime.datetime.now(datetime.timezone.utc)
                 file_del_flag = guest_upload_manage.file_del_flag
-
-                if end_date > current_time and file_del_flag==0:
+                
+                if end_date > current_time and file_del_flag==0 and guest_upload_manage.url_invalid_flag == False:
                     guest_upload_manage_id = str(guest_upload_manage.id)
                     self.request.session['guest_upload_manage_id'] = guest_upload_manage_id
                     return HttpResponseRedirect(reverse('draganddrop:guest_file_upload_auth', kwargs={'pk': guest_upload_manage.id}))
                 elif end_date > current_time and file_del_flag == 1:
                     return HttpResponseRedirect(reverse('draganddrop:guest_file_unable_upload'))
+                
                 else:
                     return HttpResponseRedirect(reverse('draganddrop:guest_file_unable_upload'))
 
@@ -624,12 +527,10 @@ class GuestSendAjaxView(View):
 
 class GuestFileUnableUpload(ListView):
     model = GuestUploadManage
-    # template_name = 'draganddrop/guest_upload/guest_upload_error.html'
-    template_name = 'draganddrop/guest_upload/guest_file_upload_auth.html'
+    template_name = 'draganddrop/guest_upload/guest_upload_auth.html'
 
     def index(request):
-        # return render(request, 'draganddrop/guest_upload/guest_upload_error.html')
-        return render(request, 'draganddrop/guest_file_upload_auth.html')
+        return render(request, 'draganddrop/guest_upload/guest_upload_auth.html')
 
 ###########################
 # ゲストアップロード１  #
@@ -676,7 +577,6 @@ class Step1GuestUpload(CreateView, FormView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form,**kwargs):
-        print('ふぉーむばりっどにきてる')
         context = super().get_context_data(**kwargs)
         guest_upload_manage_id = self.kwargs['pk']
         guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).first()
@@ -770,7 +670,7 @@ class Step1GuestUpload(CreateView, FormView):
                         htmlfile.save()
 
         guest_upload_manage_obj.save()
-        print('ふぉーむおわり')
+
         return HttpResponseRedirect(reverse('draganddrop:step2_guest_upload', kwargs={'pk': guest_upload_manage_obj.id}))
 
 
@@ -782,34 +682,12 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         context = super().get_context_data(**kwargs)
 
         guest_upload_manage_id = self.kwargs['pk']
-        # guest_upload_manage_id_tmp = self.request.session['guest_upload_manage_id']
 
         guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
-        # guest_upload_manage_tmp = GuestUploadManage.objects.filter(pk=guest_upload_manage_id_tmp).prefetch_related('file').first()
 
-        # 旧guest_download_tableの取得(新に変更される前に)
-        # number_of_guest_download_table_old =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
-
-        # 旧guest_download_file_tableの取得
-        # number_of_guest_download_file_table_old = 0
-        # for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
-        #         number_of_guest_download_file_table_old += int(guestdownloadtable.guest_download_table.all().count())
-
-        # 旧ファイルの合計サイズ
-        # guest_upload_manage_file_size_old = 0
-        # for file in guest_upload_manage.file.all():
-        #     guest_upload_manage_file_size_old = guest_upload_manage_file_size_old + int(file.size)
-
-
-        #更新データをGuestUploadManageに保存
-        # guest_upload_manage.title = guest_upload_manage_tmp.title
-        # guest_upload_manage.end_date = guest_upload_manage_tmp.end_date
-        # guest_upload_manage.message = guest_upload_manage_tmp.message
-
-
-        # 既存ファイルと新ファイルを結合
-        # guest_upload_manage_file = guest_upload_manage.file.all() | guest_upload_manage_tmp.file.all()
-
+        guest_upload_manage.uploaded_date = datetime.datetime.now()
+        
+        guest_upload_manage.url_invalid_flag = True
         # Downloadtableへ保存
 
         # グループに紐付くdownloadtableの作成
@@ -866,45 +744,33 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
 
         guest_upload_manage.save()
 
-        #全送信先の旧データをremoveして新データをaddする。
-        # guest_upload_manage.dest_user_group.set(guest_upload_manage_tmp.dest_user_group.all())
-        # guest_upload_manage.dest_user.set(guest_upload_manage_tmp.dest_user.all())
-
-        # PersonalResourceManagement更新処理
         personal_resource_manage = PersonalResourceManagement.objects.filter(user=guest_upload_manage.created_user).first()
 
-        # download_tableのレコード数を更新
-        # number_of_guest_download_table_tmp =  GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all().count()
-        # personal_resource_manage.number_of_guest_download_table += (number_of_guest_download_table_tmp - number_of_guest_download_table_old)
-
-        # 新ファイルの合計サイズ
+        # ファイルの合計サイズ
         guest_upload_manage_file_size = 0
         for file in guest_upload_manage.file.all():
             guest_upload_manage_file_size = guest_upload_manage_file_size + int(file.size)
         personal_resource_manage.guest_upload_manage_file_size += guest_upload_manage_file_size
 
-        # download_file_tableのレコード数を更新
-        # number_of_guest_download_file_table_tmp = 0
-        # for guestdownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
-        #     number_of_guest_download_file_table_tmp += int(guestdownloadtable.guest_download_table.all().count())
-        # personal_resource_manage.number_of_guest_download_file_table += (number_of_guest_download_file_table_tmp - number_of_guest_download_file_table_old)
+        # guest_upload_download_file_tableのレコード数を更新
+        number_of_guest_upload_download_file_table = 0
+        for guestuploaddownloadtable in GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_upload_manage).all():
+            number_of_guest_upload_download_file_table += int(guestuploaddownloadtable.guest_upload_download_table.all().count())
+        personal_resource_manage.number_of_guest_upload_download_file_table += number_of_guest_upload_download_file_table
 
         personal_resource_manage.save()
 
-        # tmpレコード削除 
+        # tmpレコード削除 (allになっているのが気になる)
         guest_tmp_flag_1 = GuestUploadManage.objects.filter(tmp_flag=1).all()
         guest_tmp_flag_1.delete()
 
         download_table = personal_resource_manage.number_of_guest_upload_download_table
-        # download_table = personal_resource_manage.number_of_guest_download_table
         download_file_table = personal_resource_manage.number_of_guest_upload_download_file_table
         total_file_size = personal_resource_manage.total_file_size
-        user = User.objects.filter(email=guest_upload_manage.dest_user_mail1).prefetch_related('company').first()
-        print('userとは～～～～～',user)
-        print('comapnyidとは～～～～～',user.company)
+        user = User.objects.filter(email=guest_upload_manage.dest_user).first()
         
         # 個人管理テーブルの作成・更新
-        total_data_usage(guest_upload_manage, user.company.id, user.id, download_table, download_file_table, guest_upload_manage_file_size, 3)
+        total_data_usage(guest_upload_manage, user.company.id, user.id, download_table, download_file_table, guest_upload_manage_file_size, 4)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(user.company.id)
         # this_personal_resource_manage.save()
@@ -929,21 +795,3 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
 #         # 2ページから1ページに戻る時の処理
 #         if page_num == 1:
 #             return HttpResponseRedirect(reverse('draganddrop:step1_guest_update', kwargs={'pk': guest_upload_manage_id_old}))
-
-#         # 3ページから2ページに戻る時の処理
-#         if page_num == 2:
-#             # ページ情報をセッションに保存しておく
-#             self.request.session['page_num'] = 1
-#             return HttpResponseRedirect(reverse('draganddrop:step1_guest_update', kwargs={'pk': guest_upload_manage_id_old}))
-
-#         # 4ページから3ページに戻る時の処理
-#         if page_num == 3:
-#             # ページ情報をセッションに保存しておく
-#             self.request.session['page_num'] = 2
-#             return HttpResponseRedirect(reverse('draganddrop:step2_guest_update', kwargs={'pk': guest_upload_manage_id_old}))
-
-#         # 5ページから4ページに戻る時の処理
-#         if page_num == 4:
-#             # ページ情報をセッションに保存しておく
-#             self.request.session['page_num'] = 3
-#             return HttpResponseRedirect(reverse('draganddrop:step3_guest_update', kwargs={'pk': guest_upload_manage_id_old}))

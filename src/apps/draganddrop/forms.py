@@ -452,7 +452,7 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
     #         # 'enabledHours': [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
     #     }),
     #     input_formats=['%Y/%m/%d %H:%M:%S'])
-
+    dest_user = forms.CharField(widget=forms.TextInput, required=True)
     message = forms.CharField(
         widget=forms.Textarea(attrs={"rows":3}), required=False)
     guest_mail = forms.CharField(widget=forms.EmailInput, required=True)
@@ -464,16 +464,9 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
             'title',
             'guest_user_mail',
             'guest_user_name',
-            'dest_user',
+            # 'dest_user',
             'dest_user_group',
-            'dest_user_mail1',
-            'dest_user_mail2',
-            'dest_user_mail3',
-            'dest_user_mail4',
-            'dest_user_mail5',
-            'dest_user_mail6',
-            'dest_user_mail7',
-            'dest_user_mail8',
+            # 'dest_user_mail1',
             'decode_token',
             'url',
             'message'
@@ -484,7 +477,7 @@ class ManageTasksGuestUploadCreateStep1Form(forms.ModelForm):
         # Viewからログインユーザーを取得
         self.user = kwargs.pop('user', None)
         self.url = kwargs.pop('url', None)
-        self.dest_user_mail1 = kwargs.pop('dest_user_mail1')
+        self.dest_user = kwargs.pop('dest_user')
         super(ManageTasksGuestUploadCreateStep1Form, self).__init__(*args, **kwargs)
 
     def clean_title(self):

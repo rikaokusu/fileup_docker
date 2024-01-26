@@ -283,7 +283,7 @@ class GuestUploadManage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=140)
     file = models.ManyToManyField(Filemodel, verbose_name=('file'), blank=True)
-    dest_user = models.ManyToManyField(Address, blank=True)
+    dest_user = models.EmailField(max_length=70, null=True, blank=True)
     dest_user_mail1 = models.EmailField(max_length=100, null=True, blank=True)
     dest_user_mail2 = models.EmailField(max_length=100, null=True, blank=True)
     dest_user_mail3 = models.EmailField(max_length=100, null=True, blank=True)
@@ -305,10 +305,10 @@ class GuestUploadManage(models.Model):
     password_create_time = models.DateTimeField(verbose_name='OTP作成日時', blank=True, null=True,)
     decode_token = models.CharField(max_length=50, null=True, blank=True)
     url = models.CharField(max_length=140, null=True, blank=True)
-    file_del_flag = models.IntegerField(null=True, blank=True, default=0)
+    file_del_flag = models.IntegerField(null=True, blank=True, default=0)#ここではレコード自体の削除可否を表すtrash_flagの扱い
     message = models.CharField(max_length=140, blank=True, null=True)
     url_invalid_flag = models.IntegerField(verbose_name='ゲストへのURL招待無効フラグ',null=True, blank=True, default=0)
-    created_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
+    uploaded_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
 
     @property
     def is_past_due(self):
@@ -321,7 +321,7 @@ class GuestUploadManage(models.Model):
 class GuestUploadDownloadtable(models.Model):
     guest_upload_manage = models.ForeignKey(GuestUploadManage, on_delete=models.CASCADE, related_name='guest_uploadmanage', null=True)
     is_downloaded = models.BooleanField(null=True, blank=True, default=False)
-    dest_user = models.ForeignKey(Address, related_name='guest_downloadtable_dest_user', on_delete=models.CASCADE, blank=True, null=True)
+    dest_user = models.EmailField(max_length=70, null=True, blank=True)
     dowloaded_date = models.DateTimeField(verbose_name='ダウンロード日', blank=True, null=True,)
     del_flag = models.BooleanField(null=True, blank=True, default=False)
     trash_flag = models.IntegerField(null=True, blank=True, default=0)

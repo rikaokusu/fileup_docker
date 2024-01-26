@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, GuestUploadManage, GuestUploadDownloadtable, ResourceManagement, PersonalResourceManagement
 from draganddrop.views.home.home_common import CommonView
 from accounts.models import User,Service,Company,FileupPermissions
 from contracts.models import Plan, Contract, FileupDetail
@@ -33,6 +33,12 @@ class ResourceManagementView(TemplateView,CommonView):
             date = datetime.datetime.now()
             resource_management.number_of_active_upload_manage = UploadManage.objects.filter(company = self.request.user.company.id, file_del_flag=0, end_date__gt=date).all().count()
             resource_management.number_of_deactive_upload_manage = UploadManage.objects.filter(Q(company=self.request.user.company.id, file_del_flag=1) | Q(company = self.request.user.company.id, end_date__lt=date)).all().count() 
+            resource_management.number_of_active_url_upload_manage = UrlUploadManage.objects.filter(company=self.request.user.company.id, file_del_flag=0, end_date__gt=date).all().count()
+            resource_management.number_of_deactive_url_upload_manage = UrlUploadManage.objects.filter(Q(company=self.request.user.company.id, file_del_flag=1) | Q(company=self.request.user.company.id, end_date__lt=date)).all().count() 
+            resource_management.number_of_active_otp_upload_manage = OTPUploadManage.objects.filter(company=self.request.user.company.id, file_del_flag=0, end_date__gt=date).all().count()
+            resource_management.number_of_deactive_otp_upload_manage = OTPUploadManage.objects.filter(Q(company=self.request.user.company.id, file_del_flag=1) | Q(company=self.request.user.company.id, end_date__lt=date)).all().count() 
+            resource_management.number_of_active_guest_upload_manage = GuestUploadManage.objects.filter(company=self.request.user.company.id, file_del_flag=0).all().count()
+            resource_management.number_of_deactive_guest_upload_manage = GuestUploadManage.objects.filter(company=self.request.user.company.id, end_date__lt=date, uploaded_date__isnull=True).all().count() 
             resource_management.save()
             print('ここのなか',resource_management.number_of_removed_url_upload_manage)
             # 会社管理画面のレコード数とディスク使用量計算
@@ -43,12 +49,16 @@ class ResourceManagementView(TemplateView,CommonView):
                 + resource_management.number_of_deactive_url_upload_manage
                 + resource_management.number_of_active_otp_upload_manage
                 + resource_management.number_of_deactive_otp_upload_manage
+                + resource_management.number_of_active_guest_upload_manage
+                + resource_management.number_of_deactive_guest_upload_manage
                 + resource_management.number_of_download_table
                 + resource_management.number_of_download_file_table
                 + resource_management.number_of_url_download_table
                 + resource_management.number_of_url_download_file_table
                 + resource_management.number_of_otp_download_table
                 + resource_management.number_of_otp_download_file_table
+                + resource_management.number_of_guest_upload_download_table
+                + resource_management.number_of_guest_upload_download_file_table
                 ) * settings.DEFAULT_RECORD_SIZE #20KB(20480)
 
                 resource_management.total_size = (resource_management.total_record_size
@@ -85,6 +95,10 @@ class ResourceManagementView(TemplateView,CommonView):
             # OTP総件数
             total_otp_upload_manage = resource_management.number_of_active_otp_upload_manage + resource_management.number_of_deactive_otp_upload_manage + resource_management.number_of_removed_otp_upload_manage
             context["total_otp_upload_manage"] = total_otp_upload_manage if total_otp_upload_manage < 9999 else ("9,999+")
+
+            # ゲストアップロード総件数
+            total_guest_upload_manage = resource_management.number_of_active_guest_upload_manage + resource_management.number_of_deactive_guest_upload_manage + resource_management.number_of_removed_guest_upload_manage
+            context["total_guest_upload_manage"] = total_guest_upload_manage if total_guest_upload_manage < 9999 else ("9,999+")
 
             units = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB")
 

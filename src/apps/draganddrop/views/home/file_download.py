@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, UpdateView, FormView, View, CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
-from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPDownloadtable, OTPDownloadFiletable, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from django.http import JsonResponse
 from django.http import HttpResponse
 import datetime
@@ -190,6 +190,64 @@ class OTPFileDownloadZipView(View):
         print("response.write(ret_zip)", ret_zip)
 
         return response
+
+################################
+# ゲストアップロード 一括(Zip)ダウンロード機能  #
+################################
+class GuestFileDownloadZipView(View):
+    
+    def get(self, request, *args, **kwargs):
+        print('ジップのはじまりにきた')
+        # 対象課題のIDを取得
+        pk = self.kwargs['pk']
+
+        # ファイル情報を取得
+        guest_download_table = GuestUploadDownloadtable.objects.filter(pk=pk).first()
+        guest_downloadfiletable_qs = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_download_table)
+        print('ジップの途中1')
+        # レスポンスの生成
+        response = HttpResponse(content_type='application/zip')
+
+        # ダウンロードするファイル名を定義
+        fn_on_space = "download"
+
+        # 半角スペース削除
+        fn = fn_on_space.replace(" ", "")
+
+        response['Content-Disposition'] = 'filename="{fn}.zip"'.format(fn=urllib.parse.quote(fn))
+
+        # メモリーに保存する
+        buffer = io.BytesIO()
+        print('ジップのメモリー保管済み')
+        # Zipファイルの生成
+        zip = zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED)
+        print('ジップのファイル作成')
+
+        # Zipファイルに追加する
+        for guest_downloadfiletable in guest_downloadfiletable_qs:
+            file = guest_downloadfiletable.download_file
+            zip.writestr(file.name, file.upload.read())
+        print('ジップのファイル追加')
+
+
+        # Zipファイルをクローズ
+        zip.close()
+
+        # バッファのフラッシュ
+        buffer.flush()
+
+        # バッファの内容を書き出し
+        ret_zip = buffer.getvalue()
+
+        # バッファをクローズ
+        buffer.close()
+
+        # レスポンスに書き込み
+        response.write(ret_zip)
+        print("response.write(ret_zip)", ret_zip)
+        print('ジップの終わり前')
+        return response
+
 
 ######################################################
 # ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
@@ -450,6 +508,95 @@ class OTPFileDownloadStatus(LoginRequiredMixin, View):
                 otp_downloadtable.otp_upload_manage.is_downloaded = True  # 対応完了
 
                 otp_downloadtable.otp_upload_manage.save()
+
+        except Exception as e:
+            return JsonResponse({"status": "ng",
+                                "message": str(e),
+                                })
+
+        return JsonResponse({"status": "ok",
+                            "message": "ダウンロードしました",
+                            })
+
+######################################################
+# ゲストアップロード　ファイルダウンロード時にダウンロード管理テーブルを更新する処理  #
+######################################################
+
+class GuestFileDownloadStatus(LoginRequiredMixin, View):
+
+    def post(self, request):
+
+        # ダウンロードされたファイルが単体か複数か判断するための変数
+        is_type = request.POST.get('is_type')
+
+        # downloadtableのidを呼び出す
+        guest_downloadtable_id = request.POST.get('guest_downloadtable_id')
+
+        # downloadtable_idからdownloadtableのオブジェクトを取得する
+        guest_downloadtable = GuestUploadDownloadtable.objects.filter(id=guest_downloadtable_id).first()
+
+        # downloadfiletableのQSを取得する。取得条件はdownloadtableが一致する行。
+        guest_downloadfiletable_qs = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_downloadtable)
+
+        # ファイルのIDをリスト化
+        # file_idsの中身が単体と複数ファイルの場合の条件定義
+        file_ids = []
+        if is_type == "single":
+            file_ids.append(request.POST.get('file_id'))
+        elif is_type == "multiple":
+            for file in guest_downloadfiletable_qs.all():
+                file_ids.append(file.download_file.id)
+
+        else:
+            pass
+
+        try:
+            for file_id in file_ids:
+                # ファイルIDからファイルモデルのオブジェクトを取得する
+                filemodel = Filemodel.objects.filter(id=file_id).first()
+
+                guest_downloadfiletable = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_downloadtable, download_file=filemodel).first()
+                # 取得したDownloadFiletableのオブジェクトのis_downloadedの値をTrueに変更する
+                guest_downloadfiletable.is_downloaded = True
+                guest_downloadfiletable.guest_upload_dl_count += 1
+
+
+                # DownloadFiletableのオブジェクトを保存する"""
+                guest_downloadfiletable.save()
+
+                # ダウンロード時間を保持して保存する
+                guest_downloadfiletable.dowloaded_date = datetime.datetime.now()
+                guest_downloadfiletable.save()
+
+                guest_downloadfiletable.dowloaded_date = datetime.datetime.now()
+                guest_downloadfiletable.save()
+
+            # ユーザー個別のDL状況
+            # ダウンロードファイルテーブルで受信テーブルに紐づいている全ての行を取得
+            # 最後に.count()をつけて、QSの数がint型で返ってくるようにする。
+            file_number = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_downloadtable).count()
+
+            # ダウンロードファイルテーブルで受信テーブルに紐づいている中で、is_downloadedフラグがTrueのものを取得
+            # 最後に.count()をつけて、QSの数がint型で返ってくるようにする。
+            downloaded_file_number = GuestUploadDownloadFiletable.objects.filter(guest_upload_download_table=guest_downloadtable, is_downloaded=True).count()
+
+            if file_number == downloaded_file_number:
+
+                guest_downloadtable.is_downloaded = True  # 対応完了
+
+                guest_downloadtable.save()
+
+            # DownloadtableでUploadManageに紐づいている行を取得
+
+            file_number = GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_downloadtable.guest_upload_manage).count()
+
+            downloaded_file_number = GuestUploadDownloadtable.objects.filter(guest_upload_manage=guest_downloadtable.guest_upload_manage, is_downloaded=True).count()
+
+            if file_number == downloaded_file_number:
+
+                guest_downloadtable.guest_upload_manage.is_downloaded = True  # 対応完了
+
+                guest_downloadtable.guest_upload_manage.save()
 
         except Exception as e:
             return JsonResponse({"status": "ng",
