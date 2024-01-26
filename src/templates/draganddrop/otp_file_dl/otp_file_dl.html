@@ -185,6 +185,44 @@
 		});
 	});
 
+    ///////////////
+	//Zipファイルダウンロード時にダウンロード管理テーブルを更新する処理
+	///////////////
+	$('.url_zip_download').on('click', function () {
+
+		var is_type = "multiple"
+		var file_id = $(this).attr('id');
+		var otp_downloadtable_id = $(this).data('otp_downloadtable_id');
+
+		// 送信データとして保存
+		var data = {
+			'otp_downloadtable_id': otp_downloadtable_id,
+			'is_type': is_type
+		};
+
+		$.ajax({
+			type: 'POST',
+			url: "{% url 'draganddrop:otp_file_download_status' %}",
+			data: data,
+			dataType: 'json',
+			success: function (data) {
+				if (data.status == 'ok') {
+
+					// guest_file_download_zip(=一括(Zip)ダウンロード機能)にアクセス
+					window.location.href = '/guest_file_download_zip/' + guest_downloadtable_id + '/';
+
+					setTimeout(function(){
+						window.location.reload();
+					}, 2000);
+
+				} else {
+					window.location.reload();
+
+				}
+			}
+		});
+	});
+
 //閉じるボタン
 
 let closebutton = document.getElementById('url_dl_close_btn');
