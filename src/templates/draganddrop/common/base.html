@@ -290,8 +290,77 @@
     </div>
   </div>
 
+<!-- お知らせModal -->
+<div class="modal fade" id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header notice_modal_header">
+        <ul class="tab nav nav-tabs clearfix info_tab">
+          <li class="nav-item">
+            <a class="nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="info_2" data-toggle="tab" href="#info2" role="tab" aria-controls="item2" aria-selected="false">お知らせ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
+          </li>
+        </ul>
+      </div><!--modal-header-->
+      <div class="modal-body"> 
+        <div class="area tab-content">
+
+            <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
+              
+                {% for all in all_informations %}
+                    <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                    {% if not all.id in read_info %}
+                        <span class="bg-warning">{{ all.category }}</span>
+                    {% else %}
+                        <span>{{ all.category }}</span>
+                    {% endif %}
+                    </b><span class="newsList-title">{{ all.title }}</span></a></li>
+                {% empty %}
+                    <li><span class="newsList-empty">お知らせはありません</span></li>
+                {% endfor %} 
+            </ul>
+            <ul class="tab-pane fade" id="info2" role="tabpanel" aria-labelledby="info_2">
+                {% for notice in notice_informations %}
+                    <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                    {% if not notice.id in read_info %}
+                        <span class="bg-warning">{{ notice.category }}</span>
+                    {% else %}
+                        <span>{{ notice.category }}</span>
+                    {% endif %}
+                    </b><span class="newsList-title">{{ notice.title }}</span></a></li>
+                {% empty %}
+                    <li><span class="newsList-empty">お知らせはありません</span></li>
+                {% endfor %}
+            </ul>
+            <ul class="tab-pane fade" id="info3" role="tabpanel" aria-labelledby="info_3">
+                {% for mainte in maintenance_informations %}
+                    <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
+                    {% if not mainte.id in read_info %}              
+                        <span class="bg-warning">{{ mainte.category }}</span>
+                    {% else %}
+                        <span>{{ mainte.category }}</span>
+                    {% endif %}
+                    </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
+                {% empty %}
+                    <li><span class="newsList-empty">お知らせはありません</span></li> 
+                {% endfor %}
+            </ul> 
+        </div>
+      </div><!--modal-body-->
+      <div class="modal-footer justify-content-center bg-white">
+        <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();" style="padding: .3rem .4rem;">閉じる</button>
+      </div><!-- /.modal-footer -->
+    </div><!--ModalContent-->
+  </div><!---->
+</div><!--お知らせモーダルおわり-->
+
   <!-- お知らせモーダル用 -->
-  <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  {% comment %} <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content info-modal-content">
           <!--ポータル版-->
@@ -309,60 +378,6 @@
             <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
             <!--bootstrap版-->
             <div class="area tab-content">
-              {% comment %} 
-              <nav>
-                <div class="nav nav-tabs info_tab" id="nav-tab" role="tablist">
-                  <a class="nav-item nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
-                  <a class="nav-item nav-link" id="info_2" data-toggle="tab" href="#info2" role="tab" aria-controls="item2" aria-selected="false">お知らせ</a>
-                  <a class="nav-item nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
-                </div>
-              </nav>
-              <div class="tab-content" id="nav-tabContent"> {% endcomment %}
-                <!--数字だけなら正常。-->
-                {% comment %} <div class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
-                  1111111111111111111111111111111111111
-                  {% for all in all_informations %}
-                      <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                      {% if not all.id in read_info %}
-                          <span class="bg-warning">{{ all.category }}</span>
-                      {% else %}
-                          <span>{{ all.category }}</span>
-                      {% endif %}
-                      </b><span class="newsList-title">{{ all.title }}</span></a></li>
-                  {% empty %}
-                      <li><span class="newsList-empty">お知らせはありません</span></li>
-                  {% endfor %} 
-                </div>
-                <div class="tab-pane fade" id="info2" role="tabpanel" aria-labelledby="info_2">
-                  2222222222222222222222222222222222222
-                  {% for notice in notice_informations %}
-                      <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                      {% if not notice.id in read_info %}
-                          <span class="bg-warning">{{ notice.category }}</span>
-                      {% else %}
-                          <span>{{ notice.category }}</span>
-                      {% endif %}
-                      </b><span class="newsList-title">{{ notice.title }}</span></a></li>
-                  {% empty %}
-                      <li><span class="newsList-empty">お知らせはありません</span></li>
-                  {% endfor %}
-                </div>
-                <div class="tab-pane fade" id="info3" role="tabpanel" aria-labelledby="info_3">
-                  333333333333333333333333
-                  {% for mainte in maintenance_informations %}
-                      <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                      {% if not mainte.id in read_info %}              
-                          <span class="bg-warning">{{ mainte.category }}</span>
-                      {% else %}
-                          <span>{{ mainte.category }}</span>
-                      {% endif %}
-                      </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
-                  {% empty %}
-                      <li><span class="newsList-empty">お知らせはありません</span></li> 
-                  {% endfor %} 
-                </div>
-              </div>  {% endcomment %}
-
 
               <!--portalとやり方そろっているけど数字すら表示おかしい-->
                 <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
@@ -380,7 +395,6 @@
                     {% endfor %} 
                 </ul>
                 <ul class="tab-pane fade show active" id="info2" role="tabpanel" aria-labelledby="info_2">
-                  22222
                     {% for notice in notice_informations %}
                         <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not notice.id in read_info %}
@@ -394,7 +408,6 @@
                     {% endfor %}
                 </ul>
                 <ul class="tab-pane fade show active" id="info3" role="tabpanel" aria-labelledby="info_3">
-                  33333334
                     {% for mainte in maintenance_informations %}
                         <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                         {% if not mainte.id in read_info %}              
@@ -413,7 +426,7 @@
             </div><!-- /.modal-footer -->
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+</div><!-- /.modal -->  {% endcomment %}
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

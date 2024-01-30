@@ -3474,6 +3474,9 @@ DatePicker
 }
 
 /**********************  お知らせ  ****************************/
+.notice_modal_header{
+    padding:0;
+}
 .info_tab .nav-link{
     padding: 0 !important;
     font-size: 14px;

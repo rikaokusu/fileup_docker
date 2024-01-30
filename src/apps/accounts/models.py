@@ -367,3 +367,81 @@ class FileupPermissions(models.Model):
     role4 = models.BooleanField('各機能権限４',default=False)
     # 各機能権限５
     role5 = models.BooleanField('各機能権限５',default=False)
+
+
+
+"""
+リマインダー
+"""
+class Notification(models.Model):
+
+    CATEGORY_CHOICES = (
+            ('お知らせ', 'お知らせ'),
+            ('メッセージ', 'メッセージ'),
+            ('メンテナンス', 'メンテナンス'),
+            ('メンテナンス終了', 'メンテナンス終了'),
+            ('メンテナンス中止', 'メンテナンス中止')
+    )
+    SERVICE_CHOICES = (
+        ('全てのサービス', '全てのサービス'),
+        ('ポータル','ポータル'),
+        ('FileUP!','FileUP!'),
+        ('まなもあ','まなもあ'),
+        ('Kolette','Kolette')
+    )
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #サービス名
+    service = models.CharField(_('service'),null=True,choices=SERVICE_CHOICES,max_length=255)
+    #会社紐づけ
+    company = models.ForeignKey(Company,blank=True, null=True,on_delete=models.CASCADE, related_name='target_company')
+    #会社名リスト
+    company_list = models.TextField(null=True,blank=True)
+    #送信者(CL運営者、ログインユーザー)
+    sender = models.CharField(_('sender'),null=True,max_length=30)
+    #送信日？
+    release_date = models.DateTimeField(_('release date'), default=timezone.now, blank=True)
+    #タイトル、件名
+    title = models.CharField(_('title'), max_length=255)
+    #カテゴリ（お知らせ、メンテナンス）
+    category = models.CharField(_('category'), max_length=30, default="1", choices=CATEGORY_CHOICES, blank=False)
+    # category = models.CharField(_('category'), max_length=255, default="お知らせ")
+    target_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='target_user')
+    # ユーザーemailリスト
+    email_list = models.TextField(null=True,blank=True)
+    #ユーザー種別
+    user_category = models.TextField(null=True,blank=True)
+    # 通知開始日
+    start_date = models.DateTimeField(_('start date'), default=timezone.now, blank=True)
+    #内容
+    contents = models.TextField('内容', blank=True, null=True)
+    #メンテナンス情報（作業開始日時）
+    maintenance_start_date = models.DateTimeField(_('メンテナンス開始日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業終了日時）
+    maintenance_end_date = models.DateTimeField(_('メンテナンス終了日時'), default=timezone.now, blank=True)
+    #メンテナンス情報（作業内容）
+    maintenance_contents = models.TextField('作業内容', blank=True, null=True)
+    #メンテナンス情報（作業対象）
+    maintenance_targets = models.CharField(_('service'),null=True,choices=SERVICE_CHOICES,max_length=255)
+    # maintenance_targets = models.TextField('作業対象', blank=True, null=True)
+    #メンテナンス情報（作業影響）
+    maintenance_affects = models.TextField('作業影響', blank=True, null=True)
+    #メンテナンス情報（作業中止理由）
+    maintenance_cancel_reason = models.TextField('作業中止理由', blank=True, null=True)
+
+    class Meta:
+        managed = False
+
+"""
+お知らせ既読管理
+"""
+class Read(models.Model):
+    # ユーザー
+    read_user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='read_user')
+    # 既読日
+    read_date = models.DateTimeField(_('read date'), default=timezone.now, blank=True)
+    # お知らせID
+    notification_id = models.ForeignKey(Notification, blank=True, null=True, on_delete=models.CASCADE, related_name='notification_id')
+
+    class Meta:
+        managed = False
