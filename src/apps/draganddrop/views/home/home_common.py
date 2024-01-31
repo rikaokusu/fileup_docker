@@ -34,18 +34,62 @@ class CommonView(ContextMixin):
         context["app_name"] = app_name
         context["current_user"] = current_user
 
+        ######################　通知機能
+        my_email = current_user.email
 
-        #インフォメーション
-        all_informations = Notification.objects.filter(start_date__lte = today)
-        notice_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),Q(category = 'メッセージ')|Q(category = 'お知らせ'),start_date__lte = today).distinct().values()
-        maintenance_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today, category__contains = 'メンテナンス').distinct().values()
+        all_info = Notification.objects.filter(start_date__lte = today)
+        #全てのサービスかFileUPの通知のみ取得
+        all_info = all_info.filter(
+        Q(service="FileUP!") | 
+        Q(service="全てのサービス")).order_by('release_date').reverse()
+        all_informations = []
+        maintenance_informations = []
+        notice_informations = []
+
+        for info in all_info:
+            info_email = info.email_list
+            email_if = my_email in info_email  #True False　自分が通知対象者か
+            info_category = info.category
+            if email_if == True:
+                all_informations.append(info)
+                if "メンテナンス" in info_category:
+                    maintenance_informations.append(info)
+                else: #お知らせ、メッセージ
+                    notice_informations.append(info)
+
+        #通知カウントも修正する
         read = Read.objects.filter(read_user=current_user).count()
         read_info = Read.objects.filter(read_user=current_user).values_list('notification_id', flat=True)
         if read > 0:
-            info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
-            no_read = info_all - read
+            no_read = len(all_informations) - read
         else:
-            no_read = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
+            print('通知のかずーーー',len(all_informations))
+            no_read = len(all_informations)
+
+        if no_read > 99 :
+            context["no_read"] = "99+"
+
+        else:
+            context["no_read"] = no_read
+        #通知機能おわり
+            
+        # #インフォメーション
+        # all_informations = Notification.objects.filter(start_date__lte = today)
+        # notice_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),Q(category = 'メッセージ')|Q(category = 'お知らせ'),start_date__lte = today).distinct().values()
+        # maintenance_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today, category__contains = 'メンテナンス').distinct().values()
+        # read = Read.objects.filter(read_user=current_user).count()
+        # read_info = Read.objects.filter(read_user=current_user).values_list('notification_id', flat=True)
+        # if read > 0:
+        #     info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
+        #     no_read = info_all - read
+        # else:
+        #     no_read = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
+
+        # if no_read > 99 :
+        #     context["no_read"] = "99+"
+
+        # else:
+        #     context["no_read"] = no_read
 
         email_list = current_user.email.rsplit('@', 1)
         # メールアドレスをユーザ名とドメインに分割
@@ -53,11 +97,7 @@ class CommonView(ContextMixin):
 
         url_name = self.request.resolver_match.url_name
         app_name = self.request.resolver_match.app_name
-        if no_read > 99 :
-            context["no_read"] = "99+"
 
-        else:
-            context["no_read"] = no_read
         context["read_info"] = read_info
         context["url_name"] = url_name
         context["app_name"] = app_name
