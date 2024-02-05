@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
 from draganddrop.models import UploadManage, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
+from accounts.models import Notification
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -509,11 +510,19 @@ class Step3(TemplateView, CommonView):
             files.append(file_name)
         files = ' '.join(files)
         print('ふぁいるかくにん',files)
+        print('通常あっぷろーどですとユーザー',dest_users)
+        print('通常あっぷろーどですとユーザーりすと',dest_user_list)
+        print('通常あっぷろーどですとグループりすと',dest_group_list)
+        
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
         # 操作ログ
         add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+
+        #############通知する//groupはすべてメールアドレスのリストにしないとかも
+        # Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=file_title,email_list=dest_user_list)
+        ##################通知終了
 
         for personal_user_upload_manage in personal_user_upload_manages:
 
