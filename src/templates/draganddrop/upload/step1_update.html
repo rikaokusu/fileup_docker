@@ -828,6 +828,7 @@ $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
 // メールアドレス欄の空きを詰める処理
 // -----------------
 $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_mail4, #id_dest_user_mail5,#id_dest_user_mail6, #id_dest_user_mail7,#id_dest_user_mail8").on('input', function (){
+    
     var m_list = []
     var m_count = 0
     var count = 1;
@@ -835,17 +836,35 @@ $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_ma
     while(count<=8){
         var id_num = String(count)
         var id_next = String(count + 1)
-        {% comment %} if($(`#id_dest_user_mail${id_num}`).next().text()=='既に入力済みのアドレスです。'){
-            $(`#id_dest_user_mail${id_num}`).next().remove()
-        } {% endcomment %}
+        //現在のフィールド空白で次のフィールドに入力有
         if($(`#id_dest_user_mail${id_num}`).val() == '' && !$(`#id_dest_user_mail${id_next}`).val() == ''){
             $(`#id_dest_user_mail${id_num}`).val($(`#id_dest_user_mail${id_next}`).val())
-            $(`#id_dest_user_mail${id_next}`).val("")
+            if($(`.row_${id_next}`).attr("aria-invalid")=='false'){
+                $(`.row_${id_num}`).attr("aria-invalid", "false");
+                if($(`.row_${id_next}`).find('label')){
+                    $(`.row_${id_num}`).next().remove();
+                    $(`.row_${id_next}`).next().remove();
+                };
+                
+            };
+            $(`#id_dest_user_mail${id_next}`).val("");
+        //現在のフィールド＆次のフィールド空白
         }else if($(`#id_dest_user_mail${id_num}`).val() == '' && $(`#id_dest_user_mail${id_next}`).val() == ''){
             $(`.row_${id_next}`).attr('readonly', true);
+            //if($(`.row_${id_next}`).attr("aria-invalid")=='false'){
+                $(`.row_${id_num}`).attr("aria-invalid", "false");
+                if($(`.row_${id_num}`).find('label')){
+                    $(`.row_${id_num}`).next().remove();
+                };
+            //};
+        }else if(id_num==8 && $(`#id_dest_user_mail${id_num}`).val() == ''){
+            $(`.row_${id_num}`).attr("aria-invalid", "false");
+            $(`.row_${id_num}`).next().remove();
+            $(`.row_${id_num}`).next('.dest_user_duplicate_error').remove()
         };
+        
         count++;
-    }
+    };
 });
 
 // -----------------
@@ -854,7 +873,8 @@ $("#id_dest_user_mail1,#id_dest_user_mail2, #id_dest_user_mail3,#id_dest_user_ma
 
 $(function () {
 
-    $('#postForm').validate({
+    {% comment %} $('#postForm').validate({
+        //既存ルール
         errorClass: 'help-inline',
         validClass: 'success',
         highlight: function (element, errorClass, validClass) {
@@ -873,7 +893,6 @@ $(function () {
             dest_user_mail1: {
                 email: true,
                 CustomValidateEmail: true,
-
             },
         },
         messages: {
@@ -884,7 +903,6 @@ $(function () {
             dest_user_mail1: {
                 email: '正しいメールアドレスを入力してください。',
                 CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
-
             },
             dest_user_mail2: {
                 email: '正しいメールアドレスを入力してください。',
@@ -935,11 +953,12 @@ $(function () {
 
         //エラーメッセージの表示場所を設定
         errorPlacement: function (err, elem) {
-            if (elem.attr('name')=='title') {
-                $('.title_duplicate_error').remove();
+            if (elem.attr('name')=='title'){
+                elem.next('.dest_user_duplicate_error').remove();
                 err.insertAfter(elem);
-            }else {
-                err.insertAfter(elem); // default error placement.
+            }else{
+                elem.next('.dest_user_duplicate_error').remove();
+                err.insertAfter(elem);
             }
         }
     });
@@ -950,24 +969,33 @@ $(function () {
             reg = new RegExp(/^[A-Za-z0-9]*@ybb.com/);
             return this.optional(elem) || !reg.test(val);
         },
-    );
-});
+    );{% endcomment %}
+}); 
 
 //直接入力バリデーション
 
-$(document).ready(function() {
+{% comment %} $(document).ready(function() {
   $('.step1_mail').on('input', function() {
     var inputValue = $(this).val();
     var inputId = $(this).attr('id');
+    var num = parseInt(inputId.replace(/[^0-9]/g, ''));
+    console.log('num',num)
     if (checkDuplicate(inputId, inputValue)) {
+        console.log('重複あり')
         $(this).addClass('duplicate');
-        $('#' + inputId).after('<div class=dest_user_duplicate_error>既に入力済みのアドレスです。</div>');
+        console.log('kekkaaaa',$('#' + inputId).next().hasClass('help-inline'))
+        if($('#' + inputId).next().hasClass('help-inline')===false){
+            $('#' + inputId).attr("aria-invalid", "true");
+            $('#' + inputId).after('<div class=dest_user_duplicate_error>既に入力済みのアドレスです。</div>');
+        }
+
     } else {
-      $(this).removeClass('duplicate');
-      $('#' + inputId).next('.dest_user_duplicate_error').remove();
-      if ($('.duplicate').length === 0) {
-        $('.dest_user_duplicate_error').remove();
-      }
+        $(this).removeClass('duplicate');
+        $('#' + inputId).next('.dest_user_duplicate_error').remove();
+        if ($('.duplicate').length === 0) {
+            $('#' + inputId).attr("aria-invalid", "false");
+            $('.dest_user_duplicate_error').remove();
+        }
     }
   });
 });
@@ -981,7 +1009,179 @@ function checkDuplicate(inputId, value) {
     } 
   });
   return duplicate;
-}
+} {% endcomment %}
+
+
+//ヴァリデーション合併
+$(function () {
+
+    $('#postForm').validate({
+        errorClass: 'help-inline',
+        validClass: 'success',
+        highlight: function (element, errorClass, validClass) {
+            $(element).parents("div.control-group").addClass("error");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).parents(".error").removeClass("error");
+        },
+
+
+        rules: {
+            title: {
+                required: true,
+                maxlength: 20,
+            },
+            dest_user_mail1: {
+                email: true,
+                CustomValidateEmail: true,
+            },
+            dest_user_mail2: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail3: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail4: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail5: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail6: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail7: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+            dest_user_mail8: {
+                email: true,
+                CustomValidateEmail: true,
+                DuplicateValidateEmail: true,
+            },
+        },
+        messages: {
+            title: {
+                required: 'タイトルを入力してください。',
+                maxlength: 'タイトルは20字以内でご入力ください。',
+            },
+            dest_user_mail1: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail2: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail3: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail4: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail5: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail6: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail7: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail8: {
+                email: '正しいメールアドレスを入力してください。',
+                //CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            /*dest_user_mail9: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },
+            dest_user_mail10: {
+                email: '正しいメールアドレスを入力してください。',
+                CustomValidateEmail: 'ISP及びフリーメールアドレスは登録できません。',
+            },*/
+        },
+
+        //エラーメッセージの表示場所を設定
+        errorPlacement: function (err, elem) {
+            if (elem.attr('name')=='title'){
+                elem.next('.dest_user_duplicate_error').remove();
+                err.insertAfter(elem);
+            }else{
+                elem.next('.dest_user_duplicate_error').remove();
+                console.log('ええええw',elem[0])
+                err.insertAfter(elem);
+            }
+        }
+    });
+
+    {% comment %} $.validator.addMethod(
+        "CustomValidateEmail",
+        function (val, elem) {
+            reg = new RegExp(/^[A-Za-z0-9]*@ybb.com/);
+            return this.optional(elem) || !reg.test(val);
+        },
+    ); {% endcomment %}
+    $.validator.addMethod(
+        "DuplicateValidateEmail",
+        function (val, elem) {
+            cls = elem[0]
+            console.log(cls)
+            next_val = 0;
+            return val == next_val;
+        },
+        "既に入力済みのアドレスです。"
+    );
+
+
+    //おためし
+    $("#testForm").validate({
+        rules:{
+          name:{
+            required:true,
+            CustomValidateUserID:true
+          },
+          password:{
+            required:true
+          }
+        },
+        messages:{
+          name:{
+            required:'名前を入力してください',
+          },
+          password:{
+            required:'パスワードを入力してください'
+          }
+        }
+      });
+      jQuery.validator.addMethod(
+        "CustomValidateUserID",
+        function(val,elem){
+          reg = new RegExp("^[0-9a-zA-Z]+$");
+          return this.optional(elem) || reg.test(val);
+        },
+        "ユーザIDは0-9,a-z,A-Zを使用してください"
+      );
+    //おためし終
+
+
+}); 
 
 
 // --------------------------------------

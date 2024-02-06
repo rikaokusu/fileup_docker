@@ -63,6 +63,9 @@ $(function(){
         },
     });
 
+    //重複確認バリデーション
+    
+
     // メールアドレス用カスタムバリデーション
     // jQuery.validator.addMethod(
     //   "CustomValidateEmail",
