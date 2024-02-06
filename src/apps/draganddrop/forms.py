@@ -14,7 +14,7 @@ import datetime
 from django.db.models import Prefetch
 from django.db.models import Q
 
-
+#File
 class FileForm(ModelForm):
     class Meta:
         model = Filemodel
@@ -221,8 +221,6 @@ class AddressForm(forms.ModelForm):
             'company_name': {
                 'required': '必須です!',
             }}
-
-
 # データ管理
 class Group_Checkbox(forms.CheckboxSelectMultiple):
     input_type = 'checkbox'

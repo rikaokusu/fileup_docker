@@ -27,97 +27,99 @@
     {% csrf_token %}
 
     <div class="box1_upload">
-        <!-----------------------------------タイトル DL回数-------------------------------------->
-        <div class="box2_upload">
-            <table class="table table-borderless">
-                <tr>
-                    <th>
-                        <h2 class="step1_upload_box_title">1 基本情報</h2>
-                    </th>
-                </tr>
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>タイトル</h2><span class="required_label def">必須</span>
-                    </td>
-                    <td>
-                        {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
-                        {% if form.title.errors %}
-                            {% for error in form.title.errors %}
-                                <div class="title_duplicate_error">
-                                    {{ error }}
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="step1-title-error" style="visibility:hidden"></div>
-                      {% endif %}
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <div class="step1_label_wrapper mb-1">
-                            <h2>DL回数</h2>
-                            <span class="required_label def">必須</span>
-                        </div>
-                        <h3>・DL可能回数を選択して下さい。</h3>
-                    </td>
-                    {% if plan == "free" %}
-                        <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
-                            {% render_field form.dl_limit|append_attr:"readonly:readonly" class="form-control dl_limit_readonly"%}
+        <div class="box_top_upload">
+            <!-----------------------------------タイトル DL回数-------------------------------------->
+            <div class="box2_upload">
+                <table class="table table-borderless">
+                    <tr>
+                        <th>
+                            <h2 class="step1_upload_box_title">1 基本情報</h2>
+                        </th>
+                    </tr>
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>タイトル</h2><span class="required_label def">必須</span>
                         </td>
-                    {% else %}
                         <td>
-                            {% render_field form.dl_limit class="form-control dl_limit" %}
+                            {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
+                            {% if form.title.errors %}
+                                {% for error in form.title.errors %}
+                                    <div class="title_duplicate_error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="step1-title-error" style="visibility:hidden"></div>
+                          {% endif %}
                         </td>
-                    {% endif %}
-                </tr>
-            </table>
+                    </tr>
+    
+                    <tr>
+                        <td>
+                            <div class="step1_label_wrapper mb-1">
+                                <h2>DL回数</h2>
+                                <span class="required_label def">必須</span>
+                            </div>
+                            <h3>・DL可能回数を選択して下さい。</h3>
+                        </td>
+                        {% if plan == "free" %}
+                            <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
+                                {% render_field form.dl_limit|append_attr:"readonly:readonly" class="form-control dl_limit_readonly"%}
+                            </td>
+                        {% else %}
+                            <td>
+                                {% render_field form.dl_limit class="form-control dl_limit" %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                </table>
+            </div>
+            <!---box2_upload 閉じタグ-->
+    
+            <!--有効期限, メッセージ-->
+    
+            <div class="box3_upload">
+                <table class="table table-borderless step1_table">
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>有効期限</h2><span class="required_label def">必須</span>
+                        </td>
+                        {% if plan == "free" %}
+                        <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
+                            <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div>
+                            <div class="mb-3 3d_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">３日間</div>
+                            <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                            <div class="mb-3 14d_btn btn btn-outline-primary end_date_btn_disabled my-btn-4 rounded-0">14日間</div>
+                            <div class="mb-3 1m_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">1ヶ月間</div>
+                            <div class="mb-3 mm_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">無期限</div>
+                        </td>
+                        {% else %}
+                        <td>
+                            <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date class="form-control" %}</div>
+                            <div class="mb-3 3d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">３日間</div>
+                            <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                            <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
+                            <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
+                            <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>メッセージ</h2><span class="optional_label def">任意</span>
+                        </td>
+                        <td>
+                            {% render_field form.message class="form-control step1_upload_message" placeholder="メッセージを送信できます。" %}
+                        </td>
+                    </tr>
+    
+                </table>
+            </div>
+            <!---step3_upload 閉じタグ--->
         </div>
-        <!---box2_upload 閉じタグ-->
-
-        <!--有効期限, メッセージ-->
-
-        <div class="box3_upload">
-            <table class="table table-borderless step1_table">
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>有効期限</h2><span class="required_label def">必須</span>
-                    </td>
-                    {% if plan == "free" %}
-                    <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
-                        <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div>
-                        <div class="mb-3 3d_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">３日間</div>
-                        <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
-                        <div class="mb-3 14d_btn btn btn-outline-primary end_date_btn_disabled my-btn-4 rounded-0">14日間</div>
-                        <div class="mb-3 1m_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">1ヶ月間</div>
-                        <div class="mb-3 mm_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">無期限</div>
-                    </td>
-                    {% else %}
-                    <td>
-                        <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date class="form-control" %}</div>
-                        <div class="mb-3 3d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">３日間</div>
-                        <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
-                        <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
-                        <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
-                        <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
-                    </td>
-                    {% endif %}
-                </tr>
-                
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>メッセージ</h2><span class="optional_label def">任意</span>
-                    </td>
-                    <td>
-                        {% render_field form.message class="form-control step1_upload_message" placeholder="メッセージを送信できます。" %}
-                    </td>
-                </tr>
-
-            </table>
-        </div>
-        <!---step3_upload 閉じタグ--->
 
         <!----------------------------------送信先---------------------------------------->
 
@@ -210,13 +212,14 @@
 
             <div class="ml-1 mr-1">
                 <button type="button" class="cancel btn-cancel" data-toggle="modal" id="cancel_btn"
-                    data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+                    data-target="#CancelModal">キャンセル</button>
             </div>
 
             <div class="ml-2 mr-1">
                 <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
                     data-target="#send_data_modal" disabled>次へ
-                    <i class="fa-solid fa-angle-right ml-2"></i></button>
+                    <i class="fas fa-angle-right ml-2"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -321,8 +324,10 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content center-modal address_lists_modal">
                 <div class="modal-header address_lists_modal_header d-flex justify-content-center">
-                    <span class="big_modal_title">グループ</span>
-                    <i class="fa-solid fa-users icon_users"></i>
+                    <span class="big_modal_title" style="margin-top:0;">グループ</span>
+                    <i class="fas fa-users fa-2x icon_users" style="padding-top:0;"></i>
+                    {% comment %} <span class="big_modal_title">グループ</span>
+                    <i class="fa-solid fa-users icon_users"></i> {% endcomment %}
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
@@ -394,7 +399,7 @@
     <div class="modal-dialog modal-dialog-centered" role=" document">
         <div class="modal-content center-modal dest_user_confirm_modal">
             <div class="modal-header default_modal_header">
-                <span class="modal-title home_modal_title">グループメンバー<i class="fa-solid fa-users ml-2"></i></span>
+                <span class="modal-title home_modal_title">グループメンバー<i class="fas fa-users ml-2"></i></span>
             </div>
 
             <div class="modal-body">

@@ -36,9 +36,18 @@ class DownloadTableDeleteAjaxView(View,CommonView):
         try:
             # ダウンロードテーブルに変更
             downloadtable = Downloadtable.objects.get(pk__exact=delete_id)
-            #↓二行操作ログ用・ファイル名取得
+            #操作ログ用・ファイル名取得
             uploadmanage = UploadManage.objects.get(id=downloadtable.upload_manage.id)
-            files = uploadmanage.file.all()
+            # ファイル名
+            upload_files = uploadmanage.file.all()
+            files = []
+            for file in upload_files:
+                print('ふぁいるかくにん1',file.name)           
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = uploadmanage.file.all()
+            #操作ログ終わり
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()
@@ -95,8 +104,14 @@ class UrlDownloadTableDeleteAjaxView(View,CommonView):
             #↓二行操作ログ用・ファイル名取得
             urluploadmanage = UrlUploadManage.objects.get(id=urldownloadtable.url_upload_manage.id)
             print('urlもしかしてfileみえない？1',urluploadmanage)
-            files = urluploadmanage.file.all()
-            print('urlもしかしてfileみえない？2',files)
+            # ファイル名
+            url_upload_files = urluploadmanage.file.all()
+            files = []
+            for file in url_upload_files:       
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = urluploadmanage.file.all()
             # ダウンロードテーブルの削除フラグを立てる
             urldownloadtable.trash_flag = 1
 
@@ -131,9 +146,14 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
             otpdownloadtable = OTPDownloadtable.objects.get(pk__exact=otp_delete_id)
             #↓二行操作ログ用・ファイル名取得
             otpuploadmanage = OTPUploadManage.objects.get(id=otpdownloadtable.otp_upload_manage.id)
-            print('otpもしかしてfileみえない？1',otpuploadmanage)
-            files = otpuploadmanage.file.all()
-            print('otpもしかしてfileみえない？2',files)
+            # ファイル名
+            otp_upload_files = otpuploadmanage.file.all()
+            files = []
+            for file in otp_upload_files:         
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
+            # files = otpuploadmanage.file.all()
             # ダウンロードテーブルの削除フラグを立てる
             otpdownloadtable.trash_flag = 1
 
@@ -193,12 +213,18 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
 ##################################
 # 受信テーブル一括削除 #
 ##################################
-class MultiDownloadTableDeleteAjaxView(View):
-    def post(self, request):
-        multi_delete_id = request.POST.getlist('dest_user_ids[]')
+class MultiDownloadTableDeleteAjaxView(View,CommonView):
+    def post(self, request,**kwargs):
+        # print('一括削除かくにん繰り返してる？２２２２')
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        multi_delete_id = request.POST.getlist('dest_user_ids[]')#downloadテーブルのid(int)
         url_multi_delete_id = request.POST.getlist('url_dest_user_ids[]')
         otp_multi_delete_id = request.POST.getlist('otp_dest_user_ids[]')
         guest_multi_delete_id = request.POST.getlist('guest_dest_user_ids[]')
+        print('ですとゆーざーにしてるのなんで1',multi_delete_id)
+        print('ですとゆーざーにしてるのなんで2',url_multi_delete_id)
+        print('ですとゆーざーにしてるのなんで3',otp_multi_delete_id)
 
         try:
             # ダウンロードテーブルに変更
@@ -215,24 +241,26 @@ class MultiDownloadTableDeleteAjaxView(View):
             lst = [gtable for gtable in guest_multi_tables]
             guest_multi_manages = GuestUploadManage.objects.filter(pk__in=lst).all()
             guest_multi_tables = guest_multi_tables.all()
+            #↓二行操作ログ用・ファイル名取得
+            print('通常一括削除かくにん1',multi_tables)
+            print('url一括削除かくにん1',url_multi_tables)
+            print('otp一括削除かくにん1',otp_multi_tables)
 
             # ダウンロードテーブルに紐づいているファイルのQSを取得
             if multi_tables:
                 for multi_table in multi_tables:
                     multi_table.trash_flag = 1
-
+                    print('forの中マルチテーブル1',multi_table)
                     multi_table.save()
-
-            elif url_multi_tables:
+                    
+            if url_multi_tables:
                 for url_multi_table in url_multi_tables:
                     url_multi_table.trash_flag = 1
-
                     url_multi_table.save()
             
             elif otp_multi_tables:
                 for otp_multi_table in otp_multi_tables:
                     otp_multi_table.trash_flag = 1
-
                     otp_multi_table.save()
             
             else:
@@ -245,6 +273,8 @@ class MultiDownloadTableDeleteAjaxView(View):
                     guest_multi_manage.file_del_flag = 1
                     guest_multi_manage.save()
 
+            # 操作ログ登録-------操作ログには3レコード作成されてしまう。
+            add_log(2,3,current_user,"","","",3,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = '一括削除しました'

@@ -3,7 +3,7 @@ import datetime
 # from datetime import datetime,timezone
 from django.contrib import messages
 from django.shortcuts import redirect
-from draganddrop.models import OperationLog,LogFile,LogDestUser
+from draganddrop.models import OperationLog
 
 
 import logging
@@ -55,7 +55,7 @@ def check_session(self, request, instance):
             # 保存
             instance.save()
 
-def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_category, client_addr):
+def add_log(category, operation, op_user,file_title,file_name,dest_mail_log,upload_category, client_addr):
     # t_delta = datetime.timedelta(hours=9)
     # JST = datetime.timezone(t_delta, 'JST')
     # now = datetime.datetime.now(JST)
@@ -76,21 +76,22 @@ def add_log(category, operation, op_user,file_title,files,dest_mail_log,upload_c
         category = category,
         operation = operation,
         file_title = file_title,
+        file_name = file_name,
         # log_filename = log_filename,
         destination_address = dest_mail_log,
         upload_category = upload_category,
         client_addr = client_addr,
     )
-    print('add_logです',files)
-    for file in files:
-        print('add_logのforのなか',operation_log_obj)
-        print('add_logのforのなか',file)
-        LogFile.objects.create(
-            # file = file,
-            log = operation_log_obj,
-            file = file,
-        )
-        print('add_logのforのうしろ',file)
+    # print('add_logです',files)
+    # for file in files:
+    #     print('add_logのforのなか',operation_log_obj)
+    #     print('add_logのforのなか',file)
+    #     LogFile.objects.create(
+    #         # file = file,
+    #         log = operation_log_obj,
+    #         file = file,
+    #     )
+    #     print('add_logのforのうしろ',file)
 
     # for destuser in destusers:
     #     LogDestUser.objects.create(

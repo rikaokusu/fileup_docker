@@ -17,7 +17,11 @@ def get_direct_users(upload_manage):
 
     direct_user_qs = Address.objects.filter(email__in=direct_user)
 
+    print('アドレス帳？？',upload_manage_dest_user_all)
+    print('アドレス帳？？22',direct_user_qs)
+
     dest_user_all = upload_manage_dest_user_all | direct_user_qs
+    print('アドレス帳？？合計',dest_user_all)
 
     return dest_user_all
     

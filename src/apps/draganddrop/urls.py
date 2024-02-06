@@ -10,7 +10,6 @@ app_name = 'draganddrop'
 
 urlpatterns = [
 
-
      ############
      # home  #
      ############

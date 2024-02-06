@@ -36,12 +36,12 @@
 				{% for file in otp_upload_manage.file.all %}
                     {% if otp_dest_user_data.otp_download_table.all|otp_dl_count:file.id >= otp_dest_user_data.otp_upload_manage.dl_limit %}
                     <span class="past_file file_name" data-toggle="tooltip" data-otp_downloadtable_id="{{ otpdownloadtable.id }}"
-                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i></span><br>
+                        data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:20 }}<i class="far fa-arrow-alt-circle-down" style="margin-left: 5px;"></i></span><br>
                     <hr class="file_name_border">
                     {% else %}
                     <a href="{{ file.upload.url }}" id="{{ file.id }}" class="file_name urldownloadtable" download="{{ file.name }}"
                         data-toggle="tooltip" data-otp_downloadtable_id="{{ otp_dest_user_data.id }}" data-placement="right"
-                        title="{{ file.name }}">{{ file.name | truncatechars:20 }}<i class="fa-regular fa-circle-down" style="margin-left: 5px;"></i>
+                        title="{{ file.name }}">{{ file.name | truncatechars:20 }}<i class="far fa-arrow-alt-circle-down" style="margin-left: 5px;"></i>
                         
                         {% if extention == ".pptx" or extention == ".docx" or extention == ".xlsx" or extention == ".doc" or extention == ".xls" or extention == ".ppt" %}
                         <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.pdffilemodel.upload.url }}"></a>

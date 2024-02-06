@@ -4,14 +4,14 @@
 
 
 {% block content %}
-<div class="d-flex flex-row bd-highlight mt-4 top_bar" >
+<div class="d-flex flex-row bd-highlight mt-4 top_bar mb-5" >
     <div class="top">
         <div class="tate mr-4" style="height:74px;"></div>
         <h1>個人管理画面</h1>
     </div>
 </div>
 
-<div class="d-flex  mb-4" style="margin-top: 100px;">
+<div class="d-flex  mb-4">
 	<!-- <div class="tate mr-1 d-flex align-items-center"> -->
 		<h1 class="ml-3">データ利用状況</h1>
 	<!-- </div> -->
@@ -24,7 +24,7 @@
 {% for personal_resource_management in personal_resource_management %}
 
 <!--データ使用量詳細-->
-<div class="personal_resource_management_box" style="margin-top: 40px;">
+<div class="personal_resource_management_box">
 		
 
 		<div class="box3_resource_management mr-4">
@@ -75,8 +75,8 @@
 
 
 <!--戻るボタン-->
-<div class="d-flex flex-row justify-content-center">
-		<a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fa-solid fa-angle-left mr-2"></i>トップ画面に戻る</a>
+<div class="d-flex flex-row justify-content-center mt-5">
+    <a class="return_top_btn" href="{% url 'draganddrop:home' %}"><i class="fas fa-angle-left mr-2"></i>トップ画面に戻る</a>
 </div>
 
 {% endblock %}

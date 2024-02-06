@@ -9,7 +9,7 @@
 
     <div class="top">
         <div class="tate mr-4"></div>
-        <h1>複製</h1><i class="fa-solid fa-copy fa-2x icon-globe"></i>
+        <h1>複製</h1><i class="fas fa-copy fa-2x icon-globe"></i>
     </div>
 
     <div class="progressbar">
@@ -200,13 +200,13 @@
 
             <div class="ml-1 mr-1">
                 <button type="button" id="cancel_btn" class="cancel btn-cancel" data-toggle="modal"
-                    data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+                    data-target="#CancelModal">キャンセル</button>
             </div>
 
             <div class="ml-2 mr-1">
                 <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
                     data-target="#send_data_modal" disabled>次へ
-                    <i class="fa-solid fa-angle-right ml-2"></i></button>
+                    <i class="fas fa-angle-right ml-2"></i></button>
             </div>
 
 
@@ -311,7 +311,8 @@
             <div class="modal-content center-modal address_lists_modal">
             <div class="modal-header address_lists_modal_header d-flex justify-content-center">
                 <span class="big_modal_title">グループ</span>
-                <i class="fa-solid fa-users icon_users"></i>
+                {% comment %} <i class="fa-solid fa-users icon_users"></i> {% endcomment %}
+                <i class="fas fa-users fa-fw fa-2x icon-address-group"></i>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 </button>
             </div>

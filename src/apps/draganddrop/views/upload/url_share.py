@@ -368,17 +368,6 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
         current_user = self.request.user
         url_upload_manage_id = self.kwargs['pk']
         url_upload_manage_obj = UrlUploadManage.objects.filter(pk=url_upload_manage_id).first()
-        # 操作ログ用
-        # 宛先メールアドレス
-        dest_mails = [url_upload_manage_obj.dest_user_mail1,url_upload_manage_obj.dest_user_mail2,url_upload_manage_obj.dest_user_mail3,url_upload_manage_obj.dest_user_mail4,url_upload_manage_obj.dest_user_mail5,url_upload_manage_obj.dest_user_mail6,url_upload_manage_obj.dest_user_mail7,url_upload_manage_obj.dest_user_mail8]
-        # 宛先メールアドレスNoneのやつを省く
-        dest_mail_ok = [dest_mail_ok for dest_mail_ok in dest_mails if dest_mail_ok != None]
-        # 宛先メールアドレス('')を省くため文字列に変換
-        dest_mail_log = ' '.join(dest_mail_ok)
-        print(dest_mail_log,"かっこけしたい")
-        # ファイルタイトル
-        file_title = url_upload_manage_obj.title
-        # 操作ログ終わり
 
         # ファイルの削除
         if self.del_file:
@@ -473,9 +462,6 @@ class Step2URLupload(LoginRequiredMixin, CreateView, CommonView):
                         htmlfile.save()
 
         url_upload_manage_obj.save()
-        # 操作ログ
-        print("URLふぁいるずadd_log直前",files)
-        add_log(2,1,current_user,file_title,files,dest_mail_log,1,self.request.META.get('REMOTE_ADDR'))
 
         return HttpResponseRedirect(reverse('draganddrop:step2_url_upload', kwargs={'pk': url_upload_manage_obj.id}))
 
@@ -484,7 +470,8 @@ class Step3URLupload(TemplateView, CommonView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        current_user = self.request.user
+        
         url_upload_manage_id = self.kwargs['pk']
 
         context["url_upload_manage_id"] = url_upload_manage_id
@@ -544,6 +531,30 @@ class Step3URLupload(TemplateView, CommonView):
             # url_download_file_tableのレコード数を取得
             for urldownloadtable in UrlDownloadtable.objects.filter(url_upload_manage=personal_user_url_upload_manage).all():
                 download_file_table += int(urldownloadtable.url_download_table.all().count())
+
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  url_upload_manage_obj.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = url_upload_manage_obj.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        url_dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        url_dest_users = ' '.join(url_dest_users)
+        # ファイルタイトル
+        file_title = url_upload_manage_obj.title
+        # ファイル名
+        url_upload_files = url_upload_manage_obj.file.all()
+        files = []
+        for file in url_upload_files:          
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,1,current_user,file_title,files,url_dest_users,1,self.request.META.get('REMOTE_ADDR'))
 
         # 個人管理テーブルの作成・更新
         total_data_usage(url_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, url_upload_manage_file_size, 2)
@@ -1116,6 +1127,7 @@ class Step3UrlUpdate(TemplateView, CommonView):  # サーバサイドだけの�
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        current_user = self.request.user
 
         url_upload_manage_id = self.kwargs['pk']
         url_upload_manage_id_tmp = self.request.session['url_upload_manage_id']
@@ -1264,6 +1276,30 @@ class Step3UrlUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         download_table = personal_resource_manage.number_of_url_download_table
         download_file_table = personal_resource_manage.number_of_url_download_file_table
         total_file_size = personal_resource_manage.total_file_size
+
+        #操作ログ用
+        #送信先取得,アドレス帳＆直接入力
+        dest_user =  url_upload_manage.dest_user.values_list('email', flat=True)
+        dest_user_list = list(dest_user)
+        #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+        dest_group = url_upload_manage.dest_user_group.values_list('group_name', flat=True)
+        dest_group_list = list(dest_group)
+        #送信先　直接入力＆アドレス帳＆グループ list型
+        dest_users = dest_user_list + dest_group_list
+        # ↑の('')を省くため文字列に変換
+        dest_users = ' '.join(dest_users)
+        # ファイルタイトル
+        file_title = url_upload_manage.title
+        # ファイル名
+        url_upload_files = url_upload_manage.file.all()
+        files = []
+        for file in url_upload_files:         
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,2,current_user,file_title,files,dest_users,1,self.request.META.get('REMOTE_ADDR'))
 
         # 個人管理テーブルの作成・更新
         total_data_usage(url_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, url_upload_manage_file_size, 2)

@@ -26,52 +26,80 @@
     {% csrf_token %}
 
     <div class="box1_upload">
-        <!-----------------------------------タイトル DL回数-------------------------------------->
-        <div class="box2_upload">
-            <table class="table table-borderless">
-                <tr>
-                    <th>
-                        <h2 class="step1_upload_box_title">1 基本情報</h2>
-                    </th>
-                </tr>
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>タイトル</h2><span class="required_label def">必須</span>
-                    </td>
-                    <td>
-                        {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
-                        {% if form.title.errors %}
-                            {% for error in form.title.errors %}
-                                <div class="title_duplicate_error">
-                                    {{ error }}
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="step1-title-error" style="visibility:hidden"></div>
-                      {% endif %}
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="step1_label_wrapper">
-                            <h2>依頼先</h2><span class="required_label def">必須</span>
-                        {% comment %} <h3>・ファイル共有リクエスト先のメールアドレスを入力してください。</h3> {% endcomment %}
-                    </td>
+        <div class="box_top_upload">
+            <!-----------------------------------タイトル DL回数-------------------------------------->
+            <div class="box2_upload">
+                <table class="table table-borderless">
+                    <tr>
+                        <th>
+                            <h2 class="step1_upload_box_title">1 基本情報</h2>
+                        </th>
+                    </tr>
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>タイトル</h2><span class="required_label def">必須</span>
+                        </td>
                         <td>
-                            {% render_field form.guest_mail class="form-control step1_guest_mail" placeholder="ファイル共有リクエスト先のメールアドレス"  %}
+                            {% render_field form.title class="form-control step1_upload_title" placeholder="タイトル" %}
                             {% if form.title.errors %}
                                 {% for error in form.title.errors %}
-                                    <div class="guest_mail_error">
+                                    <div class="title_duplicate_error">
                                         {{ error }}
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                    <div class="step1-guest-mail-error" style="visibility:hidden"></div>
-                            {% endif %}
+                                <div class="step1-title-error" style="visibility:hidden"></div>
+                          {% endif %}
                         </td>
-                </tr>
-            </table>
+                    </tr>
+    
+                    <tr>
+                        <td class="step1_label_wrapper">
+                                <h2>依頼先</h2><span class="required_label def">必須</span>
+                            {% comment %} <h3>・ファイル共有リクエスト先のメールアドレスを入力してください。</h3> {% endcomment %}
+                        </td>
+                            <td>
+                                {% render_field form.guest_mail class="form-control step1_guest_mail" placeholder="ファイル共有リクエスト先のメールアドレス"  %}
+                                {% if form.title.errors %}
+                                    {% for error in form.title.errors %}
+                                        <div class="guest_mail_error">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                        <div class="step1-guest-mail-error" style="visibility:hidden"></div>
+                                {% endif %}
+                            </td>
+                    </tr>
+                </table>
+            </div>
+            <!---box2_upload 閉じタグ-->
+    
+            <!--有効期限, メッセージ-->
+    
+            <div class="box3_upload">
+                <table class="table table-borderless step1_table">
+                    <tr>
+                        <td class="step1_label_wrapper">
+                                <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
+                        </td>
+                        <td>
+                            <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="step1_label_wrapper">
+                            <h2>メッセージ</h2><span class="optional_label def">任意</span>
+                        </td>
+                        <td>
+                            {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
+                        </td>
+                    </tr>
+    
+                </table>
+            </div>
+            <!---step3_upload 閉じタグ--->
         </div>
         <!---box2_upload 閉じタグ-->
 
@@ -158,7 +186,7 @@
 
             <div class="ml-1 mr-1">
                 <button type="button" class="cancel btn-cancel" data-toggle="modal" id="cancel_btn"
-                    data-target="#CancelModal"><i class="fa-solid fa-xmark mr-2"></i>キャンセル</button>
+                    data-target="#CancelModal">キャンセル</button>
             </div>
 
             <div class="ml-2 mr-1">
@@ -262,76 +290,6 @@
 </div> {% endcomment %}
 <!--アドレス帳モーダル閉じタグ-->
 
-<!--グループ一覧モーダル-->
-
-{% comment %} <div class="modal fade" id="group_book_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-            <div class="modal-content center-modal address_lists_modal">
-                <div class="modal-header address_lists_modal_header d-flex justify-content-center">
-                    <span class="big_modal_title">グループ</span>
-                    <i class="fa-solid fa-users icon_users"></i>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    </button>
-                </div>
-                <div class="modal-body address_lists_modal_body">
-                <p>受信ユーザーを選択してください。</p>
-                <table class="table" id="group_book_list_table" style="table-layout: fixed;">
-                    <thead> 
-                        <tr>
-                            <th class="checkbox_step1"><label><input type="checkbox" id="all_group_list"
-                                        name="all_group_list_ids"></label></th>
-                            <th class="group_name">グループ名</th>
-                            <th class="group_members">会社名 氏名</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="group_boxes">
-                        {% for group_list in group_lists %}
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="group_list_ids" 
-                                value="{{group_list.id}}" id="group_list_data" data-group_name="{{group_list.group_name}}">
-                            </td>
-                            
-                            <td>
-                                {{group_list.group_name}}
-                            </td>
-
-                            <td>
-                                {% for address in group_list.address.all|slice:":5" %}
-                                    {% if address.company_name %}
-                                        {{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
-                                    {% elif address.trade_name %}
-                                        {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
-                                    {% else %}
-                                        {{address.last_name}}{{address.first_name}}<br />
-                                    {% endif %}
-                                {% endfor %}
-                              
-                                {% with group_number=group_list.address.all.count %}
-                                    {% if group_number >= 6 %}
-                                        <div class="rest_dest_user_count">あと{{group_number|add:"-5"}}名</div>
-                                        <div class="triangle dest_user_all_modal" data-toggle="modal"
-                                            data-target="#view_all_member_modal{{group_list.id}}">もっと見る
-                                        </div>
-                                    {% endif %}
-                                {% endwith %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-            </div>
-            <div class="modal-footer address_modal_footer">
-                <button type="button" class="btn my-btn-w7 my-btn-h4 blue_btn rounded-0"
-                    data-dismiss="modal" id="dest_user_group_select_button">選択</button>
-                <button type="button" class="btn my-btn-w7 my-btn-h4 btn-secondary rounded-0"
-                    data-dismiss="modal">閉じる</button>
-            </div>
-        </div>
-    </div>
-</div> {% endcomment %}
 
 <!----------------------------------もっと見るモーダル-------------------------------------->
 {% for group_list in group_lists %}
@@ -341,7 +299,7 @@
     <div class="modal-dialog modal-dialog-centered" role=" document">
         <div class="modal-content center-modal dest_user_confirm_modal">
             <div class="modal-header default_modal_header">
-                <span class="modal-title home_modal_title">グループメンバー<i class="fa-solid fa-users ml-2"></i></span>
+                <span class="modal-title home_modal_title">グループメンバー<i class="fas fa-users ml-2"></i></span>
             </div>
 
             <div class="modal-body">

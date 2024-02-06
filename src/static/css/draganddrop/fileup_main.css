@@ -178,7 +178,7 @@ common class
 .required_label {
     width: 37px;
     height: 20px;
-    padding: 3px;
+    line-height: 20px;
     background: #307db8;
     /* background: #005392; */
     color: #fff;
@@ -190,7 +190,7 @@ common class
     .optional_label {
     width: 37px;
     height: 20px;
-    padding: 3px;
+    line-height:20px;
     background: #bbbbbb;
     /* background: #005392; */
     color: #fff;
@@ -240,6 +240,12 @@ common class
         font-size: 48px;
     }
     .icon-address-book-home {
+        padding-left: 15px;
+        color: #fff;
+        padding-top: 1px;
+        font-size: 47px;
+    }
+    .icon-address-group {
         padding-left: 15px;
         color: #fff;
         padding-top: 1px;
@@ -421,28 +427,6 @@ common class
         color: #FFF;
         background-color: #005392;
         border: solid 2px #005392;
-    }
-
-    .uploadbtn {
-        background-color: #005392;
-        color: #FFF !important;
-        font-size: 30px;
-        font-weight: bold;
-        text-align: center;
-        width: 30%;
-        display: flex;
-        justify-content: center;
-    }
-    .uploadbtn_disabled {
-        background-color: #005392;
-        color: #FFF !important;
-        font-size: 30px;
-        font-weight: bold;
-        text-align: center;
-        width: 30%;
-        display: flex;
-        justify-content: center;
-        opacity: 0.3;
     }
 
     .my-btn {
@@ -963,12 +947,6 @@ common class
         border: solid 1px #FFF;
     }
 
-    p.box {
-        border-bottom: 2px solid #D9D9D9;
-        margin: 0px 0px 16px 0px;
-        width: 1340px;
-    }
-
     .box_progressbar {
         width: 100%;
     }
@@ -1406,7 +1384,7 @@ for Login Page
 
     .address_lists_modal_header {
         background-color: #005392 !important;
-        width: 1138px;
+        /* width: 1138px; */
         margin-bottom: 1rem;
         color: #FFF;
     }
@@ -1570,13 +1548,13 @@ html,body{
     display:flex;
     position: relative;
 }
-.icon_set{
-    min-width: 200px !important;
-    max-width: 200px !important;
-    padding-top: 9px !important;
-}
-.badge-warning{
+/* .badge-warning{
     right: 53px !important;
+} */
+
+.info_number{
+    top: 9px;
+    right: -6px;
 }
 
 .login_user{
@@ -1608,6 +1586,16 @@ html,body{
     color: #a6a6a6;
 }
 
+.dropdown_menu_end{
+    right: 0;
+    left: auto;
+}
+
+
+.info_icon{
+    padding-top: 13px !important;
+    cursor: pointer;
+}
 /************************************************    メニュー部分　************/
 
 .lang-text{
@@ -1778,7 +1766,7 @@ ul.sample1 li{
 
     .box1_upload {
         width: 1336px;
-        height: 650px;
+        /* height: 650px; */
         padding: 10px 10px;
         margin: 0 0;
         font-weight: bold;
@@ -1797,16 +1785,21 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         float: left;
         border-color: #999999;
-        height: 35%
+        /* height: 35% */
     }
 
-    .box2_upload,
+    /* .box2_upload,
     .box3_upload {
         border-bottom: dotted;
         border-color: #999999;
+    } */
+    .box_top_upload{
+        border-bottom: dotted;
+        border-color: #999999;
+        height:250px;
     }
 
     .box2_upload {
@@ -1825,7 +1818,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         width: 60%;
         float: left;
     }
@@ -1836,7 +1829,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         /* clear: both; */
         height: 65%;
         width: 40%;
@@ -1849,7 +1842,7 @@ ul.sample1 li{
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         width: 100%;
         height: 90%;
         margin-left: auto;
@@ -2166,7 +2159,7 @@ font-family: 'Font Awesome 5 Free';
 
     .box1_url {
         width: 1336px;
-        height: 650px;
+        /* height: 650px; */
         padding: 10px 10px;
         margin: 0 0;
         font-weight: bold;
@@ -2186,12 +2179,12 @@ font-family: 'Font Awesome 5 Free';
         box-sizing: border-box;
         text-align: center;
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px; /* span必須・任意用*/
         float: left;
         border-color: #999999;
         padding-bottom: 5px;
         width: 50%;
-        height: 45%
+        /* height: 45% */
     }
 
     .box11 {
@@ -2231,7 +2224,7 @@ font-family: 'Font Awesome 5 Free';
         text-align: center;
         /* line-height: 100px; */
         font-weight: bold;
-        font-size: 5px;
+        font-size: 10px;
         clear: both;
         height: 55%;
         width: 60%;
@@ -2426,7 +2419,7 @@ font-family: 'Font Awesome 5 Free';
     }
 
     .step1_guestul_mail6 {
-        margin-top: 60px;
+        margin-top: 86px;
     }
 
     /*--------------------
@@ -3104,10 +3097,10 @@ DatePicker
     color: #FFF;
     }
 
-.address_sign_up_modal {
+/* .address_sign_up_modal {
     width: 750px;
     overflow-x: auto;
-}
+} */
 .address_sign_up_modal_body {
     width: 750px;
 }
@@ -3181,6 +3174,67 @@ DatePicker
     content: '\f071';
     font-family: 'Font Awesome 5 Free';
 } 
+
+/*----------------------------------------------------------------------------------------
+ホーム・メニュー
+------------------------------------------------------------------------------------------*/
+.home_menu{
+    width:1260px;
+    margin: 20px auto;
+    min-width: 1260px;
+    display:flex;
+    justify-content: space-between;
+}
+
+.home_menu .home_menu_wrap{
+    width: 30%;
+}
+
+/* homeドロップダウン中身 */
+.home_menu_btn{
+    width: 100%;
+    font-size: 20px;
+    border-radius: 0;
+    background-color: #005392;
+    color: #fff;
+    font-weight: bold;
+    padding:10px;
+}
+.home_menu_btn_disabled{
+    width: 100%;
+    font-size: 20px;
+    border-radius: 0;
+    background-color: #005392;
+    color: #fff;
+    font-weight: bold;
+    opacity:0.3;
+}
+
+.home_menu_btn:hover{
+    color: #fff;
+}
+
+.home_menu .home_menu_drop{
+    width: 100%;
+    background-color: #005CA2;
+}
+/* クリック時 */
+.home_menu_item:active {
+    text-decoration: none;
+    background-color: #fff;
+}
+.home_menu .home_menu_drop_disabled{
+    width: 100%;
+    background-color: #005CA2;
+    opacity:0.3;
+}
+.home_menu_item{
+    color:#fff;
+    padding: .4rem 1.5rem;
+}
+.home_menu_item:hover{
+    color:#005CA2;
+}
 
 /*---------------------------------
 管理画面
@@ -3322,7 +3376,7 @@ DatePicker
     width: 1336px;
     display: flex;
     justify-content: space-between;
-    margin: 150px 0;
+    margin-bottom: 150px;
 }
 
 
@@ -3430,7 +3484,11 @@ DatePicker
     margin-top:20px;
     border-bottom: 3px solid #005392;
 }
-
+.log-address-title{
+    font-size: 18px;
+    color:#464646;
+    margin-top:20px;
+}
 /********************　ログアウト　****************************/
 .logout-btn{
     font-size:14px !important;
@@ -3442,6 +3500,14 @@ DatePicker
 }
 
 /**********************  お知らせ  ****************************/
+.notice_modal_header{
+    padding:0;
+}
+.info_tab .nav-link{
+    padding: 0 !important;
+    font-size: 14px;
+}
+
 .tab > li.active {
     color: #fff;
     background: #008080;
@@ -3456,4 +3522,195 @@ DatePicker
 
 .info-guide {
     border-bottom: 4px solid #004376;
+}
+
+.tab > li {
+    display: table-cell;
+    vertical-align: middle;
+    width: 600px;
+    color: #6f6e6e;
+    background-color:#d8d5d1;
+    margin: 0 10px -1px 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    list-style: none;
+    -webkit-transition: .3s;
+    transition: .3s;
+    position: relative;
+    text-align: center;
+    font-weight: bold;
+}
+.nav-item > a.active {
+    color: #fff !important;
+    cursor: auto;
+    border: none;
+}
+.nav-item > a{
+    color: #575757;
+}
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: transparent;
+    border:none;
+}
+.nav-link:hover{
+    border:none;
+}
+li.nav-item:has(a.active) {
+    color: #fff;
+    background: #008080 !important;
+    cursor: auto;
+}
+
+.tab > li.active a{
+    text-decoration: none;
+    color: #ffffff;
+}
+/* .tab > li.active {
+    color: #fff;
+    background: #008080;
+    cursor: auto;
+}
+
+.tab > li.active a{
+    text-decoration: none;
+    color: #ffffff;
+} */
+
+.info_tab {
+    margin-bottom: 0.7rem;
+}
+
+/* お知らせ内容  */
+.area{
+    min-height:300px;
+    max-height:300px;
+}
+
+.area ul {
+    display: none;
+}
+.area ul.show {
+    min-height:300px;
+    max-height:300px;
+    display: block;
+    list-style: none;
+    padding-left: 0;
+}
+
+.show > li a {
+    /* position: relative; */
+    display: table;
+    padding: 10px 0;
+    width: 100%;
+    height: 50px;
+    color: #222222;
+    text-decoration: none;
+    cursor: default;
+}
+
+.show > li .newsList-date {
+    display: table-cell;
+    padding: 0 0 0 10px;
+    width: 114px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.show > li .newsList-category {
+    display: table-cell;
+    width: 110px;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.show > li .newsList-title {
+    display: table-cell;
+    padding: 0 0 0 30px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 16px; 
+}
+
+.show > li .red {
+    color: #202429 !important;
+}
+
+.show > li .newsList-category span {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 0;
+    width: 110px;
+    background: #E9ECEF;
+    color: #000000;
+    text-align: center;
+    font-size: 12px;
+}
+
+.show > li .newsList-empty {
+    display: table-cell;
+    padding: 0 0 0 30px;
+    text-align: left;
+    vertical-align: middle;
+    color: #000000;
+} 
+
+.using{
+    height:100px;
+    width:200px;
+    background-color: #008080;
+    border-radius: 100px 100px 0 0;
+}
+
+.trial-text{
+    color:#294a6a;
+}
+
+#no-info{
+    color: rgb(69, 57, 57) !important;
+}
+
+
+
+/**** tameshi  ***/
+.info_tab{
+    border-bottom: 3px solid #008080;
+    padding-left: 0;
+    display: table;
+    table-layout: fixed;
+}
+
+.info_tab > a{
+    display: table-cell;
+    vertical-align: middle;
+    width: 600px;
+    color: #575757;
+    background-color:#d8d5d1 !important;
+    margin: 0 10px -1px 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    list-style: none;
+    -webkit-transition: .3s;
+    transition: .3s;
+    position: relative;
+    text-align: center;
+    font-weight: bold;
+}
+
+.info_tab > a.active {
+    color: #fff !important;
+    background: #008080 !important;
+    cursor: auto;
+    border: none;
+}
+
+.nav-tabs .nav-link{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.show li{
+    list-style: none;
 }
