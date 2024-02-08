@@ -430,7 +430,7 @@ class Step3(TemplateView, CommonView):
 
     def get_context_data(self, **kwargs):
 
-        # print("------------------- Step3")
+        print("------------------- Step3")
 
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
@@ -441,6 +441,8 @@ class Step3(TemplateView, CommonView):
 
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
         upload_manage.tmp_flag = 0
+
+        print("------------------- upload_manage.pk", upload_manage.pk)
 
         context["upload_manage"] = upload_manage
 
@@ -558,13 +560,15 @@ class Step3(TemplateView, CommonView):
                     # print("------------------ first_approversがいます", first_approver.first_approver)
                     # ApprovalManageを作成
                     first_approver_approval_manage = ApprovalManage.objects.create(
-                        upload_mange = upload_manage,
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
                         application_title = upload_manage.title,
                         application_user = upload_manage.created_user,
                         application_date = upload_manage.created_date,
                         application_user_company_id = upload_manage.company,
                         approval_status = 1,
-                        first_approver = first_approver.first_approver
+                        first_approver = first_approver.first_approver,
+                        upload_method = 1 # 通常アップロード
                     )
                     first_approver_approval_manage.save()
 
@@ -573,13 +577,15 @@ class Step3(TemplateView, CommonView):
                 for second_approver in second_approvers:
                     # ApprovalManageを作成
                     second_approver_approval_manage = ApprovalManage.objects.create(
-                        upload_mange = upload_manage,
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
                         application_title = upload_manage.title,
                         application_user = upload_manage.created_user,
                         application_date = upload_manage.created_date,
                         application_user_company_id = upload_manage.company,
                         approval_status = 1,
-                        second_approver = second_approver.second_approver
+                        second_approver = second_approver.second_approver,
+                        upload_method = 1 # 通常アップロード
                     )
                     second_approver_approval_manage.save()
 
@@ -803,6 +809,8 @@ class Step1Update(FormView, CommonView):
         upload_manage.dl_limit = dl_limit
         # メッセージをセット
         upload_manage.message = message
+        # アップロード方法をセット
+        upload_manage.upload_method = 1# 通常アップロード
 
         # メールアドレス直接入力 DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
@@ -1326,7 +1334,14 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
         print("ふぁいるずadd_log直前")
         add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
-        
+        # ApprovalManageを取得
+        approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage)
+        for approval_manage in approval_manages:
+            # 値を更新
+            approval_manage.application_title = upload_manage.title
+            approval_manage.application_date = upload_manage.created_date
+            approval_manage.save()
+
         # 個人管理テーブルの作成・更新
         total_data_usage(upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, upload_manage_file_size, 1)
         # 会社管理テーブルの作成・更新

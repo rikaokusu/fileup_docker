@@ -87,26 +87,46 @@
                             <h2>有効期限</h2><span class="required_label def">必須</span>
                         </td>
                         {% if plan == "free" %}
-                        <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
-                            <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div>
-                            <div class="mb-3 3d_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">３日間</div>
-                            <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
-                            <div class="mb-3 14d_btn btn btn-outline-primary end_date_btn_disabled my-btn-4 rounded-0">14日間</div>
-                            <div class="mb-3 1m_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">1ヶ月間</div>
-                            <div class="mb-3 mm_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">無期限</div>
+                            <td data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top">
+                                <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date|append_attr:"readonly:readonly" class="form-control" style="pointer-events: none;" %}</div>
+                                <div class="mb-3 3d_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">３日間</div>
+                                <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                                <div class="mb-3 14d_btn btn btn-outline-primary end_date_btn_disabled my-btn-4 rounded-0">14日間</div>
+                                <div class="mb-3 1m_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">1ヶ月間</div>
+                                <div class="mb-3 mm_btn btn btn-outline-primary end_date_btn_disabled my-btn-w4 rounded-0">無期限</div>
+                            <!-- エラー -->
+                            {% if form.end_date.errors %}
+                                {% for error in form.end_date.errors %}
+                                    <div class="title_duplicate_error m-0">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="step1-title-error m-0" style="visibility:hidden"></div>
+                            {% endif %}
                         </td>
                         {% else %}
-                        <td>
-                            <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date class="form-control" %}</div>
-                            <div class="mb-3 3d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">３日間</div>
-                            <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
-                            <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
-                            <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
-                            <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
-                        </td>
+                            <td>
+                                <div class="mb-3 step1_upload_date data_picker_table">{% render_field form.end_date class="form-control" %}</div>
+                                <div class="mb-3 3d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">３日間</div>
+                                <div class="mb-3 7d_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">7日間</div>
+                                <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
+                                <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
+                                <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
+                                <!-- エラー -->
+                                {% if form.end_date.errors %}
+                                    {% for error in form.end_date.errors %}
+                                        <div class="title_duplicate_error m-0">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="step1-title-error m-0" style="visibility:hidden"></div>
+                                {% endif %}
+                            </td>
                         {% endif %}
                     </tr>
-                    
+
                     <tr>
                         <td class="step1_label_wrapper">
                             <h2>メッセージ</h2><span class="optional_label def">任意</span>

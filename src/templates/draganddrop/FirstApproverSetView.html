@@ -325,17 +325,24 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         <!-- 役職名 -->
                         <td class="r_task_reminder_col_2 align-middle">
                             {% comment %} {{ user.company.pic_company_name }} {% endcomment %}
-                            部長
                         </td>
 
                         <!-- 削除ボタン -->
                         <td class="r_task_reminder_col_2" style="text-align:right; vertical-align: middle;">
-
-                            <!-- ログインユーザーの削除ボタンは非表示 -->
-                            <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" title="権限の取り消し" id="delete_is_co_admin_user" data-toggle="modal" data-target="#co_admin_user_delete_modal{{forloop.counter}}" data-pk="{{ user.id }}">
-                                権限の取り消し
-                            </button>
-
+                            {% if first_approver_count <= 1 %}
+                                <!-- 承認者が一名しか設定されていない場合はボタンを無効化 -->
+                                <sapan>
+                                    <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" id="delete_is_co_admin_user"
+                                        title="承認者は一名以上必要です" style="pointer-events: none; opacity: 0.2;">
+                                        権限の取り消し
+                                    </button>
+                                </sapan>
+                            {% else %}
+                                <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" title="権限の取り消し" id="delete_is_co_admin_user"
+                                    data-toggle="modal" data-target="#co_admin_user_delete_modal{{forloop.counter}}" data-pk="{{ user.id }}">
+                                    権限の取り消し
+                                </button>
+                            {% endif %}
                         </td>
 
                     </tr>

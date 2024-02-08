@@ -45,9 +45,9 @@ urlpatterns = [
      path('guest_file_download_status/', file_download.GuestFileDownloadStatus.as_view(), name='guest_file_download_status'),
 
      ## send_table.py ##
-     # 送信テーブルファイルアップロード単数削除 
+     # 送信テーブルファイルアップロード単数削除 ☑
      path('delete/', send_table.DeleteAjaxView.as_view(), name='delete'),
-     # 送信テーブルのファイルアップロード ファイルのみ削除 
+     # 送信テーブルのファイルアップロード ファイルのみ削除 ☑
      path('file_delete/', send_table.FileDeleteAjaxView.as_view(), name='file_delete'),
      # 送信テーブル URL共有単数削除  
      path('url_delete/', send_table.UrlDeleteAjaxView.as_view(), name='url_delete'),
@@ -63,7 +63,7 @@ urlpatterns = [
      path('send_table_file_multi_delete/', send_table.SendTableFileMultiDeleteAjaxView.as_view(), name='send_table_file_multi_delete'),
 
      ## download_table.py ##
-     # 受信テーブル ファイルアップロード単数削除(ゴミ箱へ) 
+     # 受信テーブル ファイルアップロード単数削除(ゴミ箱へ)
      path('downloadtabledelete/', download_table.DownloadTableDeleteAjaxView.as_view(), name='downloadtabledelete'),
      # 受信テーブル URL共有単数削除(ゴミ箱へ)
      path('urldownloadtabledelete/', download_table.UrlDownloadTableDeleteAjaxView.as_view(), name='urldownloadtabledelete'),
@@ -256,9 +256,16 @@ urlpatterns = [
 
      # 承認
      path('approve/<uuid:pk>/', approval.ApproveView.as_view(), name='approve'),
-     # 差し戻し
+     # 差戻し
      path('returned_application/<uuid:pk>/', approval.DeclineApplicationView.as_view(), name='returned_application'),
-
+     # 再申請
+     path('reapplication/<uuid:pk>/', approval.ReapplicationView.as_view(), name='reapplication'),
+     # 取り消し(削除) 通常アップロードアップロード
+     path('approvaldelete/', approval.ApprovalDeleteAjaxView.as_view(), name='approvaldelete'),
+     # 取り消し(削除) URL共有
+     path('urlapprovaldelete/', approval.UrlApprovalDeleteAjaxView.as_view(), name='urlapprovaldelete'),
+     # 取り消し(削除) OPT共有
+     path('optapprovaldelete/', approval.OTPApprovalDeleteAjaxView.as_view(), name='optapprovaldelete'),
 
      ##################################
      # 操作ログ  

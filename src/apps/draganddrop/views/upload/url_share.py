@@ -4,6 +4,7 @@ from draganddrop.views.home.home_common import CommonView, total_data_usage, res
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
 from draganddrop.models import Filemodel, PDFfilemodel, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -119,6 +120,8 @@ class Step1UrlUpload(FormView, CommonView):
         url_upload_manage_obj.created_date = datetime.datetime.now()
         # # テンポラリフラグをセット
         url_upload_manage_obj.tmp_flag = 1
+        # アップロード方法をセット
+        url_upload_manage_obj.upload_method = 2# URL共有
 
         # # 保存期日とタイトルに関しても上記と同じように取得
         title = form.cleaned_data['title']
@@ -472,6 +475,9 @@ class Step3URLupload(TemplateView, CommonView):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         
+
+        print("------------------- URL共有 Step3URLupload")
+
         url_upload_manage_id = self.kwargs['pk']
 
         context["url_upload_manage_id"] = url_upload_manage_id
@@ -560,7 +566,64 @@ class Step3URLupload(TemplateView, CommonView):
         total_data_usage(url_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, url_upload_manage_file_size, 2)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
-            
+
+
+        # ユーザーの承認ワークフロー設定を取得
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        print("------------------ approval_workflow step2", approval_workflow)
+
+        # 承認ワークフローが「使用する」に設定されている場合
+        if approval_workflow.is_approval_workflow:
+
+            # 申請ステータスを「申請中」に設定
+            url_upload_manage_obj.application_status = 1
+            url_upload_manage_obj.save()
+
+            # 一次承認者を取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ first_approvers step2", first_approvers)
+            # 二次承認者を取得
+            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ second_approver step2", second_approvers)
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+                for first_approver in first_approvers:
+                    # print("------------------ first_approversがいます", first_approver.first_approver)
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        url_upload_manage = url_upload_manage_obj,
+                        manage_id = url_upload_manage_obj.id,
+                        application_title = url_upload_manage_obj.title,
+                        application_user = url_upload_manage_obj.created_user,
+                        application_date = url_upload_manage_obj.created_date,
+                        application_user_company_id = url_upload_manage_obj.company,
+                        approval_status = 1,
+                        first_approver = first_approver.first_approver,
+                        upload_method = 2 # URL共有
+                    )
+                    first_approver_approval_manage.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        url_upload_manage = url_upload_manage_obj,
+                        manage_id = url_upload_manage_obj.id,
+                        application_title = url_upload_manage_obj.title,
+                        application_user = url_upload_manage_obj.created_user,
+                        application_date = url_upload_manage_obj.created_date,
+                        application_user_company_id = url_upload_manage_obj.company,
+                        approval_status = 1,
+                        second_approver = second_approver.second_approver,
+                        upload_method = 2 # URL共有
+                    )
+                    second_approver_approval_manage.save()
+
+
+
+
         return context
 
 ##################################
@@ -1300,6 +1363,14 @@ class Step3UrlUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         # 操作ログ終わり
         # 操作ログ
         add_log(2,2,current_user,file_title,files,dest_users,1,self.request.META.get('REMOTE_ADDR'))
+
+        # ApprovalManageを取得
+        approval_manages = ApprovalManage.objects.filter(url_upload_manage=url_upload_manage)
+        for approval_manage in approval_manages:
+            # 値を更新
+            approval_manage.application_title = url_upload_manage.title
+            approval_manage.application_date = url_upload_manage.created_date
+            approval_manage.save()
 
         # 個人管理テーブルの作成・更新
         total_data_usage(url_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, url_upload_manage_file_size, 2)

@@ -27,11 +27,6 @@ class DownloadTableDeleteAjaxView(View,CommonView):
         current_user = self.request.user
         delete_id = request.POST.get('delete_id') #downloadtableのid
         delete_name = request.POST.get('delete_name')#ファイルタイトル
-        # print('----------------- delete_id', delete_id)
-        # print('----------------- delete_name', delete_name)
-
-        cancel_comment = request.POST.get('cancel_comment')
-        # print("----------------- cancel_comment", cancel_comment)
 
         try:
             # ダウンロードテーブルに変更
@@ -48,34 +43,14 @@ class DownloadTableDeleteAjaxView(View,CommonView):
             files = ' '.join(files)
             # files = uploadmanage.file.all()
             #操作ログ終わり
+            print("------------- uploadmanage", uploadmanage)
+            files = uploadmanage.file.all()
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()
             # 操作ログ登録
             print('もしかしてfileみえない？3',files)
             add_log(2,3,current_user,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
-
-            # UploadManageのステータスをキャンセルに更新
-            uploadmanage.application_status = 6 # キャンセル
-            uploadmanage.save()
-
-            # ApprovalManageのステータスをキャンセルに更新
-            approval_manages = ApprovalManage.objects.filter(upload_mange=uploadmanage)
-            for approval_manage in approval_manages:
-                # ステータスをキャンセルに更新
-                approval_manage.approval_status = 5 # キャンセル
-                approval_manage.save()
-
-            # 承認履歴を残す
-            approval_log = ApprovalLog.objects.create(
-                approval_manage = ApprovalManage.objects.filter(upload_mange=uploadmanage).first(),
-                approval_operation_user = self.request.user.id,
-                approval_operation_user_company_id = self.request.user.company.id,
-                approval_operation_date = datetime.now(),
-                approval_operation_content = 5, # キャンセル
-                message = cancel_comment,
-            )
-            approval_log.save()
 
             #メッセージを格納してJSONで返す
             data = {}

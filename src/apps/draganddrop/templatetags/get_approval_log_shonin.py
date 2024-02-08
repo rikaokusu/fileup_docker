@@ -7,15 +7,15 @@ register = template.Library()
 
 
 @register.filter
-def get_approval_log(value):
-    """ 申請一覧 承認履歴を取得"""
-    print("--------------- 申請一覧 承認履歴を取得 value", value)
+def get_approval_log_shonin(value):
+    """ 承認一覧 承認履歴を取得"""
+    print("--------------- 承認一覧 承認履歴を取得 value", value)
 
     # 通常アップロード
     if value.upload_method == 1:
         # print("------------------------- 通常アップロード")
 
-        upload_manages = UploadManage.objects.filter(id=value.id)
+        upload_manages = UploadManage.objects.filter(id=value.manage_id)
         # print("--------------- upload_manages", upload_manages)
 
         upload_manage_list = []
@@ -32,7 +32,7 @@ def get_approval_log(value):
     elif value.upload_method == 2:
         # print("------------------------- URL共有")
 
-        url_upload_manages = UrlUploadManage.objects.filter(id=value.id)
+        url_upload_manages = UrlUploadManage.objects.filter(id=value.manage_id)
         # print("--------------- upload_manages", upload_manages)
 
         url_upload_manage_list = []
@@ -49,7 +49,7 @@ def get_approval_log(value):
     elif value.upload_method == 3:
         # print("------------------------- OPT共有")
 
-        opt_upload_manages = OTPUploadManage.objects.filter(id=value.id)
+        opt_upload_manages = OTPUploadManage.objects.filter(id=value.manage_id)
         # print("--------------- opt_upload_manages", opt_upload_manages)
 
         opt_upload_manage_list = []
@@ -66,7 +66,7 @@ def get_approval_log(value):
     else:
         # print("------------------------- ゲストアップロード")
 
-        guest_upload_manages = GuestUploadManage.objects.filter(id=value.id)
+        guest_upload_manages = GuestUploadManage.objects.filter(id=value.manage_id)
         # print("--------------- upload_manages", upload_manages)
 
         guest_upload_manage_list = []

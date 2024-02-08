@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
 from draganddrop.models import Filemodel, UploadManage, Downloadtable, DownloadFiletable, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable
+from draganddrop.models import ApprovalManage, ApprovalLog
 from django.http import JsonResponse
 import urllib.parse
 import os
@@ -9,18 +10,29 @@ from django.db.models import Q
 from django.conf import settings
 import zipfile
 
+# 時刻取得
+from datetime import datetime, timedelta
+
 ############################################
 # 送信テーブル単数削除 #
 ############################################
 
 class DeleteAjaxView(View):
+
     def post(self, request):
+
+        print('----------------- DeleteAjaxView')
 
         # ダウンロードされたファイルが単体か複数か判断するための変数
         # is_type = request.POST.get('is_type')
         send_delete_id = request.POST.getlist('send_delete_id[]')
         send_delete_name = request.POST.get('send_delete_name')
+        print("------------- send_delete_id", send_delete_id)
+        print("------------- send_delete_name", send_delete_name)
+
         upload_manages = UploadManage.objects.filter(pk__in=send_delete_id)
+        print("------------- upload_manages", upload_manages)
+
 
         try:
             for upload_manage in upload_manages:
@@ -60,6 +72,14 @@ class DeleteAjaxView(View):
 
                     # DBの対象行を削除
                     file.delete()
+
+                # ApprovalManageを削除
+                approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage)
+                approval_manages.delete()
+
+                # ApprovalLogを削除
+                approval_logs = ApprovalLog.objects.filter(upload_manage=upload_manage)
+                approval_logs.delete()
 
                 upload_manage.delete()
 
@@ -209,6 +229,14 @@ class UrlDeleteAjaxView(View):
 
                     # DBの対象行を削除
                     file.delete()
+
+                # ApprovalManageを削除
+                url_approval_manages = ApprovalManage.objects.filter(url_upload_manage=url_upload_manage)
+                url_approval_manages.delete()
+
+                # ApprovalLogを削除
+                url_approval_logs = ApprovalLog.objects.filter(url_upload_manage=url_upload_manage)
+                url_approval_logs.delete()
 
                 url_upload_manage.delete()
 

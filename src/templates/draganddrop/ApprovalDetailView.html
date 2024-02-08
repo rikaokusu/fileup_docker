@@ -3,6 +3,7 @@
 {% load get_user_invoice_dept_name %}
 {% load get_operation_user_name %}
 {% load get_extention %}
+{% load is_past_due %}
 
 {% block content %}
 
@@ -140,7 +141,41 @@
 
 				<tr>
 					<td class="tr_head">申請件名</td>
-					<td>{{ approval_manage.application_title }}</td>
+					<td>
+                    {% if approval_manage.upload_method == 1 %}<!-- 通常アップロード -->
+                        {% if approval_manage.upload_manage.file_del_flag == 1 %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.upload_manage.title }}">{{ approval_manage.upload_manage.title }}
+                            </span><br>
+                            <p class="file_del_tag">ファイル削除済み</p>
+                        {% elif approval_manage.upload_manage.end_date|is_past_due %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.upload_manage.title }}">{{ approval_manage.upload_manage.title }}</span><br>
+                            <p class="expired_tag">期限切れ</p>
+                        {% else %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.upload_manage.title }}">{{ approval_manage.upload_manage.title }}</span>
+                        {% endif %}
+                    {% elif approval_manage.upload_method == 2 %}<!-- URL共有 -->
+                        {% if approval_manage.url_upload_manage.file_del_flag == 1 %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.url_upload_manage.title }}">{{ approval_manage.url_upload_manage.title }}
+                            </span><br>
+                            <p class="file_del_tag">ファイル削除済み</p>
+                        {% elif approval_manage.url_upload_manage.end_date|is_past_due %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.url_upload_manage.title }}">{{ approval_manage.url_upload_manage.title }}</span><br>
+                            <p class="expired_tag">期限切れ</p>
+                        {% else %}
+                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                title="{{ approval_manage.url_upload_manage.title }}">{{ approval_manage.url_upload_manage.title }}</span>
+                        {% endif %}
+                    {% elif approval_manage.upload_method == 3 %}<!-- OPT共有 -->
+                        OPT共有
+                    {% else %}<!-- ゲストアップロード -->
+                        ゲストアップロード
+                    {% endif %}
+                    </td>
 				</tr>
 
 				<tr>
@@ -150,42 +185,93 @@
 
 				<tr>
 					<td class="tr_head">申請日時</td>
-					<td>{{ approval_manage.application_date }}</td>
+					<td>{{ approval_manage.application_date|date:'Y/m/d' }}
+                        {{ approval_manage.application_date|date:'H:i' }}
+                    </td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">コメント内容</td>
-					<td>{{ approval_manage.upload_mange.message }}</td>
+					<td>
+                        {% if approval_manage.upload_method == 1 %}<!-- 通常アップロード -->
+                            {{ approval_manage.upload_manage.message }}
+                        {% elif approval_manage.upload_method == 2 %}<!-- URL共有 -->
+                            {{ approval_manage.url_upload_manage.message }}
+                        {% elif approval_manage.upload_method == 3 %}<!-- OPT共有 -->
+                            {{ approval_manage.url_upload_manage.message }}
+                        {% else %}<!-- ゲストアップロード -->
+                            {{ approval_manage.url_upload_manage.message }}
+                        {% endif %}
+                    </td>
 				</tr>
 
 				<tr>
 					<td class="tr_head">送付ファイル</td>
 					<td>
-						{% comment %} {% for file in approval_manage.upload_mange.file.all %}
-							{{ file }}<br>
-						{% endfor %} {% endcomment %}
+                        {% if approval_manage.upload_method == 1 %}<!-- 通常アップロード -->
+                            {% for file in approval_manage.upload_manage.file.all %}
+                                {% with extention=file.name|get_extention %}
+                                    {% if approval_manage.upload_manage.file_del_flag == 0 %}
+                                        <a href="{{ file.upload.url }}" id="{{ file.id }}" class="urldownloadtable"
+                                            download="{{ file.name }}" data-toggle="tooltip"
+                                            data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
+                                            title="{{ file.name }}">{{ file.name | truncatechars:16 }}
 
-                        {% for file in approval_manage.upload_mange.file.all %}
-                            {% with extention=file.name|get_extention %}
-                                <a href="{{ file.upload.url }}" id="{{ file.id }}" class="urldownloadtable"
-                                    download="{{ file.name }}" data-toggle="tooltip"
-                                    data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
-                                    title="{{ file.name }}">{{ file.name | truncatechars:16 }}
-            
-                                    {% if extention == ".pdf" %}
-                                    <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
-                                            class="fas fa-search"></i></a>
-            
-                                    {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
-                                    <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
-            
-                                    {% elif extention == ".txt" %}
-                                    <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
-                                    {%endif%}
-                                </a>
-                                <br>
-                            {%endwith%}
-                        {% endfor %}
+                                            {% if extention == ".pdf" %}
+                                                <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                                        class="fas fa-search"></i>
+                                                </a>
+                                            {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
+                                                <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+                                            {% elif extention == ".txt" %}
+                                                <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+                                            {%endif%}
+                                        </a>
+                                        <br>
+                                    {% else %}<!-- ファイル削除済み -->
+                                        <del data-toggle="tooltip" data-placement="right"
+                                            title="{{file.name}}">{{ file.name | truncatechars:16 }}<br>
+                                        </del>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+
+                        {% elif approval_manage.upload_method == 2 %}<!-- URL共有 -->
+                            {% for file in approval_manage.url_upload_manage.file.all %}
+                                {% with extention=file.name|get_extention %}
+                                    {% if approval_manage.url_upload_manage.file_del_flag == 0 %}
+                                        <a href="{{ file.upload.url }}" id="{{ file.id }}" class="urldownloadtable"
+                                            download="{{ file.name }}" data-toggle="tooltip"
+                                            data-url_downloadtable_id="{{ url_dest_user_data.id }}" data-placement="right"
+                                            title="{{ file.name }}">{{ file.name | truncatechars:16 }}
+
+                                            {% if extention == ".pdf" %}
+                                                <a class="iframe" href="/static/js/pdfjs/web/viewer.html?file={{ file.upload.url }}"><i
+                                                        class="fas fa-search"></i>
+                                                </a>
+                                            {% elif extention == ".jpeg" or extention == ".jpg" or extention == ".png" or extention == ".gif" or extention == ".svg"%}
+                                                <a class="image" href="{{ file.upload.url }}"><i class="fas fa-search"></i></a>
+
+                                            {% elif extention == ".txt" %}
+                                                <a class="iframe" href="{{ file.pdffilemodel.upload.url }}"><i class="fas fa-search"></i></a>
+                                            {%endif%}
+                                        </a>
+                                        <br>
+                                    {% else %}<!-- ファイル削除済み -->
+                                        <del data-toggle="tooltip" data-placement="right"
+                                            title="{{file.name}}">{{ file.name | truncatechars:16 }}<br>
+                                        </del>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+
+                        {% elif user_approval_manage.upload_method == 3 %}<!-- OPT共有 -->
+                            OPT共有
+                        {% else %}<!-- ゲストアップロード -->
+                            ゲストアップロード
+                        {% endif %}
+
+
 					</td>
 				</tr>
 			</tr>
@@ -201,19 +287,16 @@
 						{% if approval_manage.approval_status == 1 %}
                             未承認
 						{% elif approval_manage.approval_status == 2 %}
-                            承認済み
-                        {% elif approval_manage.approval_status == 5 %}
-                            取り消し
-						{% else %}
+                            一次承認済み
+                        {% elif approval_manage.approval_status == 3 %}
+                            最終承認済み
+                        {% elif approval_manage.approval_status == 4 %}
                             差戻し
+						{% else %}
+                            キャンセル
 						{% endif %}
 					</td>
 				</tr>
-
-				{% comment %} <tr>
-					<td class="tr_head">承認者</td>
-					<td>山田 太郎</td>
-				</tr> {% endcomment %}
 
 				<tr>
 					<td class="tr_head">承認日時</td>
@@ -221,15 +304,12 @@
 						{% if not approval_manage.approval_date %}
 							--------------
 						{% else %}
-							{{ approval_manage.approval_date }}
+							{{ approval_manage.approval_date|date:'Y/m/d' }}
+                            {{ approval_manage.approval_date|date:'H:i' }}
 						{% endif %}
                     </td>
 				</tr>
 
-				{% comment %} <tr>
-					<td class="tr_head">次の承認者</td>
-					<td>佐藤 勇作</td>
-				</tr> {% endcomment %}
 			</tr>
 			{% endfor %}
 		</tbody>

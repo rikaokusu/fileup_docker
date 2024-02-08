@@ -92,7 +92,15 @@ APPLICATION_STATUS_CHOICE = (
     (4, '最終承認待ち'),
     (5, '最終承認済み'),
     (6, 'キャンセル'),
-    (7, '差戻し')
+    (7, '差戻し'),
+    (8, '再申請')
+)
+
+UPLOAD_METHOD_CHOICE = (
+    (1, '通常アップロード'),
+    (2, 'URL共有'),
+    (3, 'OPT共有'),
+    (4, 'ゲストアップロード'),
 )
 
 class UploadManage(models.Model):
@@ -123,8 +131,11 @@ class UploadManage(models.Model):
     application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
     # 承認日時
     approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
-    # 論理削除
-    is_rogical_deleted = models.BooleanField('論理削除', default=False)
+    # 再申請済みフラグ
+    is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
+    # アップロード方法
+    upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+
 
     @property
     def is_past_due(self):
@@ -200,6 +211,15 @@ class UrlUploadManage(models.Model):
     url = models.CharField(max_length=140, null=True, blank=True)
     file_del_flag = models.IntegerField(null=True, blank=True, default=0)
     message = models.CharField(max_length=140, blank=True, null=True)
+    # 申請ステータス
+    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 承認日時
+    approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+    # 再申請済みフラグ
+    is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
+    # アップロード方法
+    upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+
 
     @property
     def is_past_due(self):
@@ -256,6 +276,9 @@ class OTPUploadManage(models.Model):
     url = models.CharField(max_length=140, null=True, blank=True)
     file_del_flag = models.IntegerField(null=True, blank=True, default=0)
     message = models.CharField(max_length=140, blank=True, null=True)
+    # アップロード方法
+    upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+
 
     @property
     def is_past_due(self):
@@ -316,6 +339,10 @@ class GuestUploadManage(models.Model):
     message = models.CharField(max_length=140, blank=True, null=True)
     url_invalid_flag = models.IntegerField(verbose_name='ゲストへのURL招待無効フラグ',null=True, blank=True, default=0)
     uploaded_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
+    created_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
+    # アップロード方法
+    upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+
 
     @property
     def is_past_due(self):
@@ -503,8 +530,16 @@ APPLOVAL_STATUS_CHOICE = (
 class ApprovalManage(models.Model):
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # ファイルアップロード
-    upload_mange = models.ForeignKey(UploadManage, on_delete=models.CASCADE, null=True, related_name='upload_mange')
+
+    # UploadManage
+    upload_manage = models.ForeignKey(UploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='upload_manage_approvalmanage_set')
+    # UrlUploadManage
+    url_upload_manage = models.ForeignKey(UrlUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='url_upload_approvalmanage_set')
+    # OTPUploadManage
+    opt_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='opt_upload_approvalmanage_set')
+    # GuestUploadManage
+    guest_upload_manage = models.ForeignKey(GuestUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='guest_upload_approvalmanage_set')
+
     # 申請件名
     application_title = models.CharField('申請件名', max_length=500, blank=True, null=True)
     # 申請ユーザー
@@ -523,6 +558,15 @@ class ApprovalManage(models.Model):
     approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
     # 差戻し日時
     returned_date = models.DateTimeField('差戻し日時',  blank=True, null=True)
+    # 論理削除
+    is_rogical_deleted = models.BooleanField('論理削除', default=False)
+    # 再申請フラグ
+    is_reapplication_flg = models.BooleanField('再申請フラグ', default=False)
+    # アップロード方法
+    upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+    # UploadManageのID
+    manage_id = models.CharField('UploadManageのID', max_length=500, blank=True, null=True)
+
 
 
 APPROVAL_OPERATION_CONTENT = (
@@ -531,16 +575,32 @@ APPROVAL_OPERATION_CONTENT = (
     (3, '最終承認'),
     (4, '差戻し'),
     (5, 'キャンセル'),
+    (6, '再申請'),
+)
+
+APPROVAL_OPERATION_USER_POSITION = (
+    (1, '一次承認者'),
+    (2, '二次承認者'),
+    (3, '申請者'),
 )
 
 """
 承認履歴
 """
 class ApprovalLog(models.Model):
-    # ApprovalManage
-    approval_manage = models.ForeignKey(ApprovalManage, on_delete=models.CASCADE, null=True, related_name='approval_manage')
+    # UploadManage
+    upload_manage = models.ForeignKey(UploadManage, on_delete=models.SET_NULL, null=True, related_name='upload_manage')
+    # URLUploadManage
+    url_upload_manage = models.ForeignKey(UrlUploadManage, on_delete=models.SET_NULL, null=True, related_name='url_upload_manage')
+    # OTPUploadManage
+    opt_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='opt_upload_manage')
+    # GuestUploadManage
+    guest_upload_manage = models.ForeignKey(GuestUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='guest_upload_manage')
     # 操作ユーザー
     approval_operation_user = models.CharField('操作ユーザー', max_length=255, blank=True, null=True)
+    # 操作ユーザーの立場
+    approval_operation_user_position = models.IntegerField(
+        verbose_name='操作ユーザーの立場', default=1, null=True, blank=True, choices=APPROVAL_OPERATION_USER_POSITION)
     # 操作ユーザーの会社のID
     approval_operation_user_company_id = models.CharField(max_length=500, verbose_name="操作ユーザーの会社のID", null=True, blank=True)
     # 操作日時
@@ -550,6 +610,8 @@ class ApprovalLog(models.Model):
         verbose_name='操作', default=0, null=True, blank=True, choices=APPROVAL_OPERATION_CONTENT)
     # メッセージ
     message = models.TextField('メッセージ', blank=True, null=True)
+    # UploadManageのID
+    manage_id = models.CharField('UploadManageのID', max_length=500, blank=True, null=True)
 
 
 

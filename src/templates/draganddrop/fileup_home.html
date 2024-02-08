@@ -85,6 +85,14 @@
     </div>
     <!--その他終わり-->
 </div><!--home_menu終わり-->
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_otp_upload' %}" role="button">OTP共有</a>
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:address_list' %}" role="button">アドレス帳<i
+        class="fas fa-address-book fa-1x icon-address-book-home"></i></a>
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:approval_workflow' %}" role="button">承認ワークフロー</a>
+
+    {% comment %} <a class="btn uploadbtn ml-3 rounded-0" href=""  role="button" style="background-color=gray:">承認ワークフロー</a> {% endcomment %}
+    <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_guest_upload_create' %}" role="button">ゲストアップロード</a>
+    {% comment %} <a class="btn uploadbtn ml-3 rounded-0" href="{% url 'draganddrop:step1_guest_upload' %}" role="button">ゲストアップロード</a> {% endcomment %}
 
 
 
@@ -1096,11 +1104,6 @@
                         
                         <!-- 削除ボタン -->
                         <td class="deleteIcon">
-                        {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
-                            <span data-toggle="tooltip" title="承認済みのファイルは削除できません" data-placement="top">
-                                <button class="fas_button_delete" style="background-color: #C0C0C0;"></button>
-                            </span>
-                        {% else %}
                             {% if upload_manage.file_del_flag == 0 %}
                             <span data-toggle="tooltip" title="削除" data-placement="top">
                                 <button class="fas_button_delete"
@@ -1118,7 +1121,6 @@
                                 data-target="#file_deleted_task_modal"></button>
                             </span>
                             {% endif %}
-                        {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -1318,16 +1320,22 @@
 
                         <!-- 変更ボタン -->
                         <td class="updateIcon">
-                            {% if url_upload_manage.file_del_flag == 1 %}
-                                <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
-                                        <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                            {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
+                                <span data-toggle="tooltip" title="承認済みのファイルは編集できません" data-placement="top">
+                                    <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
                                 </span>
                             {% else %}
-                                <span data-toggle="tooltip" title="データの編集" data-placement="top">
-                                    <a href="{% url 'draganddrop:step1_url_update' url_upload_manage.pk %}">
-                                        <button class="fas_button_edit" ></button>
-                                    </a>
-                                </span>
+                                {% if url_upload_manage.file_del_flag == 1 %}
+                                    <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                                            <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                                    </span>
+                                {% else %}
+                                    <span data-toggle="tooltip" title="データの編集" data-placement="top">
+                                        <a href="{% url 'draganddrop:step1_url_update' url_upload_manage.pk %}">
+                                            <button class="fas_button_edit" ></button>
+                                        </a>
+                                    </span>
+                                {% endif %}
                             {% endif %}
                         </td>
                         

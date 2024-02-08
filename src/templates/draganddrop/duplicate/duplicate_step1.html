@@ -89,6 +89,16 @@
                         <div class="mb-3 14d_btn btn btn-outline-primary end_date_outline_btn my-btn-4 rounded-0">14日間</div>
                         <div class="mb-3 1m_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">1ヶ月間</div>
                         <div class="mb-3 mm_btn btn btn-outline-primary end_date_outline_btn my-btn-w4 rounded-0">無期限</div>
+                        <!-- エラー -->
+                        {% if form.end_date.errors %}
+                            {% for error in form.end_date.errors %}
+                                <div class="title_duplicate_error m-0">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="step1-title-error m-0" style="visibility:hidden"></div>
+                        {% endif %}
                     </td>
                 </tr>
 

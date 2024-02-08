@@ -4,6 +4,7 @@ from draganddrop.views.home.home_common import CommonView, total_data_usage, res
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, ManageTasksStep1Form, DummyForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksUrlStep1Form, UrlDistFileUploadForm, ManageTasksOTPStep1Form, OTPDistFileUploadForm, UrlFileDownloadAuthMailForm, UrlFileDownloadAuthPassForm
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -203,6 +204,8 @@ class DuplicateStep1(FormView, CommonView):
         upload_manage.dl_limit = dl_limit
         # メッセージをセット
         upload_manage.message = message
+        # アップロード方法をセット
+        upload_manage.upload_method = 1 # 通常アップロード
 
         # メールアドレス直接入力 DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
@@ -599,8 +602,65 @@ class DuplicateStep3(TemplateView, CommonView):  # サーバサイドだけの�
         total_data_usage(upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, upload_manage_file_size, 1)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
-            
+
+
+
+        # ユーザーの承認ワークフロー設定を取得
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        # print("------------------ approval_workflow step2", approval_workflow)
+
+        # 承認ワークフローが「使用する」に設定されている場合
+        if approval_workflow.is_approval_workflow:
+
+            # 申請ステータスを「申請中」に設定
+            upload_manage.application_status = 1
+            upload_manage.save()
+
+            # 一次承認者を取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ first_approvers step2", first_approvers)
+            # 二次承認者を取得
+            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ second_approver step2", second_approvers)
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+                for first_approver in first_approvers:
+                    # print("------------------ first_approversがいます", first_approver.first_approver)
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 1,
+                        first_approver = first_approver.first_approver,
+                        upload_method = 1 # 通常アップロード
+                    )
+                    first_approver_approval_manage.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 1,
+                        second_approver = second_approver.second_approver,
+                        upload_method = 1 # 通常アップロード
+                    )
+                    second_approver_approval_manage.save()
+
         return context
+
+
 """
 URL 複製
 """
@@ -794,6 +854,8 @@ class UrlDuplicateStep1(FormView, CommonView):
         url_upload_manage.auth_meth = auth_meth
         # メッセージをセット
         url_upload_manage.message = message
+        # アップロード方法をセット
+        url_upload_manage.upload_method = 2 # URL共有
 
         # メールアドレス直接入力 DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
@@ -1218,6 +1280,60 @@ class UrlDuplicateStep3(TemplateView, CommonView):
         total_data_usage(url_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, url_upload_manage_file_size, 2)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
+
+
+        # ユーザーの承認ワークフロー設定を取得
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        # print("------------------ approval_workflow step2", approval_workflow)
+
+        # 承認ワークフローが「使用する」に設定されている場合
+        if approval_workflow.is_approval_workflow:
+
+            # 申請ステータスを「申請中」に設定
+            url_upload_manage.application_status = 1
+            url_upload_manage.save()
+
+            # 一次承認者を取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ first_approvers step2", first_approvers)
+            # 二次承認者を取得
+            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ second_approver step2", second_approvers)
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+                for first_approver in first_approvers:
+                    # print("------------------ first_approversがいます", first_approver.first_approver)
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        url_upload_manage = url_upload_manage,
+                        manage_id = url_upload_manage.pk,
+                        application_title = url_upload_manage.title,
+                        application_user = url_upload_manage.created_user,
+                        application_date = url_upload_manage.created_date,
+                        application_user_company_id = url_upload_manage.company,
+                        approval_status = 1,
+                        first_approver = first_approver.first_approver,
+                        upload_method = 2 # URL共有
+                    )
+                    first_approver_approval_manage.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        url_upload_manage = url_upload_manage,
+                        manage_id = url_upload_manage.pk,
+                        application_title = url_upload_manage.title,
+                        application_user = url_upload_manage.created_user,
+                        application_date = url_upload_manage.created_date,
+                        application_user_company_id = url_upload_manage.company,
+                        approval_status = 1,
+                        second_approver = second_approver.second_approver,
+                        upload_method = 2 # URL共有
+                    )
+                    second_approver_approval_manage.save()
 
         return context
 

@@ -11,9 +11,20 @@ from accounts.models import Notification,Read
 
 
 class UploadManageAdmin(admin.ModelAdmin):
-    list_display = ('title', '_file', '_dest_user', 'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8', 'created_user',
-                    'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit', 'application_status', 'is_rogical_deleted')
-    list_display_links = ('title',)
+    list_display = ('id', 'title', '_file', '_dest_user', 'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8', 'created_user',
+                    'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit', 'application_status', 'is_reapplied_flg', 'upload_method')
+    list_display_links = ('id', 'title',)
+
+    def _file(self, row):
+        return ','.join([x.name for x in row.file.all()])
+
+    def _dest_user(self, row):
+        return ','.join([x.full_name_preview for x in row.dest_user.all()])
+    
+
+class UrlUploadManageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', '_file', '_dest_user', 'application_status', 'is_reapplied_flg', 'upload_method')
+    list_display_links = ('id', 'title',)
 
     def _file(self, row):
         return ','.join([x.name for x in row.file.all()])
@@ -58,13 +69,19 @@ class ApprovalOperationLogAdmin(admin.ModelAdmin):
 
 
 class ApprovalManageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'approval_status', 'approval_date', 'returned_date', 'first_approver', 'second_approver')
-    list_display_links = ('id', 'upload_mange', 'application_title', 'application_user','application_date', 'application_user_company_id', 'approval_status', 'approval_date', 'returned_date', 'first_approver', 'second_approver')
+    list_display = ('id', 'manage_id', 'upload_manage', 'url_upload_manage', 'opt_upload_manage', 'guest_upload_manage', 'application_title', 'application_user','application_date', 'application_user_company_id', 'approval_status',
+                    'approval_date', 'returned_date', 'first_approver', 'second_approver', 'is_rogical_deleted', 'is_reapplication_flg', 'upload_method')
+    list_display_links = ('id', 'manage_id', 'upload_manage', 'url_upload_manage', 'application_title', 'application_user','application_date', 'application_user_company_id',
+                            'approval_status', 'approval_date', 'returned_date', 'first_approver', 'second_approver', 'is_rogical_deleted', 'is_reapplication_flg',
+                            'upload_method')
 
 
 class ApprovalLogAdmin(admin.ModelAdmin):
-    list_display = ('approval_manage', 'approval_operation_user', 'approval_operation_user_company_id','approval_operation_date', 'approval_operation_content', 'message')
-    list_display_links = ('approval_manage', 'approval_operation_user', 'approval_operation_user_company_id','approval_operation_date', 'approval_operation_content', 'message')
+    list_display = ('upload_manage', 'url_upload_manage', 'opt_upload_manage', 'guest_upload_manage', 'approval_operation_user', 'approval_operation_user_position',
+                    'approval_operation_user_company_id','approval_operation_date', 'approval_operation_content', 'message', 'manage_id')
+    list_display_links = ('upload_manage', 'url_upload_manage', 'opt_upload_manage', 'guest_upload_manage', 'approval_operation_user',
+                            'approval_operation_user_position', 'approval_operation_user_company_id','approval_operation_date',
+                            'approval_operation_content', 'message')
 
 
 class OperationLogAdmin(admin.ModelAdmin):
@@ -83,7 +100,7 @@ admin.site.register(PDFfilemodel)
 admin.site.register(Downloadtable, DownloadtableAdmin)
 admin.site.register(DownloadFiletable, DownloadFiletableAdmin)
 admin.site.register(Group)
-admin.site.register(UrlUploadManage)
+admin.site.register(UrlUploadManage, UrlUploadManageAdmin)
 admin.site.register(UrlDownloadtable)
 admin.site.register(UrlDownloadFiletable)
 admin.site.register(Address)

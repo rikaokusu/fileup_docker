@@ -8,6 +8,7 @@ register = template.Library()
 @register.filter
 def is_past_due(value):
 
+
     date = make_aware(datetime.now())
 
     return date > value

@@ -9,6 +9,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
 
 # 日付
 import datetime
+import pytz
+from django.utils.timezone import make_aware
 
 # 逆参照のテーブルをフィルタやソートする
 from django.db.models import Prefetch
@@ -139,6 +141,24 @@ class ManageTasksStep1Form(forms.ModelForm):
                         raise forms.ValidationError(
                             mark_safe('同じタイトルが既に存在しています。'))
         return title
+
+    def clean_end_date(self):
+        # formに入力された値を取得
+        now = datetime.datetime.now()# naive
+        # print("---------- created_date ---------", now)# 2024-01-22 17:18:38.627163
+
+        # formに入力された値を取得
+        end_date = self.cleaned_data['end_date']# aware
+        # print("---------- end_date ---------", end_date)# 2024-01-22 17:00:59+09:00
+
+        # awareに合わせるために変換
+        created_date = make_aware(now)
+        # print("---------- created_date ---------", created_date)
+
+        # 終了日時が開始日時+5時間より小さければNG
+        if end_date < created_date + datetime.timedelta(hours=5):
+            raise forms.ValidationError('終了日時は開始日時から5時間以上の時刻で設定してください。')
+        return end_date
 
 """
 管理ユーザーの情報変更画面
@@ -332,13 +352,33 @@ class ManageTasksUrlStep1Form(forms.ModelForm):
                         raise forms.ValidationError(
                             mark_safe('同じタイトルが既に存在しています。'))
 
-        return title        
+        return title
+
+    def clean_end_date(self):
+        # formに入力された値を取得
+        now = datetime.datetime.now()# naive
+        # print("---------- created_date ---------", created_date)# 2024-01-22 17:18:38.627163
+
+        # formに入力された値を取得
+        end_date = self.cleaned_data['end_date']# aware
+        # print("---------- end_date ---------", end_date)# 2024-01-22 17:00:59+09:00
+
+        # awareに合わせるために変換
+        created_date = make_aware(now)
+        # print("---------- created_date ---------", created_date)
+
+        # 終了日時が開始日時+5時間より小さければNG
+        if end_date < created_date + datetime.timedelta(hours=5):
+            raise forms.ValidationError('終了日時は開始日時から5時間以上の時刻で設定してください。')
+        return end_date
+
 
 class UrlDistFileUploadForm(forms.ModelForm):
 
     class Meta:
         model = UrlUploadManage
         fields = ('file',)
+
 
 """
 OTP管理フォーム
@@ -420,7 +460,26 @@ class ManageTasksOTPStep1Form(forms.ModelForm):
                         raise forms.ValidationError(
                             mark_safe('同じタイトルが既に存在しています。'))
 
-        return title        
+        return title
+
+    def clean_end_date(self):
+        # formに入力された値を取得
+        now = datetime.datetime.now()# naive
+        # print("---------- created_date ---------", created_date)# 2024-01-22 17:18:38.627163
+
+        # formに入力された値を取得
+        end_date = self.cleaned_data['end_date']# aware
+        # print("---------- end_date ---------", end_date)# 2024-01-22 17:00:59+09:00
+
+        # awareに合わせるために変換
+        created_date = make_aware(now)
+        # print("---------- created_date ---------", created_date)
+
+        # 終了日時が開始日時+5時間より小さければNG
+        if end_date < created_date + datetime.timedelta(hours=5):
+            raise forms.ValidationError('終了日時は開始日時から5時間以上の時刻で設定してください。')
+        return end_date
+
 
 class OTPDistFileUploadForm(forms.ModelForm):
 
