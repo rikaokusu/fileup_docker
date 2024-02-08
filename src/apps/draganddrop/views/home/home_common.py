@@ -4,9 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from accounts.models import User, File
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File,Notification,Read
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm

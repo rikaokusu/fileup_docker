@@ -499,19 +499,31 @@ class Step3(TemplateView, CommonView):
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
-        print('ふぁいるかくにん',files)
-        print('通常あっぷろーどですとユーザー',dest_users)
-        print('通常あっぷろーどですとユーザーりすと',dest_user_list)
-        print('通常あっぷろーどですとグループりすと',dest_group_list)
-        
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
         # 操作ログ
         add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
+        ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
+        #送信先 email
+        emailList_db = ','.join(dest_user_list)
+        #タイトル
+        Notice_title = current_user.display_name + "さんが" + file_title + "を共有しました。"
+        #メッセージ
+        Notice_message = upload_manage.message
+        #グループemaillist作成
+        group_email = []
+        print('なにこれ',upload_manage.dest_user_group)
+        # for group in upload_manage.dest_user_group:
+        #     user = group.group_name
+        #     # email = group.group_name
+        #     print('グループ名わかる？',user)
+            # print('グループ名わかる？',user)
+        # notice_group = Group.objects.first(group_name=)
+
         #############通知する//groupはすべてメールアドレスのリストにしないとかも
-        # Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=file_title,email_list=dest_user_list)
+        Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
         ##################通知終了
 
         for personal_user_upload_manage in personal_user_upload_manages:

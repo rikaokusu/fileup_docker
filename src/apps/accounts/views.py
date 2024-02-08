@@ -241,10 +241,8 @@ class PasswordChange(LoginRequiredMixin, PasswordChangeView, CommonView):
         # 不正遷移check
         if not self.request.user.is_staff:
             if self.request.user.company.pass_change == '2':
-                return render(request, '403.html', status=403)
-
+                return render(request, '403.html', status=403)     
         return super().dispatch(request, *args, **kwargs)
-
 
 """
 ユーザー自身のパスワード変更完了
