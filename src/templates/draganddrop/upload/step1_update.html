@@ -869,12 +869,14 @@ $("#id_dest_user_mail7, #id_dest_user_mail8").on('input', function () {
         //現在のフィールド空白で次のフィールドに入力有
         if($(`#id_dest_user_mail${id_num}`).val() == '' && !$(`#id_dest_user_mail${id_next}`).val() == ''){
             $(`#id_dest_user_mail${id_num}`).val($(`#id_dest_user_mail${id_next}`).val())
-            $(`#id_dest_user_mail${id_num}`).valid()
             $(`#id_dest_user_mail${id_next}`).val("");
+            $(`#id_dest_user_mail${id_num}`).valid()
+
         //現在のフィールド＆次のフィールド空白
         }else if($(`#id_dest_user_mail${id_num}`).val() == '' && $(`#id_dest_user_mail${id_next}`).val() == ''){
             $(`.row_${id_next}`).attr('readonly', true);
             $(`.row_${id_num}`).attr("aria-invalid", "false");
+            $(`#id_dest_user_mail${id_num}`).valid()
             if($(`.row_${id_num}`).find('label')){
                 $(`.row_${id_num}`).next().remove();
             };
