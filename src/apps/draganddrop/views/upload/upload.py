@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
 from draganddrop.models import UploadManage, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
-from accounts.models import Notification
+from accounts.models import Notification,User
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -16,6 +16,11 @@ from django.conf import settings
 import threading
 #操作ログ関数
 from lib.my_utils import add_log
+#メール送信
+from django.core.mail import send_mass_mail
+# テンプレート情報取得
+from django.template.loader import get_template
+from django.contrib.sites.shortcuts import get_current_site
 
 ###########################
 # アップロード機能  #
@@ -514,16 +519,56 @@ class Step3(TemplateView, CommonView):
         Notice_message = upload_manage.message
         #グループemaillist作成
         group_email = []
-        print('なにこれ',upload_manage.dest_user_group)
-        # for group in upload_manage.dest_user_group:
-        #     user = group.group_name
-        #     # email = group.group_name
-        #     print('グループ名わかる？',user)
-            # print('グループ名わかる？',user)
-        # notice_group = Group.objects.first(group_name=)
+        for group in dest_group_list:
+            qs = Address.objects.filter(group__group_name=group)
+            for user in qs:
+                email = user.email
+                group_email.append(email)
+        group_email_db = ','.join(group_email)
+        emailList_for = dest_user_list + group_email #list型
+        emailList_db = emailList_db + ',' + group_email_db #str型
 
-        #############通知する//groupはすべてメールアドレスのリストにしないとかも
+        ###通知テーブル登録
         Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+        #メール送信
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+
+        tupleMessage = []
+        for email in emailList_for:
+            e_user = User.objects.get(email=email)
+            e_send = e_user.is_send_mail
+            print('めーーーる可否',e_send)
+
+            if e_send == True:
+                context = {
+                    'protocol': 'https' if self.request.is_secure() else 'http',
+                    'domain': domain,
+                    #送信者
+                    'user_last_name':self.request.user.last_name,
+                    'user_first_name':self.request.user.first_name,
+                }
+                subject_template = get_template('draganddrop/mail_template/subject.txt')
+                subject = subject_template.render(context)
+
+                message_template = get_template('draganddrop/mail_template/message.txt')
+                message = message_template.render(context)
+                from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                recipient_list = [email]#受信者リスト
+                
+                message1 = (
+                    subject,
+                    message,
+                    from_email,
+                    recipient_list,
+                )
+                messageList = list(message1)
+                tupleMessage.insert(-1,messageList)
+
+                print('受信通知めーる',tupleMessage)
+            # send_mail(subject, message, from_email, recipient_list)
+        send_mass_mail(tupleMessage)
         ##################通知終了
 
         for personal_user_upload_manage in personal_user_upload_manages:

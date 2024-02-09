@@ -73,24 +73,6 @@ class CommonView(ContextMixin):
         else:
             context["no_read"] = no_read
         #通知機能おわり
-            
-        # #インフォメーション
-        # all_informations = Notification.objects.filter(start_date__lte = today)
-        # notice_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),Q(category = 'メッセージ')|Q(category = 'お知らせ'),start_date__lte = today).distinct().values()
-        # maintenance_informations = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today, category__contains = 'メンテナンス').distinct().values()
-        # read = Read.objects.filter(read_user=current_user).count()
-        # read_info = Read.objects.filter(read_user=current_user).values_list('notification_id', flat=True)
-        # if read > 0:
-        #     info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
-        #     no_read = info_all - read
-        # else:
-        #     no_read = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = current_user),start_date__lte = today).distinct().count()
-
-        # if no_read > 99 :
-        #     context["no_read"] = "99+"
-
-        # else:
-        #     context["no_read"] = no_read
 
         email_list = current_user.email.rsplit('@', 1)
         # メールアドレスをユーザ名とドメインに分割
@@ -122,6 +104,29 @@ class CommonView(ContextMixin):
                 # context["total_data_usage"] = resource_manage.total_data_usage
         
         return context
+    
+
+"""
+メール通知ON/OFF
+"""
+class SendMailAjaxView(View):
+    def post(self, request):
+        user = self.request.user
+        mail_choiced = request.POST.get('mail_choiced')
+        #存在確認
+        if mail_choiced == "1":
+            user.is_send_mail = True
+            data = {
+                'judge':'mail_true',
+            }
+        else:
+            user.is_send_mail = False
+            data = {
+                'judge':'mail_false'
+            }
+        user.save()
+
+        return JsonResponse(data,safe=True)
 
 """
 お知らせページ
