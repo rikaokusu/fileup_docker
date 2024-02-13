@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 class DeleteAjaxView(View):
 
     def post(self, request):
-
+        current_user = self.request.user
         print('----------------- DeleteAjaxView')
 
         # ダウンロードされたファイルが単体か複数か判断するための変数
@@ -40,6 +40,32 @@ class DeleteAjaxView(View):
 
         try:
             for upload_manage in upload_manages:
+                #####操作ログ用
+                uploadmanage = UploadManage.objects.get(id=upload_manage.id)
+                print('送信テーブルurl',uploadmanage)
+                #送信先取得,アドレス帳＆直接入力
+                dest_user =  uploadmanage.dest_user.values_list('email', flat=True)
+                dest_user_list = list(dest_user)
+                #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+                dest_group = uploadmanage.dest_user_group.values_list('group_name', flat=True)
+                dest_group_list = list(dest_group)
+                #送信先　直接入力＆アドレス帳＆グループ list型
+                dest_users = dest_user_list + dest_group_list
+                # ↑の('')を省くため文字列に変換
+                dest_users = ' '.join(dest_users)
+                #操作ログ用・ファイル名取得
+                # ファイル名
+                upload_files = uploadmanage.file.all()
+                files = []
+                for file in upload_files:
+                    print('ふぁいるかくにん1',file.name)           
+                    file_name = file.name + "\r\n"
+                    files.append(file_name)
+                files = ' '.join(files)
+                # 操作ログ登録
+                print('もしかしてfileみえない？3',files)
+                add_log(2,3,current_user,send_delete_name,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+                #操作ログ終わり
 
                 #download_tableのレコード数を取得
                 number_of_download_table = Downloadtable.objects.filter(upload_manage=upload_manage).all().count()
@@ -193,10 +219,20 @@ class UrlDeleteAjaxView(View):
         
         try:
             for url_upload_manage in url_upload_manages:
-                
-                #操作ログ用・ファイル名取得
+                #####操作ログ用
                 uploadmanage = UrlUploadManage.objects.get(id=url_upload_manage.id)
                 print('送信テーブルurl',uploadmanage)
+                #送信先取得,アドレス帳＆直接入力
+                dest_user =  uploadmanage.dest_user.values_list('email', flat=True)
+                dest_user_list = list(dest_user)
+                #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+                dest_group = uploadmanage.dest_user_group.values_list('group_name', flat=True)
+                dest_group_list = list(dest_group)
+                #送信先　直接入力＆アドレス帳＆グループ list型
+                dest_users = dest_user_list + dest_group_list
+                # ↑の('')を省くため文字列に変換
+                dest_users = ' '.join(dest_users)
+                #操作ログ用・ファイル名取得
                 # ファイル名
                 upload_files = uploadmanage.file.all()
                 files = []
@@ -205,11 +241,10 @@ class UrlDeleteAjaxView(View):
                     file_name = file.name + "\r\n"
                     files.append(file_name)
                 files = ' '.join(files)
-                # files = uploadmanage.file.all()
-                #操作ログ終わり
                 # 操作ログ登録
                 print('もしかしてfileみえない？3',files)
-                add_log(2,3,current_user,url_send_delete_name,files,"",1,self.request.META.get('REMOTE_ADDR'))
+                add_log(2,3,current_user,url_send_delete_name,files,dest_users,1,self.request.META.get('REMOTE_ADDR'))
+                #操作ログ終わり
 
                 #download_tableのレコード数を取得
                 number_of_url_download_table = UrlDownloadtable.objects.filter(url_upload_manage=url_upload_manage).all().count()
@@ -359,13 +394,39 @@ class UrlFileDeleteAjaxView(View):
 
 class OTPDeleteAjaxView(View):
     def post(self, request):
-
+        current_user = self.request.user
         otp_send_delete_id = request.POST.getlist('otp_send_delete_id[]')
         otp_send_delete_name = request.POST.get('otp_send_delete_name')
         otp_upload_manages = OTPUploadManage.objects.filter(pk__in=otp_send_delete_id)
 
         try:
             for otp_upload_manage in otp_upload_manages:
+                #####操作ログ用
+                uploadmanage = OTPUploadManage.objects.get(id=otp_upload_manage.id)
+                print('送信テーブルurl',uploadmanage)
+                #送信先取得,アドレス帳＆直接入力
+                dest_user =  uploadmanage.dest_user.values_list('email', flat=True)
+                dest_user_list = list(dest_user)
+                #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
+                dest_group = uploadmanage.dest_user_group.values_list('group_name', flat=True)
+                dest_group_list = list(dest_group)
+                #送信先　直接入力＆アドレス帳＆グループ list型
+                dest_users = dest_user_list + dest_group_list
+                # ↑の('')を省くため文字列に変換
+                dest_users = ' '.join(dest_users)
+                #操作ログ用・ファイル名取得
+                # ファイル名
+                upload_files = uploadmanage.file.all()
+                files = []
+                for file in upload_files:
+                    print('ふぁいるかくにん1',file.name)           
+                    file_name = file.name + "\r\n"
+                    files.append(file_name)
+                files = ' '.join(files)
+                # 操作ログ登録
+                print('もしかしてfileみえない？3',files)
+                add_log(2,3,current_user,otp_send_delete_name,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
+                #操作ログ終わり
 
                 #download_tableのレコード数を取得
                 number_of_otp_download_table = OTPDownloadtable.objects.filter(otp_upload_manage=otp_upload_manage).all().count()

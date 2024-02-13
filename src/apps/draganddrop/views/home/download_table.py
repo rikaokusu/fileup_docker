@@ -162,9 +162,15 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
         try:
             # ダウンロードテーブルに変更
             guestdownloadtable = GuestUploadDownloadtable.objects.get(pk__exact=guest_delete_id)
+            print('げすと削除ここ？？？',guestdownloadtable)
             #↓二行操作ログ用・ファイル名取得
             guestuploadmanage = GuestUploadManage.objects.get(id=guestdownloadtable.guest_upload_manage.id)
-            files = guestuploadmanage.file.all()
+            guest_upload_files = guestuploadmanage.file.all()
+            files = []
+            for file in guest_upload_files:         
+                file_name = file.name + "\r\n"
+                files.append(file_name)
+            files = ' '.join(files)
             # ダウンロードテーブルの削除フラグを立てる
             guestdownloadtable.trash_flag = 1
             guestuploadmanage.file_del_flag = 1
@@ -173,7 +179,7 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
             guestdownloadtable.save()
             guestuploadmanage.save()
             # 操作ログ登録
-            add_log(2,3,current_user,guest_delete_name,files,"",3,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,guest_delete_name,files,"",6,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = guest_delete_name + 'を削除しました'

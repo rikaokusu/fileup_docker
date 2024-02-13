@@ -640,6 +640,7 @@ class OperationLog(models.Model):
     (3,'一括'),
     (4,'ユーザー'),
     (5,'グループ'),
+    (6,'ゲストアップロード'),
     )
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
