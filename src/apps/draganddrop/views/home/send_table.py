@@ -8,6 +8,8 @@ import os
 from django.db.models import Q
 from django.conf import settings
 import zipfile
+#操作ログ関数
+from lib.my_utils import add_log
 
 ############################################
 # 送信テーブル単数削除 #
@@ -21,6 +23,8 @@ class DeleteAjaxView(View):
         send_delete_id = request.POST.getlist('send_delete_id[]')
         send_delete_name = request.POST.get('send_delete_name')
         upload_manages = UploadManage.objects.filter(pk__in=send_delete_id)
+
+        print('単数ならここに削除おちる？？',upload_manages)
 
         try:
             for upload_manage in upload_manages:
@@ -162,14 +166,30 @@ class FileDeleteAjaxView(View):
 
 class UrlDeleteAjaxView(View):
     def post(self, request):
-
+        current_user = self.request.user
         url_send_delete_id = request.POST.getlist('url_send_delete_id[]')
-        url_send_delete_name = request.POST.get('url_send_delete_name')
-
+        url_send_delete_name = request.POST.get('url_send_delete_name')#ファイルタイトル
         url_upload_manages = UrlUploadManage.objects.filter(pk__in=url_send_delete_id)
-
+        
         try:
             for url_upload_manage in url_upload_manages:
+                
+                #操作ログ用・ファイル名取得
+                uploadmanage = UrlUploadManage.objects.get(id=url_upload_manage.id)
+                print('送信テーブルurl',uploadmanage)
+                # ファイル名
+                upload_files = uploadmanage.file.all()
+                files = []
+                for file in upload_files:
+                    print('ふぁいるかくにん1',file.name)           
+                    file_name = file.name + "\r\n"
+                    files.append(file_name)
+                files = ' '.join(files)
+                # files = uploadmanage.file.all()
+                #操作ログ終わり
+                # 操作ログ登録
+                print('もしかしてfileみえない？3',files)
+                add_log(2,3,current_user,url_send_delete_name,files,"",1,self.request.META.get('REMOTE_ADDR'))
 
                 #download_tableのレコード数を取得
                 number_of_url_download_table = UrlDownloadtable.objects.filter(url_upload_manage=url_upload_manage).all().count()
