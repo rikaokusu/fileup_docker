@@ -386,6 +386,14 @@ class OTPDeleteAjaxView(View):
                     # DBの対象行を削除
                     file.delete()
 
+                # ApprovalManageを削除
+                otp_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage)
+                otp_approval_manages.delete()
+
+                # ApprovalLogを削除
+                otp_approval_logs = ApprovalLog.objects.filter(otp_upload_manage=otp_upload_manage)
+                otp_approval_logs.delete()
+
                 otp_upload_manage.delete()
 
             # PersonalResourceManagementテーブル情報を修正

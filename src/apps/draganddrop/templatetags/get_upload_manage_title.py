@@ -21,7 +21,7 @@ def get_upload_manage_title(value):
     # OPT共有
     elif value.upload_method == 3:
         # print("------------------------- OPT共有")
-        return value.opt_upload_manage.title
+        return value.otp_upload_manage.title
     # ゲストアップロード
     else:
         # print("------------------------- ゲストアップロード")

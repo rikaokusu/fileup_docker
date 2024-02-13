@@ -21,7 +21,7 @@ def get_upload_manage_application_status(value):
 
     elif value.upload_method == 3:
         print("------------------------- OPT共有")
-        return value.opt_upload_manage.application_status
+        return value.otp_upload_manage.application_status
 
     else:
         print("------------------------- ゲストアップロード")

@@ -99,7 +99,7 @@ APPLICATION_STATUS_CHOICE = (
 UPLOAD_METHOD_CHOICE = (
     (1, '通常アップロード'),
     (2, 'URL共有'),
-    (3, 'OPT共有'),
+    (3, 'OTP共有'),
     (4, 'ゲストアップロード'),
 )
 
@@ -276,6 +276,12 @@ class OTPUploadManage(models.Model):
     url = models.CharField(max_length=140, null=True, blank=True)
     file_del_flag = models.IntegerField(null=True, blank=True, default=0)
     message = models.CharField(max_length=140, blank=True, null=True)
+    # 申請ステータス
+    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 承認日時
+    approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+    # 再申請済みフラグ
+    is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
 
@@ -340,6 +346,12 @@ class GuestUploadManage(models.Model):
     url_invalid_flag = models.IntegerField(verbose_name='ゲストへのURL招待無効フラグ',null=True, blank=True, default=0)
     uploaded_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
     created_date = models.DateTimeField(verbose_name='アップロード日時', blank=True, null=True,)
+    # 申請ステータス
+    application_status = models.IntegerField('申請ステータス', choices=APPLICATION_STATUS_CHOICE, default=1)
+    # 承認日時
+    approval_date = models.DateTimeField('承認日時',  blank=True, null=True)
+    # 再申請済みフラグ
+    is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
 
@@ -450,8 +462,10 @@ IS_APPROVA_WORKFLOW = (
 )
 
 APPROVAL_FORMAT = (
-    (1, '１人が承認すれば次の承認者に進む'),
-    (2, '全員が承認すると次の承認者に進む'),
+    (1, '全員が承認すると次の承認者に進む'),# 機能が実装できていないため項目は一つにしておく
+
+    # (1, '１人が承認すれば次の承認者に進む'),
+    # (2, '全員が承認すると次の承認者に進む'),
 )
 
 class ApprovalWorkflow(models.Model):
@@ -536,7 +550,7 @@ class ApprovalManage(models.Model):
     # UrlUploadManage
     url_upload_manage = models.ForeignKey(UrlUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='url_upload_approvalmanage_set')
     # OTPUploadManage
-    opt_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='opt_upload_approvalmanage_set')
+    otp_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='otp_upload_approvalmanage_set')
     # GuestUploadManage
     guest_upload_manage = models.ForeignKey(GuestUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='guest_upload_approvalmanage_set')
 
@@ -593,7 +607,7 @@ class ApprovalLog(models.Model):
     # URLUploadManage
     url_upload_manage = models.ForeignKey(UrlUploadManage, on_delete=models.SET_NULL, null=True, related_name='url_upload_manage')
     # OTPUploadManage
-    opt_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='opt_upload_manage')
+    otp_upload_manage = models.ForeignKey(OTPUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='otp_upload_manage')
     # GuestUploadManage
     guest_upload_manage = models.ForeignKey(GuestUploadManage, on_delete=models.SET_NULL, blank=True, null=True, related_name='guest_upload_manage')
     # 操作ユーザー

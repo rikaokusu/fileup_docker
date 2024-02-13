@@ -194,8 +194,11 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # 通常アップロード用
         user=self.request.user.id
 
+        # print("--------------- TOP画面 送信テーブル")
+
         # 承認ワークフローを使用する場合
         if approval_workflow.is_approval_workflow == 1:
+            # print("--------------- TOP画面 承認ワークフローを使用する")
 
             # 一次承認者と二次承認者が設定されている場合
             if first_approver and second_approver:
@@ -203,6 +206,8 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
                 upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)# 最終承認済み
                 # URL共有
                 url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
+                # OTP共有
+                otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
 
             # 一次承認者しか設定されていない場合
             else:
@@ -210,13 +215,17 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
                 upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)# 一次承認済み
                 # URL共有
                 url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
+                # OTP共有
+                otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
 
         else:
+            # print("--------------- TOP画面 承認ワークフローを使用しない")
             # 通常アップロード
             upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)# キャンセル
             # URL共有
             url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
-
+            # OTP共有
+            otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
 
 
         context["upload_manages"] = upload_manages
@@ -226,31 +235,60 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         context["url_upload_manages"] = url_upload_manages
 
         # OTPアップロード用
-        otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+        # otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["otp_upload_manages"] = otp_upload_manages
+
+
 
         """受信テーブル"""
         # ダウンロード用
+
+        # print("--------------- TOP画面 受信テーブル")
+
         if approval_workflow.is_approval_workflow == 1:
+            # 一次承認者と二次承認者が設定されている場合
             if first_approver and second_approver:
+                # print("--------------- TOP画面 承認ワークフローを使用する")
+                # 通常アップロード
                 upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=5)
+                # URL共有
+                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=5)
+                # OTP共有
+                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=5)
+            # 一次承認者しか設定されていない場合
             else:
+                # print("--------------- TOP画面 一次承認者しか設定されていない場合")
+                # 通常アップロード
                 upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=3)
+                # URL共有
+                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=3)
+                # OTP共有
+                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=3)
+
         else:
+            # print("--------------- TOP画面 承認ワークフローを使用しない")
+            # 通常アップロード
             upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+            # URLダウンロード用
+            url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+            # OTPダウンロード用
+            otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+
+
         context["upload_manage_for_dest_users"] = upload_manage_for_dest_users
 
         # URLダウンロード用
-        url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+        # url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["url_upload_manage_for_dest_users"] = url_upload_manage_for_dest_users
         # OTPダウンロード用
-        otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+        # otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["otp_upload_manage_for_dest_users"] = otp_upload_manage_for_dest_users
         
         # ゲストアップロードダウンロード用
         guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0)
         context["guest_upload_manage_for_dest_users"] = guest_upload_manage_for_dest_users
         print('ゲストアップロードダウンロード',guest_upload_manage_for_dest_users)
+
 
         """ゴミ箱表示"""
         # アップロード用

@@ -4,6 +4,7 @@ from draganddrop.views.home.home_common import CommonView, total_data_usage, res
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksOTPStep1Form, OTPDistFileUploadForm, OTPFileDownloadAuthForm
 from draganddrop.models import Filemodel, PDFfilemodel, Address, Group, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import ApprovalManage, ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -117,6 +118,8 @@ class Step1OTPUpload(FormView, CommonView):
         otp_upload_manage_obj.created_date = datetime.datetime.now()
         # # テンポラリフラグをセット
         otp_upload_manage_obj.tmp_flag = 1
+        # アップロード方法をセット
+        otp_upload_manage_obj.upload_method = 3# OTP共有
 
         # # 保存期日とタイトルに関しても上記と同じように取得
         title = form.cleaned_data['title']
@@ -534,7 +537,7 @@ class Step3OTPupload(TemplateView, CommonView):
         otp_upload_files = otp_upload_manage_obj.file.all()
         files = []
         for file in otp_upload_files:
-            print('ふぁいるかくにん1111',file.name)           
+            print('ふぁいるかくにん1111',file.name)
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
@@ -547,7 +550,61 @@ class Step3OTPupload(TemplateView, CommonView):
         total_data_usage(otp_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
-            
+
+
+        # ユーザーの承認ワークフロー設定を取得
+        approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        # print("------------------ approval_workflow step2", approval_workflow)
+
+        # 承認ワークフローが「使用する」に設定されている場合
+        if approval_workflow.is_approval_workflow:
+
+            # 申請ステータスを「申請中」に設定
+            otp_upload_manage_obj.application_status = 1
+            otp_upload_manage_obj.save()
+
+            # 一次承認者を取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ first_approvers step2", first_approvers)
+            # 二次承認者を取得
+            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+            # print("------------------ second_approver step2", second_approvers)
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+                for first_approver in first_approvers:
+                    # print("------------------ first_approversがいます", first_approver.first_approver)
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        manage_id = otp_upload_manage_obj.pk,
+                        application_title = otp_upload_manage_obj.title,
+                        application_user = otp_upload_manage_obj.created_user,
+                        application_date = otp_upload_manage_obj.created_date,
+                        application_user_company_id = otp_upload_manage_obj.company,
+                        approval_status = 1,
+                        first_approver = first_approver.first_approver,
+                        upload_method = 3 # OTP共有
+                    )
+                    first_approver_approval_manage.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        manage_id = otp_upload_manage_obj.pk,
+                        application_title = otp_upload_manage_obj.title,
+                        application_user = otp_upload_manage_obj.created_user,
+                        application_date = otp_upload_manage_obj.created_date,
+                        application_user_company_id = otp_upload_manage_obj.company,
+                        approval_status = 1,
+                        second_approver = second_approver.second_approver,
+                        upload_method = 3 # OTP共有
+                    )
+                    second_approver_approval_manage.save()
+
         return context
 
 ##################################
@@ -761,6 +818,8 @@ class Step1OTPUpdate(FormView, CommonView):
         otp_upload_manage.dl_limit = dl_limit
         # メッセージをセット
         otp_upload_manage.message = message
+        # アップロード方法をセット
+        otp_upload_manage.upload_method = 3 # OTP共有
 
 
         # メールアドレス直接入力 DBへ保存
@@ -1087,6 +1146,8 @@ class Step2OTPUpdate(FormView, CommonView):
 class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの処理
     template_name = 'draganddrop/otp/step3_otp_upload.html'
 
+    print("------------------------ Step3OTPUpdate")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
@@ -1260,6 +1321,15 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         # 操作ログ終わり
         # 操作ログ
         add_log(2,2,current_user,file_title,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
+
+        # ApprovalManageを取得
+        approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage)
+        # print("------------------------ approval_manages", approval_manages)
+        for approval_manage in approval_manages:
+            # 値を更新
+            approval_manage.application_title = otp_upload_manage.title
+            approval_manage.application_date = otp_upload_manage.created_date
+            approval_manage.save()
 
         # 個人管理テーブルの作成・更新
         total_data_usage(otp_upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)

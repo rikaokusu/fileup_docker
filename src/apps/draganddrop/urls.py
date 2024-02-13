@@ -265,7 +265,7 @@ urlpatterns = [
      # 取り消し(削除) URL共有
      path('urlapprovaldelete/', approval.UrlApprovalDeleteAjaxView.as_view(), name='urlapprovaldelete'),
      # 取り消し(削除) OPT共有
-     path('optapprovaldelete/', approval.OTPApprovalDeleteAjaxView.as_view(), name='optapprovaldelete'),
+     path('otpapprovaldelete/', approval.OTPApprovalDeleteAjaxView.as_view(), name='otpapprovaldelete'),
 
      ##################################
      # 操作ログ  

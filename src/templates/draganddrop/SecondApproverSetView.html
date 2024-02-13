@@ -281,7 +281,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                     <th style="text-align:left; vertical-align: middle;">ユーザー名</th>
                     <th style="text-align:left; vertical-align: middle;">メールアドレス</th>
                     <th style="text-align:left; vertical-align: middle;">部署</th>
-                    <th style="text-align:left; vertical-align: middle;">役職</th>
+                    {% comment %} <th style="text-align:left; vertical-align: middle;">役職</th> {% endcomment %}
                     <th style="text-align:left; vertical-align: middle;"></th><!-- 削除ボタン -->
                 </tr>
             </thead>
@@ -308,9 +308,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         </td>
 
                         <!-- 役職名 -->
-                        <td class="r_task_reminder_col_2 align-middle">
-                            {% comment %} {{ user.company.pic_company_name }} {% endcomment %}
-                        </td>
+                        {% comment %} <td class="r_task_reminder_col_2 align-middle">
+                        </td> {% endcomment %}
 
                         <!-- 削除ボタン -->
                         <td class="r_task_reminder_col_2" style="text-align:right; vertical-align: middle;">

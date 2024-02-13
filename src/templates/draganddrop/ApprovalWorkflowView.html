@@ -331,12 +331,18 @@
 							<td colspan="8" class="title_label">
 								<div class="search_checkbox_small" id="setai_chg_zoku">
 									{% if user_approval_workflow.approval_format == 1 %}
+										全員が承認すると次の承認者に進む
+									{% else %}
+										--------------
+									{% endif %}
+
+									{% comment %} {% if user_approval_workflow.approval_format == 1 %}
 										１人が承認すれば次の承認者に進む
 									{% elif user_approval_workflow.approval_format == 2 %}
 										全員が承認すると次の承認者に進む
 									{% else %}
 										--------------
-									{% endif %}
+									{% endif %} {% endcomment %}
 								</div>
 							</td>
 						</tr>
@@ -473,9 +479,20 @@
 								<a class="file_tile" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}"
 									title="{{ user_approval_manage.url_upload_manage.title }}">{{ user_approval_manage.url_upload_manage.title|truncatechars:14 }}</a>
 							{% endif %}
-						<!-- OPT共有 -->
+						<!-- OTP共有 -->
 						{% elif user_approval_manage.upload_method == 3 %}
-							3333
+							{% if user_approval_manage.otp_upload_manage.file_del_flag == 1 %}
+								<a class="" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}"
+									title="{{ user_approval_manage.otp_upload_manage.title }}">{{ user_approval_manage.otp_upload_manage.title|truncatechars:14 }}</a><br>
+								<p class="file_del_tag">ファイル削除済み</p>
+							{% elif user_approval_manage.otp_upload_manage.end_date|is_past_due %}
+								<a class="" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}"
+								title="{{ user_approval_manage.otp_upload_manage.title }}">{{ user_approval_manage.otp_upload_manage.title|truncatechars:14 }}</a><br>
+								<p class="expired_tag">期限切れ</p>
+							{% else %}
+								<a class="file_tile" href="{% url 'draganddrop:approval_detail' user_approval_manage.id %}"
+									title="{{ user_approval_manage.otp_upload_manage.title }}">{{ user_approval_manage.otp_upload_manage.title|truncatechars:14 }}</a>
+							{% endif %}
 						<!-- ゲストアップロード -->
 						{% else %}
 							444
@@ -936,7 +953,7 @@
 												編集
 											</a>
 										</div>
-									{% elif user_upload_manage.upload_method == 3 %}<!-- OPT共有 -->
+									{% elif user_upload_manage.upload_method == 3 %}<!-- OTP共有 -->
 										<div class="mr-2 ml-auto bd-highlight">
 											<a class="btn my-btn-w5 btn-primary rounded-4"
 												href="{% url 'draganddrop:step1_otp_update' user_upload_manage.pk %}" role="button">
@@ -978,16 +995,16 @@
 										data-url_send_delete_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk }}">
 										取消
 									</button>
-								<!-- OPT共有 -->
+								<!-- OTP共有 -->
 								{% elif user_upload_manage.upload_method == 3 %}
 									<button type="button" class="btn my-btn-w5 btn-outline-danger mr-2" data-toggle="modal" data-target="#otp_del_task_modal"
-										data-del_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk }}">
+										data-otp_send_del_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk }}">
 										取消
 									</button>
 								<!-- ゲストアップロード -->
 								{% else %}
 									<button type="button" class="btn my-btn-w5 btn-outline-danger mr-2" data-toggle="modal" data-target="#del_guest_uplod_manage_modal"
-										data-otp_send_del_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk }}">
+										data-guest_send_del_name="{{ user_upload_manage.title }}" data-value="{{ user_upload_manage.pk }}">
 										取消
 									</button>
 								{% endif %}
@@ -1081,7 +1098,7 @@
 				</div>
 
 
-				<!-- 取り消しモーダル OPT共有 -->
+				<!-- 取り消しモーダル OTP共有 -->
 				<div class="modal fade" id="otp_del_task_modal" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
 					<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 						<div class="modal-content center-modal">
@@ -1557,10 +1574,15 @@ $(document).ready(function(){
 	$('#otp_del_task_modal').off('show.bs.modal');
 	$('#otp_del_task_modal').on('show.bs.modal', function (event) {
 
+		console.log("取り消しモーダルOTP共有用開いたよ")
+
 		// 行のIDを取得
 		var button = $(event.relatedTarget)
 		var otp_send_delete_id = button.data('value')
 		var otp_send_delete_name = button.data('otp_send_del_name')
+		console.log("otp_send_delete_id", otp_send_delete_id)
+		console.log("otp_send_delete_name", otp_send_delete_name)
+
 		var modal = $(this);
 		modal.find('.otp-send-del-file-name-text').text(otp_send_delete_name + "　" + "の申請を取り消します。よろしいですか？");
 
@@ -1575,22 +1597,26 @@ $(document).ready(function(){
 		$('#otp_del_task_modal_btn').on('click', function () {
 			$.ajax({
 				type: "POST",
-				{% comment %} url: '{% url "draganddrop:optapprovaldelete" %}', {% endcomment %}
+				url: '{% url "draganddrop:otpapprovaldelete" %}',
 				data: {
 					'otp_send_delete_id': vals,
 					'otp_send_delete_name': otp_send_delete_name
 				},
 				dataType: 'json',
 				success: function (data) {
+					console.log("差戻処理成功")
 					$('#result_toast').on('show.bs.toast', function (e) {
 					var toast = $(this);
 					toast.find('.toast-body').addClass('alert-success');
-					toast.find('.toast-body').text("ファイルを削除しました");
+					toast.find('.toast-body').text("申請を取り消しました");
 					});
 					$('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
 					setTimeout(function(){
 						window.location.href = "./";},1*1000);
-				}
+				},
+				error: function () {
+					console.log('エラーが起きました');
+				},
 			});
 		});
 	});

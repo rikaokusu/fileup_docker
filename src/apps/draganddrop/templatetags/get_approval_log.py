@@ -45,22 +45,22 @@ def get_approval_log(value):
 
         approval_logs = ApprovalLog.objects.filter(url_upload_manage__in=url_upload_manage_list).order_by("approval_operation_date", "approval_operation_content")
 
-    # OPT共有
+    # OTP共有
     elif value.upload_method == 3:
-        # print("------------------------- OPT共有")
+        # print("------------------------- OTP共有")
 
-        opt_upload_manages = OTPUploadManage.objects.filter(id=value.id)
-        # print("--------------- opt_upload_manages", opt_upload_manages)
+        otp_upload_manages = OTPUploadManage.objects.filter(id=value.id)
+        # print("--------------- otp_upload_manages", otp_upload_manages)
 
-        opt_upload_manage_list = []
-        opt_upload_manage_list_raw_1 = list(opt_upload_manages.values_list('id', flat=True))
+        otp_upload_manage_list = []
+        otp_upload_manage_list_raw_1 = list(otp_upload_manages.values_list('id', flat=True))
 
         # IDをstrに直してリストに追加
-        for opt_upload_manage_uuid_1 in opt_upload_manage_list_raw_1:
-            opt_upload_manage_uuid_string_1 = str(opt_upload_manage_uuid_1)
-            opt_upload_manage_list.append(opt_upload_manage_uuid_string_1)
+        for otp_upload_manage_uuid_1 in otp_upload_manage_list_raw_1:
+            otp_upload_manage_uuid_string_1 = str(otp_upload_manage_uuid_1)
+            otp_upload_manage_list.append(otp_upload_manage_uuid_string_1)
 
-        approval_logs = ApprovalLog.objects.filter(opt_upload_manage__in=opt_upload_manage_list).order_by("approval_operation_date", "approval_operation_content")
+        approval_logs = ApprovalLog.objects.filter(otp_upload_manage__in=otp_upload_manage_list).order_by("approval_operation_date", "approval_operation_content")
 
     # ゲストアップロード
     else:

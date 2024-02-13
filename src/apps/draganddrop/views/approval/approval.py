@@ -55,9 +55,14 @@ class ApplicationStatusCheckView(ContextMixin):
         user_upload_manages = UploadManage.objects.filter(created_user=self.request.user.id)
         # print("--------------- user_upload_manages", user_upload_manages)
 
-        # UploadManageを取得
+        # UrlUploadManageを取得
         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id)
         # print("--------------- url_upload_manages", url_upload_manages)
+
+        # OTPUploadManageを取得
+        otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id)
+        print("--------------- otp_upload_manages", otp_upload_manages)
+
 
         # 一次承認者に設定されているユーザーを取得
         first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
@@ -273,6 +278,104 @@ class ApplicationStatusCheckView(ContextMixin):
                             print("----------------- 二次承認者 else")
 
 
+        # OTP共有
+        if otp_upload_manages:
+            print("--------------- OTP共有")
+            for otp_upload_manage in otp_upload_manages:
+
+                first_approval_manage_status_list = []
+                first_approval_manage_count = ""
+
+                # UrlUploadManageに紐づく一次承認者のApprovalManageを取得
+                first_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage, first_approver__in=first_approver_list)
+
+                # ApprovalManage数を取得
+                first_approval_manage_count = first_approval_manages.count()
+
+                for first_approval_manage in first_approval_manages:
+                    # ステータスをリストに追加
+                    first_approval_manage_status_list.append(first_approval_manage.approval_status)
+
+                second_approval_manage_status_list = []
+                second_approval_manage_count = ""
+
+                # UrlUploadManageに紐づく一次承認者のApprovalManageを取得
+                second_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage, second_approver__in=second_approver_list)
+
+                # ApprovalManage数を取得
+                second_approval_manage_count = second_approval_manages.count()
+
+                for second_approval_manage in second_approval_manages:
+                    # ステータスをリストに追加
+                    second_approval_manage_status_list.append(second_approval_manage.approval_status)
+
+                # approval_manageの数とapproval_manage_listのstatusの数を比較
+                if (first_approval_manage_count == first_approval_manage_status_list.count(1)):
+                    print("----------------- 申請中")
+                    otp_upload_manage.application_status = 1 # 申請中
+                    otp_upload_manage.save()
+
+                elif (first_approval_manage_count == first_approval_manage_status_list.count(2)):
+                    print("----------------- 一次承認済み")
+                    otp_upload_manage.application_status = 3 # 一次承認済み
+                    otp_upload_manage.save()
+
+                else:
+                    # リストの要素で最大の値を求める
+                    max_value = max(first_approval_manage_status_list)
+                    print("----------------- max_value", max_value)
+
+                    if (max_value == 2): # [1,2](2, 一次承認待ち)
+                        print("----------------- 一次承認待ち")
+                        otp_upload_manage.application_status = 2 # 一次承認待ち
+                        otp_upload_manage.save()
+
+                    elif(max_value == 4): # [1,4](7, 差戻し)
+                        print("----------------- 差戻し")
+                        otp_upload_manage.application_status = 7 # 差戻し
+                        otp_upload_manage.save()
+
+                    else: # [1,6](6, キャンセル)
+                        print("----------------- キャンセル")
+                        otp_upload_manage.application_status = 6 # キャンセル
+                        otp_upload_manage.save()
+
+
+                if second_approval_manages:
+                    print("----------------- 二次承認者のApprovalManageあるよ")
+
+                    # approval_manageの数とapproval_manage_listのstatusの数を比較
+                    if (second_approval_manage_count == second_approval_manage_status_list.count(1)):# [1,1](1, 申請中)
+                        print("----------------- 二次承認者 申請中")
+
+                    elif (second_approval_manage_count == second_approval_manage_status_list.count(3)):# [3,3](5, 最終承認済み)
+                        print("----------------- 二次承認者 最終承認済み")
+                        otp_upload_manage.application_status = 5 # 最終承認済み
+                        otp_upload_manage.save()
+
+                    else:
+                        # リストの要素で最大の値を求める
+                        max_value = max(second_approval_manage_status_list)
+                        print("----------------- max_value", max_value)
+
+                        if(max_value == 3): # [1,3](4, 最終承認待ち)
+                            print("----------------- 二次承認者 最終承認待ち")
+                            otp_upload_manage.application_status = 4 # 最終承認待ち
+                            otp_upload_manage.save()
+
+                        elif(max_value == 4): # [1,4](7, 差戻し)
+                            print("----------------- 二次承認者 差戻し")
+                            otp_upload_manage.application_status = 7 # 差戻し
+                            otp_upload_manage.save()
+
+                        elif(max_value == 6): # [1,6](6, キャンセル)
+                            print("----------------- 二次承認者 キャンセル")
+
+                        else:
+                            print("----------------- 二次承認者 else")
+
+
+
         return context
 
 
@@ -334,14 +437,17 @@ class ApprovalWorkflowView(TemplateView, CommonView, ApplicationStatusCheckView)
             # 承認一覧に表示用
             # 通常アップロード
             upload_manages = UploadManage.objects.filter(created_user=user.id)
-            print("--------------- upload_manages", upload_manages)
+            # print("--------------- upload_manages", upload_manages)
             # URL共有
             url_upload_manages = UrlUploadManage.objects.filter(created_user=user.id)
-            print("--------------- url_upload_manages", url_upload_manages)
+            # print("--------------- url_upload_manages", url_upload_manages)
+            # OTP共有
+            otp_upload_manages = OTPUploadManage.objects.filter(created_user=user.id)
+            # print("--------------- otp_upload_manages", otp_upload_manages)
 
             # クエリーセットを合体
-            report = chain(upload_manages, url_upload_manages)
-            print("--------------- report", report)
+            report = chain(upload_manages, url_upload_manages, otp_upload_manages)
+            # print("--------------- report", report)
 
             context["user_upload_manages"] = report
 
@@ -406,67 +512,190 @@ class ApprovalWorkflowEditView(LoginRequiredMixin, CommonView, UpdateView):
             approval_workflow_edit.approval_format == None
 
             # UploadManageを取得
-            upload_manages = UploadManage.objects.filter(company=login_admin_user.company.id)
-            print("-------------- upload_manages", upload_manages)
+            upload_manages = UploadManage.objects.filter(company=login_admin_user.company.id).values_list('id', flat=True)
+            # print("-------------- upload_manages", upload_manages)
 
-            upload_manage_list = []
-            upload_manage_list_raw_1 = list(upload_manages.values_list('id', flat=True))
+            # UrlUploadManageを取得
+            url_upload_manages = UrlUploadManage.objects.filter(company=login_admin_user.company.id).values_list('id', flat=True)
+            # print("-------------- url_upload_manages", url_upload_manages)
+
+            # OTPUploadManageを取得
+            otp_upload_manages = OTPUploadManage.objects.filter(company=login_admin_user.company.id).values_list('id', flat=True)
+            # print("-------------- otp_upload_manages", otp_upload_manages)
+
+            # GuestUploadManageを取得
+            guest_upload_manages = GuestUploadManage.objects.filter(company=login_admin_user.company.id).values_list('id', flat=True)
+            # print("-------------- guest_upload_manages", guest_upload_manages)
+
+            # 結合
+            upload_manage_list_raw_1 = upload_manages.union(url_upload_manages, url_upload_manages, otp_upload_manages, guest_upload_manages)
+            # print("-------------- upload_manage_list_raw_1", upload_manage_list_raw_1)
 
             # IDをstrに直してリストに追加
+            upload_manage_list = []
             for upload_manage_uuid_1 in upload_manage_list_raw_1:
                 upload_manage_uuid_string_1 = str(upload_manage_uuid_1)
                 upload_manage_list.append(upload_manage_uuid_string_1)
 
-            # UploadManageに紐づいているApprovalManageを取得
-            approval_manages = ApprovalManage.objects.filter(upload_manage__in=upload_manage_list)
+
+            # 紐づいているApprovalManageを取得
+            approval_manages = ApprovalManage.objects.filter(manage_id__in=upload_manage_list)
             # print("-------------- approval_manages", approval_manages)
 
             for approval_manage in approval_manages:
+                # print("-------------- approval_manage", approval_manage)
+
                 # 一次承認者の場合
                 if approval_manage.first_approver:
                     # print("-------------- 一次承認者の場合")
+
+                    # 各承認者のApprovalManageのステータスを変更
                     approval_manage.approval_status = 2 # 一次承認済み
 
-                    # if not ApprovalLog.objects.filter(approval_manage=approval_manage, approval_operation_user=approval_manage.first_approver):
-                    if not ApprovalLog.objects.filter(upload_manage=approval_manage.upload_manage, approval_operation_user=approval_manage.first_approver):
-    
-                        # print("-------------- 一次承認者の承認履歴がない")
+                    # 通常アップロード
+                    if approval_manage.upload_method == 1:
+                        if not ApprovalLog.objects.filter(upload_manage=approval_manage.upload_manage, approval_operation_user=approval_manage.first_approver):
+                            # print("-------------- 一次承認者の承認履歴がない 通常アップロード")
 
-                        # 承認履歴がない場合は承認履歴を残す
-                        approval_log = ApprovalLog.objects.create(
-                            # approval_manage = approval_manage,
-                            upload_manage = approval_manage.upload_manage,
-                            approval_operation_user = approval_manage.first_approver,
-                            approval_operation_user_position = 1,
-                            approval_operation_user_company_id = approval_manage.application_user_company_id,
-                            approval_operation_date = datetime.now(),
-                            approval_operation_content = 2, # 一次承認
-                            manage_id = approval_manage.upload_manage.pk
-                        )
-                        approval_log.save()
+                            # 承認履歴がない場合は承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                upload_manage = approval_manage.upload_manage,
+                                approval_operation_user = approval_manage.first_approver,
+                                approval_operation_user_position = 1,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 2, # 一次承認
+                                manage_id = approval_manage.upload_manage.pk
+                            )
+                            approval_log.save()
+
+                    # URL共有
+                    elif approval_manage.upload_method == 2:
+                        if not ApprovalLog.objects.filter(url_upload_manage=approval_manage.url_upload_manage, approval_operation_user=approval_manage.first_approver):
+                            # print("-------------- 一次承認者の承認履歴がない URL共有")
+
+                            # 承認履歴がない場合は承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                url_upload_manage = approval_manage.url_upload_manage,
+                                approval_operation_user = approval_manage.first_approver,
+                                approval_operation_user_position = 1,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 2, # 一次承認
+                                manage_id = approval_manage.url_upload_manage.pk
+                            )
+                            approval_log.save()
+
+                    # OTP共有
+                    elif approval_manage.upload_method == 3:
+                        if not ApprovalLog.objects.filter(otp_upload_manage=approval_manage.otp_upload_manage, approval_operation_user=approval_manage.first_approver):
+                            # print("-------------- 一次承認者の承認履歴がない OTP共有")
+
+                            # 承認履歴がない場合は承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                otp_upload_manage = approval_manage.otp_upload_manage,
+                                approval_operation_user = approval_manage.first_approver,
+                                approval_operation_user_position = 1,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 2, # 一次承認
+                                manage_id = approval_manage.otp_upload_manage.pk
+                            )
+                            approval_log.save()
+
+                        # ゲストアップロード
+                    else:
+                        if not ApprovalLog.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, approval_operation_user=approval_manage.first_approver):
+                            # print("-------------- 一次承認者の承認履歴がない ゲストアップロード")
+
+                            # 承認履歴がない場合は承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                guest_upload_manage = approval_manage.guest_upload_manage,
+                                approval_operation_user = approval_manage.first_approver,
+                                approval_operation_user_position = 1,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 2, # 一次承認
+                                manage_id = approval_manage.guest_upload_manage.pk
+                            )
+                            approval_log.save()
+
 
                 # 二次承認者の場合
                 else:
                     # print("-------------- 二次承認者の場合")
+
+                    # 各承認者のApprovalManageのステータスを変更
                     approval_manage.approval_status = 3 # 最終承認済み
 
-                    # if not ApprovalLog.objects.filter(approval_manage=approval_manage, approval_operation_user=approval_manage.second_approver):
-                    if not ApprovalLog.objects.filter(upload_manage=approval_manage.upload_manage, approval_operation_user=approval_manage.second_approver):
-    
-                        # print("-------------- 二次承認者の承認履歴がない")
+                    # 通常アップロード
+                    if approval_manage.upload_method == 1:
+                        if not ApprovalLog.objects.filter(upload_manage=approval_manage.upload_manage, approval_operation_user=approval_manage.second_approver):
+                            # print("-------------- 二次承認者の承認履歴がない 通常アップロード")
 
-                        # 承認履歴を残す
-                        approval_log = ApprovalLog.objects.create(
-                            # approval_manage = approval_manage,
-                            upload_manage = approval_manage.upload_manage,
-                            approval_operation_user = approval_manage.second_approver,
-                            approval_operation_user_position = 2,
-                            approval_operation_user_company_id = approval_manage.application_user_company_id,
-                            approval_operation_date = datetime.now(),
-                            approval_operation_content = 3,# 最終承認
-                            manage_id = approval_manage.upload_manage.pk
-                        )
-                        approval_log.save()
+                            # 承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                upload_manage = approval_manage.upload_manage,
+                                approval_operation_user = approval_manage.second_approver,
+                                approval_operation_user_position = 2,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 3, # 最終承認
+                                manage_id = approval_manage.upload_manage.pk
+                            )
+                            approval_log.save()
+
+                    # URL共有
+                    elif approval_manage.upload_method == 2:
+                        if not ApprovalLog.objects.filter(url_upload_manage=approval_manage.url_upload_manage, approval_operation_user=approval_manage.second_approver):
+                            # print("-------------- 二次承認者の承認履歴がない URL共有")
+
+                            # 承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                url_upload_manage = approval_manage.url_upload_manage,
+                                approval_operation_user = approval_manage.second_approver,
+                                approval_operation_user_position = 2,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 3, # 最終承認
+                                manage_id = approval_manage.url_upload_manage.pk
+                            )
+                            approval_log.save()
+
+                    # OTP共有
+                    elif approval_manage.upload_method == 3:
+                        if not ApprovalLog.objects.filter(otp_upload_manage=approval_manage.otp_upload_manage, approval_operation_user=approval_manage.second_approver):
+                            # print("-------------- 二次承認者の承認履歴がない OTP共有")
+
+                            # 承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                otp_upload_manage = approval_manage.otp_upload_manage,
+                                approval_operation_user = approval_manage.second_approver,
+                                approval_operation_user_position = 2,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 3, # 最終承認
+                                manage_id = approval_manage.otp_upload_manage.pk
+                            )
+                            approval_log.save()
+
+                    # ゲストアップロード
+                    else:
+                        if not ApprovalLog.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, approval_operation_user=approval_manage.second_approver):
+                            # print("-------------- 二次承認者の承認履歴がない ゲストアップロード")
+
+                            # 承認履歴を残す
+                            approval_log = ApprovalLog.objects.create(
+                                guest_upload_manage = approval_manage.guest_upload_manage,
+                                approval_operation_user = approval_manage.second_approver,
+                                approval_operation_user_position = 2,
+                                approval_operation_user_company_id = approval_manage.application_user_company_id,
+                                approval_operation_date = datetime.now(),
+                                approval_operation_content = 3, # 最終承認
+                                manage_id = approval_manage.guest_upload_manage.pk
+                            )
+                            approval_log.save()
+
 
                 # 承認日時がNoneの場合は現在の日付を代入
                 if approval_manage.approval_date == None:
@@ -573,11 +802,19 @@ class FirstApproverSetView(LoginRequiredMixin, CommonView, FormView):
         # ステータスが申請中のアップロードされたファイルを会社単位で取得
         # UploadManage
         user_company_upload_manages = UploadManage.objects.filter(company=login_admin_user.company.id)
-        print("--------- user_company_upload_manages", user_company_upload_manages)
+        # print("--------- user_company_upload_manages", user_company_upload_manages)
 
         # UrlUploadManage
         user_company_url_upload_manages = UrlUploadManage.objects.filter(company=login_admin_user.company.id)
-        print("--------- user_company_url_upload_manages", user_company_url_upload_manages)
+        # print("--------- user_company_url_upload_manages", user_company_url_upload_manages)
+
+        # OTPUploadManage
+        user_company_otp_upload_manages = OTPUploadManage.objects.filter(company=login_admin_user.company.id)
+        print("--------- user_company_otp_upload_manages", user_company_otp_upload_manages)
+
+        # GuestUploadManage
+        user_company_guest_upload_manages = GuestUploadManage.objects.filter(company=login_admin_user.company.id)
+        print("--------- user_company_guest_upload_manages", user_company_guest_upload_manages)
 
 
         # 一次承認者を追加する
@@ -627,7 +864,43 @@ class FirstApproverSetView(LoginRequiredMixin, CommonView, FormView):
                         )
                         first_approver_approval_manage.save()
 
+            # OTPUploadManage
+            if user_company_otp_upload_manages:
+                for user_company_otp_upload_manage in user_company_otp_upload_manages:
+                    print("--------- user_company_otp_upload_manage", user_company_otp_upload_manage)
+                    # OTPUploadManage 新しく一次承認者に設定されたユーザー分のupload_manageを作成する
+                    if not ApprovalManage.objects.filter(first_approver=user.id, otp_upload_manage=user_company_otp_upload_manage):
+                        first_approver_approval_manage = ApprovalManage.objects.create(
+                            otp_upload_manage = user_company_otp_upload_manage,
+                            manage_id = user_company_otp_upload_manage.pk,
+                            application_title = user_company_otp_upload_manage.title,
+                            application_user = user_company_otp_upload_manage.created_user,
+                            application_date = user_company_otp_upload_manage.created_date,
+                            application_user_company_id = user_company_otp_upload_manage.company,
+                            approval_status = 1,
+                            first_approver = user.id,
+                            upload_method = 3
+                        )
+                        first_approver_approval_manage.save()
 
+            # GuestUploadManage
+            if user_company_guest_upload_manages:
+                for user_company_guest_upload_manage in user_company_guest_upload_manages:
+                    print("--------- user_company_guest_upload_manage", user_company_guest_upload_manage)
+                    # GuestUploadManage 新しく一次承認者に設定されたユーザー分のupload_manageを作成する
+                    if not ApprovalManage.objects.filter(first_approver=user.id, guest_upload_manage=user_company_guest_upload_manage):
+                        first_approver_approval_manage = ApprovalManage.objects.create(
+                            guest_upload_manage = user_company_guest_upload_manage,
+                            manage_id = user_company_guest_upload_manage.pk,
+                            application_title = user_company_guest_upload_manage.title,
+                            application_user = user_company_guest_upload_manage.created_user,
+                            application_date = user_company_guest_upload_manage.created_date,
+                            application_user_company_id = user_company_guest_upload_manage.company,
+                            approval_status = 1,
+                            first_approver = user.id,
+                            upload_method = 4
+                        )
+                        first_approver_approval_manage.save()
 
 
         # 操作履歴を残す
@@ -788,7 +1061,15 @@ class SecondApproverSetView(LoginRequiredMixin, CommonView, FormView):
 
         # UrlUploadManage
         user_company_url_upload_manages = UrlUploadManage.objects.filter(company=login_admin_user.company.id)
-        print("--------- user_company_url_upload_manages", user_company_url_upload_manages)
+        # print("--------- user_company_url_upload_manages", user_company_url_upload_manages)
+
+        # OTPUploadManage
+        user_company_otp_upload_manages = OTPUploadManage.objects.filter(company=login_admin_user.company.id)
+        print("--------- user_company_otp_upload_manages", user_company_otp_upload_manages)
+
+        # GuestUploadManage
+        user_company_guest_upload_manages = GuestUploadManage.objects.filter(company=login_admin_user.company.id)
+        print("--------- user_company_guest_upload_manages", user_company_guest_upload_manages)
 
 
         # 二次承認者を追加する
@@ -835,6 +1116,45 @@ class SecondApproverSetView(LoginRequiredMixin, CommonView, FormView):
                             upload_method = 2
                         )
                         second_approver_approval_manage.save()
+
+            # OTPUploadManage
+            if user_company_otp_upload_manages:
+                for user_company_otp_upload_manage in user_company_otp_upload_manages:
+                    print("--------- user_company_otp_upload_manage", user_company_otp_upload_manage)
+                    # OTPUploadManage 新しく一次承認者に設定されたユーザー分のupload_manageを作成する
+                    if not ApprovalManage.objects.filter(second_approver=user.id, otp_upload_manage=user_company_otp_upload_manage):
+                        second_approver_approval_manage = ApprovalManage.objects.create(
+                            otp_upload_manage = user_company_otp_upload_manage,
+                            manage_id = user_company_otp_upload_manage.pk,
+                            application_title = user_company_otp_upload_manage.title,
+                            application_user = user_company_otp_upload_manage.created_user,
+                            application_date = user_company_otp_upload_manage.created_date,
+                            application_user_company_id = user_company_otp_upload_manage.company,
+                            approval_status = 1,
+                            second_approver = user.id,
+                            upload_method = 3
+                        )
+                        second_approver_approval_manage.save()
+
+            # GuestUploadManage
+            if user_company_guest_upload_manages:
+                for user_company_guest_upload_manage in user_company_guest_upload_manages:
+                    print("--------- user_company_guest_upload_manage", user_company_guest_upload_manage)
+                    # GuestUploadManage 新しく一次承認者に設定されたユーザー分のupload_manageを作成する
+                    if not ApprovalManage.objects.filter(second_approver=user.id, guest_upload_manage=user_company_guest_upload_manage):
+                        second_approver_approval_manage = ApprovalManage.objects.create(
+                            guest_upload_manage = user_company_guest_upload_manage,
+                            manage_id = user_company_guest_upload_manage.pk,
+                            application_title = user_company_guest_upload_manage.title,
+                            application_user = user_company_guest_upload_manage.created_user,
+                            application_date = user_company_guest_upload_manage.created_date,
+                            application_user_company_id = user_company_guest_upload_manage.company,
+                            approval_status = 1,
+                            second_approver = user.id,
+                            upload_method = 4
+                        )
+                        second_approver_approval_manage.save()
+
 
 
 
@@ -1009,8 +1329,44 @@ class ApproveView(View):
                         message = approve_comment,
                         manage_id = approval_manage.url_upload_manage.pk
                     )
+                elif approval_upload_method == "3":
+                    print("-------------- 承認履歴 OPT")
+
+                    # 再申請済みフラグがTrueの場合はFalseに変更
+                    if approval_manage.otp_upload_manage.is_reapplied_flg:
+                        approval_manage.otp_upload_manage.is_reapplied_flg = False
+                        approval_manage.otp_upload_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = approval_manage.otp_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 1,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 2,# 一次承認
+                        message = approve_comment,
+                        manage_id = approval_manage.otp_upload_manage.pk
+                    )
                 else:
-                    print("-------------- 承認履歴 その他")
+                    print("-------------- 承認履歴 ゲスト")
+
+                    # 再申請済みフラグがTrueの場合はFalseに変更
+                    if approval_manage.guest_upload_manage.is_reapplied_flg:
+                        approval_manage.guest_upload_manage.is_reapplied_flg = False
+                        approval_manage.guest_upload_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        guest_upload_manage = approval_manage.guest_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 1,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 2,# 一次承認
+                        message = approve_comment,
+                        manage_id = approval_manage.guest_upload_manage.pk
+                    )
 
                 approval_log.save()
 
@@ -1062,8 +1418,45 @@ class ApproveView(View):
                         message = approve_comment,
                         manage_id = approval_manage.url_upload_manage.pk
                     )
+                elif approval_upload_method == "3":
+                    print("-------------- 承認履歴 OPT")
+
+                    # 再申請済みフラグがTrueの場合はFalseに変更
+                    if approval_manage.otp_upload_manage.is_reapplied_flg:
+                        approval_manage.otp_upload_manage.is_reapplied_flg = False
+                        approval_manage.otp_upload_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = approval_manage.otp_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 2,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 3,# 最終承認
+                        message = approve_comment,
+                        manage_id = approval_manage.otp_upload_manage.pk
+                    )
                 else:
-                    print("-------------- 承認履歴 その他")
+                    print("-------------- 承認履歴 ゲスト")
+
+                    # 再申請済みフラグがTrueの場合はFalseに変更
+                    if approval_manage.guest_upload_manage.is_reapplied_flg:
+                        approval_manage.guest_upload_manage.is_reapplied_flg = False
+                        approval_manage.guest_upload_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        guest_upload_manage = approval_manage.guest_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 2,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 3,# 最終承認
+                        message = approve_comment,
+                        manage_id = approval_manage.guest_upload_manage.pk
+                    )
+
 
                 approval_log.save()
 
@@ -1140,12 +1533,34 @@ class DeclineApplicationView(View):
                         message = returned_comment,
                         manage_id = approval_manage.url_upload_manage.pk
                     )
+                elif approval_upload_method == "3":
+                    # print("-------------- 承認履歴 OPT共有")
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = approval_manage.otp_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 1,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 4,
+                        message = returned_comment,
+                        manage_id = approval_manage.otp_upload_manage.pk
+                    )
                 else:
-                    print("-------------- 承認履歴 その他")
+                    # print("-------------- 承認履歴 ゲストアップロード")
+                    approval_log = ApprovalLog.objects.create(
+                        guest_upload_manage = approval_manage.guest_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 1,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 4,
+                        message = returned_comment,
+                        manage_id = approval_manage.guest_upload_manage.pk
+                    )
 
             # 二次承認者
             elif approval_manage.second_approver:
-                print("-------------- 二次承認者")
+                # print("-------------- 二次承認者")
 
                 if approval_upload_method == "1":
                     # print("-------------- 承認履歴 通常アップロード")
@@ -1171,9 +1586,30 @@ class DeclineApplicationView(View):
                         message = returned_comment,
                         manage_id = approval_manage.url_upload_manage.pk
                     )
+                elif approval_upload_method == "3":
+                    # print("-------------- 承認履歴 OPT共有")
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = approval_manage.otp_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 2,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 4,
+                        message = returned_comment,
+                        manage_id = approval_manage.otp_upload_manage.pk
+                    )
                 else:
-                    print("-------------- 承認履歴 その他")
-
+                    # print("-------------- 承認履歴 ゲストアップロード")
+                    approval_log = ApprovalLog.objects.create(
+                        guest_upload_manage = approval_manage.guest_upload_manage,
+                        approval_operation_user = self.request.user.id,
+                        approval_operation_user_position = 2,
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date = datetime.now(),
+                        approval_operation_content = 4,
+                        message = returned_comment,
+                        manage_id = approval_manage.guest_upload_manage.pk
+                    )
             else:
                 print("------------------- 差戻 else")
 
@@ -1252,8 +1688,46 @@ class ReapplicationView(View):
                     message = reapplication_comment,
                     manage_id = url_upload_manage.pk
                 )
+            elif upload_method == "3":
+                # print("-------------- 承認履歴 OPT共有")
+
+                otp_upload_manage = OTPUploadManage.objects.filter(id=upload_manage_pk).first()
+
+                # 再申請済みフラグをTrueに変更
+                otp_upload_manage.is_reapplied_flg = True
+                otp_upload_manage.save()
+
+                # 承認履歴を残す
+                approval_log = ApprovalLog.objects.create(
+                    otp_upload_manage = otp_upload_manage,
+                    approval_operation_user = self.request.user.id,
+                    approval_operation_user_position = 3,
+                    approval_operation_user_company_id = self.request.user.company.id,
+                    approval_operation_date = datetime.now(),
+                    approval_operation_content = 6,
+                    message = reapplication_comment,
+                    manage_id = otp_upload_manage.pk
+                )
             else:
-                print("-------------- 承認履歴 その他")
+                # print("-------------- 承認履歴 ゲストアップロー")
+
+                guest_upload_manage = GuestUploadManage.objects.filter(id=upload_manage_pk).first()
+
+                # 再申請済みフラグをTrueに変更
+                guest_upload_manage.is_reapplied_flg = True
+                guest_upload_manage.save()
+
+                # 承認履歴を残す
+                approval_log = ApprovalLog.objects.create(
+                    guest_upload_manage = guest_upload_manage,
+                    approval_operation_user = self.request.user.id,
+                    approval_operation_user_position = 3,
+                    approval_operation_user_company_id = self.request.user.company.id,
+                    approval_operation_date = datetime.now(),
+                    approval_operation_content = 6,
+                    message = reapplication_comment,
+                    manage_id = guest_upload_manage.pk
+                )
 
             approval_log.save()
 
@@ -1283,7 +1757,7 @@ class ReapplicationView(View):
 
 
 """
-取り消し(削除) 通常アップロードアップロード
+取り消し(削除) 通常アップロード
 ※UploadManageのDBデータは削除
 """
 class ApprovalDeleteAjaxView(View,CommonView):
@@ -1516,6 +1990,16 @@ class OTPApprovalDeleteAjaxView(View):
 
                     # DBの対象行を削除
                     file.delete()
+
+                # ApprovalManageを削除
+                approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage)
+                # print("------------------- approval_manages", approval_manages)
+                approval_manages.delete()
+
+                # ApprovalLogを削除
+                approval_logs = ApprovalLog.objects.filter(otp_upload_manage=otp_upload_manage)
+                # print("------------------- approval_logs", approval_logs)
+                approval_logs.delete()
 
                 otp_upload_manage.delete()
 

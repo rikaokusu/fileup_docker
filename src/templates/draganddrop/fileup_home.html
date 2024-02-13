@@ -1566,16 +1566,22 @@
 
                         <!-- 変更ボタン -->
                         <td class="updateIcon">
-                            {% if otp_upload_manage.file_del_flag == 1 %}
-                            <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                            {% if is_approval_workflow == 1 %}<!-- 承認ワークフローを"使用する" -->
+                                <span data-toggle="tooltip" title="承認済みのファイルは編集できません" data-placement="top">
                                     <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
-                            </span>
+                                </span>
                             {% else %}
-                            <span data-toggle="tooltip" title="データの編集" data-placement="top">
-                                <a href="{% url 'draganddrop:step1_otp_update' otp_upload_manage.pk %}">
-                                    <button class="fas_button_edit" ></button>
-                                </a>
-                            </span>
+                                {% if otp_upload_manage.file_del_flag == 1 %}
+                                <span data-toggle="tooltip" title="ファイル削除済みのため無効" data-placement="top">
+                                        <button class="fas_button_edit" style="background-color: #C0C0C0;"></button>
+                                </span>
+                                {% else %}
+                                <span data-toggle="tooltip" title="データの編集" data-placement="top">
+                                    <a href="{% url 'draganddrop:step1_otp_update' otp_upload_manage.pk %}">
+                                        <button class="fas_button_edit" ></button>
+                                    </a>
+                                </span>
+                                {% endif %}
                             {% endif %}
                         </td>
     
