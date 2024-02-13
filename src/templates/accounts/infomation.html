@@ -21,6 +21,15 @@
             {% if info.category == 'メッセージ' %}
                 {{ info.contents }}<br>
                 ご契約中のサービス詳細を確認したい場合はページ上部の契約管理をご利用ください。
+            {% elif info.category == '受信通知' %}
+                以下のファイルを受信しました。ご確認ください。<br>
+                <div class="font-weight-bold py-4">
+                    日時：{{ info.release_date }}<br>
+                    送信者：{{ info.sender }}<br>
+                    タイトル：{{info.fileup_title}}<br>
+                    メッセージ：{{info.contents}}<br>
+                </div>
+                
             {% elif info.category == 'メンテナンス' %}
                 いつもCloudLabポータルをご利用いただきまして誠にありがとうございます。<br>
                 ご利用のお客様にメンテナンスのご案内です。<br>

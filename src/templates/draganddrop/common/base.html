@@ -53,7 +53,7 @@
     <nav class="navbar navbar-expand static-top navbar-dark">
       <div class="NavContents">
           <a class="navbar-brand py-0 mr-0 h4" href="{% url 'draganddrop:home' %}"><img src="{% static 'img/fileup_logo1.svg' %}" alt="CloudLab" style="width:130px; height:58px;" class="p-0"></a>
-          {% if current_user.is_authenticated and current_user.is_active and current_user.is_staff %}
+          {% if current_user.is_active %}
             <div class="nav-flex">
               <!-- ヘッダーアイコン -->
               <div class="d-none d-inline-block form-inline info_icon position-relative mr-2">
@@ -158,15 +158,15 @@
                                                               <!-- 値 -->
                                                               <td class="pt-3  pb-2 float-right">
                                                                   <div class="radioArea pl-2" id="mail_radio">
-                                                                      <input type="radio" name="mail_choice" id="ma-valid" value="1" disabled>
+                                                                      {% comment %} <input type="radio" name="mail_choice" id="ma-valid" value="1" disabled>
                                                                       <label for="ma-valid"> 有効</label>
                                                                       <input type="radio" name="mail_choice" id="ma-invalid" value="2" checked>
-                                                                      <label for="ma-invalid">無効</label>
+                                                                      <label for="ma-invalid">無効</label> {% endcomment %}
                                                                       {% comment %} あとで↓に戻す {% endcomment %}
-                                                                      {% comment %} <input type="radio" name="mail_choice" id="ma-valid" value="1" {% if current_user.is_send_mail == True %}checked{% endif %}>
+                                                                      <input type="radio" name="mail_choice" id="ma-valid" value="1" {% if current_user.is_send_mail == True %}checked{% endif %}>
                                                                       <label for="ma-valid"> 有効</label>
                                                                       <input type="radio" name="mail_choice" id="ma-invalid" value="2" {% if current_user.is_send_mail == False %}checked{% endif %}>
-                                                                      <label for="ma-invalid">無効</label> {% endcomment %}
+                                                                      <label for="ma-invalid">無効</label>
                                                                   </div>
                                                               </td>
                                                           </div>
@@ -193,39 +193,6 @@
       </div>
   </nav>
 <!--ポータルから移行おわり-->
-<!--元々のナビ-->
-{% comment %} 
-  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-
-    <a class="navbar-brand mr-1" href="{% url 'draganddrop:home' %}">Yuitech</a>
-
-
-    <div class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0 ">
-      <div class="separator">
-      </div>
-    </div>
-
-    <div class="d-none d-md-inline-block form-inline ml-2 mr-0 mr-md-3 my-2 my-md-0">
-    </div>
-
-    <ul class="navbar-nav ml-auto ml-md-0">
-      <li class="nav-item dropdown no-arrow">
-        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-user-circle fa-fw"></i>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-          {% if not current_user.is_authenticated and not current_user.is_active and not current_user.is_staff %}
-          <a class="dropdown-item" href="{% url 'accounts:login' %}">ログイン</a>
-          {% else %}
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{% url 'accounts:logout' %}" data-toggle="modal"
-            data-target="#logoutModal">ログアウト</a>
-          {% endif %}
-        </div>
-      </li>
-    </ul>
-  </nav> {% endcomment %}
   {% endif %}
   {% endif %}
   {% endif %}
@@ -360,75 +327,6 @@
   </div><!---->
 </div><!--お知らせモーダルおわり-->
 
-  <!-- お知らせモーダル用 -->
-  {% comment %} <div class="modal fade " id="info_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
-        <div class="modal-content info-modal-content">
-          <!--ポータル版-->
-            <ul class="tab nav nav-tabs clearfix info_tab">
-              <li class="nav-item">
-                <a class="nav-link active" id="info_1" data-toggle="tab" href="#info1" role="tab" aria-controls="item1" aria-selected="true">全て表示</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="info_2" data-toggle="tab" href="#info2" role="tab" aria-controls="item2" aria-selected="false">お知らせ</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="info_3" data-toggle="tab" href="#info3" role="tab" aria-controls="item3" aria-selected="false">メンテナンス</a>
-              </li>
-            </ul>
-            <!-- コンテンツ  全体を非表示にし、showクラスが付いたコンテンツのみ表示 -->
-            <!--bootstrap版-->
-            <div class="area tab-content">
-
-              <!--portalとやり方そろっているけど数字すら表示おかしい-->
-                <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
-                  
-                    {% for all in all_informations %}
-                        <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                        {% if not all.id in read_info %}
-                            <span class="bg-warning">{{ all.category }}</span>
-                        {% else %}
-                            <span>{{ all.category }}</span>
-                        {% endif %}
-                        </b><span class="newsList-title">{{ all.title }}</span></a></li>
-                    {% empty %}
-                        <li><span class="newsList-empty">お知らせはありません</span></li>
-                    {% endfor %} 
-                </ul>
-                <ul class="tab-pane fade show active" id="info2" role="tabpanel" aria-labelledby="info_2">
-                    {% for notice in notice_informations %}
-                        <li><a href="{% url 'draganddrop:information' notice.id %}"><time datetime="{{ notice.release_date|date:'Y-m-d' }}" class="newsList-date">{{ notice.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                        {% if not notice.id in read_info %}
-                            <span class="bg-warning">{{ notice.category }}</span>
-                        {% else %}
-                            <span>{{ notice.category }}</span>
-                        {% endif %}
-                        </b><span class="newsList-title">{{ notice.title }}</span></a></li>
-                    {% empty %}
-                        <li><span class="newsList-empty">お知らせはありません</span></li>
-                    {% endfor %}
-                </ul>
-                <ul class="tab-pane fade show active" id="info3" role="tabpanel" aria-labelledby="info_3">
-                    {% for mainte in maintenance_informations %}
-                        <li><a href="{% url 'draganddrop:information' mainte.id %}"><time datetime="{{ mainte.release_date|date:'Y-m-d' }}" class="newsList-date">{{ mainte.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
-                        {% if not mainte.id in read_info %}              
-                            <span class="bg-warning">{{ mainte.category }}</span>
-                        {% else %}
-                            <span>{{ mainte.category }}</span>
-                        {% endif %}
-                        </b><span class="newsList-title">{{ mainte.title }}</span></a></li>
-                    {% empty %}
-                        <li><span class="newsList-empty">お知らせはありません</span></li> 
-                    {% endfor %}
-                </ul> 
-            </div>
-            <div class="modal-footer justify-content-center bg-white">
-                <button class="btn my-btn-cancel btn-sm my-btn-w8 " data-dismiss="modal" onfocus="this.blur();">閉じる</button>
-            </div><!-- /.modal-footer -->
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->  {% endcomment %}
-
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
@@ -517,6 +415,48 @@ $(document).ready(function() {
     $("#info_modal").modal('show')
   })
 })
+
+////////////   メール通知設定
+$("input:radio[name='mail_choice']").change(function(){
+
+  var mail_choiced = $('input[name="mail_choice"]:checked').val()
+  $.ajax({
+      type:"POST",
+      url:"{% url 'draganddrop:send_mail' %}",
+      data:{
+      'mail_choiced':mail_choiced
+      },
+      dataType: 'json'
+  }).done(function(data, jqXHR){
+      if(data['judge']=='mail_true'){
+          $('#result_toast').on('show.bs.toast', function (e) {
+              var toast = $(this);
+              toast.find('.toast-body').addClass('alert-success');//このクラスを付与して成功時の色を定義
+              toast.find('.toast-body').text("メール通知設定を有効にしました。");//サーバ側から戻ってきたメッセージを表示
+          });
+          $('#result_toast').toast({ delay: 5000, animation: true }).toast('show'); //表示処理 
+
+      }else{
+          $('#result_toast').on('show.bs.toast', function (e) {
+              var toast = $(this);
+              toast.find('.toast-body').addClass('alert-success');//このクラスを付与して成功時の色を定義
+              toast.find('.toast-body').text("メール通知設定を無効にしました。");//サーバ側から戻ってきたメッセージを表示
+          });
+          $('#result_toast').toast({ delay: 5000, animation: true }).toast('show'); //表示処理 
+          };
+  }).fail(function(data){
+      $('#result_toast').on('show.bs.toast', function (e) {
+          var toast = $(this);
+          toast.find('.toast-body').removeClass('alert-success');
+          toast.find('.toast-body').addClass('alert-danger');//このクラスを付与して成功時の色を定義
+          toast.find('.toast-body').text('メール通知設定が失敗しました。再度設定してください');//サーバ側から戻ってきたメッセージを表示
+      });
+      $('#result_toast').toast({ delay: 5000, animation: true }).toast('show'); //表示処理 
+  });
+});
+
+
+
 
 // --------------------------
 //  localStorageのデータを削除
