@@ -335,6 +335,88 @@ common class
         padding-top: 5px;
     }
 
+/*-----------------
+アップロードタイプアイコン
+------------------*/
+.upload_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    position: relative;
+}
+
+.url_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    position: relative;
+}
+.otp_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    position: relative;
+}
+
+.guest_box {
+    width: 100%;
+    display: -webkit-inline-box;
+    position: relative;
+}
+
+.upload_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    /* position: absolute; */
+    right: 0px;
+    background-color: rgb(149, 212, 3);
+    border-radius: 3px;
+    padding: 2px 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "通常";
+    margin-top: 5px;
+}
+
+.url_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    /* position: absolute; */
+    right: 0px;
+    background-color: #2e6de4;
+    border-radius: 3px;
+    padding: 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "URL";
+    margin-top: 5px;
+}
+
+.otp_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    /* position: absolute; */
+    right: 0px;
+    background-color: rgb(168, 31, 223);
+    border-radius: 3px;
+    padding: 2px 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "OTP";
+    margin-top: 5px;
+}
+
+.guest_box::after {
+    color: #ffffff;
+    font-size: 0.5rem;
+    /* position: absolute; */
+    right: 0px;
+    background-color: #fc8a1f;
+    border-radius: 3px;
+    padding: 3px;
+    white-space: nowrap;
+    margin-left: 10px;
+    content: "ｹﾞｽﾄ";
+    margin-top: 5px;
+}
+
     /*---------------
     btn
 ----------------*/

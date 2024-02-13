@@ -22,53 +22,92 @@
 {% endif %}
 
 {% for personal_resource_management in personal_resource_management %}
-
 <!--データ使用量詳細-->
-<div class="personal_resource_management_box">
-		
+<div class="row">
+    <div class="col pr-0">
+        <div class="d-flex">
+            <div class="box3_resource_management mr-3">
+                <div>アップロード件数</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{personal_resource_management.number_of_active_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{personal_resource_management.number_of_deactive_upload_manage}} 削除済:{{personal_resource_management.number_of_removed_upload_manage}} 総数:{{total_upload_manage}})</div>
+            </div>
+            <div class="box3_resource_management mr-3">
+                <div>URL共有件数</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{personal_resource_management.number_of_active_url_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{personal_resource_management.number_of_deactive_url_upload_manage}} 削除済:{{personal_resource_management.number_of_removed_url_upload_manage}} 総数:{{total_url_upload_manage}})</div>
+            </div>
+            <div class="box3_resource_management mr-3">
+                <div>OTP共有件数</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{personal_resource_management.number_of_active_otp_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{personal_resource_management.number_of_deactive_otp_upload_manage}} 削除済:{{personal_resource_management.number_of_removed_otp_upload_manage}} 総数:{{total_otp_upload_manage}})</div>
+            </div>
+            <div class="box3_resource_management mr-3">
+                <div class="font-weight-bold h5 mb-0">ファイル合計サイズ</div>
+                <div class="d-flex justify-content-center">
+                    {% if total_file_size <= 0 %}
+				        <div class="box3_resource_management_value">0</div>
+				    {% else %}
+				        <div class="box3_resource_management_value">{{total_file_size}}</div>
+				    {% endif %}
+				    <div class="box3_resource_management_unit">{{unit}}</div>
+                </div>
+            </div>
+        </div><!--d-flx-->
+        <div class=" pt-3 d-flex">
 
-		<div class="box3_resource_management mr-4">
-			<div>アップロード件数</div>
-			<div class="d-flex justify-content-center">
-				<div class="box3_resource_management_value">{{personal_resource_management.number_of_active_upload_manage}}</div>
-				<div class="box3_resource_management_unit">件</div>
-			</div>
-			<div>(無効:{{personal_resource_management.number_of_deactive_upload_manage}} 総数:{{total_upload_manage}})</div>
-		</div>
-	
-		<div class="box3_resource_management mr-4">
-			<div>URL共有件数</div>
-			<div class="d-flex justify-content-center">
-				<div class="box3_resource_management_value">{{personal_resource_management.number_of_active_url_upload_manage}}</div>
-				<div class="box3_resource_management_unit">件</div>
-			</div>
-			<div>(無効:{{personal_resource_management.number_of_deactive_url_upload_manage}} 総数:{{total_url_upload_manage}})</div>
-		</div>
-	
-		<div class="box3_resource_management mr-4">
-			<div>ファイル合計サイズ</div>
-			<div class="d-flex justify-content-center">
-				{% if total_file_size <= 0 %}
-				<div class="box3_resource_management_value">0</div>
-				{% else %}
-				<div class="box3_resource_management_value">{{total_file_size}}</div>
-				{% endif %}
-				<div class="box3_resource_management_unit">{{unit}}</div>
-			</div>
-		</div>
-
-		<div class="box3_resource_management">
-			<div>データ使用量</div>
-			<div class="d-flex justify-content-center">
-				{% if total_data_usage <= 0 %}
-				<div class="box3_resource_management_value">0</div>
-				{% else %}
-				<div class="box3_resource_management_value">{{total_data_usage}}</div>
-				{% endif %}
-				<div class="box3_resource_management_unit">{{total_data_usage_unit}}</div>
-			</div>
-		</div>
-
+            <div class="box3_resource_management mr-3">
+                <div>ゲストアップロード件数</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{personal_resource_management.number_of_active_guest_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{personal_resource_management.number_of_deactive_guest_upload_manage}} 削除済:{{personal_resource_management.number_of_removed_guest_upload_manage}} 総数:{{total_guest_upload_manage}})</div>
+            </div>
+            <div class="box3_resource_management mr-3" style="background:#e7e7e7;">
+                {% comment %} <div>　</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{resource_management.number_of_active_otp_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{resource_management.number_of_deactive_otp_upload_manage}} 削除済:{{resource_management.number_of_removed_otp_upload_manage}} 総数:{{total_otp_upload_manage}})</div> {% endcomment %}
+            </div>
+            <div class="box3_resource_management mr-3" style="background:#e7e7e7;">
+                {% comment %} <div>　</div>
+                <div class="d-flex justify-content-center">
+                    <div class="box3_resource_management_value">{{resource_management.number_of_active_url_upload_manage}}</div>
+                    <div class="box3_resource_management_unit">件</div>
+                </div>
+                <div>(無効:{{resource_management.number_of_deactive_url_upload_manage}} 削除済:{{resource_management.number_of_removed_url_upload_manage}} 総数:{{total_url_upload_manage}})</div> {% endcomment %}
+            </div>
+            <div class="box3_resource_management mr-3">
+                <div class="font-weight-bold h5 mb-0">ディスク使用量</div>
+                <div class="d-flex justify-content-center">
+                    {% if total_data_usage <= 0 %}
+				        <div class="box3_resource_management_value">0</div>
+				    {% else %}
+				        <div class="box3_resource_management_value">{{total_data_usage}}</div>
+				    {% endif %}
+				        <div class="box3_resource_management_unit">{{total_data_usage_unit}}</div>
+                </div>
+                <div class="balloonoya">
+                    <p>
+                        (<span class="title_color" style="font-weight: bold;">残用量</span>
+                        : {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
+                    </p>
+                    <span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+                </div> 
+            </div>
+        </div><!--d-flx-->
+    </div><!--col-->
 </div>
 
 {% endfor %}

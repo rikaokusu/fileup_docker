@@ -220,7 +220,7 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
 
 
         context["upload_manages"] = upload_manages
-
+        print('ある？？？？？？？アップロード',upload_manages)
         # URLアップロード用
         # url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["url_upload_manages"] = url_upload_manages
@@ -243,7 +243,6 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # URLダウンロード用
         url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["url_upload_manage_for_dest_users"] = url_upload_manage_for_dest_users
-
         # OTPダウンロード用
         otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
         context["otp_upload_manage_for_dest_users"] = otp_upload_manage_for_dest_users

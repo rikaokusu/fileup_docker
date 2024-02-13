@@ -18,6 +18,7 @@
 {% load otp_get_direct_users %}
 {% load get_display_name %}
 {% load mathfilters %}
+{% load get_created_user_mail %}
 
 
 {% block content %}
@@ -145,7 +146,7 @@
                         </td>
 
                         <!-- タイトル -->
-                        <td>
+                        <td class="upload_box">
                             {% if dest_user_data.upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                 title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
@@ -216,7 +217,7 @@
 
                         <!-- 送信者 -->
                         <td>
-                            {{dest_user_data.upload_manage.created_user.email}}
+                            {{dest_user_data.upload_manage.created_user|get_created_user_mail}}
                         </td>
 
                         <!-- 一括ダウンロードボタン -->
@@ -333,7 +334,7 @@
                 </td>
 
                 <!-- タイトル -->
-                <td>
+                <td class="url_box">
                     {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
@@ -348,7 +349,7 @@
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
                     <a href="{{url_dest_user_data.url_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
-                    <span class="material-icons copy_button" data-url="{{url_dest_user_data.url_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                    <span class="material-icons copy_button" data-url="{{url_dest_user_data.url_upload_manage.url}}" style="font-size:15px;"></span>
                     {% endif %}
                 </td>
 
@@ -410,7 +411,8 @@
 
                 <!-- 送信者 -->
                 <td>
-                    {{url_dest_user_data.url_upload_manage.created_user.email}}
+                    {% comment %} {{url_dest_user_data.url_upload_manage.created_user.email}} {% endcomment %}
+                    {{url_dest_user_data.url_upload_manage.created_user|get_created_user_mail}}
                 </td>
 
                 <!-- 一括ダウンロードボタン url-->
@@ -525,7 +527,7 @@
                 </td>
 
                 <!-- タイトル -->
-                <td>
+                <td class="otp_box">
                     {% if otp_dest_user_data.otp_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{otp_dest_user_data.otp_upload_manage.title}}">{{otp_dest_user_data.otp_upload_manage.title | truncatechars:13}}</span>
@@ -540,7 +542,7 @@
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{otp_dest_user_data.otp_upload_manage.title}}">{{otp_dest_user_data.otp_upload_manage.title | truncatechars:13}}</span>
                     <a href="{{otp_dest_user_data.otp_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
-                    <span class="material-icons copy_button" data-url="{{otp_dest_user_data.otp_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                    <span class="material-icons copy_button" data-url="{{otp_dest_user_data.otp_upload_manage.url}}" style="font-size:15px;"></span>
                     {% endif %}
                 </td>
 
@@ -595,7 +597,7 @@
 
                 <!-- 送信者 -->
                 <td>
-                    {{otp_dest_user_data.otp_upload_manage.created_user.email}}
+                    {{otp_dest_user_data.otp_upload_manage.created_user|get_created_user_mail}}
                 </td>
 
                 <!-- 一括ダウンロードボタン otp-->
@@ -711,7 +713,7 @@
                 </td>
 
                 <!-- タイトル -->
-                <td>
+                <td class="guest_box">
                     {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
@@ -726,7 +728,7 @@
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
                     {% comment %} <a href="{{guest_dest_user_data.guest_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a> {% endcomment %}
-                    {% comment %} <span class="material-icons copy_button" data-url="{{guest_dest_user_data.guest_upload_manage.url}}" style="font-size:15px;">content_copy</span> {% endcomment %}
+                    {% comment %} <span class="material-icons copy_button" data-url="{{guest_dest_user_data.guest_upload_manage.url}}" style="font-size:15px;"></span> {% endcomment %}
                     {% endif %}
                 </td>
 
@@ -943,7 +945,7 @@
                         </td>
 
                         <!-- タイトル -->
-                        <td>
+                        <td class="upload_box">
                             {% if upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                 title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span><br>
@@ -1196,7 +1198,7 @@
                         </td>
 
                         <!-- タイトル -->
-                        <td>
+                        <td class="url_box">
                             {% if url_upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
@@ -1211,7 +1213,7 @@
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
                                 <a href="{{url_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
-                                <span class="material-icons copy_button" data-url="{{url_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                                <span class="material-icons copy_button" data-url="{{url_upload_manage.url}}" style="font-size:15px;"></span>
                             {% endif %}
                         </td>
 
@@ -1449,7 +1451,7 @@
                         </td>
 
                         <!-- タイトル -->
-                        <td>
+                        <td class="otp_box">
                             {% if otp_upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{otp_upload_manage.title}}">{{otp_upload_manage.title | truncatechars:13}}</span>
@@ -1464,7 +1466,7 @@
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{otp_upload_manage.title}}">{{otp_upload_manage.title | truncatechars:13}}</span>
                                 <a href="{{otp_upload_manage.url}}" class="url" target="_blank" rel="noopener noreferrer">URL</a>
-                                <span class="material-icons copy_button" data-otp="{{otp_upload_manage.url}}" style="font-size:15px;">content_copy</span>
+                                <span class="material-icons copy_button" data-otp="{{otp_upload_manage.url}}" style="font-size:15px;"></span>
                             {% endif %}
                         </td>
 

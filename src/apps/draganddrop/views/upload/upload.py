@@ -588,7 +588,8 @@ class Step3(TemplateView, CommonView):
                         upload_method = 1 # 通常アップロード
                     )
                     second_approver_approval_manage.save()
-
+        else:
+            upload_manage.save()
         return context
 
 ###########################
