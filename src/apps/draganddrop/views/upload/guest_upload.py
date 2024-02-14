@@ -558,86 +558,18 @@ class Step1GuestUpload(CreateView, FormView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_user = self.request.user
         guest_upload_manage_id = self.kwargs['pk']
         context["guest_upload_manage_id"] = guest_upload_manage_id
 
         guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
         files = guest_upload_manage_obj.file.all()
+        print('ふぁいるずの中身あるの？？？？',files) 
         context["files"] = files
         context["guest_upload_manage"] = guest_upload_manage_obj
 
         file = serializers.serialize("json", files, fields=('name', 'size', 'upload', 'id'))
 
         context["dist_file"] = file
-
-        #操作ログ用
-        #送信先(自分)
-        dest_users = current_user.email
-        # ファイル名
-        guestupload_files = guest_upload_manage_obj.file.all()
-        guest_user = guest_upload_manage_obj.guest_user_mail
-        files = []
-        for file in guestupload_files:
-            print('ふぁいるかくにん1',file.name)           
-            file_name = file.name + "\r\n"
-            files.append(file_name)
-        files = ' '.join(files)
-        # ファイルタイトル
-        file_title = guest_upload_manage_obj.title
-        # 操作ログ終わり
-        # 操作ログ
-        add_log(2,1,current_user,file_title,files,dest_users,6,self.request.META.get('REMOTE_ADDR'))
-        ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
-        #送信先 email
-        emailList_db = current_user.email
-        #タイトル
-        Notice_title = guest_user + "さんが" + file_title + "を共有しました。"
-        #メッセージ
-        Notice_message = guest_upload_manage_obj.message
-
-        ###通知テーブル登録
-        Notification.objects.create(service="FileUP!",category="受信通知",sender=guest_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
-
-        #メール送信
-        # current_site = get_current_site(self.request)
-        # domain = current_site.domain
-
-        # tupleMessage = []
-        # for email in emailList_for:
-        #     e_user = User.objects.get(email=email)
-        #     e_send = e_user.is_send_mail
-        #     print('めーーーる可否',e_send)
-
-        #     if e_send == True:
-        #         context = {
-        #             'protocol': 'https' if self.request.is_secure() else 'http',
-        #             'domain': domain,
-        #             #送信者
-        #             'user_last_name':self.request.user.last_name,
-        #             'user_first_name':self.request.user.first_name,
-        #         }
-        #         subject_template = get_template('draganddrop/mail_template/subject.txt')
-        #         subject = subject_template.render(context)
-
-        #         message_template = get_template('draganddrop/mail_template/message.txt')
-        #         message = message_template.render(context)
-        #         from_email = settings.EMAIL_HOST_USER#CL側のメアド
-        #         recipient_list = [email]#受信者リスト
-                
-        #         message1 = (
-        #             subject,
-        #             message,
-        #             from_email,
-        #             recipient_list,
-        #         )
-        #         messageList = list(message1)
-        #         tupleMessage.insert(-1,messageList)
-
-        #         print('受信通知めーる',tupleMessage)
-        #     # send_mail(subject, message, from_email, recipient_list)
-        # send_mass_mail(tupleMessage)
-        ##################Notification通知用終了
 
         # 削除IDを取得
         if 'del_file_pk' in self.request.session:
@@ -819,6 +751,80 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         #     guest_upload_manage.file.add(file)
 
         guest_upload_manage.save()
+
+        #操作ログ用
+        #送信元（ゲスト）
+        current_user = self.request.user
+        guest_mail = guest_upload_manage.guest_user_mail
+        guest_name = guest_upload_manage.guest_user_name
+        guest = guest_mail + '/' + guest_name
+        #送信先(自分)
+        dest_users = current_user.email
+        # ファイル名
+        guestupload_files = guest_upload_manage.file.all()
+        print('ふぁいるかくにん00000ここはきてる？？',guestupload_files)           
+        files = []
+        for file in guestupload_files:
+            print('ふぁいるかくにん00000',file.name)           
+            file_name = file.name + "\r\n"
+            files.append(file_name)
+        files = ' '.join(files)
+        # ファイルタイトル
+        file_title = guest_upload_manage.title
+        # 操作ログ終わり
+        # 操作ログ
+        add_log(2,1,guest,file_title,files,dest_users,6,self.request.META.get('REMOTE_ADDR'))
+        ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
+        #送信先 (自分)email
+        emailList_db = current_user.email
+        #タイトル
+        Notice_title = guest + "さんが" + file_title + "を共有しました。"
+        #メッセージ
+        Notice_message = guest_upload_manage.message
+
+        ###通知テーブル登録
+        Notification.objects.create(service="FileUP!",category="受信通知",sender=guest,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+        #メール送信
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+
+        print('いーめーるげすと',emailList_db)
+        e_user = User.objects.get(email=emailList_db)
+        # tupleMessage = []
+        # for user_email in emailList_db:
+        #     e_user = User.objects.get(email=user_email)
+        #     print('いーめーるげすとkorewakaru?',e_user)
+        e_send = e_user.is_send_mail
+        print('めーーーる可否',e_send)
+
+        if e_send == True:
+            context = {
+                'protocol': 'https' if self.request.is_secure() else 'http',
+                'domain': domain,
+                #送信者(この場合ゲストユーザー)
+                'user_last_name':guest_name,
+                # 'user_first_name':self.request.user.first_name,
+            }
+            subject_template = get_template('draganddrop/mail_template/subject.txt')
+            subject = subject_template.render(context)
+
+            message_template = get_template('draganddrop/mail_template/message.txt')
+            message = message_template.render(context)
+            from_email = settings.EMAIL_HOST_USER#CL側のメアド
+            recipient_list = [emailList_db]#受信者リスト
+            
+            # message1 = (
+            #     subject,
+            #     message,
+            #     from_email,
+            #     recipient_list,
+            # )
+            # messageList = list(message1)
+            # tupleMessage.insert(-1,messageList)
+            send_mail(subject, message, from_email, recipient_list)
+        # send_mass_mail(tupleMessage)
+        ##################Notification通知用終了
 
         personal_resource_manage = PersonalResourceManagement.objects.filter(user=guest_upload_manage.created_user).first()
 

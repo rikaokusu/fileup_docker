@@ -138,6 +138,7 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
     def get_context_data(self, **kwargs):
         print('インフォメーションがうごいた')
         context = super().get_context_data(**kwargs)
+        current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         user = self.request.user
         info = Notification.objects.get(id=self.kwargs['pk'])
         if Read.objects.filter(read_user=user,notification_id=info).exists()==False:
@@ -147,14 +148,42 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
             #追記
             today = datetime.datetime.now()
 
-            read2 = Read.objects.filter(read_user=user).count()
-            if read2 > 0:
-                info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = user),start_date__lte = today).distinct().count()
-                no_read = info_all - read2
-                if no_read > 99 :
-                    context["no_read"] = "99+"
-                else:
-                    context["no_read"] = no_read
+            #全体の通知の数を確認
+            my_email = current_user.email
+            all_info = Notification.objects.filter(start_date__lte = today)
+            #全てのサービスかFileUPの通知のみ取得
+            all_info = all_info.filter(
+            Q(service="FileUP!") | 
+            Q(service="全てのサービス")).order_by('release_date').reverse()
+            all_informations = []
+
+            for info in all_info:
+                info_email = info.email_list
+                email_if = my_email in info_email  #True False　自分が通知対象者か
+                if email_if == True:
+                    all_informations.append(info)
+
+            # read2 = Read.objects.filter(read_user=user).count()
+            # if read2 > 0:
+            #     info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = user),start_date__lte = today).distinct().count()
+            #     no_read = info_all - read2
+            #     if no_read > 99 :
+            #         context["no_read"] = "99+"
+            #     else:
+                #         context["no_read"] = no_read
+            #通知カウントも修正する
+            read = Read.objects.filter(read_user=current_user).count()
+            if read > 0:
+                no_read = len(all_informations) - read
+            else:
+                print('通知のかずーーー',len(all_informations))
+                no_read = len(all_informations)
+
+            if no_read > 99 :
+                context["no_read"] = "99+"
+
+            else:
+                context["no_read"] = no_read
         
         context["user"] = user
         context["info"] = info

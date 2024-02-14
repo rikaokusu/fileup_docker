@@ -654,7 +654,7 @@ class OperationLog(models.Model):
     category = models.IntegerField(_('カテゴリ'), default='0', choices=OPERATION_LOG_CATEGORY)
     # 操作種別
     operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
-    # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
+    # 宛先メールアドレス
     destination_address=models.CharField(_('宛先メールアドレス'),max_length=999, null=True)
     # ファイルタイトル
     file_title = models.CharField(_(')ファイルタイトル'),max_length=64,null=True)

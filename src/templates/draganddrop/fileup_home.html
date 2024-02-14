@@ -149,15 +149,15 @@
                         <td class="upload_box">
                             {% if dest_user_data.upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
                             <p class="file_del_tag">ファイル削除済み</p>
                             {% elif  dest_user_data.upload_manage.end_date|is_past_due %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                            title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                            title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
                             <p class="expired_tag">期限切れ</p>
                             {% else %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
+                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
                             {% endif %}
                         </td>
 

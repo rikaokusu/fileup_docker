@@ -825,10 +825,8 @@
         } else {
           addflug = false;
         }
-
         // ローディング
-        // loadingView(true);
-
+        //loadingView(true);
       }); // end addfile event
 
         // プログレスバーを動作させる
@@ -978,12 +976,6 @@
     return new Date().getTime().toString(16) + Math.floor(strong * Math.random()).toString(16)
   }
 
-  //ローディング
-  function loadingView(flag) {
-    $('#loading-view').remove();
-    if (!flag) return;
-    $('<div id="loading-view" />').appendTo('body');
-  }
 
   //ファイルサイズをセッションから取得。
   $(document).ready(function () {
@@ -1039,8 +1031,18 @@
     loadingView(false);
 
   });
-
-
+//ローディング
+function loadingView(flag) {
+  $('#loading-view').remove();
+  if (!flag) return;
+      $('<div id="loading-view" />').appendTo('.modal');
+}
+$('.register_btn').on('click', function (e, data) {
+  console.log('ここきてる？？')
+    loadingView(true);
+    $(window).off('beforeunload');
+    $('#postForm').submit();
+});
 //全送信先モーダル表示中に確認画面モーダルにz-indexを追加する処理//
 $('#confirm_modal').on('show.bs.modal', function (event) {
 
