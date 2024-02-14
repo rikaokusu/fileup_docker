@@ -55,15 +55,25 @@ class AddressListView(FormView, CommonView):
         address = form.save(commit=False)
         legal_or_individual = form.cleaned_data['legal_or_individual']
         company_name = form.cleaned_data['company_name']
+        trade_name = form.cleaned_data['trade_name']
         last_name = form.cleaned_data['last_name']
         address.created_user = self.request.user.id
         if legal_or_individual == 0:
             first_name = form.cleaned_data['first_name']
             address.full_name_preview = company_name + " " + last_name + " " + first_name
+        elif company_name:
+            first_name = form.cleaned_data['first_name']
+            address.full_name_preview = company_name + " " + last_name + " " + first_name
+        else:
+            first_name = form.cleaned_data['first_name']
+            address.full_name_preview = trade_name + " " + last_name + " " + first_name
         address.save()
         # #操作ログ用
         email = address.email
-        log_user = address.company_name + address.last_name + address.first_name
+        if company_name:
+            log_user = address.company_name + address.last_name + address.first_name
+        else:
+            log_user = address.trade_name + address.last_name + address.first_name
         # #操作ログ終わり
         # # 操作ログ登録
         add_log(3,1,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
@@ -142,7 +152,10 @@ class AddressDeleteAjaxView(View,CommonView):
             address_list = Address.objects.filter(pk=address_delete_id).first()
             #操作ログ用
             email = address_list.email
-            log_user = address_list.company_name + address_list.last_name + address_list.first_name
+            if address_list.company_name:
+                log_user = address_list.company_name + address_list.last_name + address_list.first_name
+            else:
+                log_user = address_list.trade_name + address_list.last_name + address_list.first_name
             add_log(3,3,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
             #操作ログ終わり
             address_list.delete()
@@ -172,7 +185,11 @@ class AddressMultiDeleteAjaxView(View,CommonView):
             #操作ログ用
             users = []
             for user in address_lists:
-                u_c = user.company_name
+                if user.company_name:
+                    u_c = user.company_name
+                else:
+                    u_c = user.trade_name
+                    
                 u_l = user.last_name
                 u_f = user.first_name
                 user = u_c + u_l + u_f + "\r\n"
@@ -212,7 +229,8 @@ class AddressEmailValidationView(View):
         is_available = "true"
         if request.is_ajax():
             email = self.request.POST.get("email")
-            if Address.objects.filter(email=email).exists():
+            user = self.request.user
+            if Address.objects.filter(email=email,created_user=user).exists():
                 is_available = "false"
         
         return HttpResponse(is_available)

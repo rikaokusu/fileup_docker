@@ -76,15 +76,15 @@
                             <td>
                                 {% if address_list.legal_or_individual == 1 %}
                                     {% if address_list.legal_person_posi == 1 %}
-                                        {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                                        {{ address_list.get_legal_personality_display }} {{ address_list.company_name }}
                                     {% else %}
-                                        {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                                        {{ address_list.company_name }} {{ address_list.get_legal_personality_display }}
                                     {% endif %}
                                 {% else %}
                                     {% if address_list.trade_name == null %}
                                         　ー　
                                     {% else %}
-                                        {{address_list.trade_name}}
+                                        {{ address_list.trade_name }}
                                     {% endif %}
                                 {% endif %}
                             </td>
@@ -93,19 +93,19 @@
                                     {% if address_list.department_name == null %}
                                         　ー　
                                     {% else %}
-                                        {{address_list.department_name}}
+                                        {{ address_list.department_name }}
                                     {% endif %}
                                 {% else %}
                                         　ー　
                                 {% endif %}
                             </td>
                             <td>
-                                {{address_list.last_name}} {{address_list.first_name | truncatechars:3}}
+                                {{ address_list.last_name }} {{ address_list.first_name | truncatechars:3 }}
 
                             </td>
 
                             <td>
-                                {{address_list.email}}
+                                {{ address_list.email }}
                             </td>
 
                             <!-- 変更ボタン -->
@@ -725,7 +725,7 @@ $('#confirm_modal_for_sign_up').on('show.bs.modal', function (event) {
 
         //法人格
         var legal_personality_number = $('#id_legal_personality').val()
-
+        console.log('本人格教えて',legal_personality_number)
         if (legal_personality_number == "1") {
             legal_personality = '株式会社'
 
@@ -738,7 +738,43 @@ $('#confirm_modal_for_sign_up').on('show.bs.modal', function (event) {
         } else if (legal_personality_number == "4") {
             legal_personality = '合名会社'
 
+        } else if (legal_personality_number == "5") {
+            legal_personality = '有限会社'
+
+        } else if (legal_personality_number == "6") {
+            legal_personality = '医療法人'
+
+        } else if (legal_personality_number == "7") {
+            legal_personality = '財団法人'
+
+        } else if (legal_personality_number == "8") {
+            legal_personality = '社団法人'
+
+        } else if (legal_personality_number == "9") {
+            legal_personality = '宗教法人'
+
+        } else if (legal_personality_number == "10") {
+            legal_personality = '学校法人'
+
+        } else if (legal_personality_number == "11") {
+            legal_personality = '相互会社'
+
+        } else if (legal_personality_number == "12") {
+            legal_personality = '特定非営利活動法人'
+
+        } else if (legal_personality_number == "13") {
+            legal_personality = '独立行政法人'
+
+        } else if (legal_personality_number == "14") {
+            legal_personality = '地方独立行政法人'
+
+        } else if (legal_personality_number == "15") {
+            legal_personality = '国立研究開発法人'
+
+        } else if (legal_personality_number == "99") {
+            legal_personality = 'その他'
         }
+        console.log('けっかほうじん',legal_personality)
 
         //法人名の生成
         var legal_person_posi = $('input[name=legal_person_posi]:checked').val()

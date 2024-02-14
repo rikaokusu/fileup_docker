@@ -72,6 +72,7 @@
                                 {% endif %}
                             </td>
                     </tr>
+                    
                 </table>
             </div>
             <!---box2_upload 閉じタグ-->
@@ -80,6 +81,23 @@
     
             <div class="box3_upload">
                 <table class="table table-borderless step1_table">
+                    <tr>
+                        <td class="step1_label_wrapper">
+                                <h2>依頼先氏名</h2><span class="required_label def">必須</span>
+                        </td>
+                        <td>
+                            {% render_field form.guest_name class="form-control step1_guest_name" placeholder="ファイル共有リクエスト先の方の氏名"  %}
+                            {% if form.guest_name.errors %}
+                                {% for error in form.guest_name.errors %}
+                                    <div class="guest_name_error">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                    <div class="step1-guest-name-error" style="visibility:hidden"></div>
+                            {% endif %}
+                        </td>
+                    </tr>
                     <tr>
                         <td class="step1_label_wrapper">
                                 <h2 data-toggle="tooltip" data-placement="top" title="リクエスト先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
@@ -96,54 +114,13 @@
                             {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
                         </td>
                     </tr>
-    
+                    
                 </table>
             </div>
             <!---step3_upload 閉じタグ--->
+            
         </div>
         <!---box2_upload 閉じタグ-->
-
-        <!--有効期限, メッセージ-->
-
-        <div class="box3_upload">
-            <table class="table table-borderless step1_table">
-                <tr>
-                    <td class="step1_label_wrapper">
-                            <h2>依頼先氏名</h2><span class="required_label def">必須</span>
-                    </td>
-                        <td>
-                            {% render_field form.guest_name class="form-control step1_guest_name" placeholder="ファイル共有リクエスト先の方の氏名"  %}
-                            {% if form.guest_name.errors %}
-                                {% for error in form.guest_name.errors %}
-                                    <div class="guest_name_error">
-                                        {{ error }}
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                    <div class="step1-guest-name-error" style="visibility:hidden"></div>
-                            {% endif %}
-                        </td>
-                </tr>
-                <tr>
-                    <td class="step1_label_wrapper">
-                            <h2 data-toggle="tooltip" data-placement="top" title="依頼先へ送付したURLの有効期限（リクエスト日から７日間）">URL有効期限</h2>
-                    </td>
-                    <td>
-                        <h2>{{ seven_days|date:"Y年n月j日" }}23時59分<h2>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="step1_label_wrapper">
-                        <h2>メッセージ</h2><span class="optional_label def">任意</span>
-                    </td>
-                    <td>
-                        {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
-                    </td>
-                </tr>
-
-            </table>
-        </div>
-        <!---step2_upload 閉じタグ--->
 
         <!----------------------------------受信者---------------------------------------->
 
@@ -155,7 +132,7 @@
                     <h3>・現在ログイン中のユーザーが対象です。</h3>
                 </div>
             </div>            
-            <div class="mail-data" data-mail="{{ user_mail }}">
+            <div class="mail-data pl-3" data-mail="{{ user_mail }}">
                 {% render_field form.dest_user class="form-control step1_guestul_mail step1_guestul_mail step1_mail" placeholder="1"%}
             </div>
             </h3>
@@ -163,9 +140,9 @@
         <!---box4_upload閉じタグ--->
 
         <!----------------------------受信者表示・全受信者確認ボタン-------------------------------------->
-        <div class="box5_upload">
+        {% comment %} <div class="box5_upload">
             <div class="box6_upload">
-                {% comment %} <h3>アドレス帳から選択された受信ユーザー上位10件まで表示されます。</h3> {% endcomment %}
+                <h3>アドレス帳から選択された受信ユーザー上位10件まで表示されます。</h3>
                 <div>
                     <div id="all_dest_user_lists"></div>
                 </div>
@@ -175,7 +152,7 @@
                 <a class="triangle step1_url_confirm_btn" data-toggle="modal" data-target="#confirm_modal"
                     style="display:none">全受信ユーザー確認</a>
             </div>
-        </div>
+        </div> {% endcomment %}
 
     </div>
     <!---box1_upload 閉じタグ--->

@@ -46,10 +46,22 @@ CHOICE = [
 
 Legal_Personality = [
     ('0', ''),
-    ('1', '株式会社'),
-    ('2', '合同会社'),
-    ('3', '合資会社'),
-    ('4', '合名会社'),
+    ('1', "株式会社"),
+    ('2', "合同会社"),
+    ('3', "合資会社"),
+    ('4', "合名会社"),
+    ("5", "有限会社"),
+    ("6", "医療法人"),
+    ("7", "財団法人"),
+    ("8", "社団法人"),
+    ("9", "宗教法人"),
+    ("10", "学校法人"),
+    ("11", "相互会社"),
+    ("12", "特定非営利活動法人"),
+    ("13", "独立行政法人"),
+    ("14", "地方独立行政法人"),
+    ("15", "国立研究開発法人"),
+    ("99", "その他")
 ]
 
 Legal_Person_Posi = [
@@ -238,9 +250,10 @@ class AddressForm(forms.ModelForm):
             'full_name_preview',
         )
         error_messages = {
-            'company_name': {
-                'required': '必須です!',
-            }}
+            # 'company_name': {
+            #     'required': '必須です!',
+            # }
+        }
 # データ管理
 class Group_Checkbox(forms.CheckboxSelectMultiple):
     input_type = 'checkbox'

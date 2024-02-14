@@ -31,7 +31,7 @@ class GroupListView(FormView, CommonView):
         context["groups_lists"] = groups_lists
 
         """ address list table"""
-        address_lists = Address.objects.filter(is_direct_email=False)
+        address_lists = Address.objects.filter(created_user=self.request.user.id,is_direct_email=False)
         context["address_lists"] = address_lists
 
         if 'address_lists_id' in self.request.session:
@@ -93,16 +93,19 @@ class GroupCreateAjaxView(View,CommonView):
         try:
             address_list = request.POST.getlist('address_list[]')
             address_list = [int(s) for s in address_list]
+            
             group_name = request.POST.get('group_name')
             group_obj = Group.objects.create(group_name=group_name)
-            group_obj.created_user = self.request.user.id
+            group_obj.created_user = current_user.id
             #操作ログ用
             group_name = group_obj.group_name
             log_users = []
             for address in address_list:
-                print('あどれすforきてる')
                 log_users1 = Address.objects.get(id=address)
-                log_users1 = log_users1.company_name + log_users1.last_name + log_users1.first_name + "\r\n"
+                if log_users1.company_name:
+                    log_users1 = log_users1.company_name + log_users1.last_name + log_users1.first_name + "\r\n"
+                else:
+                    log_users1 = log_users1.trade_name + log_users1.last_name + log_users1.first_name + "\r\n"
                 log_users.append(log_users1)
             log_users = ' '.join(log_users)
             #操作ログ終わり
@@ -211,7 +214,10 @@ class GroupDeleteAjaxView(View, CommonView):
             
             group_users = []
             for user in group_address:
-                g_c = user.company_name
+                if user.company_name:
+                    g_c = user.company_name
+                else:
+                    g_c = user.trade_name
                 g_l = user.last_name
                 g_f = user.first_name
                 user = g_c + g_l + g_f + "\r\n"
@@ -252,7 +258,10 @@ class GroupMultiDeleteAjaxView(View,CommonView):
             
                 group_users = []
                 for user in group_address:
-                    g_c = user.company_name
+                    if user.company_name:
+                        g_c = user.company_name
+                    else:
+                        g_c = user.trade_name
                     g_l = user.last_name
                     g_f = user.first_name
                     user = g_c + g_l + g_f + "\r\n"
