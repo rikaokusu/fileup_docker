@@ -6,7 +6,6 @@ from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, ResourceManagement, PersonalResourceManagement
 from accounts.models import User, File,Notification,Read
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
@@ -606,7 +605,6 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
     personal_resource_manage.save()
 
     # レコード総件数
-    print("動いてる？？？？")
     print("-----", personal_resource_manage.number_of_url_download_file_table)
     personal_resource_manage.total_record_size = (personal_resource_manage.number_of_active_upload_manage 
     + personal_resource_manage.number_of_deactive_upload_manage 
