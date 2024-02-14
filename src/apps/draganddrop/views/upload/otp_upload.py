@@ -414,41 +414,41 @@ class Step2OTPupload(LoginRequiredMixin, CreateView, CommonView):
 
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
-                if file_name_without_dot == "txt":
-                    path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
-                    with open(path) as f:
-                        s = f.read()
+                # if file_name_without_dot == "txt":
+                #     path = os.path.join(settings.FULL_MEDIA_ROOT_FREETMP, file_name)
+                #     with open(path) as f:
+                #         s = f.read()
 
-                        # htmlファイルを生成して書き込む
-                        upload_s = str(file.upload)
-                        upload_ss = upload_s.split('/')[0]
-                        file_path = urllib.parse.unquote(file.upload.url)
+                #         # htmlファイルを生成して書き込む
+                #         upload_s = str(file.upload)
+                #         upload_ss = upload_s.split('/')[0]
+                #         file_path = urllib.parse.unquote(file.upload.url)
 
-                        upload = file_path[1:]
-                        upload_path = upload.split('.')
-                        path_html = upload_path[0] + ".html"
-                        with open(path_html, mode='w') as f:
-                            f.write("<html>\n")
-                            f.write("<head>\n")
-                            f.write("</head>\n")
-                            f.write("<body>\n")
-                            f.write("<pre>\n")
-                            f.write(s)
-                            f.write("</pre>\n")
-                            f.write("</body>\n")
-                            f.write("</html>\n")
-                        htmlfilename = path_html
-                        htmlname = os.path.basename(htmlfilename)
-                        path_html_s = upload_ss + "/" + htmlname
+                #         upload = file_path[1:]
+                #         upload_path = upload.split('.')
+                #         path_html = upload_path[0] + ".html"
+                #         with open(path_html, mode='w') as f:
+                #             f.write("<html>\n")
+                #             f.write("<head>\n")
+                #             f.write("</head>\n")
+                #             f.write("<body>\n")
+                #             f.write("<pre>\n")
+                #             f.write(s)
+                #             f.write("</pre>\n")
+                #             f.write("</body>\n")
+                #             f.write("</html>\n")
+                #         htmlfilename = path_html
+                #         htmlname = os.path.basename(htmlfilename)
+                #         path_html_s = upload_ss + "/" + htmlname
                         
-                        htmlfile, created = PDFfilemodel.objects.get_or_create(
-                            name=htmlname,
-                            size=file.size,
-                            upload=path_html_s,
-                            file=file,
-                        )
+                #         htmlfile, created = PDFfilemodel.objects.get_or_create(
+                #             name=htmlname,
+                #             size=file.size,
+                #             upload=path_html_s,
+                #             file=file,
+                #         )
 
-                        htmlfile.save()
+                #         htmlfile.save()
 
         otp_upload_manage_obj.save()
 

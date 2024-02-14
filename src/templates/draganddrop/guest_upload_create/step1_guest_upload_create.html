@@ -80,7 +80,7 @@
             <!--有効期限, メッセージ-->
     
             <div class="box3_upload">
-                <table class="table table-borderless step1_table">
+                <table class="table table-borderless ">
                     <tr>
                         <td class="step1_label_wrapper">
                                 <h2>依頼先氏名</h2><span class="required_label def">必須</span>
@@ -107,10 +107,10 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="step1_label_wrapper">
+                        <td class="step1_label_wrapper mt-2">
                             <h2>メッセージ</h2><span class="optional_label def">任意</span>
                         </td>
-                        <td>
+                        <td class="pt-3">
                             {% render_field form.message class="form-control step1_upload_message" placeholder="依頼先へメッセージを送信できます。" %}
                         </td>
                     </tr>

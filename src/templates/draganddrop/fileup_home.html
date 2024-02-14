@@ -149,15 +149,15 @@
                         <td class="upload_box">
                             {% if dest_user_data.upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
                             <p class="file_del_tag">ファイル削除済み</p>
                             {% elif  dest_user_data.upload_manage.end_date|is_past_due %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                            title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
+                            title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
                             <p class="expired_tag">期限切れ</p>
                             {% else %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
+                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
                             {% endif %}
                         </td>
 
@@ -211,8 +211,12 @@
 
                         <!-- 保存期限 -->
                         <td>
-                            {{dest_user_data.upload_manage.end_date|date:'Y/m/d' }}
-                            {{dest_user_data.upload_manage.end_date | date:'H:i'}}
+                            {% if dest_user_data.upload_manage.end_date|date:'Y/m/d' == '2099/01/01' %}
+                                無期限
+                            {% else %}
+                                {{dest_user_data.upload_manage.end_date|date:'Y/m/d' }}
+                                {{dest_user_data.upload_manage.end_date|date:'H:i'}}
+                            {% endif %}
                         </td>
 
                         <!-- 送信者 -->
@@ -405,8 +409,12 @@
 
                 <!-- 保存期限 -->
                 <td>
-                    {{url_dest_user_data.url_upload_manage.end_date|date:'Y/m/d' }}
-                    {{url_dest_user_data.url_upload_manage.end_date | date:'H:i'}}
+                    {% if url_dest_user_data.url_upload_manage.end_date|date:'Y/m/d' == '2099/01/01' %}
+                        無期限
+                    {% else %}
+                        {{url_dest_user_data.url_upload_manage.end_date|date:'Y/m/d' }}
+                        {{url_dest_user_data.url_upload_manage.end_date|date:'H:i'}}
+                    {% endif %}
                 </td>
 
                 <!-- 送信者 -->
@@ -591,8 +599,12 @@
 
                 <!-- 保存期限 -->
                 <td>
-                    {{otp_dest_user_data.otp_upload_manage.end_date|date:'Y/m/d' }}
-                    {{otp_dest_user_data.otp_upload_manage.end_date | date:'H:i'}}
+                    {% if otp_dest_user_data.otp_upload_manage.end_date|date:'Y/m/d' == '2099/01/01' %}
+                        無期限
+                    {% else %}
+                        {{otp_dest_user_data.otp_upload_manage.end_date|date:'Y/m/d' }}
+                        {{otp_dest_user_data.otp_upload_manage.end_date | date:'H:i'}}
+                    {% endif %}
                 </td>
 
                 <!-- 送信者 -->

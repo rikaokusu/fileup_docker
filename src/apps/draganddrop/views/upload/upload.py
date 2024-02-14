@@ -382,42 +382,44 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
                 print('パス取れた？？？',path)
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
-                if file_name_without_dot == "txt":
-                    # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-                    with open(path) as f:
-                        s = f.read()
+                # if file_name_without_dot == "txt":
+                #     print('txtとにんしきしたーーーーーー')
+                #     # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
+                #     with open(path) as f:
+                        
+                #         s = f.read()
+                #         print('html生成前ーーーーー')
+                #         # htmlファイルを生成して書き込む
+                #         upload_s = str(file.upload)
+                #         upload_ss = upload_s.split('/')[0]
 
-                        # htmlファイルを生成して書き込む
-                        upload_s = str(file.upload)
-                        upload_ss = upload_s.split('/')[0]
+                #         file_path = urllib.parse.unquote(file.upload.url)
 
-                        file_path = urllib.parse.unquote(file.upload.url)
+                #         upload = file_path[1:]
+                #         upload_path = upload.split('.')
+                #         path_html = upload_path[0] + ".html"
+                #         with open(path_html, mode='w') as f:
+                #             f.write("<html>\n")
+                #             f.write("<head>\n")
+                #             f.write("</head>\n")
+                #             f.write("<body>\n")
+                #             f.write("<pre>\n")
+                #             f.write(s)
+                #             f.write("</pre>\n")
+                #             f.write("</body>\n")
+                #             f.write("</html>\n")
+                #         htmlfilename = path_html
+                #         htmlname = os.path.basename(htmlfilename)
+                #         path_html_s = upload_ss + "/" + htmlname
+                #         print('path_html_s部分',path_html_s)
+                #         htmlfile, created = PDFfilemodel.objects.get_or_create(
+                #             name=htmlname,
+                #             size=file.size,
+                #             upload=path_html_s,
+                #             file=file
+                #         )
 
-                        upload = file_path[1:]
-                        upload_path = upload.split('.')
-                        path_html = upload_path[0] + ".html"
-                        with open(path_html, mode='w') as f:
-                            f.write("<html>\n")
-                            f.write("<head>\n")
-                            f.write("</head>\n")
-                            f.write("<body>\n")
-                            f.write("<pre>\n")
-                            f.write(s)
-                            f.write("</pre>\n")
-                            f.write("</body>\n")
-                            f.write("</html>\n")
-                        htmlfilename = path_html
-                        htmlname = os.path.basename(htmlfilename)
-                        path_html_s = upload_ss + "/" + htmlname
-                        print('path_html_s部分',path_html_s)
-                        htmlfile, created = PDFfilemodel.objects.get_or_create(
-                            name=htmlname,
-                            size=file.size,
-                            upload=path_html_s,
-                            file=file
-                        )
-
-                        htmlfile.save()
+                #         htmlfile.save()
         
         upload_manage.save()
 
