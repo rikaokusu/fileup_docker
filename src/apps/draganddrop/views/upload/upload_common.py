@@ -39,7 +39,6 @@ class FileUpload(View, CommonView):
             up_file_name.extend(self.request.session['up_file_name'])
 
         for upload_file in self.request.FILES.values():
-
             file, created = Filemodel.objects.get_or_create(
                 name=upload_file.name,
                 size=upload_file.size,
