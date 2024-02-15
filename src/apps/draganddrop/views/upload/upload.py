@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
 from draganddrop.models import UploadManage, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
-from accounts.models import Notification
+from accounts.models import Notification,User
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -16,6 +16,11 @@ from django.conf import settings
 import threading
 #操作ログ関数
 from lib.my_utils import add_log
+#メール送信
+from django.core.mail import send_mass_mail
+# テンプレート情報取得
+from django.template.loader import get_template
+from django.contrib.sites.shortcuts import get_current_site
 
 ###########################
 # アップロード機能  #
@@ -503,20 +508,72 @@ class Step3(TemplateView, CommonView):
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
-        print('ふぁいるかくにん',files)
-        print('通常あっぷろーどですとユーザー',dest_users)
-        print('通常あっぷろーどですとユーザーりすと',dest_user_list)
-        print('通常あっぷろーどですとグループりすと',dest_group_list)
-        
         # ファイルタイトル
         file_title = upload_manage.title
         # 操作ログ終わり
         # 操作ログ
         add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
-        #############通知する//groupはすべてメールアドレスのリストにしないとかも
-        # Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=file_title,email_list=dest_user_list)
-        ##################通知終了
+        ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
+        #送信先 email
+        emailList_db = ','.join(dest_user_list)
+        #タイトル
+        Notice_title = current_user.display_name + "さんが" + file_title + "を共有しました。"
+        #メッセージ
+        Notice_message = upload_manage.message
+        #グループemaillist作成
+        group_email = []
+        for group in dest_group_list:
+            qs = Address.objects.filter(group__group_name=group)
+            for user in qs:
+                email = user.email
+                group_email.append(email)
+        group_email_db = ','.join(group_email)
+        emailList_for = dest_user_list + group_email #list型
+        emailList_db = emailList_db + ',' + group_email_db #str型
+
+        ###通知テーブル登録
+        Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+        #メール送信
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+
+        tupleMessage = []
+        for email in emailList_for:
+            e_user = User.objects.get(email=email)
+            e_send = e_user.is_send_mail
+            print('めーーーる可否',e_send)
+
+            if e_send == True:
+                context = {
+                    'protocol': 'https' if self.request.is_secure() else 'http',
+                    'domain': domain,
+                    #送信者
+                    'user_last_name':self.request.user.last_name,
+                    'user_first_name':self.request.user.first_name,
+                }
+                subject_template = get_template('draganddrop/mail_template/subject.txt')
+                subject = subject_template.render(context)
+
+                message_template = get_template('draganddrop/mail_template/message.txt')
+                message = message_template.render(context)
+                from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                recipient_list = [email]#受信者リスト
+                
+                message1 = (
+                    subject,
+                    message,
+                    from_email,
+                    recipient_list,
+                )
+                messageList = list(message1)
+                tupleMessage.insert(-1,messageList)
+
+                print('受信通知めーる',tupleMessage)
+            # send_mail(subject, message, from_email, recipient_list)
+        send_mass_mail(tupleMessage)
+        ##################Notification通知用終了
 
         for personal_user_upload_manage in personal_user_upload_manages:
 
@@ -1345,6 +1402,64 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
             approval_manage.application_date = upload_manage.created_date
             approval_manage.save()
 
+        ###################　Notification通知用  ～を変更しました 操作ログの下にいれる
+        #送信先 email
+        emailList_db = ','.join(dest_user_list)
+        #タイトル
+        Notice_title = current_user.display_name + "さんが" + file_title + "を変更しました。"
+        #メッセージ
+        Notice_message = upload_manage.message
+        #グループemaillist作成
+        group_email = []
+        for group in dest_group_list:
+            qs = Address.objects.filter(group__group_name=group)
+            for user in qs:
+                email = user.email
+                group_email.append(email)
+        group_email_db = ','.join(group_email)
+        emailList_for = dest_user_list + group_email #list型
+        emailList_db = emailList_db + ',' + group_email_db #str型
+
+        ###通知テーブル登録
+        Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+        #メール送信
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+
+        tupleMessage = []
+        for email in emailList_for:
+            e_user = User.objects.get(email=email)
+            e_send = e_user.is_send_mail
+
+            if e_send == True:
+                context = {
+                    'protocol': 'https' if self.request.is_secure() else 'http',
+                    'domain': domain,
+                    #送信者
+                    'user_last_name':self.request.user.last_name,
+                    'user_first_name':self.request.user.first_name,
+                }
+                subject_template = get_template('draganddrop/mail_template/update_subject.txt')
+                subject = subject_template.render(context)
+
+                message_template = get_template('draganddrop/mail_template/update_message.txt')
+                message = message_template.render(context)
+                from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                recipient_list = [email]#受信者リスト
+                
+                message1 = (
+                    subject,
+                    message,
+                    from_email,
+                    recipient_list,
+                )
+                messageList = list(message1)
+                tupleMessage.insert(-1,messageList)
+
+            # send_mail(subject, message, from_email, recipient_list)
+        send_mass_mail(tupleMessage)
+        ##################Notification通知用終了
         # 個人管理テーブルの作成・更新
         total_data_usage(upload_manage, self.request.user.company.id, self.request.user.id, download_table, download_file_table, upload_manage_file_size, 1)
         # 会社管理テーブルの作成・更新

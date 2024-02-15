@@ -95,7 +95,8 @@ urlpatterns = [
      ############################
      #  ユーザープロフィール情報変更
      path('update_userinfomation/<uuid:pk>', home_common.UserUpdateInfoView.as_view(), name='update_userinfomation'),
-
+     # メール通知設定ON/OFF
+     path('user/send_mail/',home_common.SendMailAjaxView.as_view(),name='send_mail'),
      #現在の写真削除
      path('accounts/delete_image/', home_common.delete_image, name='delete_image'),
      #ユーザープロファイル画像変更

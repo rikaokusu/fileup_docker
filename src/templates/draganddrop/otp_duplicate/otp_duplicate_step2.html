@@ -405,29 +405,37 @@
         let server_file_size = 0;
         let total_file_size = 0;
         dist_file_json = JSON.parse(dist_file);
+        // フロント側のみのファイルサイズ
+        let front_file_size = 0;
 
         for (var i = 0; i < dist_file_json.length; i++) {
             server_file_size += Number(dist_file_json[i].fields.size)
             total_file_size = Number(company_total_file_size) + server_file_size
+
+            //フロントのみのファイルサイズ計算
+            front_file_size += Number(file.size)
+            //以下total_file_sizeをfront_file_sizeに書き換えた
+            if (plan == "free") {
+              if (front_file_size >= 314572800) {
+                  this.removeFile(file);
+                  $('.error_msg_place').remove();
+                  $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+                    "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+                }
+            } else (plan == "light"); {
+              if (front_file_size >= 1073741824) {
+                //alert('いふのなかきてるよ！'+ front_file_size)
+                this.removeFile(file);
+                $('.error_msg_place').remove();
+                $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+                  "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+              } 
             }
+        }
         // フロント側のファイルサイズを合算する
         total_file_size += Number(file.size)
-        
-        if (plan == "free") {
-          if (total_file_size >= 314572800) {
-              this.removeFile(file);
-              $('.error_msg_place').remove();
-              $('#validation-error').html('<div class="alert alert_message" role="alert">' +
-                "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
-            }
-        } else (plan == "light"); {
-          if (total_file_size >= 1073741824) {
-            this.removeFile(file);
-            $('.error_msg_place').remove();
-            $('#validation-error').html('<div class="alert alert_message" role="alert">' +
-              "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
-          }
-        } 
+        //フロントのみのファイルサイズ計算元々ここにあった         
+
 
         // ファイル名から拡張子を取得する
         var ext = checkFileExt(file.name); // Get extension
@@ -609,11 +617,15 @@
         }
 
         // ローディング
-        loadingView(true);
+        //loadingView(true);
 
 
       }); // end addfile event
-
+      
+        // プログレスバーを動作させる
+        myDropzone.on("totaluploadprogress", function (progress) {
+          $(".progress-bar").css("width", progress + "%");
+        });
 
       // 確定ボタンを押下したらファイルをアップロード
       $("#submit_file_upload, #draft_submit_file_upload").click(function (e) {
@@ -815,7 +827,18 @@
 
   });
 
-
+//ローディング
+function loadingView(flag) {
+  $('#loading-view').remove();
+  if (!flag) return;
+      $('<div id="loading-view" />').appendTo('.modal');
+}
+$('.register_btn').on('click', function (e, data) {
+  console.log('ここきてる？？')
+    loadingView(true);
+    $(window).off('beforeunload');
+    $('#postForm').submit();
+});
 //全送信先モーダル表示中に確認画面モーダルにz-indexを追加する処理//
 $('#confirm_modal').on('show.bs.modal', function (event) {
 

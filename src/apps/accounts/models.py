@@ -46,6 +46,11 @@ class Service(models.Model):
 会社テーブル
 """
 class Company(models.Model):
+    SETTING_CHOICES = (
+        ('1','有効'),
+        ('2','無効')
+    )
+
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 会社名
@@ -100,6 +105,10 @@ class Company(models.Model):
     change_row = models.CharField('上書きフラグ', max_length=255, blank=True, null=True)
     #ミドルネーム選択
     middle_choice = models.BooleanField(_('middle_choice'), default=False)
+    #パスワード変更
+    pass_change = models.CharField('パスワード変更', max_length=2, choices=SETTING_CHOICES, default='2')
+    #プロファイル変更
+    profile_change = models.CharField('プロフィール変更', max_length=2, choices=SETTING_CHOICES, default='2')
     #ミドルネーム選択２
     # middle_choice2 = models.CharField('ミドルネームの使用', max_length=2, choices=MIDDLE_CHOICES, default='2')
     # メールサーバ
@@ -429,7 +438,9 @@ class Notification(models.Model):
     maintenance_affects = models.TextField('作業影響', blank=True, null=True)
     #メンテナンス情報（作業中止理由）
     maintenance_cancel_reason = models.TextField('作業中止理由', blank=True, null=True)
-
+    #FileUP用ファイルタイトル
+    fileup_title = models.TextField('ファイルタイトル', blank=True, null=True)
+    
     class Meta:
         managed = False
 

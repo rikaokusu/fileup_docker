@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address
 from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage, ApprovalLog
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
 from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage

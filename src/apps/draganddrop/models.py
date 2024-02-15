@@ -666,6 +666,7 @@ class OperationLog(models.Model):
     (3,'一括'),
     (4,'ユーザー'),
     (5,'グループ'),
+    (6,'ゲストアップロード'),
     )
     # ID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -679,7 +680,7 @@ class OperationLog(models.Model):
     category = models.IntegerField(_('カテゴリ'), default='0', choices=OPERATION_LOG_CATEGORY)
     # 操作種別
     operation = models.IntegerField(_('オペレーション'), default='0', choices=OPERATION_LOG_OPERATION)
-    # 宛先メールアドレス=通常、URL,OTPで参照するテーブルが別？
+    # 宛先メールアドレス
     destination_address=models.CharField(_('宛先メールアドレス'),max_length=999, null=True)
     # ファイルタイトル
     file_title = models.CharField(_(')ファイルタイトル'),max_length=64,null=True)

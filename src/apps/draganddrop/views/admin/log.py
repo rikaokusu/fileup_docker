@@ -39,9 +39,16 @@ class LogView(CommonView,TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        logs =  OperationLog.objects.filter(category=2).order_by('created_date').reverse
-        logs_address_user =  OperationLog.objects.filter(category=3,upload_category=4).order_by('created_date').reverse
-        logs_address_group =  OperationLog.objects.filter(category=3,upload_category=5).order_by('created_date').reverse
+        current_user = self.request.user
+        print('ろぐカレントユーザー',current_user)
+        # logs =  OperationLog.objects.filter(operation_user=current_user,category=2).order_by('created_date').reverse
+        logs =  OperationLog.objects.filter(operation_user=current_user,category=2)
+        guest_logs =  OperationLog.objects.filter(upload_category=6,category=2,destination_address=current_user.email)
+        logs = logs.union(guest_logs).order_by('created_date').reverse
+        print('ゲストのレコードわかる？？？？？？？？？？',guest_logs)
+
+        logs_address_user =  OperationLog.objects.filter(operation_user=current_user,category=3,upload_category=4).order_by('created_date').reverse
+        logs_address_group =  OperationLog.objects.filter(operation_user=current_user,category=3,upload_category=5).order_by('created_date').reverse
         # log_files =  LogFile.objects.all()
         # log_destusers = LogDestUser.objects.all()
         logsfirst =  OperationLog.objects.first()
