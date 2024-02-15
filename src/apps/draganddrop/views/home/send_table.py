@@ -539,6 +539,15 @@ class SendTableMultiDeleteAjaxView(View):
                     # DBの対象行を削除
                     file.delete()
 
+                # ApprovalManageを削除
+                approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage)
+                approval_manages.delete()
+
+                # ApprovalLogを削除
+                approval_logs = ApprovalLog.objects.filter(upload_manage=upload_manage)
+                approval_logs.delete()
+
+
                 upload_manage.delete()
 
                 # PersonalResourceManagementテーブル情報を修正
@@ -587,6 +596,14 @@ class SendTableMultiDeleteAjaxView(View):
                     # DBの対象行を削除
                     file.delete()
 
+                # ApprovalManageを削除
+                url_approval_manages = ApprovalManage.objects.filter(url_upload_manage=url_upload_manage)
+                url_approval_manages.delete()
+
+                # ApprovalLogを削除
+                url_approval_logs = ApprovalLog.objects.filter(url_upload_manage=url_upload_manage)
+                url_approval_logs.delete()
+
                 url_upload_manage.delete()
 
                 # PersonalResourceManagementテーブル情報を修正
@@ -633,6 +650,14 @@ class SendTableMultiDeleteAjaxView(View):
 
                     # DBの対象行を削除
                     file.delete()
+
+                # ApprovalManageを削除
+                otp_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage)
+                otp_approval_manages.delete()
+
+                # ApprovalLogを削除
+                otp_approval_logs = ApprovalLog.objects.filter(otp_upload_manage=otp_upload_manage)
+                otp_approval_logs.delete()
 
                 otp_upload_manage.delete()
 
