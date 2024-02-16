@@ -109,6 +109,8 @@ class Company(models.Model):
     pass_change = models.CharField('パスワード変更', max_length=2, choices=SETTING_CHOICES, default='2')
     #プロファイル変更
     profile_change = models.CharField('プロフィール変更', max_length=2, choices=SETTING_CHOICES, default='2')
+    # 会社自体のステータス True=有効、False=無効
+    status = models.BooleanField(null=True,default=True)
     #ミドルネーム選択２
     # middle_choice2 = models.CharField('ミドルネームの使用', max_length=2, choices=MIDDLE_CHOICES, default='2')
     # メールサーバ

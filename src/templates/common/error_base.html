@@ -1,0 +1,35 @@
+{% load i18n static %}
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    {% render_bundle 'main' %}
+    <link rel="stylesheet" type="text/css" href="{% static './css/draganddrop/fileup_main.css'%}">
+    <link rel="stylesheet" type="text/css" href="{% static 'error/css/error.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body style="width:100%; height:100%;">
+    <div id="particles-js">
+    
+        <div class="contents">
+            <a class="navbar-brand mr-1 py-0" href="{% url 'draganddrop:home' %}" style="font-size:26px; color:#005392;"><img src="{% static 'error/img/FileUP_logo_BL.svg' %}" alt="FileUP!" style="width:40px; height:40px;" class="p-0">&nbsp;FileUP!</a>
+            {% block content %}
+            {% endblock %}
+            <p></p>
+            {% comment %} <button type="button" class="btn my-btn-accept mx-auto d-block btn-lg" onclick="history.back(-1)">一つ前のページへ戻る</button> {% endcomment %}
+        </div>
+    </div>
+    <script src="{% static 'error/js/particles.min.js' %}"></script>
+    <script src="{% static 'error/js/error.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body> 
+
+</html>

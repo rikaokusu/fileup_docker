@@ -5,7 +5,7 @@ from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from accounts.models import User, File,Notification,Read
+from accounts.models import User, File,Notification,Read,Company
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
@@ -16,10 +16,32 @@ from django.conf import settings
 import math
 from django.shortcuts import redirect, render
 from django.http import JsonResponse
+# mixins.py
+from django.contrib.auth.mixins import UserPassesTestMixin
 
+# 無効化中の企業のアカウントアクセス制限
+class InvalidCompanyMixin(UserPassesTestMixin):
+    raise_exception = False
+
+    def test_func(self):
+        company = Company.objects.filter(pk=self.request.user.company.id).first()
+        return company.status
+
+    def handle_no_permission(self,**kwargs):
+        
+        if not self.request.user.is_anonymous:
+            company = Company.objects.get(pk=self.request.user.company.id)
+            if company.status == False:
+                # if self.request.user:
+                #     context = super().get_context_data(**kwargs)
+                #     context['user']=self.request.user
+                #     return render(self.request, 'notallowed.html', status=403, context=context)
+                return render(self.request, '403.html', status=403)
+        else:
+            return redirect('accounts:login')
 # Token_LENGTH = 5  # ランダムURLを作成するためのTOKEN
 
-class CommonView(ContextMixin):
+class CommonView(InvalidCompanyMixin,ContextMixin):
 
     # ログインユーザーを返す
     def get_context_data(self, **kwargs):

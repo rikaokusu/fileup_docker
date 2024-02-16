@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}409 同時接続エラー{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">同時接続エラーが発生しました<br>(409 Conflict)</h1>
+    <p></p>
+    <h4 class="text-center">他の管理ユーザーと同時に操作を行ったため、手続きを中断しました。<br>
+    解決のヒント：他の管理ユーザー操作後に操作をやり直してください。</h5>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}406 Illegal page transition{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">不正なページ移動です。<br>(406 Illegal page transition)</h1>
+    <p></p>
+    <h5 class="text-center">前のページの情報が引き継がれていない可能性があります。<br>
+    解決のヒント：再ログインのうえ、手続きをやり直してください。</h5>
+{% endblock %}

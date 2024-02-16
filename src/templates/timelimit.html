@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}リンク期限切れ{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">ご指定のページのアクセス期限が切れています。</h1>
+    <p></p>
+    <h4 class="text-center">再度登録をやり直してください。<br>
+    解決のヒント：登録時、アクセス期限内に指定のメールアドレスに送付されたURLにアクセスしてください。</h5>
+{% endblock %}
