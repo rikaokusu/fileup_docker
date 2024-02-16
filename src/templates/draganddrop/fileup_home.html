@@ -73,12 +73,17 @@
         </button>
         <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:personal_resource_management' %}">個人管理画面</a>
-            {% if plan == "free" %}
-                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">会社管理画面</button>
-                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">承認ワークフロー設定</button>
-                <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">操作ログ</button>
+            {% if current_user.is_staff %}
+                {% if plan == "free" %}
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">会社管理画面</button>
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">承認ワークフロー設定</button>
+                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">操作ログ</button>
+                {% else %}
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:resource_management'%}">会社管理画面</a>
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:approval_workflow' %}">承認ワークフロー設定</a>
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:log' %}">操作ログ</a>
+                {% endif %}
             {% else %}
-                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:resource_management'%}">会社管理画面</a>
                 <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:approval_workflow' %}">承認ワークフロー設定</a>
                 <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:log' %}">操作ログ</a>
             {% endif %}
