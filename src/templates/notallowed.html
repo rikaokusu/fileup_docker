@@ -1,0 +1,136 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}サービス提供を停止しています{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">現在、ご登録頂いた会社アカウントのサービスを停止しています。</h1>
+    <p></p>
+    <h4 class="text-center">誠に恐れ入りますが、CL運営へ問い合わせメッセージをお送りください。<br>
+        解決のヒント：CL運営へのお問い合わせは
+        <button type="button" class="btn my-btn-accept rounded-pill mr-2" data-target="#contactModal" data-toggle="modal" onfocus="this.blur();" id="contactbutton">こちら</button>
+    </h4>
+    <button type="button" class="btn my-btn-accept mx-auto d-block btn-lg" onclick="location.href='{% url 'accounts:company_contact' %}'">ログインページへ戻る</button>
+
+
+    <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content user">
+                <form method="POST" validate data-validate>
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">CL運営へのお問い合わせ</h5>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class=" text-left">内容をご確認後、送信ボタンをクリックしてください。<h6>
+                        <div>
+                            <div>メールアドレス：{{ user.email }}</div>
+                        </div>
+                        <div>
+                            <div>　　　　会社名：
+                                {% if user.company.pic_corp_class == '1' %}
+                                    {% if user.company.pic_legal_personality == '99' or user.company.pic_legal_personality == '' %}
+                                        {{ user.company.pic_company_name }}
+                                    {% else %}
+                                        {% if user.company.pic_legal_person_posi == '1' %}
+                                            {{ user.company.get_pic_legal_personality_display }}{{ user.company.pic_company_name }}
+                                        {% else %}
+                                            {{ user.company.pic_company_name }}{{ user.company.get_pic_legal_personality_display }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% elif user.company.pic_corp_class == '2' %}
+                                    {{ user.company.pic_company_name }}
+                                {% endif  %}
+                            </div>
+                        </div>
+                        <div>
+                            <div>　　　　お名前：{{ user.last_name }}{{ user.first_name }}</div>
+                        </div>
+                        <div>
+                            <div>問い合わせ種類：会社アカウントが無効になっている</div>
+                        </div>
+                        <div>
+                            <div>問い合わせ内容(任意)：<br>
+                                <textarea class="form-control" id="message" name="message"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="my-btn my-btn-accept  my-btn-w8" id="subbutton">送信</button>
+                        <button type="button" class="my-btn my-btn-cancel  my-btn-w8" data-dismiss="modal">キャンセル</button>
+                    </div><!-- /.modal-footer -->
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- レスポンス用トースト -->
+    <div class="position-fixed p-3" style="z-index: 2000; right: 0; bottom: 0;">
+        <div id="result_toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">
+                <div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#subbutton').on('click', function () {
+                // ローディングアイコン
+                loadingView(true);
+
+                var mail = $('input[name="transbank"]:checked').val();
+                var user = $("input[name=transdate]").val();
+                var message = $('input[name="transservice"]:checked').val();
+                }).get();
+                console.log(t_service);
+
+                {% comment %} $.ajax({
+                    type: "POST",
+                    url: "{% url 'accounts:company_contact' %}",
+                    data: {
+                        'mail': mail,
+                        'user': user,
+                        'message': message
+                    },
+                    dataType: 'json'
+                }).done(function(data, textStatus, jqXHR) {
+                    console.log('データの中身',data)
+                    // 成功時のコールバック=viewから処理が戻ってきて必要な要素をgetできた時
+
+                    // ローディングこれを書くと戻ってこれる
+                    loadingView(false);
+                    //トースト表示
+                    $('#transferModal').modal('hide')
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                        var toast = $(this);
+                        toast.find('.toast-body').addClass('alert-success');//このクラスを付与して成功時の色を定義
+                        toast.find('.toast-body').text(data["message"]);//サーバ側から戻ってきたメッセージを表示
+                    });
+                    $('#result_toast').toast({ delay: 5000, animation: true }).toast('show'); //表示処理
+                }).fail(function(data, jqXHR, textStatus, errorThrown ) {
+                // 失敗時のコールバック
+                   // ローディング
+                   loadingView(false);
+                    //トースト表示
+                    $('#transferModal').modal('hide')
+                    $('#result_toast').on('show.bs.toast', function (e) {
+                        var toast = $(this);
+                        toast.find('.toast-body').addClass('alert-danger');//このクラスを付与して成功時の色を定義
+                        toast.find('.toast-body').text("送信に失敗しました。再度操作してください。");//サーバ側から戻ってきたメッセージを表示
+                    });
+                    $('#result_toast').toast({ delay: 5000, animation: true }).toast('show'); //表示処理
+                }); {% endcomment %}
+
+
+                //　ローディングアイコン
+                function loadingView(flag) {
+                    //上でfalseって書いてあるからいいかと思ったけどこれないと無理
+                    $('#loading-view').remove(); 
+                    if(!flag) return;
+                    $('<div id="loading-view" />').appendTo('body');
+                }  
+            });
+    </script>
+{% endblock %}

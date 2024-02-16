@@ -53,6 +53,29 @@ import string, random
 
 from django.contrib.auth import get_user_model
 
+# mixins.py
+from django.contrib.auth.mixins import UserPassesTestMixin
+
+# 無効化中の企業のアカウントアクセス制限
+class InvalidCompanyMixin(UserPassesTestMixin):
+    raise_exception = False
+
+    def test_func(self):
+        company = Company.objects.filter(pk=self.request.user.company.id).first()
+        return company.status
+
+    def handle_no_permission(self,**kwargs):
+        
+        if not self.request.user.is_anonymous:
+            company = Company.objects.get(pk=self.request.user.company.id)
+            if company.status == False:
+                if self.request.user:
+                    context = super().get_context_data(**kwargs)
+                    context['user']=self.request.user
+                    return render(self.request, 'notallowed.html', status=403, context=context)
+        else:
+            return redirect('accounts:login')
+
 
 # 全てで実行させるView
 class CommonView(ContextMixin):
@@ -102,15 +125,9 @@ class HomeTemplateView(LoginRequiredMixin, ListView, CommonView):
 
         return service
 
-
-
-
-
-
 # """
 # ログイン画面
 # """
-
 
 # class Login(LoginView):
 #     """ログインページ"""
@@ -126,7 +143,6 @@ class HomeTemplateView(LoginRequiredMixin, ListView, CommonView):
 """
 from django.contrib.auth import authenticate, login, logout
 class Login(LoginView):
-    """ログインページ"""
     form_class = LoginForm
     template_name = 'accounts/login.html'
     redirect_field_name = 'next'
@@ -141,24 +157,17 @@ class Login(LoginView):
 
         context["url_name"] = url_name
 
-    #     # サービス管理者の抽出
-    #     # services = Service.objects.filter(number__in=current_user.service_admin)
-    #     # context["services"] = services
-
         return context
-    
+
     def form_valid(self, form):
         email = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(email=email, password=password)
-        # user_record = User.objects.filter(email=email, password=password).first()
         f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!",status__in=["1","2"])
         f_p = FileupPermissions.objects.filter(user=user).first()
-        print(f_contract,'userレコードしってます2222222222222会社イコール')
         # Check here if the user is an admin
         #全体ユーザーテーブルにレコードがあるか、それが有効だったら
         if user is not None and user.is_active:
-            print('全体ユーザーにいる',user.company)
             # そのユーザーの所属会社がfileupを契約中or試用中
             if f_contract:
                 # そのユーザーにfileupが割り当てられている場合
@@ -172,11 +181,9 @@ class Login(LoginView):
                         return redirect('draganddrop:home')
                     # return HttpResponseRedirect(self.success_url)
                 else:
-                    print('はいれませーん')
                     messages.error(self.request, 'このユーザーはサービスを利用できません。')
                     return redirect('accounts:login')
             else:
-                print('そもそも契約してないです')
                 messages.error(self.request, 'ご契約状況を確認してください。')
                 return redirect('accounts:login')
         else:

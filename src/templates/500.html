@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}500 Internal Server Error{% endblock %}
+        
+{% block content %}
+    <h1 class="text-center">サーバーエラーが発生しました。<br>(500 Internal Server Error)</h1>
+    <p></p>
+    <h5 class="text-center">サーバーの問題でお探しのページを表示できません。<br>
+        解決のヒント：再度時間をおいてアクセスしてください。</h5>
+{% endblock %}

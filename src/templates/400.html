@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}400 Bad Request{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">ご指定のページは見つかりませんでした。<br>(400 Bad Request)</h1>
+    <p></p>
+    <h4 class="text-center">リクエストされた内容をサーバーが理解できませんでした。<br>
+    解決のヒント：ブラウザのキャッシュやCookieを削除すると解消される場合があります。</h5>
+{% endblock %}

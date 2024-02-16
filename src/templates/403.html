@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}403 Forbidden{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">指定されたURLへのアクセス権限がありません。<br>(403 Forbidden)</h1>
+    <p></p>
+    <h5 class="text-center">当ページへのアクセスが管理者などによって許可されておりません。<br>
+    解決のヒント：管理者にお問い合わせください。</h5>
+{% endblock %}

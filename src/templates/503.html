@@ -1,0 +1,10 @@
+{% extends "common/error_base.html" %}
+{% load i18n static %}
+    {% block title %}503 Service Unavailable{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">一時的にアクセスできません。<br>(503 Service Unavailable)</h1>
+    <p></p>
+    <h5 class="text-center">混雑のためアクセスしにくくなっています。<br>
+    解決のヒント：再度時間をおいてアクセスしてください。</h5>
+{% endblock %}
