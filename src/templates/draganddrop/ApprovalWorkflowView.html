@@ -401,13 +401,13 @@
 						<td colspan="8" class="title_label">
 							<div class="">
 								<ul>
-									{% for first_approver in first_approver_qs %}
-										{% if first_approver %}
+									{% if first_approver_qs %}
+										{% for first_approver in first_approver_qs %}
 											<li class="member m-0">{{ first_approver }}</li>
-										{% else %}
-											--------------
-										{% endif %}
-									{% endfor %}
+										{% endfor %}
+									{% else %}
+										--------------
+									{% endif %}
 								</ul>
 							</div>
 						</td>
@@ -424,13 +424,13 @@
 						<td colspan="8" class="title_label">
 							<div class="">
 								<ul>
-									{% for second_approver in second_approver_qs %}
-										{% if second_approver %}
+									{% if second_approver_qs %}
+										{% for second_approver in second_approver_qs %}
 											<li class="member m-0">{{ second_approver }}</li>
-										{% else %}
-											--------------
-										{% endif %}
-									{% endfor %}
+										{% endfor %}
+									{% else %}
+										--------------
+									{% endif %}
 								</ul>
 							</div>
 						</td>

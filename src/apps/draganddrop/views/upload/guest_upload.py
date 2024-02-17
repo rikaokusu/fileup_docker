@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksguestStep1Form, guestDistFileUploadForm, guestFileDownloadAuthForm, ManageTasksGuestUploadCreateStep1Form
 from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksGuestUploadCreateStep1Form,GuestFileUploadAuthForm,GuestUploadDistFileUploadForm
 from draganddrop.models import Filemodel, PDFfilemodel, Address, Group, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import ApprovalManage, ApprovalLog, ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
 from accounts.models import User, Company, Messages, Service,FileupPermissions
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -140,6 +141,9 @@ class Step1GuestUploadCreate(FormView, CommonView):
         guest_upload_manage_obj.created_date = datetime.datetime.now()
         # # テンポラリフラグをセット
         guest_upload_manage_obj.tmp_flag = 1
+        # アップロード方法をセット
+        # guest_upload_manage_obj.upload_method = 4 # ゲストアップロード
+
 
         # # 保存期日とタイトルに関しても上記と同じように取得
         title = form.cleaned_data['title']
@@ -372,8 +376,92 @@ class Step2GuestUploadCreate(TemplateView, CommonView):
         total_data_usage(guest_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, guest_upload_manage_file_size, 4)
         # 会社管理テーブルの作成・更新
         resource_management_calculation_process(self.request.user.company.id)
-            
+
+        # ユーザーの承認ワークフロー設定を取得
+        # approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
+        # # print("------------------ approval_workflow step2", approval_workflow)
+
+        # # 一次承認者を取得
+        # first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # # print("------------------ first_approvers step2", first_approvers)
+        # # 二次承認者を取得
+        # second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # # print("------------------ second_approver step2", second_approvers)
+
+        # # # 承認ワークフローが「使用する」に設定されている場合
+        # if approval_workflow.is_approval_workflow == 1:
+        #     print("------------------ 承認ワークフローが「使用する」に設定されている")
+
+        #     if first_approvers:
+        #         # print("------------------ first_approversがいます step2")
+
+        #         # 申請ステータスを「一次承認済み」に設定
+        #         guest_upload_manage_obj.application_status = 3
+        #         guest_upload_manage_obj.save()
+
+        #         for first_approver in first_approvers:
+        #             # ApprovalManageを作成
+        #             first_approver_approval_manage = ApprovalManage.objects.create(
+        #                 guest_upload_manage = guest_upload_manage_obj,
+        #                 manage_id = guest_upload_manage_obj.pk,
+        #                 application_title = guest_upload_manage_obj.title,
+        #                 application_user = guest_upload_manage_obj.created_user,
+        #                 application_date = guest_upload_manage_obj.created_date,
+        #                 application_user_company_id = guest_upload_manage_obj.company,
+        #                 approval_status = 2, # 一次承認済み
+        #                 first_approver = first_approver.first_approver,
+        #                 upload_method = 4 # ゲストアップロード
+        #             )
+        #             first_approver_approval_manage.save()
+
+        #             # 承認履歴を残す
+        #             approval_log = ApprovalLog.objects.create(
+        #                 guest_upload_manage = guest_upload_manage_obj,
+        #                 approval_operation_user = first_approver.first_approver,
+        #                 approval_operation_user_position = 1, # 一次承認者
+        #                 approval_operation_user_company_id = self.request.user.company.id,
+        #                 approval_operation_date =  guest_upload_manage_obj.created_date,
+        #                 approval_operation_content = 2, # 一次承認
+        #                 manage_id = guest_upload_manage_obj.pk
+        #             )
+        #             approval_log.save()
+
+        #     if second_approvers:
+        #         # print("------------------ second_approversがいます step2")
+
+        #         # 申請ステータスを「最終承認済み」に設定
+        #         guest_upload_manage_obj.application_status = 5
+        #         guest_upload_manage_obj.save()
+
+        #         for second_approver in second_approvers:
+        #             # ApprovalManageを作成
+        #             second_approver_approval_manage = ApprovalManage.objects.create(
+        #                 guest_upload_manage = guest_upload_manage_obj,
+        #                 manage_id = guest_upload_manage_obj.pk,
+        #                 application_title = guest_upload_manage_obj.title,
+        #                 application_user = guest_upload_manage_obj.created_user,
+        #                 application_date = guest_upload_manage_obj.created_date,
+        #                 application_user_company_id = guest_upload_manage_obj.company,
+        #                 approval_status = 3, # 最終承認済み
+        #                 second_approver = second_approver.second_approver,
+        #                 upload_method = 4 # ゲストアップロード
+        #             )
+        #             second_approver_approval_manage.save()
+
+        #             # 承認履歴を残す
+        #             approval_log = ApprovalLog.objects.create(
+        #                 guest_upload_manage = guest_upload_manage_obj,
+        #                 approval_operation_user = second_approver.second_approver,
+        #                 approval_operation_user_position = 2, # 二次承認者
+        #                 approval_operation_user_company_id = self.request.user.company.id,
+        #                 approval_operation_date =  guest_upload_manage_obj.created_date,
+        #                 approval_operation_content = 3, # 最終承認
+        #                 manage_id = guest_upload_manage_obj.pk
+        #             )
+        #             approval_log.save()
+
         return context
+
 
 ##################################
 # guest登録時の戻る処理 #

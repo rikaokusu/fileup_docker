@@ -4,7 +4,7 @@ from draganddrop.views.home.home_common import CommonView, total_data_usage, res
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import FileForm, DistFileUploadForm, AddressForm, GroupForm, ManageTasksOTPStep1Form, OTPDistFileUploadForm, OTPFileDownloadAuthForm
 from draganddrop.models import Filemodel, PDFfilemodel, Address, Group, OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from draganddrop.models import ApprovalManage, ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
+from draganddrop.models import ApprovalManage, ApprovalLog, ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers
@@ -463,6 +463,9 @@ class Step3OTPupload(TemplateView, CommonView):
     template_name = 'draganddrop/otp/step3_otp_upload.html'
 
     def get_context_data(self, **kwargs):
+
+        print("------------------- OTP共有 Step3")
+
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         
@@ -623,24 +626,24 @@ class Step3OTPupload(TemplateView, CommonView):
         approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
         # print("------------------ approval_workflow step2", approval_workflow)
 
+        # 一次承認者を取得
+        first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # print("------------------ first_approvers step2", first_approvers)
+        # 二次承認者を取得
+        second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # print("------------------ second_approver step2", second_approvers)
+
         # 承認ワークフローが「使用する」に設定されている場合
-        if approval_workflow.is_approval_workflow:
+        if approval_workflow.is_approval_workflow == 1:
+            # print("------------------ 承認ワークフローが「使用する」に設定されている")
 
             # 申請ステータスを「申請中」に設定
             otp_upload_manage_obj.application_status = 1
             otp_upload_manage_obj.save()
 
-            # 一次承認者を取得
-            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
-            # print("------------------ first_approvers step2", first_approvers)
-            # 二次承認者を取得
-            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
-            # print("------------------ second_approver step2", second_approvers)
-
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
                 for first_approver in first_approvers:
-                    # print("------------------ first_approversがいます", first_approver.first_approver)
                     # ApprovalManageを作成
                     first_approver_approval_manage = ApprovalManage.objects.create(
                         otp_upload_manage = otp_upload_manage_obj,
@@ -671,6 +674,79 @@ class Step3OTPupload(TemplateView, CommonView):
                         upload_method = 3 # OTP共有
                     )
                     second_approver_approval_manage.save()
+
+        # 使用しない場合 承認済みのApprovalManageを作成
+        else:
+            # print("------------------ 承認ワークフローが「使用しない」に設定されている")
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+
+                # 申請ステータスを「一次承認済み」に設定
+                otp_upload_manage_obj.application_status = 3
+                otp_upload_manage_obj.save()
+
+                for first_approver in first_approvers:
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        manage_id = otp_upload_manage_obj.pk,
+                        application_title = otp_upload_manage_obj.title,
+                        application_user = otp_upload_manage_obj.created_user,
+                        application_date = otp_upload_manage_obj.created_date,
+                        application_user_company_id = otp_upload_manage_obj.company,
+                        approval_status = 2, # 一次承認済み
+                        first_approver = first_approver.first_approver,
+                        upload_method = 3 # OTP共有
+                    )
+                    first_approver_approval_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        approval_operation_user = first_approver.first_approver,
+                        approval_operation_user_position = 1, # 一次承認者
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date =  otp_upload_manage_obj.created_date,
+                        approval_operation_content = 2, # 一次承認
+                        manage_id = otp_upload_manage_obj.pk
+                    )
+                    approval_log.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+
+                # 申請ステータスを「最終承認済み」に設定
+                otp_upload_manage_obj.application_status = 5
+                otp_upload_manage_obj.save()
+
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        manage_id = otp_upload_manage_obj.pk,
+                        application_title = otp_upload_manage_obj.title,
+                        application_user = otp_upload_manage_obj.created_user,
+                        application_date = otp_upload_manage_obj.created_date,
+                        application_user_company_id = otp_upload_manage_obj.company,
+                        approval_status = 3, # 最終承認済み
+                        second_approver = second_approver.second_approver,
+                        upload_method = 3 # OTP共有
+                    )
+                    second_approver_approval_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        otp_upload_manage = otp_upload_manage_obj,
+                        approval_operation_user = second_approver.second_approver,
+                        approval_operation_user_position = 2, # 二次承認者
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date =  otp_upload_manage_obj.created_date,
+                        approval_operation_content = 3, # 最終承認
+                        manage_id = otp_upload_manage_obj.pk
+                    )
+                    approval_log.save()
+
 
         return context
 

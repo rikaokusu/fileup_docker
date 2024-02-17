@@ -309,6 +309,9 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
                 url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=5)
                 # OTP共有
                 otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=5)
+                # ゲストアップロード
+                # guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0, guest_upload_manage__application_status=5)
+
             # 一次承認者しか設定されていない場合
             else:
                 # print("--------------- TOP画面 一次承認者しか設定されていない場合")
@@ -318,6 +321,8 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
                 url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=3)
                 # OTP共有
                 otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=3)
+                # ゲストアップロード
+                # guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0, guest_upload_manage__application_status=3)
 
         else:
             # print("--------------- TOP画面 承認ワークフローを使用しない")
@@ -327,6 +332,8 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
             url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
             # OTPダウンロード用
             otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0)
+            # ゲストアップロード
+            # guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0)
 
 
         context["upload_manage_for_dest_users"] = upload_manage_for_dest_users

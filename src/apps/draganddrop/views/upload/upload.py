@@ -3,7 +3,7 @@ from django.views.generic import FormView, View, CreateView, TemplateView
 from draganddrop.views.home.home_common import CommonView, total_data_usage, resource_management_calculation_process
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
-from draganddrop.models import UploadManage, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
+from draganddrop.models import UploadManage, ApprovalLog, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from accounts.models import Notification,User
 from django.http import HttpResponseRedirect
@@ -437,7 +437,7 @@ class Step3(TemplateView, CommonView):
 
     def get_context_data(self, **kwargs):
 
-        print("------------------- Step3")
+        print("------------------- 通常アップロード Step3")
 
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
@@ -599,19 +599,20 @@ class Step3(TemplateView, CommonView):
         approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
         # print("------------------ approval_workflow step2", approval_workflow)
 
+        # 一次承認者を取得
+        first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # print("------------------ first_approvers step2", first_approvers)
+        # 二次承認者を取得
+        second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
+        # print("------------------ second_approver step2", second_approvers)
+
         # 承認ワークフローが「使用する」に設定されている場合
-        if approval_workflow.is_approval_workflow:
+        if approval_workflow.is_approval_workflow == 1:
+            # print("------------------ 承認ワークフローが「使用する」に設定されている")
 
             # 申請ステータスを「申請中」に設定
             upload_manage.application_status = 1
             upload_manage.save()
-
-            # 一次承認者を取得
-            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)
-            # print("------------------ first_approvers step2", first_approvers)
-            # 二次承認者を取得
-            second_approvers = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id)
-            # print("------------------ second_approver step2", second_approvers)
 
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
@@ -647,8 +648,79 @@ class Step3(TemplateView, CommonView):
                         upload_method = 1 # 通常アップロード
                     )
                     second_approver_approval_manage.save()
+
+        # 使用しない場合 承認済みのApprovalManageを作成
         else:
-            upload_manage.save()
+            # print("------------------ 承認ワークフローが「使用しない」に設定されている")
+
+            if first_approvers:
+                # print("------------------ first_approversがいます step2")
+
+                # 申請ステータスを「一次承認済み」に設定
+                upload_manage.application_status = 3
+                upload_manage.save()
+
+                for first_approver in first_approvers:
+                    # ApprovalManageを作成
+                    first_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 2, # 一次承認済み
+                        first_approver = first_approver.first_approver,
+                        upload_method = 1 # 通常アップロード
+                    )
+                    first_approver_approval_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        upload_manage = upload_manage,
+                        approval_operation_user = first_approver.first_approver,
+                        approval_operation_user_position = 1, # 一次承認者
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date =  upload_manage.created_date,
+                        approval_operation_content = 2, # 一次承認
+                        manage_id = upload_manage.pk
+                    )
+                    approval_log.save()
+
+            if second_approvers:
+                # print("------------------ second_approversがいます step2")
+
+                # 申請ステータスを「最終承認済み」に設定
+                upload_manage.application_status = 5
+                upload_manage.save()
+
+                for second_approver in second_approvers:
+                    # ApprovalManageを作成
+                    second_approver_approval_manage = ApprovalManage.objects.create(
+                        upload_manage = upload_manage,
+                        manage_id = upload_manage.pk,
+                        application_title = upload_manage.title,
+                        application_user = upload_manage.created_user,
+                        application_date = upload_manage.created_date,
+                        application_user_company_id = upload_manage.company,
+                        approval_status = 3, # 最終承認済み
+                        second_approver = second_approver.second_approver,
+                        upload_method = 1 # 通常アップロード
+                    )
+                    second_approver_approval_manage.save()
+
+                    # 承認履歴を残す
+                    approval_log = ApprovalLog.objects.create(
+                        upload_manage = upload_manage,
+                        approval_operation_user = second_approver.second_approver,
+                        approval_operation_user_position = 2, # 二次承認者
+                        approval_operation_user_company_id = self.request.user.company.id,
+                        approval_operation_date =  upload_manage.created_date,
+                        approval_operation_content = 3, # 最終承認
+                        manage_id = upload_manage.pk
+                    )
+                    approval_log.save()
+
         return context
 
 ###########################

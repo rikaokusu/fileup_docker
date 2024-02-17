@@ -261,12 +261,14 @@ urlpatterns = [
      path('returned_application/<uuid:pk>/', approval.DeclineApplicationView.as_view(), name='returned_application'),
      # 再申請
      path('reapplication/<uuid:pk>/', approval.ReapplicationView.as_view(), name='reapplication'),
-     # 取り消し(削除) 通常アップロードアップロード
+     # 取り消し(削除) 通常アップロード
      path('approvaldelete/', approval.ApprovalDeleteAjaxView.as_view(), name='approvaldelete'),
      # 取り消し(削除) URL共有
      path('urlapprovaldelete/', approval.UrlApprovalDeleteAjaxView.as_view(), name='urlapprovaldelete'),
      # 取り消し(削除) OPT共有
      path('otpapprovaldelete/', approval.OTPApprovalDeleteAjaxView.as_view(), name='otpapprovaldelete'),
+     # 取り消し(削除) ゲストアップロード
+     # path('guestapprovaldelete/', approval.GuestApprovalDeleteAjaxView.as_view(), name='guestapprovaldelete'),
 
      ##################################
      # 操作ログ  

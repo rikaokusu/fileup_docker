@@ -314,7 +314,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                         <!-- 削除ボタン -->
                         <td class="r_task_reminder_col_2" style="text-align:right; vertical-align: middle;">
 
-                            {% if second_approver_count <= 1 %}
+                            {% comment %} {% if second_approver_count <= 1 %}
                                 <!-- 承認者が一名しか設定されていない場合はボタンを無効化 -->
                                 <sapan>
                                     <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" id="delete_is_co_admin_user"
@@ -327,10 +327,12 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
                                     data-toggle="modal" data-target="#second_approver_delete_modal{{forloop.counter}}" data-pk="{{ user.id }}">
                                     権限の取り消し
                                 </button>
-                            {% endif %}
+                            {% endif %} {% endcomment %}
 
-                            <!-- ログインユーザーの削除ボタンは非表示 -->
-
+                            <button type="button" class="my-btn my-btn-danger-1 my-btn-w12" title="権限の取り消し" id="delete_is_co_admin_user"
+                                data-toggle="modal" data-target="#second_approver_delete_modal{{forloop.counter}}" data-pk="{{ user.id }}">
+                                権限の取り消し
+                            </button>
 
                         </td>
 
