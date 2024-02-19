@@ -545,11 +545,9 @@ class Step3OTPupload(TemplateView, CommonView):
         otp_upload_files = otp_upload_manage_obj.file.all()
         files = []
         for file in otp_upload_files:
-            print('ふぁいるかくにん1111',file.name)
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
-        print('ふぁいるかくにん',files)
         # 操作ログ終わり
         # 操作ログ
         add_log(2,1,current_user,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
@@ -578,21 +576,26 @@ class Step3OTPupload(TemplateView, CommonView):
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
-
-        print('urlめーーる',emailList_for)
+        download_type = 'otp'
+        url = otp_upload_manage_obj.url
+        
         tupleMessage = []
-        for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
-            print('めーーーる可否url',e_send)
 
-            if e_send == True:
+        for email in emailList_for:
+            e_user = User.objects.filter(email=email).first()
+            if e_user:
+                e_send = e_user.is_send_mail
+
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
+                    'url': url,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,
+                    
                 }
                 subject_template = get_template('draganddrop/mail_template/subject.txt')
                 subject = subject_template.render(context)
@@ -611,10 +614,7 @@ class Step3OTPupload(TemplateView, CommonView):
                 messageList = list(message1)
                 tupleMessage.insert(-1,messageList)
 
-                print('受信通知めーる',tupleMessage)
-            # send_mail(subject, message, from_email, recipient_list)
         send_mass_mail(tupleMessage)
-        ##################Notification通知用終了
 
         # 個人管理テーブルの作成・更新
         total_data_usage(otp_upload_manage_obj, self.request.user.company.id, self.request.user.id, download_table, download_file_table, otp_upload_manage_file_size, 3)
@@ -1497,16 +1497,21 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        download_type = 'otp'
+        url = otp_upload_manage.url
 
         tupleMessage = []
         for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
+            e_user = User.objects.filter(email=email).first()
+            if e_user:
+                e_send = e_user.is_send_mail
 
-            if e_send == True:
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
+                    'url': url,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,

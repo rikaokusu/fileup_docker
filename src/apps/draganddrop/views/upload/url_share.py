@@ -235,7 +235,6 @@ class Step1UrlUpload(FormView, CommonView):
         context["token_signed"] = token_signed
         current_site = get_current_site(self.request)
         domain = current_site.domain
-        print('domainとは',domain)
         protocol = self.request.scheme
         url_upload_manage_obj.url = protocol + "://" + domain + "/" + "url_check" + "/" + token_signed
 
@@ -591,18 +590,21 @@ class Step3URLupload(TemplateView, CommonView):
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        download_type = 'url'
+        url = url_upload_manage_obj.url
 
-        print('urlめーーる',emailList_for)
         tupleMessage = []
         for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
-            print('めーーーる可否url',e_send)
-
-            if e_send == True:
+            e_user = User.objects.filter(email=email).first()
+            if e_user:
+                e_send = e_user.is_send_mail
+            
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
+                    'url': url,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,
@@ -624,8 +626,6 @@ class Step3URLupload(TemplateView, CommonView):
                 messageList = list(message1)
                 tupleMessage.insert(-1,messageList)
 
-                print('受信通知めーる',tupleMessage)
-            # send_mail(subject, message, from_email, recipient_list)
         send_mass_mail(tupleMessage)
         ##################Notification通知用終了
 
@@ -1533,16 +1533,21 @@ class Step3UrlUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        download_type = 'url'
+        url = url_upload_manage.url
 
         tupleMessage = []
         for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
+            e_user = User.objects.filter(email=email).first()
+            if e_user:
+                e_send = e_user.is_send_mail
 
-            if e_send == True:
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
+                    'url': url,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,
@@ -1611,4 +1616,3 @@ class UrlReturnUpdateView(View):
             # ページ情報をセッションに保存しておく
             self.request.session['page_num'] = 3
             return HttpResponseRedirect(reverse('draganddrop:step3_url_update', kwargs={'pk': url_upload_manage_id_old}))
-
