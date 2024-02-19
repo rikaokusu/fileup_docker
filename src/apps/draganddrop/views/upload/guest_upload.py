@@ -121,9 +121,8 @@ class Step1GuestUploadCreate(FormView, CommonView):
 
 
     def form_valid(self, form):
-        print('hfwoehfowefhosehfh')
+
         user = self.request.user
-        print('userきてる？？＞＜',user)
         if 'guest_upload_manage_id' in self.request.session:
             # guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=self.request.session['guest_upload_manage_id']).prefetch_related('dest_user').first()
             guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=self.request.session['guest_upload_manage_id']).first()

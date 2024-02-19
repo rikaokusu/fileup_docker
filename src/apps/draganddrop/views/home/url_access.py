@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views.generic import ListView, FormView, TemplateView
 from draganddrop.views.home.home_common import CommonView
@@ -21,18 +22,14 @@ class ApproveView(TemplateView):
     model = UrlUploadManage
 
     def get_context_data(self, **kwargs):
-        print('Approveげっとこんてきすとでーた')
         context = super().get_context_data(**kwargs)
 
         # URLを返す
         url_name = self.request.resolver_match.url_name
-        print('urlねーむとは',url_name)
         context["url_name"] = url_name
 
 
     def get(self, request, token):
-        print('Approveげっとにはいった')
-        
         # if request.method == "GET":
             # GET = ランダムURLにアクセスしてきた際
 
@@ -54,26 +51,37 @@ class ApproveView(TemplateView):
 
                     if end_date > current_time and file_del_flag==0:
                         if auth_meth == 1:
+                            print('正常な動きめーる')
                             return HttpResponseRedirect(reverse('draganddrop:url_file_download_auth_mail', kwargs={'pk': url_upload_manage.id}))
                         else:
+                            print('正常な動きぱす')
                             return HttpResponseRedirect(reverse('draganddrop:url_file_download_auth_pass', kwargs={'pk': url_upload_manage.id}))
                     elif end_date > current_time and file_del_flag == 1:
+                        print('期限切れ')    
                         return HttpResponseRedirect(reverse('draganddrop:url_file_unable_download'))
                     else:
+                        print('なぞ')
                         return HttpResponseRedirect(reverse('draganddrop:url_file_unable_download'))
 
 
                 except SignatureExpired:
-                    return render(request, self.template_name, context)
+                    return render(request, self.template_name)
 
 ##################################
 # URL共有 認証画面 メールアドレス ver #
 ##################################
 
-class UrlFileDownloadAuthMail(FormView, CommonView):
+# class UrlFileDownloadAuthMail(FormView, CommonView):
+class UrlFileDownloadAuthMail(FormView):
     model = UrlUploadManage
     template_name = 'draganddrop/url_file_dl/url_file_dl_auth.html'
     form_class = UrlFileDownloadAuthMailForm
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        url_name = self.request.resolver_match.url_name
+
+        context["url_name"] = url_name
+        return context
 
     def form_valid(self, form):
         email = self.request.POST.get('email') #formに入力したアドレスを取得
@@ -142,15 +150,16 @@ class UrlFileDownloadAuthPass(FormView, CommonView):
 # URLファイルダウンロード画面  #
 ###########################
 
-class UrlFileDownload(LoginRequiredMixin, ListView, CommonView):
+# class UrlFileDownload(LoginRequiredMixin, ListView, CommonView):
+class UrlFileDownload(ListView):
     model = UrlUploadManage
     template_name = 'draganddrop/url_file_dl/url_file_dl.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         email = self.request.session['email'] #前画面で保存したsessionデータを取得(formに入力したアドレス)
-       #個別ファイル用
+        #個別ファイル用
         url_upload_manage_id = self.kwargs['pk']
         url_upload_manage = UrlUploadManage.objects.filter(
             pk=url_upload_manage_id, file_del_flag=0).first()
@@ -159,6 +168,7 @@ class UrlFileDownload(LoginRequiredMixin, ListView, CommonView):
         #Zipファイル用
         url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(
             url_upload_manage=url_upload_manage_id, dest_user__email=email, del_flag=False)
+        
         context["url_upload_manage_for_dest_users"] = url_upload_manage_for_dest_users
 
         deleted_url_upload_manage = UrlDownloadtable.objects.filter(

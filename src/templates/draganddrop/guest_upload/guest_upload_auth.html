@@ -22,7 +22,6 @@
         
     </style>
     <div class="url_dl_page_wrapper">
-
         <h1><a href="#"><img src="../../../static/img/FileUP_Logo_Blue.svg" alt="FileUPロゴ"></a></h1>
         <form action="" method="post">
 
@@ -52,12 +51,12 @@
                 </div>
             </div>
 
-            <div class="login_link">
+            {% comment %} <div class="login_link">
                 <a href="{% url 'accounts:login' %}"
                 rel="noopener noreferrer">FileUPアカウントお持ちの方はこちら</a>
                 <i class="fas fa-user fa-fw fa-lg" style="color:#005392;"></i>
             </div>
-        
+         {% endcomment %}
         
         {% else %}
             <p class="unable_download_message">期限切れかリクエストが削除されているためご利用できません。</p>

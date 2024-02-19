@@ -70,11 +70,18 @@ class OTPApproveView(TemplateView):
 ##################################
 # OTP 認証画面 #
 ##################################
-class OTPFileDownloadAuth(FormView, CommonView):
+class OTPFileDownloadAuth(FormView):
 
     model = OTPUploadManage
     template_name = 'draganddrop/otp_file_dl/otp_file_dl_auth.html'
     form_class = OTPFileDownloadAuthForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        url_name = self.request.resolver_match.url_name
+
+        context["url_name"] = url_name
+        return context
 
     def form_valid(self, form):
         email = self.request.POST.get('email') #formに入力したアドレスを取得
@@ -176,7 +183,7 @@ class OTPSendAjaxView(View):
 # OTPファイルダウンロード画面  #
 ###########################
 
-class OTPFileDownload(LoginRequiredMixin, ListView, CommonView):
+class OTPFileDownload(ListView):
     model = OTPUploadManage
     template_name = 'draganddrop/otp_file_dl/otp_file_dl.html'
 
@@ -206,8 +213,7 @@ class OTPFileDownload(LoginRequiredMixin, ListView, CommonView):
             otp_upload_manage=otp_upload_manage_id, dest_user__email=email, del_flag=True)
         context["deleted_otp_upload_manage"] = deleted_otp_upload_manage
 
-        return context
-            
+        return context       
 
 ##################################
 # OTPファイルダウンロード 有効期限切れ  #
