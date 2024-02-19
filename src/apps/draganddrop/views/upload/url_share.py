@@ -597,7 +597,7 @@ class Step3URLupload(TemplateView, CommonView):
         for email in emailList_for:
             e_user = User.objects.filter(email=email).first()
             if e_user:
-                e_send = email.is_send_mail
+                e_send = e_user.is_send_mail
             
             if e_user and e_send == True or not e_user:
                 context = {
@@ -1540,7 +1540,7 @@ class Step3UrlUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         for email in emailList_for:
             e_user = User.objects.filter(email=email).first()
             if e_user:
-                e_send = email.is_send_mail
+                e_send = e_user.is_send_mail
 
             if e_user and e_send == True or not e_user:
                 context = {
