@@ -72,7 +72,7 @@
 					{% else %}
 					<span data-toggle="tooltip" title="zip形式でダウンロード" data-placement="right">
 						<button><input type="button" class="zip_dl_btn url_zip_download" value="一括ダウンロード"
-							data-otp_downloadtable_id="{{ otp_dest_user_data.id }}">
+							data-otp_downloadtable_id="{{ otp_dest_user_data.id }}" onclick="window.location.href='{% url 'draganddrop:otp_file_download_zip' otp_dest_user_data.id %}'">
 						</button>
 					</span>
 					{% endif %}
@@ -90,10 +90,10 @@
 	
 	<!----------------- メッセージ ----------------->
 		{% if otp_dest_user_data.otp_upload_manage.message %}
-		<div class="url_dl_message">
-			<h3>メッセージ</h3>
-			<p>{{otp_dest_user_data.otp_upload_manage.message|linebreaksbr}}</p>
-		</div>
+            <div class="url_dl_message">
+                <h3>送信者からのメッセージ</h3>
+                <p>&nbsp;&nbsp;{{otp_dest_user_data.otp_upload_manage.message|linebreaksbr}}</p>
+            </div>
 		{% endif %}
 
 

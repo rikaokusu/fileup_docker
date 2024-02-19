@@ -364,6 +364,11 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         otp_upload_manage_for_dest_users_deleted = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=1)
         context["otp_upload_manage_for_dest_users_deleted"] = otp_upload_manage_for_dest_users_deleted
 
+        # ゲストアップロード用
+        guest_upload_manage_for_dest_users_deleted = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=1)
+        context["guest_upload_manage_for_dest_users_deleted"] = guest_upload_manage_for_dest_users_deleted
+
+        
         """会社毎のレコード数取得"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
         context["number_of_company_upload_manage"] = number_of_company_upload_manage

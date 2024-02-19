@@ -2,8 +2,17 @@ FileUP！サービスをご利用いただきありがとうございます。
 {{ user_last_name }}{{ user_first_name }}様より受信したファイルが変更されました。
 
 下記URLよりサイトにアクセスの上、受信ファイルの確認をお願いいたします。
+{% if download_type == 'normal' %}
+ファイルダウンロード用URL（FileUP!へのログインが必要です。）
 {{ protocol}}://{{ domain }}{% url 'accounts:login' %}
-
+{% elif download_type == 'url' %}
+ファイルダウンロード用URL（最初にメールアドレス認証を行います）
+{{ url }}
+    {% comment %} {{ protocol}}://{{ domain }}{% url 'draganddrop:url_check' token %} {% endcomment %}
+{% elif download_type == 'otp' %}
+ファイルダウンロード用URL（最初にワンタイムパスワード認証を行います）
+{{ url }}
+{% endif %}
 本メールは送信専用メールアドレスから配信されています。
 ご返信いただいてもお答えできませんのでご了承ください。
 本メールに心当たりがない場合は、お手数ですが本メールの破棄をお願いいたします。

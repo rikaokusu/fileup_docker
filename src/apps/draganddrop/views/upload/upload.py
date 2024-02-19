@@ -538,17 +538,20 @@ class Step3(TemplateView, CommonView):
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        download_type = 'normal'
 
         tupleMessage = []
         for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
-            print('めーーーる可否',e_send)
+            e_user = User.objects.filter(email=email).first()
+            
+            if e_user:
+                e_send = email.is_send_mail
 
-            if e_send == True:
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,
@@ -1140,8 +1143,6 @@ class Step2Update(FormView, CommonView):
 
     def form_valid(self, form,**kwargs):
         #操作ログ用
-        print('あっぷでーとstep2-3')
-        print('ふぉーむばりっど起きてる1')
         # context = super().get_context_data(**kwargs)
         # current_user = self.request.user
         # upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
@@ -1498,16 +1499,19 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
         #メール送信
         current_site = get_current_site(self.request)
         domain = current_site.domain
+        download_type = 'normal'
 
         tupleMessage = []
         for email in emailList_for:
-            e_user = User.objects.get(email=email)
-            e_send = e_user.is_send_mail
+            e_user = User.objects.filter(email=email).first()
+            if e_user:
+                e_send = email.is_send_mail
 
-            if e_send == True:
+            if e_user and e_send == True or not e_user:
                 context = {
                     'protocol': 'https' if self.request.is_secure() else 'http',
                     'domain': domain,
+                    'download_type': download_type,
                     #送信者
                     'user_last_name':self.request.user.last_name,
                     'user_first_name':self.request.user.first_name,
