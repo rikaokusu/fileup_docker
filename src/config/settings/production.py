@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # LOGIN_URL = 'register:login'
 # LOGIN_REDIRECT_URL = 'register:top'
