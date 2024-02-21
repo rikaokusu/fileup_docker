@@ -5,7 +5,7 @@ from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from accounts.models import User, File,Notification,Read,Company
+from accounts.models import User, File,Notification,Read,Company,FileupPermissions
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
@@ -56,6 +56,12 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["url_name"] = url_name
         context["app_name"] = app_name
         context["current_user"] = current_user
+        print('権限。カレントユーザーなにが入ってる',current_user)
+        print('権限。カレントユーザーID',current_user.id)
+        user_permission = FileupPermissions.objects.get(user=current_user)
+        context["user_permission"] = user_permission
+        print('権限。カレントユーザーpermission',user_permission)
+        print('権限。カレントユーザーpermission2',user_permission.permission)
 
         ######################　通知機能
         my_email = current_user.email

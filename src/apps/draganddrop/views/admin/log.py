@@ -45,6 +45,9 @@ class LogView(CommonView,TemplateView):
         logs =  OperationLog.objects.filter(operation_user=current_user,category=2)
         guest_logs =  OperationLog.objects.filter(upload_category=6,category=2,destination_address=current_user.email)
         logs = logs.union(guest_logs).order_by('created_date').reverse
+        #管理者用ログ
+        logs =  OperationLog.objects.filter(operation_user=current_user,category=2)
+
         print('ゲストのレコードわかる？？？？？？？？？？',guest_logs)
 
         logs_address_user =  OperationLog.objects.filter(operation_user=current_user,category=3,upload_category=4).order_by('created_date').reverse

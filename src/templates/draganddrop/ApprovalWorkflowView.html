@@ -281,20 +281,20 @@
 <div class="d-flex mb-5">
 	<!---------------------------- 基本情報 ------------------------------>
 	<div class="card mr-3">
-		<div class="card-header d-flex align-items-center mb-3">
+		<div class="card-header d-flex align-items-center mb-3" style="justify-content:space-between;">
 
 			<div>
 				<h2 class="m-0">基本情報</h2>
 			</div>
 
-			{% if current_user.is_staff %}
+			{% if user_permission.permission >= "1" %} <!--管理者-->
 				<div class="mr-3 ml-auto bd-highlight">
 					<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_workflow_edit' user_approval_workflow_id %}" role="button">編集</a>
 				</div>
 			{% else %}
-				<div class="mr-3 ml-auto bd-highlight" style="pointer-events: none; opacity: 0.2;">
+				{% comment %} <div class="mr-3 ml-auto bd-highlight" style="pointer-events: none; opacity: 0.2;">
 					<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="}" role="button">編集</a>
-				</div>
+				</div>  {% endcomment %}
 			{% endif %}
 
 			<div class="bd-highlight">
@@ -363,13 +363,13 @@
 	<!---------------------------- 承認者情報覧 ------------------------------>
 	<div class="card">
 
-		<div class="card-header d-flex align-items-center mb-3">
+		<div class="card-header d-flex align-items-center mb-3" style="height:64px;">
 
 			<div>
 				<h2 class="m-0">承認者情報</h2>
 			</div>
 
-		{% if current_user.is_staff %}
+		{% if user_permission.permission >= "1" %} <!--管理者-->
 			<div class="mr-3 ml-auto  bd-highlight">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:first_approver_set' %}" role="button">第一承認者設定</a>
 			</div>
@@ -378,13 +378,13 @@
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:second_approver_set' %}" role="button">第二承認者設定</a>
 			</div>
 		{% else %}
-			<div class="mr-3 ml-auto  bd-highlight" style="pointer-events: none; opacity: 0.2;">
+			{% comment %} <div class="mr-3 ml-auto  bd-highlight" style="pointer-events: none; opacity: 0.2;">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="" role="button">第一承認者設定</a>
 			</div>
 
 			<div class="bd-highlight" style="pointer-events: none; opacity: 0.2;">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="" role="button">第二承認者設定</a>
-			</div>
+			</div> {% endcomment %}
 		{% endif %}
 		</div>
 

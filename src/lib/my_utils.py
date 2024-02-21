@@ -60,6 +60,8 @@ def add_log(category, operation, op_user,file_title,file_name,dest_mail_log,uplo
     # JST = datetime.timezone(t_delta, 'JST')
     # now = datetime.datetime.now(JST)
 
+    # logger.debug("op_company")
+    # logger.debug(op_company)
     logger.debug("operation")
     logger.debug(operation)
     logger.debug("category")
@@ -73,6 +75,7 @@ def add_log(category, operation, op_user,file_title,file_name,dest_mail_log,uplo
         # created_date = now.strftime('%Y/%m/%d %H:%M:%S'),
         created_date = datetime.datetime.now(),
         operation_user = op_user,
+        # operation_user_company_id = op_company,
         category = category,
         operation = operation,
         file_title = file_title,
