@@ -114,7 +114,7 @@ class GroupCreateAjaxView(View,CommonView):
             group_obj.address.set(address_list)
             group_obj.save()
             # 操作ログ登録
-            add_log(3,1,current_user,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,1,current_user,current_user.company,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
         #     # メッセージを格納してJSONで返す
             return JsonResponse({"status": "ok",})
            
@@ -183,7 +183,7 @@ class GroupUpdateAjaxView(View,CommonView):
             log_users = ' '.join(log_users)
             #操作ログ終わり
             # 操作ログ登録
-            add_log(3,2,current_user,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,2,current_user,current_user.company,group_name,"",log_users,5,self.request.META.get('REMOTE_ADDR'))
             # JSONで返す
             return JsonResponse({"status": "ok",})
             print("成功")
@@ -224,7 +224,7 @@ class GroupDeleteAjaxView(View, CommonView):
                 group_users.append(user)
             group_users = ' '.join(group_users)
             group_name = group_obj.group_name
-            add_log(3,3,current_user,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,3,current_user,current_user.company,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
             #操作ログ終わり
 
             group_obj.delete()
@@ -268,7 +268,7 @@ class GroupMultiDeleteAjaxView(View,CommonView):
                     group_users.append(user)
                 group_users = ' '.join(group_users)
                 group_name = group_list.group_name
-                add_log(3,3,current_user,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
+                add_log(3,3,current_user,current_user.company,group_name,"",group_users,5,self.request.META.get('REMOTE_ADDR'))
                 #操作ログ終わり
                 group_list.delete()
             # メッセージを格納してJSONで返す

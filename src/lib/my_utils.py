@@ -55,13 +55,13 @@ def check_session(self, request, instance):
             # 保存
             instance.save()
 
-def add_log(category, operation, op_user,file_title,file_name,dest_mail_log,upload_category, client_addr):
+def add_log(category, operation, op_user,op_company,file_title,file_name,dest_mail_log,upload_category, client_addr):
     # t_delta = datetime.timedelta(hours=9)
     # JST = datetime.timezone(t_delta, 'JST')
     # now = datetime.datetime.now(JST)
 
-    # logger.debug("op_company")
-    # logger.debug(op_company)
+    logger.debug("op_company")
+    logger.debug(op_company)
     logger.debug("operation")
     logger.debug(operation)
     logger.debug("category")
@@ -75,7 +75,7 @@ def add_log(category, operation, op_user,file_title,file_name,dest_mail_log,uplo
         # created_date = now.strftime('%Y/%m/%d %H:%M:%S'),
         created_date = datetime.datetime.now(),
         operation_user = op_user,
-        # operation_user_company_id = op_company,
+        operation_user_company_id = op_company,
         category = category,
         operation = operation,
         file_title = file_title,
