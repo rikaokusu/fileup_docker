@@ -56,8 +56,6 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["url_name"] = url_name
         context["app_name"] = app_name
         context["current_user"] = current_user
-        print('権限。カレントユーザーなにが入ってる',current_user)
-        print('権限。カレントユーザーID',current_user.id)
         user_permission = FileupPermissions.objects.get(user=current_user)
         context["user_permission"] = user_permission
         print('権限。カレントユーザーpermission',user_permission)
@@ -169,13 +167,14 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
         current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         user = self.request.user
         info = Notification.objects.get(id=self.kwargs['pk'])
+        print('いんふぉたいとる！１',info.title)
         if Read.objects.filter(read_user=user,notification_id=info).exists()==False:
             read = Read.objects.create(read_user=user,notification_id=info)
             read.save()
             
             #追記
             today = datetime.datetime.now()
-
+            print('いんふぉたいとる！２',info.title)
             #全体の通知の数を確認
             my_email = current_user.email
             all_info = Notification.objects.filter(start_date__lte = today)
@@ -185,12 +184,13 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
             Q(service="全てのサービス")).order_by('release_date').reverse()
             all_informations = []
 
-            for info in all_info:
-                info_email = info.email_list
+            for info2 in all_info:
+                info_email = info2.email_list
                 email_if = my_email in info_email  #True False　自分が通知対象者か
                 if email_if == True:
-                    all_informations.append(info)
-
+                    all_informations.append(info2)
+                    print('いんふぉたいとる！３',info2.title)
+            print('いんふぉたいとる！４',info.title)
             # read2 = Read.objects.filter(read_user=user).count()
             # if read2 > 0:
             #     info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = user),start_date__lte = today).distinct().count()
@@ -212,9 +212,10 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
 
             else:
                 context["no_read"] = no_read
-        
+        print('いんふぉたいとる！５',info.title)
         context["user"] = user
         context["info"] = info
+        print('かくじつにわたしたお')
         return context
 
 """
