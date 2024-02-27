@@ -693,6 +693,9 @@ class Step3URLupload(TemplateView, CommonView):
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
 
+            url_upload_manage_obj.created_at_invalid = True
+            url_upload_manage_obj.save()
+
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
 

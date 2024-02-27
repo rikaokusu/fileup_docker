@@ -12,7 +12,7 @@ from accounts.models import Notification,Read
 
 class UploadManageAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', '_file', '_dest_user', 'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8', 'created_user',
-                    'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit', 'application_status', 'is_reapplied_flg', 'upload_method')
+                    'created_date', 'end_date', 'tmp_flag', 'file_del_flag', 'is_downloaded', 'dl_limit', 'application_status', 'is_reapplied_flg', 'upload_method', 'created_at_invalid')
     list_display_links = ('id', 'title',)
 
     def _file(self, row):
@@ -23,7 +23,7 @@ class UploadManageAdmin(admin.ModelAdmin):
     
 
 class UrlUploadManageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', '_file', '_dest_user', 'application_status', 'is_reapplied_flg', 'upload_method')
+    list_display = ('id', 'title', '_file', '_dest_user', 'application_status', 'is_reapplied_flg', 'upload_method', 'created_at_invalid')
     list_display_links = ('id', 'title',)
 
     def _file(self, row):
@@ -97,7 +97,7 @@ class NotificationAdmin(admin.ModelAdmin):
 class OTPUploadManageAdmin(admin.ModelAdmin):
     list_display = ('id','title', '_file', '_dest_user',  'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8',
                     '_dest_user_group', 'created_user', 'company', 'created_date', 'end_date', 'tmp_flag', 'is_downloaded', 'dl_limit', 'password',
-                    'password_create_time', 'decode_token', 'url', 'file_del_flag', 'message', 'upload_method')
+                    'password_create_time', 'decode_token', 'url', 'file_del_flag', 'message', 'upload_method', 'created_at_invalid')
     list_display_links = ('id',)
 
     def _file(self, row):
@@ -125,7 +125,7 @@ class OTPDownloadFiletableAdmin(admin.ModelAdmin):
 class GuestUploadManageAdmin(admin.ModelAdmin):
     list_display = ('id','title', '_file', 'dest_user',  'dest_user_mail1', 'dest_user_mail2', 'dest_user_mail3', 'dest_user_mail4', 'dest_user_mail5', 'dest_user_mail6', 'dest_user_mail7', 'dest_user_mail8',
                     '_dest_user_group', 'created_user', 'company', 'created_date', 'end_date', 'tmp_flag', 'is_downloaded', 'password',
-                    'password_create_time', 'decode_token', 'url', 'file_del_flag', 'message', 'url_invalid_flag', 'uploaded_date', 'upload_method', 'created_date')
+                    'password_create_time', 'decode_token', 'url', 'file_del_flag', 'message', 'url_invalid_flag', 'uploaded_date', 'upload_method', 'created_date', 'created_at_invalid')
     list_display_links = ('id',)
 
     def _file(self, row):

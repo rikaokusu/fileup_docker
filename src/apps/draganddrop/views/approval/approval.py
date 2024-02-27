@@ -529,23 +529,24 @@ class ApprovalWorkflowView(TemplateView, CommonView, ApplicationStatusCheckView)
             # ログインユーザーが一次承認者、二次承認者に設定されているApprovalManageを取得
             user_approval_manages = ApprovalManage.objects.filter(
                 Q(first_approver=user.id) | Q(second_approver=user.id)
-            ).distinct()
+            ).exclude(upload_manage__created_at_invalid=True).exclude(url_upload_manage__created_at_invalid=True).exclude(otp_upload_manage__created_at_invalid=True
+            ).exclude(guest_upload_manage__created_at_invalid=True).distinct()
 
             # 申請一覧に表示用
             context["user_approval_manages"] = user_approval_manages
 
-            # 承認一覧に表示用
+            # 承認一覧に表示用 ※承認設定が「無効」のときに作成したファイルは非表示
             # 通常アップロード
-            upload_manages = UploadManage.objects.filter(created_user=user.id)
+            upload_manages = UploadManage.objects.filter(created_user=user.id).exclude(created_at_invalid=True)
             # print("--------------- upload_manages", upload_manages)
             # URL共有
-            url_upload_manages = UrlUploadManage.objects.filter(created_user=user.id)
+            url_upload_manages = UrlUploadManage.objects.filter(created_user=user.id).exclude(created_at_invalid=True)
             # print("--------------- url_upload_manages", url_upload_manages)
             # OTP共有
-            otp_upload_manages = OTPUploadManage.objects.filter(created_user=user.id)
+            otp_upload_manages = OTPUploadManage.objects.filter(created_user=user.id).exclude(created_at_invalid=True)
             # print("--------------- otp_upload_manages", otp_upload_manages)
             # ゲストアップロード
-            # guest_upload_manages = GuestUploadManage.objects.filter(created_user=user.id)
+            # guest_upload_manages = GuestUploadManage.objects.filter(created_user=user.id).exclude(created_at_invalid=True)
             # print("--------------- guest_upload_manages", guest_upload_manages)
 
             # クエリーセットを合体

@@ -662,6 +662,9 @@ class DuplicateStep3(TemplateView, CommonView):  # サーバサイドだけの�
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
 
+            upload_manage.created_at_invalid = True
+            upload_manage.save()
+
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
 
@@ -1412,6 +1415,9 @@ class UrlDuplicateStep3(TemplateView, CommonView):
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
 
+            url_upload_manage.created_at_invalid = True
+            url_upload_manage.save()
+
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
 
@@ -2140,6 +2146,9 @@ class OTPDuplicateStep3(TemplateView, CommonView):
         # 使用しない場合 承認済みのApprovalManageを作成
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
+
+            otp_upload_manage.created_at_invalid = True
+            otp_upload_manage.save()
 
             if first_approvers:
                 # print("------------------ first_approversがいます step2")

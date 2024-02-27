@@ -656,6 +656,9 @@ class Step3(TemplateView, CommonView):
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
 
+            upload_manage.created_at_invalid = True
+            upload_manage.save()
+
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
 

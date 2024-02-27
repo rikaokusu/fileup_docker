@@ -679,6 +679,9 @@ class Step3OTPupload(TemplateView, CommonView):
         else:
             # print("------------------ 承認ワークフローが「使用しない」に設定されている")
 
+            otp_upload_manage_obj.created_at_invalid = True
+            otp_upload_manage_obj.save()
+
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
 

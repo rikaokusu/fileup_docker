@@ -147,7 +147,8 @@ class UploadManage(models.Model):
     is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
-
+    # 承認設定が「無効」のときに作成したファイル
+    created_at_invalid = models.BooleanField('承認設定が「無効」のときに作成したファイル', default=False)
 
     @property
     def is_past_due(self):
@@ -231,7 +232,8 @@ class UrlUploadManage(models.Model):
     is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
-
+    # 承認設定が「無効」のときに作成したファイル
+    created_at_invalid = models.BooleanField('承認設定が「無効」のときに作成したファイル', default=False)
 
     @property
     def is_past_due(self):
@@ -296,6 +298,8 @@ class OTPUploadManage(models.Model):
     is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+    # 承認設定が「無効」のときに作成したファイル
+    created_at_invalid = models.BooleanField('承認設定が「無効」のときに作成したファイル', default=False)
 
 
     @property
@@ -366,6 +370,8 @@ class GuestUploadManage(models.Model):
     is_reapplied_flg = models.BooleanField('再申請済みフラグ', default=False)
     # アップロード方法
     upload_method = models.IntegerField('アップロード方法', choices=UPLOAD_METHOD_CHOICE, default=1)
+    # 承認設定が「無効」のときに作成したファイル
+    created_at_invalid = models.BooleanField('承認設定が「無効」のときに作成したファイル', default=False)
 
 
     @property
