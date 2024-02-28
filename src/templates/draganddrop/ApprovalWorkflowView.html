@@ -289,8 +289,17 @@
 
 			{% if user_permission.permission >= "1" %} <!--管理者-->
 				<div class="mr-3 ml-auto bd-highlight">
-					<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_workflow_edit' user_approval_workflow_id %}" role="button">編集</a>
+					<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_workflow_edit' user_approval_workflow_id %}" role="button">設定</a>
 				</div>
+				{% comment %} {% if first_approver_qs %} <!--第一承認者が設定されていたら-->
+					<div class="mr-3 ml-auto bd-highlight">
+						<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:approval_workflow_edit' user_approval_workflow_id %}" role="button">設定</a>
+					</div>
+				{% else %}
+					<div class="mr-3 ml-auto bd-highlight">
+						<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" tabindex="-1" role="button" style="opacity:0.5;" data-toggle="tooltip" data-placement="right" title="第一承認者設定を設定してください">設定</a>
+					</div>
+				{% endif %} {% endcomment %}
 			{% else %}
 				{% comment %} <div class="mr-3 ml-auto bd-highlight" style="pointer-events: none; opacity: 0.2;">
 					<a class="btn my-btn-w7 my-btn-h4 btn-primary rounded-0" href="}" role="button">編集</a>
@@ -373,10 +382,15 @@
 			<div class="mr-3 ml-auto  bd-highlight">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:first_approver_set' %}" role="button">第一承認者設定</a>
 			</div>
-
-			<div class="bd-highlight">
-				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:second_approver_set' %}" role="button">第二承認者設定</a>
-			</div>
+			{% comment %} {% if first_approver_qs %} <!--第一承認者が設定されていたら-->
+				<div class="bd-highlight">
+					<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="{% url 'draganddrop:second_approver_set' %}" role="button">第二承認者設定</a>
+				</div>
+			{% else %}
+				<div class="bd-highlight">
+					<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" tabindex="-1" role="button" style="opacity:0.5;" data-toggle="tooltip" data-placement="right" title="第一承認者設定を設定してください">第二承認者設定</a>
+				</div>
+			{% endif %} {% endcomment %}
 		{% else %}
 			{% comment %} <div class="mr-3 ml-auto  bd-highlight" style="pointer-events: none; opacity: 0.2;">
 				<a class="btn my-btn-w9 my-btn-h4 btn-primary rounded-0" href="" role="button">第一承認者設定</a>
