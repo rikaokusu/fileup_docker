@@ -659,9 +659,11 @@ def send_table_delete(user, download_table, download_file_table, file_size, type
             personal_resource_manage.otp_upload_manage_file_size -= file_size
             personal_resource_manage.save()
         else:
+            print('guestは把握')
             personal_resource_manage.number_of_active_guest_upload_manage = GuestUploadManage.objects.filter(created_user=user, file_del_flag=0).all().count()
             personal_resource_manage.number_of_deactive_guest_upload_manage = GuestUploadManage.objects.filter(created_user=user, end_date__lt=date, uploaded_date__isnull=True).all().count() 
             personal_resource_manage.number_of_removed_guest_upload_manage += 1
+            print('おら',personal_resource_manage.number_of_removed_guest_upload_manage)
             personal_resource_manage.number_of_guest_upload_download_table -= download_table
             personal_resource_manage.number_of_guest_upload_download_file_table -= download_file_table
             personal_resource_manage.guest_upload_manage_file_size -= file_size

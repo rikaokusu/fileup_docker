@@ -72,13 +72,25 @@
               <!--メンバー-->
               <td>
                 {% for address in groups_list.address.all|slice:":5" %}
-                  {% if address.company_name %}
-                    {{address.company_name}} {{address.last_name}}{{address.first_name}}<br />
-                  {% elif address.trade_name %}
-                    {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
-                  {% else %}
-                    {{address.last_name}}{{address.first_name}}<br />
-                  {% endif %}
+                    {% if address.company_name %}
+                        {% if address.legal_person_posi == 1 %}
+                            {% if address.legal_personality == 99 %}
+                                {{ address.company_name }} {{address.last_name}}{{address.first_name}}<br />
+                            {% else %}
+                                {{ address.get_legal_personality_display }}{{ address.company_name }} {{address.last_name}}{{address.first_name}}<br />
+                            {% endif %}
+                        {% else %}
+                            {% if address.legal_personality == 99 %}
+                                {{ address.company_name }} {{address.last_name}}{{address.first_name}}<br />
+                            {% else %}
+                                {{ address.company_name }}{{ address.get_legal_personality_display }} {{address.last_name}}{{address.first_name}}<br />
+                            {% endif %}
+                        {% endif %}
+                    {% elif address.trade_name %}
+                        {{address.trade_name}} {{address.last_name}}{{address.first_name}}<br />
+                    {% else %}
+                        {{address.last_name}}{{address.first_name}}<br />
+                    {% endif %}
                 {% endfor %}
                 
                 {%with group_number=groups_list.address.all.count%}
@@ -210,31 +222,34 @@
             </thead>
 
             <tbody id="address_boxes">
-              {%for address_list in address_lists%}
+              {% for address_list in address_lists %}
 
               <tr>
                 <td>
                   <input type="checkbox" name="address" value="{{address_list.id}}"
-                    id="address_list_data" data-company_name="{{address_list.company_name}}"
+                    id="address_list_data" {% if address_list.legal_or_individual == 1 %}
+                    {% if address_list.legal_person_posi == 1 %}data-company_name="{{ address_list.get_legal_personality_display}}{{address_list.company_name}}"
+                    {% else %}data-company_name="{{address_list.company_name}}{{ address_list.get_legal_personality_display}}"{% endif %}
+                    {% else %}data-company_name="{{address_list.trade_name}}"{% endif %}
                     data-name="{{address_list.last_name}} {{address_list.first_name}}" />
                 </td>
 
                 <td>
-                  {% if address_list.legal_or_individual == 1 %}
-                      {% if address_list.legal_person_posi == 1 %}
-                          {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
-                      {% else %}
-                          {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
-                      {% endif %}
-                  {% else %}
-                      {% if address_list.trade_name == null %}
-                          ー
-                      {% else %}
-                          {{address_list.trade_name}}
-                      {% endif %}
-                  {% endif %}
-              </td>
-              
+                    {% if address_list.legal_or_individual == 1 %}
+                        {% if address_list.legal_person_posi == 1 %}
+                            {{ address_list.get_legal_personality_display}} {{address_list.company_name}}
+                        {% else %}
+                            {{address_list.company_name}} {{ address_list.get_legal_personality_display}}
+                        {% endif %}
+                    {% else %}
+                        {% if address_list.trade_name == null %}
+                            ー
+                        {% else %}
+                            {{address_list.trade_name}}
+                        {% endif %}
+                    {% endif %}
+                </td>
+
               <td>
                 {% if address_list.department_name == null %}
                     　ー　

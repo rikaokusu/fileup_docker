@@ -536,7 +536,7 @@
 
                 <!-- チェックボックス -->
                 <td>
-                    <input type="checkbox" name="otp_dest_user_ids" value="{{otp_dest_user_data.id}}" id="url_dest_data" class="url_dest_data">
+                    <input type="checkbox" name="otp_dest_user_ids" value="{{otp_dest_user_data.id}}" id="otp_dest_data" class="otp_dest_data">
                 </td>
 
                 <!-- タイトル -->
@@ -726,7 +726,7 @@
 
                 <!-- チェックボックス -->
                 <td>
-                    <input type="checkbox" name="url_dest_user_ids" value="{{guest_dest_user_data.id}}" id="url_dest_data" class="url_dest_data">
+                    <input type="checkbox" name="guest_dest_user_ids" value="{{guest_dest_user_data.id}}" id="guest_dest_data" class="guest_dest_data">
                 </td>
 
                 <!-- タイトル -->
@@ -1928,7 +1928,7 @@
                             </td>
 
                             <!--タイトル-->
-                            <td>
+                            <td class="upload_box">
                                 {% if deleted_list.upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span><br>
@@ -1945,21 +1945,18 @@
             
                             <!--受信データ-->
                             <td>
-                                {%for file in deleted_list.upload_manage.file.all%}
-                                {% if deleted_list.upload_manage.file_del_flag == 1 %}
-                                <del class="past_file" data-toggle="tooltip" 
-                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
-                                {%else%}
-                                <a data-toggle="tooltip" data-placement="right"
-                                    title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></a>
-                                {%endif%}
+                                {% for file in deleted_list.upload_manage.file.all %}
+                                    {% if deleted_list.upload_manage.file_del_flag == 1 %}
+                                        <del class="past_file" data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+                                    {% else %}
+                                        <a data-toggle="tooltip" data-placement="right"title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></a>
+                                    {% endif %}
                                 {% endfor %}
                             </td>
 
                             <!--送信者-->
                             <td>
-                                <span data-toggle="tooltip" data-placement="right"
-                                    title="{{deleted_list.upload_manage.created_user}}">
+                                <span data-toggle="tooltip" data-placement="right"title="{{deleted_list.upload_manage.created_user}}">
                                     {{deleted_list.upload_manage.created_user.email}}<br>
                                 </span>
                             </td>
@@ -1994,18 +1991,18 @@
 
 
                                 <!--タイトル-->
-                                <td>
+                                <td class="url_box">
                                     {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                        title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
+                                        title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
                                     <p class="file_del_tag">ファイル削除済み</p>
                                     {% elif  url_deleted_list.url_upload_manage.end_date|is_past_due %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                    title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
+                                    title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
                                     <p class="expired_tag">期限切れ</p>
                                     {% else %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                        title="{{url_deleted_list.url_upload_manage.title}}">URL共有 {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
+                                        title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
                                     {% endif %}
                                 </td>
 
@@ -2054,22 +2051,22 @@
                                 <tr {% if otp_deleted_list.otp_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif otp_deleted_list.otp_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
                                     <!--チェックボックス-->
                                     <td>
-                                        <input type="checkbox" name="url_deleted_ids" value="{{otp_deleted_list.id}}"><br>
+                                        <input type="checkbox" name="otp_deleted_ids" value="{{otp_deleted_list.id}}"><br>
                                     </td>
 
                                     <!--タイトル-->
-                                    <td>
+                                    <td class="otp_box">
                                         {% if otp_deleted_list.otp_upload_manage.file_del_flag == 1 %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                                title="{{otp_deleted_list.otp_upload_manage.title}}">URL共有 {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
+                                                title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
                                             <p class="file_del_tag">ファイル削除済み</p>
                                         {% elif  otp_deleted_list.otp_upload_manage.end_date|is_past_due %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                            title="{{otp_deleted_list.otp_upload_manage.title}}">URL共有 {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
+                                            title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
                                             <p class="expired_tag">期限切れ</p>
                                         {% else %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                                title="{{otp_deleted_list.otp_upload_manage.title}}">URL共有 {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span>
+                                                title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span>
                                         {% endif %}
                                     </td>
 
@@ -2106,6 +2103,70 @@
                                             data-toggle="modal" data-value="{{otp_deleted_list.pk}}"
                                             data-otp_trash_del_name="{{otp_deleted_list.otp_upload_manage.title}}"
                                             data-target="#otp_upload_manage_delete"></button><br>
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!--ゲストアップロード用-->
+                        {% if guest_upload_manage_for_dest_users_deleted %}
+                            {% for guest_deleted_list in guest_upload_manage_for_dest_users_deleted %}
+                                <tr {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif guest_deleted_list.guest_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                                    <!--チェックボックス-->
+                                    <td>
+                                        <input type="checkbox" name="guest_deleted_ids" value="{{guest_deleted_list.id}}"><br>
+                                    </td>
+
+                                    <!--タイトル-->
+                                    <td class="guest_box">
+                                        {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %}
+                                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                                title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span><br>
+                                            <p class="file_del_tag">ファイル削除済み</p>
+                                        {% elif  guest_deleted_list.guest_upload_manage.end_date|is_past_due %}
+                                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                            title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span><br>
+                                            <p class="expired_tag">期限切れ</p>
+                                        {% else %}
+                                            <span class="file_title" data-toggle="tooltip" data-placement="right"
+                                                title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!--受信データ-->
+                                    <td>
+                                        {% for file in guest_deleted_list.guest_upload_manage.file.all %}
+                                            {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %}
+                                                <del class="past_file" data-toggle="tooltip" 
+                                                data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}</del><br>
+                                            {% else %}
+                                                <a data-toggle="tooltip" data-placement="right" title="{{file.name}}">
+                                                    {{ file.name | truncatechars:16 }}<br>
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+
+                                    <!--送信者-->
+                                    <td>
+                                        <span data-toggle="tooltip" data-placement="right"
+                                            title="{{guest_deleted_list.guest_upload_manage.created_user}}">
+                                            {{guest_deleted_list.guest_upload_manage.created_user.email}}<br>
+                                        </span>
+                                    </td>
+
+                                    <!--受信日-->
+                                    <td>
+                                        {{guest_deleted_list.guest_upload_manage.created_date | date:'Y/m/d H:i'}}<br>
+                                    </td>
+
+                                    <!--削除ボタン-->
+                                    <td>
+                                        <button type="button" class="fas_button_delete"
+                                            data-toggle="modal" data-value="{{guest_deleted_list.pk}}"
+                                            data-guest_trash_del_name="{{guest_deleted_list.guest_upload_manage.title}}"
+                                            data-target="#guest_upload_manage_delete"></button><br>
                                     </td>
 
                                 </tr>
@@ -2315,12 +2376,12 @@ $(function () {
 $(function () {
     // 「全選択」する
     $('#all').on('click', function () {
-        $("input[name='dest_user_ids'], input[name='url_dest_user_ids'], input[name='otp_dest_user_ids']").prop('checked', this
+        $("input[name='dest_user_ids'], input[name='url_dest_user_ids'], input[name='otp_dest_user_ids'], input[name='guest_dest_user_ids']").prop('checked', this
             .checked);
     });
 
     // 「全選択」以外のチェックボックスがクリックされたら、
-    $("input[name='dest_user_ids'], input[name='url_dest_user_ids'], input[name='otp_dest_user_ids']").on('click', function () {
+    $("input[name='dest_user_ids'], input[name='url_dest_user_ids'], input[name='otp_dest_user_ids'], input[name='guest_dest_user_ids']").on('click', function () {
         if ($('#boxes :checked').length == $('#boxes input[type="checkbox"]').length) {
             // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
             $('#all').prop('checked', true);
@@ -2360,7 +2421,7 @@ $(function () {
 
 $("#all").change(function () {
     var checks = [];
-    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked, #download_table [name='otp_dest_user_ids']:checked")
+    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked, #download_table [name='otp_dest_user_ids']:checked, #download_table [name='guest_dest_user_ids']:checked")
         .each(function () {
             checks.push(this.value);
         });
@@ -2376,9 +2437,9 @@ $("#all").change(function () {
 
 //button活性 非活性  受信 個別択時
 
-$("#download_table [name='dest_user_ids'], #download_table [name='url_dest_user_ids'], #download_table [name='otp_dest_user_ids']").change(function () {
+$("#download_table [name='dest_user_ids'], #download_table [name='url_dest_user_ids'], #download_table [name='otp_dest_user_ids'], #download_table [name='guest_dest_user_ids']").change(function () {
     var checks = [];
-    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked, #download_table [name='otp_dest_user_ids']:checked")
+    $("#download_table [name='dest_user_ids']:checked, #download_table [name='url_dest_user_ids']:checked, #download_table [name='otp_dest_user_ids']:checked, #download_table [name='guest_dest_user_ids']:checked")
         .each(function () {
             checks.push(this.value);
         });
@@ -3774,6 +3835,47 @@ $('#otp_upload_manage_delete').on('show.bs.modal', function (event) {
     });
 });
 
+////////////////////
+//ゲストアップロード単数削除処理
+////////////////////
+
+var guest_delete_id = ""
+var guest_delete_name = ""
+
+$('#guest_upload_manage_delete').off('show.bs.modal');
+$('#guest_upload_manage_delete').on('show.bs.modal', function (event) {
+
+    var button = $(event.relatedTarget)
+    var guest_delete_id = button.data('value')
+    var guest_delete_name = button.data('guest_trash_del_name')
+
+    var modal = $(this);
+    modal.find('.trash_guest_del_file_name_text').text(guest_delete_name + "　" + "をゴミ箱から削除します");
+
+    $('#guest_trash_delete').off('click');
+    $('#guest_trash_delete').on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '{% url "draganddrop:guesttrashdelete" %}',
+            data: {
+                'guest_delete_id': guest_delete_id,
+                'guest_delete_name': guest_delete_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#result_toast').on('show.bs.toast', function (e) {
+                var toast = $(this);
+                toast.find('.toast-body').addClass('alert-success');
+                toast.find('.toast-body').text("ファイルを削除しました");
+                });
+                $('#result_toast').toast({ delay: 6000, animation: true }).toast('show');
+                setTimeout(function(){
+                    window.location.href = "./";},1*1000);
+            }
+        });
+    });
+});
 
 ///////////////
 //セッションクリア

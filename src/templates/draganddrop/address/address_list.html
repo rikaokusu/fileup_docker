@@ -76,9 +76,17 @@
                             <td>
                                 {% if address_list.legal_or_individual == 1 %}
                                     {% if address_list.legal_person_posi == 1 %}
-                                        {{ address_list.get_legal_personality_display }} {{ address_list.company_name }}
+                                        {% if address_list.legal_personality == 99 %}
+                                            {{ address_list.company_name }}
+                                        {% else %}
+                                            {{ address_list.get_legal_personality_display }} {{ address_list.company_name }}
+                                        {% endif %}
                                     {% else %}
-                                        {{ address_list.company_name }} {{ address_list.get_legal_personality_display }}
+                                        {% if address_list.legal_personality == 99 %}
+                                            {{ address_list.company_name }}
+                                        {% else %}
+                                            {{ address_list.company_name }} {{ address_list.get_legal_personality_display }}
+                                        {% endif %}
                                     {% endif %}
                                 {% else %}
                                     {% if address_list.trade_name == null %}
@@ -725,7 +733,6 @@ $('#confirm_modal_for_sign_up').on('show.bs.modal', function (event) {
 
         //法人格
         var legal_personality_number = $('#id_legal_personality').val()
-        console.log('本人格教えて',legal_personality_number)
         if (legal_personality_number == "1") {
             legal_personality = '株式会社'
 
@@ -774,7 +781,6 @@ $('#confirm_modal_for_sign_up').on('show.bs.modal', function (event) {
         } else if (legal_personality_number == "99") {
             legal_personality = 'その他'
         }
-        console.log('けっかほうじん',legal_personality)
 
         //法人名の生成
         var legal_person_posi = $('input[name=legal_person_posi]:checked').val()
@@ -911,6 +917,7 @@ $('#confirm_modal_for_update').on('show.bs.modal', function (event) {
 
 // 新規登録モーダル
 $(function () {
+    console.log('ここは普通に動いてるで')
     var new_valid = {
 
         errorElement: "div", // labelがdivにかわる
@@ -1423,7 +1430,7 @@ $(function (){
 // ---------------------------------
 
 // フォームに文字を入力した時
-$("#id_company_name, #id_last_name, #id_first_name, #id_email").on('input dp.change click', function () {
+$("#id_company_name, #id_last_name, #id_first_name, #id_email, #id_trade_name").on('input dp.change click', function () {
     var legal_or_individual = $('input[name=legal_or_individual]:checked').val()
 
     // 種別が法人の時
@@ -1441,10 +1448,10 @@ $("#id_company_name, #id_last_name, #id_first_name, #id_email").on('input dp.cha
     // 種別が個人の時
     } else {
         // 新規登録モーダル
-        if ((!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+        if ((!$("#sign_up_modal input[name='trade_name']").val() == '') && (!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
             $("#confirm_button").prop('disabled', false); 
         // 編集モーダル
-        } else if ((!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+        } else if ((!$("#update_sign_up_modal input[name='trade_name']").val() == '') && (!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
             $("#update_data_btn").prop('disabled', false);
         }else {
                 $("#confirm_button").prop('disabled', true);
@@ -1471,10 +1478,10 @@ $('input[name=legal_or_individual]').on('change', function (event) {
             }
         }else {
             // 新規登録モーダル
-            if ((!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
+            if ((!$("#sign_up_modal input[name='trade_name']").val() == '') && (!$("#sign_up_modal input[name='last_name']").val() == '') && (!$("#sign_up_modal input[name='first_name']").val() == '') && (!$("#sign_up_modal input[name='email']").val() == '')) { 
                 $("#confirm_button").prop('disabled', false); 
             // 編集モーダル
-            } else if ((!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
+            } else if ((!$("#update_sign_up_modal input[name='trade_name']").val() == '') && (!$("#update_sign_up_modal input[name='last_name']").val() == '') && (!$("#update_sign_up_modal input[name='first_name']").val() == '') && (!$("#update_sign_up_modal input[name='email']").val() == '')) {
                 $("#update_data_btn").prop('disabled', false);
             } else {
                 $("#confirm_button").prop('disabled', true);

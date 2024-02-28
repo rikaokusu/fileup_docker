@@ -1828,7 +1828,7 @@ ul.sample1 li{
     background-color:#C53A53;
     color: white;
     text-align: center;
-    margin: 0 0 3px 0;
+    margin:5px  0 3px 6px;
     padding: 2px;
 }
 .expired_tag {
