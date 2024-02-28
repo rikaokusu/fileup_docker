@@ -162,7 +162,6 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
     login_url = '/login/'
 
     def get_context_data(self, **kwargs):
-        print('インフォメーションがうごいた')
         context = super().get_context_data(**kwargs)
         current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         user = self.request.user
@@ -174,7 +173,6 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
             
             #追記
             today = datetime.datetime.now()
-            print('いんふぉたいとる！２',info.title)
             #全体の通知の数を確認
             my_email = current_user.email
             all_info = Notification.objects.filter(start_date__lte = today)
@@ -189,8 +187,7 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
                 email_if = my_email in info_email  #True False　自分が通知対象者か
                 if email_if == True:
                     all_informations.append(info2)
-                    print('いんふぉたいとる！３',info2.title)
-            print('いんふぉたいとる！４',info.title)
+
             # read2 = Read.objects.filter(read_user=user).count()
             # if read2 > 0:
             #     info_all = Notification.objects.filter(Q(target_user_id = None)|Q(target_user_id = user),start_date__lte = today).distinct().count()
@@ -212,10 +209,8 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
 
             else:
                 context["no_read"] = no_read
-        print('いんふぉたいとる！５',info.title)
         context["user"] = user
         context["info"] = info
-        print('かくじつにわたしたお')
         return context
 
 """

@@ -127,3 +127,35 @@ LOGGING = {
         },
     }
 }
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'production': {
+#             'format': '%(asctime)s [%(levelname)s] %(process)d %(thread)d '
+#                     '%(pathname)s:%(lineno)d %(message)s'
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'class': 'logging.FileHandler',
+#             'filename': 'logs/django.log', 
+#             'formatter': 'production',
+#             'level': 'DEBUG',
+#         },
+#     },
+#     'loggers': {
+#         # 自作したログ出力
+#         '': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#         # Djangoの警告・エラー
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#     },
+# }

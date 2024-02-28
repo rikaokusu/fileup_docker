@@ -281,9 +281,9 @@
             <ul class="tab-pane fade show active" id="info1" role="tabpanel" aria-labelledby="info_1">
               
                 {% for all in all_informations %}
-                    <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}{{all.id}}</time><b class="newsList-category">
+                    <li><a href="{% url 'draganddrop:information' all.id %}"><time datetime="{{ all.release_date|date:'Y-m-d' }}" class="newsList-date">{{ all.release_date|date:'Y/m/d' }}</time><b class="newsList-category">
                     {% if not all.id in read_info %}
-                        <span class="bg-warning">{{all.id}}{{ all.category }}</span>
+                        <span class="bg-warning">{{ all.category }}</span>
                     {% else %}
                         <span>{{ all.category }}</span>
                     {% endif %}
