@@ -174,7 +174,7 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
             # ダウンロードテーブルの削除フラグを立てる
             guestdownloadtable.trash_flag = 1
             guestuploadmanage.file_del_flag = 1
-            
+
             # その後保存する
             guestdownloadtable.save()
             guestuploadmanage.save()
@@ -196,7 +196,6 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
 ##################################
 class MultiDownloadTableDeleteAjaxView(View,CommonView):
     def post(self, request,**kwargs):
-        # print('一括削除かくにん繰り返してる？２２２２')
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         multi_delete_id = request.POST.getlist('dest_user_ids[]')#downloadテーブルのid(int)
@@ -217,7 +216,7 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
             
             otp_multi_tables = OTPDownloadtable.objects.filter(pk__in=otp_multi_delete_id)
             otp_multi_tables = otp_multi_tables.all()
-            
+
             guest_multi_tables = GuestUploadDownloadtable.objects.filter(pk__in=guest_multi_delete_id)
             lst = [gtable for gtable in guest_multi_tables]
             guest_multi_manages = GuestUploadManage.objects.filter(pk__in=lst).all()
@@ -247,7 +246,6 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
             else:
                 for guest_multi_table in guest_multi_tables:
                     guest_multi_table.trash_flag = 1
-
                     guest_multi_table.save()
 
                 for guest_multi_manage in guest_multi_manages:

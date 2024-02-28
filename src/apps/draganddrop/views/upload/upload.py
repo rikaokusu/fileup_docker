@@ -138,22 +138,34 @@ class Step1(FormView, CommonView):
 
         # メールアドレス直接入力DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
-
-        # TODO:直接入力をADRESSに登録する必要あるか？
         if dest_user_mail1:
             address1, created = Address.objects.update_or_create(
                 email=dest_user_mail1)
-            address1.is_direct_email = True
-            address1.full_name_preview = dest_user_mail1
+            #送り先一覧の手打ちとアドレスメンバー重複回避判定用
+            if address1.legal_or_individual == 0:
+                add1 = True
+            else:
+                add1 = False
+
+            if not address1.full_name_preview:
+                address1.is_direct_email = True
+                address1.full_name_preview = dest_user_mail1
+                address1.created_user = self.request.user.id
             address1.save()
 
         dest_user_mail2 = form.cleaned_data['dest_user_mail2']
-
         if dest_user_mail2:
             address2, created = Address.objects.update_or_create(
                 email=dest_user_mail2)
-            address2.is_direct_email = True
-            address2.full_name_preview = dest_user_mail2
+            if address2.legal_or_individual == 0: 
+                add2 = True
+            else:
+                add2 = False
+
+            if not address2.full_name_preview:
+                address2.is_direct_email = True
+                address2.full_name_preview = dest_user_mail2
+                address2.created_user = self.request.user.id
             address2.save()
 
         dest_user_mail3 = form.cleaned_data['dest_user_mail3']
@@ -161,8 +173,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail3:
             address3, created = Address.objects.update_or_create(
                 email=dest_user_mail3)
-            address3.is_direct_email = True
-            address3.full_name_preview = dest_user_mail3
+            if address3.legal_or_individual == 0: 
+                add3 = True
+            else:
+                add3 = False
+            if not address3.full_name_preview:
+                address3.is_direct_email = True
+                address3.full_name_preview = dest_user_mail3
+                address3.created_user = self.request.user.id
             address3.save()
 
         dest_user_mail4 = form.cleaned_data['dest_user_mail4']
@@ -170,8 +188,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail4:
             address4, created = Address.objects.update_or_create(
                 email=dest_user_mail4)
-            address4.is_direct_email = True
-            address4.full_name_preview = dest_user_mail4
+            if address4.legal_or_individual == 0: 
+                add4 = True
+            else:
+                add4 = False
+            if not address4.full_name_preview:
+                address4.is_direct_email = True
+                address4.full_name_preview = dest_user_mail4
+                address4.created_user = self.request.user.id
             address4.save()
 
         dest_user_mail5 = form.cleaned_data['dest_user_mail5']
@@ -179,8 +203,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail5:
             address5, created = Address.objects.update_or_create(
                 email=dest_user_mail5)
-            address5.is_direct_email = True
-            address5.full_name_preview = dest_user_mail5
+            if address5.legal_or_individual == 0: 
+                add5 = True
+            else:
+                add5 = False
+            if not address5.full_name_preview:
+                address5.is_direct_email = True
+                address5.full_name_preview = dest_user_mail5
+                address5.created_user = self.request.user.id
             address5.save()
 
         dest_user_mail6 = form.cleaned_data['dest_user_mail6']
@@ -188,8 +218,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail6:
             address6, created = Address.objects.update_or_create(
                 email=dest_user_mail6)
-            address6.is_direct_email = True
-            address6.full_name_preview = dest_user_mail6
+            if address6.legal_or_individual == 0: 
+                add6 = True
+            else:
+                add6 = False
+            if not address6.full_name_preview:
+                address6.is_direct_email = True
+                address6.full_name_preview = dest_user_mail6
+                address6.created_user = self.request.user.id
             address6.save()
 
         dest_user_mail7 = form.cleaned_data['dest_user_mail7']
@@ -197,8 +233,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail7:
             address7, created = Address.objects.update_or_create(
                 email=dest_user_mail7)
-            address7.is_direct_email = True
-            address7.full_name_preview = dest_user_mail7
+            if address7.legal_or_individual == 0: 
+                add7 = True
+            else:
+                add7 = False
+            if not address7.full_name_preview:
+                address7.is_direct_email = True
+                address7.full_name_preview = dest_user_mail7
+                address7.created_user = self.request.user.id
             address7.save()
 
         dest_user_mail8 = form.cleaned_data['dest_user_mail8']
@@ -206,8 +248,14 @@ class Step1(FormView, CommonView):
         if dest_user_mail8:
             address8, created = Address.objects.update_or_create(
                 email=dest_user_mail8)
-            address8.is_direct_email = True
-            address8.full_name_preview = dest_user_mail8
+            if address8.legal_or_individual == 0: 
+                add8 = True
+            else:
+                add8 = False
+            if not address8.full_name_preview:
+                address8.is_direct_email = True
+                address8.full_name_preview = dest_user_mail8
+                address8.created_user = self.request.user.id
             address8.save()
 
         # upload_manageに追加する。（データを追加し、戻った際にデータを反映させるため）
@@ -222,10 +270,12 @@ class Step1(FormView, CommonView):
 
         # POSTで送信された設定された宛先ユーザーを取得
         dest_user_qs = form.cleaned_data['dest_user']
+
         # MonyToMonyの値はquerysetとして取得するので、set関数を使ってセット
         upload_manage.dest_user.set(dest_user_qs)
 
         dest_user_group_qs = form.cleaned_data['dest_user_group']
+
         upload_manage.dest_user_group.set(dest_user_group_qs)
 
         if dest_user_mail1:
@@ -247,34 +297,39 @@ class Step1(FormView, CommonView):
 
         # dest_userをsessionに追加するためQSをリスト化して保存。
         dest_user_all_list = []
-        
         for user in dest_user_qs:
-            if user.company_name:
-                dest_user_all_list.append(user.company_name +" " + user.last_name + "" + user.first_name + " " + "1")
-            elif user.company_name == None:
-                dest_user_all_list.append( user.last_name + "" + user.first_name + " " + "1")
+            
+            if user.company_name and not user.legal_personality == 99:
+                if user.legal_person_posi == 1:
+                    dest_user_all_list.append(user.get_legal_personality_display() + user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
+                else:
+                    dest_user_all_list.append(user.company_name + user.get_legal_personality_display() + " " + user.last_name + "" + user.first_name + " " + "1")
+            elif user.company_name and user.legal_personality == 99:
+                dest_user_all_list.append(user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
             elif user.trade_name:
-                dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
+                dest_user_all_list.append(user.trade_name + " " + user.last_name + "" + user.first_name + " " + "1")
             else:
                 dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
+
         for group in dest_user_group_qs:
             dest_user_all_list.append(group.group_name + " " + "2")
 
-        if dest_user_mail1:
+
+        if dest_user_mail1 and add1 == True:
             dest_user_all_list.append(dest_user_mail1 + " " + "1")
-        if dest_user_mail2:
+        if dest_user_mail2 and add2 == True:
             dest_user_all_list.append(dest_user_mail2 + " " + "1")
-        if dest_user_mail3:
+        if dest_user_mail3 and add3 == True:
             dest_user_all_list.append(dest_user_mail3 + " " + "1")
-        if dest_user_mail4:
+        if dest_user_mail4 and add4 == True:
             dest_user_all_list.append(dest_user_mail4 + " " + "1")
-        if dest_user_mail5:
+        if dest_user_mail5 and add5 == True:
             dest_user_all_list.append(dest_user_mail5 + " " + "1")
-        if dest_user_mail6:
+        if dest_user_mail6 and add6 == True:
             dest_user_all_list.append(dest_user_mail6 + " " + "1")
-        if dest_user_mail7:
+        if dest_user_mail7 and add7 == True:
             dest_user_all_list.append(dest_user_mail7 + " " + "1")
-        if dest_user_mail8:
+        if dest_user_mail8 and add8 == True:
             dest_user_all_list.append(dest_user_mail8 + " " + "1")
 
         # 日付をString化
@@ -339,18 +394,15 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
         
         upload_manage_id = self.kwargs['pk']
         upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-        
-        # #get_direct_userのコピー
-        upload_manage_dest_user_all = upload_manage.dest_user.all()
+
         # ファイルの削除
         if self.del_file:
             del_file_pk = self.del_file
             self.request.session['del_file_pk'] = del_file_pk
-
         else:
             self.request.session['del_file_pk'] = ""
-        if 'up_file_id' in self.request.session:
 
+        if 'up_file_id' in self.request.session:
             # ファイルとタスクを紐付ける
             # ファイル情報をセッションから取得
             up_file_id_str = self.request.session['up_file_id'].replace(" ", "").replace("[", "").replace("]", "")
@@ -379,21 +431,18 @@ class Step2(LoginRequiredMixin, CreateView, CommonView):
 
                 # 実ファイル名を文字列にデコード
                 file_path = urllib.parse.unquote(file.upload.url)
-                print('ふぁいるぱす',file_path)
                 # ファイルパスを分割してファイル名だけ取得
                 file_name = file_path.split('/', 3)[3]
                 # パスを取得
                 path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
-                print('パス取れた？？？',path)
+
                 # .txtファイルをHTMLファイルへ変換
                 # テキストファイルを一括で読み込む
                 # if file_name_without_dot == "txt":
-                #     print('txtとにんしきしたーーーーーー')
                 #     # path = os.path.join(settings.FULL_MEDIA_ROOT, file_name)
                 #     with open(path) as f:
                         
                 #         s = f.read()
-                #         print('html生成前ーーーーー')
                 #         # htmlファイルを生成して書き込む
                 #         upload_s = str(file.upload)
                 #         upload_ss = upload_s.split('/')[0]
@@ -503,8 +552,7 @@ class Step3(TemplateView, CommonView):
         # ファイル名
         upload_files = upload_manage.file.all()
         files = []
-        for file in upload_files:
-            print('ふぁいるかくにん1',file.name)           
+        for file in upload_files:      
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
@@ -529,7 +577,7 @@ class Step3(TemplateView, CommonView):
                 email = user.email
                 group_email.append(email)
         group_email_db = ','.join(group_email)
-        emailList_for = dest_user_list + group_email #list型
+        emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
         emailList_db = emailList_db + ',' + group_email_db #str型
 
         ###通知テーブル登録
@@ -573,8 +621,6 @@ class Step3(TemplateView, CommonView):
                 messageList = list(message1)
                 tupleMessage.insert(-1,messageList)
 
-                print('受信通知めーる',tupleMessage)
-            # send_mail(subject, message, from_email, recipient_list)
         send_mass_mail(tupleMessage)
         ##################Notification通知用終了
 
@@ -693,7 +739,7 @@ class Step3(TemplateView, CommonView):
                     )
                     approval_log.save()
 
-            if second_approvers:
+            elif second_approvers:
                 # print("------------------ second_approversがいます step2")
 
                 # 申請ステータスを「最終承認済み」に設定
@@ -726,6 +772,8 @@ class Step3(TemplateView, CommonView):
                         manage_id = upload_manage.pk
                     )
                     approval_log.save()
+            else:
+                upload_manage.save()
 
         return context
 
@@ -955,64 +1003,120 @@ class Step1Update(FormView, CommonView):
 
         if dest_user_mail1:
             address1, created = Address.objects.update_or_create(email=dest_user_mail1)
-            address1.is_direct_email = True
-            address1.full_name_preview = dest_user_mail1
+            if address1.legal_or_individual == 0:
+                add1 = True
+            else:
+                add1 = False
+            
+            if not address1.full_name_preview:
+                address1.is_direct_email = True
+                address1.full_name_preview = dest_user_mail1
+                address1.created_user = self.request.user.id
             address1.save()
 
         dest_user_mail2 = form.cleaned_data['dest_user_mail2']
 
         if dest_user_mail2:
             address2, created = Address.objects.update_or_create(email=dest_user_mail2)
-            address2.is_direct_email = True
-            address2.full_name_preview = dest_user_mail2
+            if address2.legal_or_individual == 0: 
+                add2 = True
+            else:
+                add2 = False
+
+            if not address2.full_name_preview:
+                address2.is_direct_email = True
+                address2.full_name_preview = dest_user_mail2
+                address2.created_user = self.request.user.id
+
             address2.save()
 
         dest_user_mail3 = form.cleaned_data['dest_user_mail3']
 
         if dest_user_mail3:
             address3, created = Address.objects.update_or_create(email=dest_user_mail3)
-            address3.is_direct_email = True
-            address3.full_name_preview = dest_user_mail3
+            if address3.legal_or_individual == 0: 
+                add3 = True
+            else:
+                add3 = False
+            if not address3.full_name_preview:
+                address3.is_direct_email = True
+                address3.full_name_preview = dest_user_mail3
+                address3.created_user = self.request.user.id
+
             address3.save()
 
         dest_user_mail4 = form.cleaned_data['dest_user_mail4']
 
         if dest_user_mail4:
             address4, created = Address.objects.update_or_create(email=dest_user_mail4)
-            address4.is_direct_email = True
-            address4.full_name_preview = dest_user_mail4
+            if address4.legal_or_individual == 0: 
+                add4 = True
+            else:
+                add4 = False
+            if not address4.full_name_preview:
+                address4.is_direct_email = True
+                address4.full_name_preview = dest_user_mail4
+                address4.created_user = self.request.user.id
             address4.save()
 
         dest_user_mail5 = form.cleaned_data['dest_user_mail5']
 
         if dest_user_mail5:
             address5, created = Address.objects.update_or_create(email=dest_user_mail5)
-            address5.is_direct_email = True
-            address5.full_name_preview = dest_user_mail5
+            if address5.legal_or_individual == 0: 
+                add5 = True
+            else:
+                add5 = False
+            if not address5.full_name_preview:
+                address5.is_direct_email = True
+                address5.full_name_preview = dest_user_mail5
+                address5.created_user = self.request.user.id
+
             address5.save()
 
         dest_user_mail6 = form.cleaned_data['dest_user_mail6']
 
         if dest_user_mail6:
             address6, created = Address.objects.update_or_create(email=dest_user_mail6)
-            address6.is_direct_email = True
-            address6.full_name_preview = dest_user_mail6
+            if address6.legal_or_individual == 0: 
+                add6 = True
+            else:
+                add6 = False
+            if not address6.full_name_preview:
+                address6.is_direct_email = True
+                address6.full_name_preview = dest_user_mail6
+                address6.created_user = self.request.user.id
+
             address6.save()
 
         dest_user_mail7 = form.cleaned_data['dest_user_mail7']
 
         if dest_user_mail7:
             address7, created = Address.objects.update_or_create(email=dest_user_mail7)
-            address7.is_direct_email = True
-            address7.full_name_preview = dest_user_mail7
+            if address7.legal_or_individual == 0: 
+                add7 = True
+            else:
+                add7 = False
+            if not address7.full_name_preview:
+                address7.is_direct_email = True
+                address7.full_name_preview = dest_user_mail7
+                address7.created_user = self.request.user.id
+
             address7.save()
 
         dest_user_mail8 = form.cleaned_data['dest_user_mail8']
 
         if dest_user_mail8:
             address8, created = Address.objects.update_or_create(email=dest_user_mail8)
-            address8.is_direct_email = True
-            address8.full_name_preview = dest_user_mail8
+            if address8.legal_or_individual == 0: 
+                add8 = True
+            else:
+                add8 = False
+            if not address8.full_name_preview:
+                address8.is_direct_email = True
+                address8.full_name_preview = dest_user_mail8
+                address8.created_user = self.request.user.id
+
             address8.save()
 
         # upload_manageに追加する。（データを追加し、戻った際にデータを反映させるため）
@@ -1029,33 +1133,36 @@ class Step1Update(FormView, CommonView):
         dest_user_all_list = []
 
         for user in dest_user_qs:
-            if user.company_name:
-                dest_user_all_list.append(user.company_name +" " + user.last_name + "" + user.first_name + " " + "1")
-            elif user.company_name == None:
-                dest_user_all_list.append( user.last_name + "" + user.first_name + " " + "1")
+            if user.company_name and not user.legal_personality == 99:
+                if user.legal_person_posi == 1:
+                    dest_user_all_list.append(user.get_legal_personality_display() + user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
+                else:
+                    dest_user_all_list.append(user.company_name + user.get_legal_personality_display() + " " + user.last_name + "" + user.first_name + " " + "1")
+            elif user.company_name and user.legal_personality == 99:
+                dest_user_all_list.append(user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
             elif user.trade_name:
-                dest_user_all_list.append(user.trade_name +" " + user.last_name + "" + user.first_name + " " + "1")
+                dest_user_all_list.append(user.trade_name + " " + user.last_name + "" + user.first_name + " " + "1")
             else:
                 dest_user_all_list.append(user.last_name + "" + user.first_name + " " + "1")
 
         for group in dest_user_group_qs:
             dest_user_all_list.append(group.group_name + " " + "2")
 
-        if dest_user_mail1:
+        if dest_user_mail1 and add1 == True:
             dest_user_all_list.append(dest_user_mail1 + " " + "1")
-        if dest_user_mail2:
+        if dest_user_mail2 and add2 == True:
             dest_user_all_list.append(dest_user_mail2 + " " + "1")
-        if dest_user_mail3:
+        if dest_user_mail3 and add3 == True:
             dest_user_all_list.append(dest_user_mail3 + " " + "1")
-        if dest_user_mail4:
+        if dest_user_mail4 and add4 == True:
             dest_user_all_list.append(dest_user_mail4 + " " + "1")
-        if dest_user_mail5:
+        if dest_user_mail5 and add5 == True:
             dest_user_all_list.append(dest_user_mail5 + " " + "1")
-        if dest_user_mail6:
+        if dest_user_mail6 and add6 == True:
             dest_user_all_list.append(dest_user_mail6 + " " + "1")
-        if dest_user_mail7:
+        if dest_user_mail7 and add7 == True:
             dest_user_all_list.append(dest_user_mail7 + " " + "1")
-        if dest_user_mail8:
+        if dest_user_mail8 and add8 == True:
             dest_user_all_list.append(dest_user_mail8 + " " + "1")
 
         # 日付をString化
@@ -1159,9 +1266,6 @@ class Step2Update(FormView, CommonView):
         # dest_users = dest_user_list + dest_group_list
         # # ↑の('')を省くため文字列に変換
         # dest_users = ' '.join(dest_users)
-        # print('ぐるーぷのemail',dest_group)
-        # print('ぐるーぷのemail',dest_group_list)
-        # print('宛先ぜんぶ',dest_users)
         # # ファイルタイトル
         # file_title = upload_manage.title
         # # 操作ログ終わり
@@ -1451,23 +1555,18 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
         dest_users = dest_user_list + dest_group_list
         # ↑の('')を省くため文字列に変換
         dest_users = ' '.join(dest_users)
-        print('ぐるーぷのemail',dest_group)
-        print('ぐるーぷのemail',dest_group_list)
-        print('宛先ぜんぶ',dest_users)
+
         # ファイルタイトル
         file_title = upload_manage.title
         # ファイル名
         upload_files = upload_manage.file.all()
         files = []
         for file in upload_files:
-            print('ふぁいるかくにん1111',file.name)           
             file_name = file.name + "\r\n"
             files.append(file_name)
         files = ' '.join(files)
-        print('ふぁいるかくにん',files)
         # 操作ログ終わり
         # 操作ログ
-        print("ふぁいるずadd_log直前")
         add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
         # ApprovalManageを取得
@@ -1493,7 +1592,7 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
                 email = user.email
                 group_email.append(email)
         group_email_db = ','.join(group_email)
-        emailList_for = dest_user_list + group_email #list型
+        emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
         emailList_db = emailList_db + ',' + group_email_db #str型
 
         ###通知テーブル登録

@@ -51,29 +51,39 @@ class AddressListView(FormView, CommonView):
     def form_valid(self, form,**kwargs):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
-        print('犯人はお前だ＝＝＝＝＝＝＝＝＝＝')
-        address = form.save(commit=False)
+        
         legal_or_individual = form.cleaned_data['legal_or_individual']
         company_name = form.cleaned_data['company_name']
         trade_name = form.cleaned_data['trade_name']
         last_name = form.cleaned_data['last_name']
-        address.created_user = self.request.user.id
-        if legal_or_individual == 0:
-            first_name = form.cleaned_data['first_name']
-            address.full_name_preview = company_name + " " + last_name + " " + first_name
-        elif company_name:
-            first_name = form.cleaned_data['first_name']
+        first_name = form.cleaned_data['first_name']
+        
+        existing_user = Address.objects.filter(email=form.cleaned_data['email'],created_user=current_user.id).first()#既存アドレスに同emailいないかCK
+        if existing_user:
+            address = existing_user
+            address.is_direct_email = False
+            
+            address.legal_or_individual = legal_or_individual
+            address.legal_personality = form.cleaned_data['legal_personality']
+            address.legal_person_posi = form.cleaned_data['legal_person_posi']
+            address.department_name = form.cleaned_data['department_name']
+            address.company_name = company_name
+            address.trade_name = trade_name
+            address.last_name = last_name
+            address.first_name = first_name
+            
+        else:
+            address = form.save(commit=False)
+            address.created_user = self.request.user.id
+
+        if legal_or_individual == 0 or company_name:
             address.full_name_preview = company_name + " " + last_name + " " + first_name
         else:
-            first_name = form.cleaned_data['first_name']
             address.full_name_preview = trade_name + " " + last_name + " " + first_name
         address.save()
         # #操作ログ用
         email = address.email
-        if company_name:
-            log_user = address.company_name + address.last_name + address.first_name
-        else:
-            log_user = address.trade_name + address.last_name + address.first_name
+        log_user = address.full_name_preview
         # #操作ログ終わり
         # # 操作ログ登録
         add_log(3,1,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
@@ -230,8 +240,9 @@ class AddressEmailValidationView(View):
         if request.is_ajax():
             email = self.request.POST.get("email")
             user = self.request.user
-            if Address.objects.filter(email=email,created_user=user).exists():
+            if Address.objects.filter(email=email,created_user=user.id,is_direct_email=False).exists():
+
                 is_available = "false"
-        
+
         return HttpResponse(is_available)
 
