@@ -603,7 +603,7 @@ class GuestSendAjaxView(View):
             message_template = get_template('draganddrop/guest_upload/mail_template2/message.txt')
             message = message_template.render(context)
 
-            from_email = "cloudlab-yano@yui.okinawa"
+            from_email = "cl-info@cloudlab.jp"
             recipient_list = [email]
 
             send_mail(subject, message, from_email, recipient_list)
@@ -860,7 +860,7 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
         file_title = guest_upload_manage.title
         # 操作ログ終わり
         # 操作ログ
-        add_log(2,1,guest,file_title,files,dest_users,6,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,guest,current_user.company,file_title,files,dest_users,6,self.request.META.get('REMOTE_ADDR'))
         ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
         #送信先 (自分)email
         emailList_db = current_user.email

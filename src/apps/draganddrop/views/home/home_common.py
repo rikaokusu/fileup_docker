@@ -5,7 +5,7 @@ from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
-from accounts.models import User, File,Notification,Read,Company
+from accounts.models import User, File,Notification,Read,Company,FileupPermissions
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
 # from datetime import datetime, date, timedelta, timezone
@@ -56,6 +56,10 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["url_name"] = url_name
         context["app_name"] = app_name
         context["current_user"] = current_user
+        user_permission = FileupPermissions.objects.get(user=current_user)
+        context["user_permission"] = user_permission
+        print('権限。カレントユーザーpermission',user_permission)
+        print('権限。カレントユーザーpermission2',user_permission.permission)
 
         ######################　通知機能
         my_email = current_user.email
@@ -158,18 +162,17 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
     login_url = '/login/'
 
     def get_context_data(self, **kwargs):
-        print('インフォメーションがうごいた')
         context = super().get_context_data(**kwargs)
         current_user = User.objects.filter(pk=self.request.user.id).select_related().get()
         user = self.request.user
         info = Notification.objects.get(id=self.kwargs['pk'])
+        print('いんふぉたいとる！１',info.title)
         if Read.objects.filter(read_user=user,notification_id=info).exists()==False:
             read = Read.objects.create(read_user=user,notification_id=info)
             read.save()
             
             #追記
             today = datetime.datetime.now()
-
             #全体の通知の数を確認
             my_email = current_user.email
             all_info = Notification.objects.filter(start_date__lte = today)
@@ -179,11 +182,11 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
             Q(service="全てのサービス")).order_by('release_date').reverse()
             all_informations = []
 
-            for info in all_info:
-                info_email = info.email_list
+            for info2 in all_info:
+                info_email = info2.email_list
                 email_if = my_email in info_email  #True False　自分が通知対象者か
                 if email_if == True:
-                    all_informations.append(info)
+                    all_informations.append(info2)
 
             # read2 = Read.objects.filter(read_user=user).count()
             # if read2 > 0:
@@ -206,7 +209,6 @@ class InfomationView(LoginRequiredMixin, TemplateView,CommonView):
 
             else:
                 context["no_read"] = no_read
-        
         context["user"] = user
         context["info"] = info
         return context

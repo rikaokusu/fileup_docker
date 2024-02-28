@@ -86,7 +86,7 @@ class AddressListView(FormView, CommonView):
         log_user = address.full_name_preview
         # #操作ログ終わり
         # # 操作ログ登録
-        add_log(3,1,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+        add_log(3,1,current_user,current_user.company,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
         # print('アドレス帳ユーザー4')
 
         return super().form_valid(form)
@@ -134,7 +134,7 @@ class UpdateAddressAjaxView(APIView,CommonView):
             log_user = address_obj.company_name + address_obj.last_name + address_obj.first_name
             #操作ログ終わり
             # 操作ログ登録
-            add_log(3,2,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,2,current_user,current_user.company,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
 
 
         # JSONで返す
@@ -166,7 +166,7 @@ class AddressDeleteAjaxView(View,CommonView):
                 log_user = address_list.company_name + address_list.last_name + address_list.first_name
             else:
                 log_user = address_list.trade_name + address_list.last_name + address_list.first_name
-            add_log(3,3,current_user,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,3,current_user,current_user.company,email,"",log_user,4,self.request.META.get('REMOTE_ADDR'))
             #操作ログ終わり
             address_list.delete()
             # メッセージを格納してJSONで返す
@@ -211,7 +211,7 @@ class AddressMultiDeleteAjaxView(View,CommonView):
                 u_e = user.email + "\r\n"
                 email.append(u_e)
             email = ' '.join(email)
-            add_log(3,3,current_user,email,"",users,5,self.request.META.get('REMOTE_ADDR'))
+            add_log(3,3,current_user,current_user.company,email,"",users,5,self.request.META.get('REMOTE_ADDR'))
             #操作ログ終わり
             for address_list in address_lists:
                 address_list.delete()
