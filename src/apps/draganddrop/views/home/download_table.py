@@ -43,13 +43,10 @@ class DownloadTableDeleteAjaxView(View,CommonView):
             files = ' '.join(files)
             # files = uploadmanage.file.all()
             #操作ログ終わり
-            print("------------- uploadmanage", uploadmanage)
-            files = uploadmanage.file.all()
             # ダウンロードテーブルのゴミ箱フラグを1に変更する
             downloadtable.trash_flag = 1
             downloadtable.save()
             # 操作ログ登録
-            print('もしかしてfileみえない？3',files)
             add_log(2,3,current_user,current_user.company,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
 
             #メッセージを格納してJSONで返す
