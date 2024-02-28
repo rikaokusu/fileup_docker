@@ -426,7 +426,7 @@
                 $('#validation-error').html('<div class="alert alert_message" role="alert">' +
                   "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
               }
-          } else (plan == "light"); {
+          } else {
             if (total_file_size >= 1073741824) {
               this.removeFile(file);
               $('.error_msg_place').remove();

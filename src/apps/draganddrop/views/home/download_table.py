@@ -50,7 +50,7 @@ class DownloadTableDeleteAjaxView(View,CommonView):
             downloadtable.save()
             # 操作ログ登録
             print('もしかしてfileみえない？3',files)
-            add_log(2,3,current_user,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,current_user.company,delete_name,files,"",0,self.request.META.get('REMOTE_ADDR'))
 
             #メッセージを格納してJSONで返す
             data = {}
@@ -94,7 +94,7 @@ class UrlDownloadTableDeleteAjaxView(View,CommonView):
             urldownloadtable.save()
             # 操作ログ登録
             print('urlもしかしてfileみえない？3',files)
-            add_log(2,3,current_user,url_delete_name,files,"",1,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,current_user.company,url_delete_name,files,"",1,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = url_delete_name + 'を削除しました'
@@ -137,7 +137,7 @@ class OTPDownloadTableDeleteAjaxView(View,CommonView):
             # 操作ログ登録
             print('urlもしかしてfileみえない？3',files)
             # add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
-            add_log(2,3,current_user,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,current_user.company,otp_delete_name,files,"",2,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = otp_delete_name + 'を削除しました'
@@ -179,7 +179,7 @@ class GuestDownloadTableDeleteAjaxView(View,CommonView):
             guestdownloadtable.save()
             guestuploadmanage.save()
             # 操作ログ登録
-            add_log(2,3,current_user,guest_delete_name,files,"",6,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,current_user.company,guest_delete_name,files,"",6,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = guest_delete_name + 'を削除しました'
@@ -255,7 +255,7 @@ class MultiDownloadTableDeleteAjaxView(View,CommonView):
                     guest_multi_manage.save()
 
             # 操作ログ登録-------操作ログには3レコード作成されてしまう。
-            add_log(2,3,current_user,"","","",3,self.request.META.get('REMOTE_ADDR'))
+            add_log(2,3,current_user,current_user.company,"","","",3,self.request.META.get('REMOTE_ADDR'))
             #メッセージを格納してJSONで返す
             data = {}
             data['message'] = '一括削除しました'

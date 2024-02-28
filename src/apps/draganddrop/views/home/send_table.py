@@ -64,7 +64,7 @@ class DeleteAjaxView(View):
                 files = ' '.join(files)
                 # 操作ログ登録
                 print('もしかしてfileみえない？3',files)
-                add_log(2,3,current_user,send_delete_name,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+                add_log(2,3,current_user,current_user.company,send_delete_name,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
                 #操作ログ終わり
 
                 #download_tableのレコード数を取得
@@ -243,7 +243,7 @@ class UrlDeleteAjaxView(View):
                 files = ' '.join(files)
                 # 操作ログ登録
                 print('もしかしてfileみえない？3',files)
-                add_log(2,3,current_user,url_send_delete_name,files,dest_users,1,self.request.META.get('REMOTE_ADDR'))
+                add_log(2,3,current_user,current_user.company,url_send_delete_name,files,dest_users,1,self.request.META.get('REMOTE_ADDR'))
                 #操作ログ終わり
 
                 #download_tableのレコード数を取得
@@ -425,7 +425,7 @@ class OTPDeleteAjaxView(View):
                 files = ' '.join(files)
                 # 操作ログ登録
                 print('もしかしてfileみえない？3',files)
-                add_log(2,3,current_user,otp_send_delete_name,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
+                add_log(2,3,current_user,current_user.company,otp_send_delete_name,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
                 #操作ログ終わり
 
                 #download_tableのレコード数を取得

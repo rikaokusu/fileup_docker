@@ -550,7 +550,7 @@ class Step3OTPupload(TemplateView, CommonView):
         files = ' '.join(files)
         # 操作ログ終わり
         # 操作ログ
-        add_log(2,1,current_user,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,current_user.company,file_title,files,otp_dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
         #送信先 email
@@ -1466,7 +1466,7 @@ class Step3OTPUpdate(TemplateView, CommonView):  # サーバサイドだけの�
         files = ' '.join(files)
         # 操作ログ終わり
         # 操作ログ
-        add_log(2,2,current_user,file_title,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,2,current_user,current_user.company,file_title,files,dest_users,2,self.request.META.get('REMOTE_ADDR'))
 
         # ApprovalManageを取得
         approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage)

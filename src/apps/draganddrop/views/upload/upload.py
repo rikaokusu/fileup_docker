@@ -512,7 +512,7 @@ class Step3(TemplateView, CommonView):
         file_title = upload_manage.title
         # 操作ログ終わり
         # 操作ログ
-        add_log(2,1,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,1,current_user,current_user.company,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
         ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
         #送信先 email
@@ -583,6 +583,7 @@ class Step3(TemplateView, CommonView):
             # ファイルの合計サイズを取得
             for file in personal_user_upload_manage.file.all():
                 upload_manage_file_size = upload_manage_file_size + int(file.size)
+                print('ファイルサイズ確認',upload_manage_file_size)
 
             # download_tableのレコード数を取得
             download_table += Downloadtable.objects.filter(upload_manage=personal_user_upload_manage).all().count()
@@ -1468,7 +1469,7 @@ class Step3Update(TemplateView, CommonView):  # サーバサイドだけの処�
         # 操作ログ終わり
         # 操作ログ
         print("ふぁいるずadd_log直前")
-        add_log(2,2,current_user,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
+        add_log(2,2,current_user,current_user.company,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
         # ApprovalManageを取得
         approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage)

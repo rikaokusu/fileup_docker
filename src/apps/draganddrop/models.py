@@ -680,6 +680,8 @@ class OperationLog(models.Model):
     created_date = models.DateTimeField(_('作成日時'), default=timezone.now, blank=True)
     # 操作した人
     operation_user = models.CharField(_('操作した人'), max_length=64, null=True) 
+    # 操作ユーザーの会社のID
+    operation_user_company_id = models.CharField(max_length=500, verbose_name="操作ユーザーの会社のID", null=True, blank=True)
     # 操作したIPアドレス
     client_addr = models.CharField(_('IPアドレス'), max_length=64, null=True) #1
     # カテゴリ

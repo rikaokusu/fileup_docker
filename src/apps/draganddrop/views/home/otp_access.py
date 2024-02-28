@@ -166,7 +166,7 @@ class OTPSendAjaxView(View):
             message_template = get_template('draganddrop/otp_file_dl/mail_template/message.txt')
             message = message_template.render(context)
 
-            from_email = "cloudlab-yano@yui.okinawa"
+            from_email = "cl-info@cloudlab.jp"
             recipient_list = [email]
 
             send_mail(subject, message, from_email, recipient_list)
