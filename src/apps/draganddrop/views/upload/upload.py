@@ -562,68 +562,6 @@ class Step3(TemplateView, CommonView):
         # 操作ログ
         add_log(2,1,current_user,current_user.company,file_title,files,dest_users,0,self.request.META.get('REMOTE_ADDR'))
 
-        ###################　Notification通知用  ～を受信しました 操作ログの下にいれる
-        #送信先 email
-        emailList_db = ','.join(dest_user_list)
-        #タイトル
-        Notice_title = current_user.display_name + "さんが" + file_title + "を共有しました。"
-        #メッセージ
-        Notice_message = upload_manage.message
-        #グループemaillist作成
-        group_email = []
-        for group in dest_group_list:
-            qs = Address.objects.filter(group__group_name=group)
-            for user in qs:
-                email = user.email
-                group_email.append(email)
-        group_email_db = ','.join(group_email)
-        emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
-        emailList_db = emailList_db + ',' + group_email_db #str型
-
-        ###通知テーブル登録
-        Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
-
-        #メール送信
-        current_site = get_current_site(self.request)
-        domain = current_site.domain
-        download_type = 'normal'
-
-        tupleMessage = []
-        for email in emailList_for:
-            e_user = User.objects.filter(email=email).first()
-            
-            if e_user:
-                e_send = e_user.is_send_mail
-
-            if e_user and e_send == True or not e_user:
-                context = {
-                    'protocol': 'https' if self.request.is_secure() else 'http',
-                    'domain': domain,
-                    'download_type': download_type,
-                    #送信者
-                    'user_last_name':self.request.user.last_name,
-                    'user_first_name':self.request.user.first_name,
-                }
-                subject_template = get_template('draganddrop/mail_template/subject.txt')
-                subject = subject_template.render(context)
-
-                message_template = get_template('draganddrop/mail_template/message.txt')
-                message = message_template.render(context)
-                from_email = settings.EMAIL_HOST_USER#CL側のメアド
-                recipient_list = [email]#受信者リスト
-                
-                message1 = (
-                    subject,
-                    message,
-                    from_email,
-                    recipient_list,
-                )
-                messageList = list(message1)
-                tupleMessage.insert(-1,messageList)
-
-        send_mass_mail(tupleMessage)
-        ##################Notification通知用終了
-
         for personal_user_upload_manage in personal_user_upload_manages:
 
             # ファイルの合計サイズを取得
@@ -666,6 +604,8 @@ class Step3(TemplateView, CommonView):
 
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
+                #通知用メールアドレスリスト
+                first_approver_emaillist = []
                 for first_approver in first_approvers:
                     # print("------------------ first_approversがいます", first_approver.first_approver)
                     # ApprovalManageを作成
@@ -681,7 +621,66 @@ class Step3(TemplateView, CommonView):
                         upload_method = 1 # 通常アップロード
                     )
                     first_approver_approval_manage.save()
+                    #通知用メールアドレス取得
+                    first_id = first_approver.first_approver
+                    first_user = User.objects.get(id=first_id)
+                    first_mail = first_user.email
+                    first_approver_emaillist.append(first_mail)
+                ###################　Notification通知用  ～の承認が申請されました
+                #送信先 email
+                emailList_db = ','.join(first_approver_emaillist)#str型
+                emailList_for = list(first_approver_emaillist)#list型
+                print('承認通知第一承認mail',emailList_for)
+                #タイトル
+                Notice_title = current_user.display_name + "さんが" + file_title + "の承認を依頼しました。"
+                #メッセージ
+                Notice_message = upload_manage.message
+                print('承認通知たいとる',Notice_title)
+                print('承認通知めっせーじ',Notice_message)
 
+                ###通知テーブル登録
+                Notification.objects.create(service="FileUP!",category="承認依頼",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+                #メール送信
+                current_site = get_current_site(self.request)
+                domain = current_site.domain
+                download_type = 'normal'
+
+                tupleMessage = []
+                for email in emailList_for:
+                    e_user = User.objects.filter(email=email).first()
+                    
+                    if e_user:
+                        e_send = e_user.is_send_mail
+
+                    if e_user and e_send == True or not e_user:
+                        context = {
+                            'protocol': 'https' if self.request.is_secure() else 'http',
+                            'domain': domain,
+                            'download_type': download_type,
+                            #送信者
+                            'user_last_name':self.request.user.last_name,
+                            'user_first_name':self.request.user.first_name,
+                        }
+                        subject_template = get_template('draganddrop/mail_template/approval_request_subject.txt')
+                        subject = subject_template.render(context)
+
+                        message_template = get_template('draganddrop/mail_template/approval_request.txt')
+                        message = message_template.render(context)
+                        from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                        recipient_list = [email]#受信者リスト
+                        
+                        message1 = (
+                            subject,
+                            message,
+                            from_email,
+                            recipient_list,
+                        )
+                        messageList = list(message1)
+                        tupleMessage.insert(-1,messageList)
+
+                send_mass_mail(tupleMessage)
+                ##################Notification通知用終了
             if second_approvers:
                 # print("------------------ second_approversがいます step2")
                 for second_approver in second_approvers:
@@ -705,6 +704,67 @@ class Step3(TemplateView, CommonView):
 
             upload_manage.created_at_invalid = True
             upload_manage.save()
+            ###################　Notification通知用  ～を受信しました 
+            #送信先 email
+            emailList_db = ','.join(dest_user_list)
+            #タイトル
+            Notice_title = current_user.display_name + "さんが" + file_title + "を共有しました。"
+            #メッセージ
+            Notice_message = upload_manage.message
+            #グループemaillist作成
+            group_email = []
+            for group in dest_group_list:
+                qs = Address.objects.filter(group__group_name=group)
+                for user in qs:
+                    email = user.email
+                    group_email.append(email)
+            group_email_db = ','.join(group_email)
+            emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
+            emailList_db = emailList_db + ',' + group_email_db #str型
+
+            ###通知テーブル登録
+            Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+            #メール送信
+            current_site = get_current_site(self.request)
+            domain = current_site.domain
+            download_type = 'normal'
+
+            tupleMessage = []
+            for email in emailList_for:
+                e_user = User.objects.filter(email=email).first()
+                
+                if e_user:
+                    e_send = e_user.is_send_mail
+
+                if e_user and e_send == True or not e_user:
+                    context = {
+                        'protocol': 'https' if self.request.is_secure() else 'http',
+                        'domain': domain,
+                        'download_type': download_type,
+                        #送信者
+                        'user_last_name':self.request.user.last_name,
+                        'user_first_name':self.request.user.first_name,
+                    }
+                    subject_template = get_template('draganddrop/mail_template/subject.txt')
+                    subject = subject_template.render(context)
+
+                    message_template = get_template('draganddrop/mail_template/message.txt')
+                    message = message_template.render(context)
+                    from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                    recipient_list = [email]#受信者リスト
+                    
+                    message1 = (
+                        subject,
+                        message,
+                        from_email,
+                        recipient_list,
+                    )
+                    messageList = list(message1)
+                    tupleMessage.insert(-1,messageList)
+
+            send_mass_mail(tupleMessage)
+            ##################Notification通知用終了
 
             if first_approvers:
                 # print("------------------ first_approversがいます step2")
@@ -1253,23 +1313,6 @@ class Step2Update(FormView, CommonView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form,**kwargs):
-        #操作ログ用
-        # context = super().get_context_data(**kwargs)
-        # current_user = self.request.user
-        # upload_manage = UploadManage.objects.filter(pk=upload_manage_id).first()
-        # #送信先取得,アドレス帳＆直接入力
-        # dest_user =  upload_manage.dest_user.values_list('email', flat=True)
-        # dest_user_list = list(dest_user)
-        # #送信先グループ取得　OTPとかにも対応  value_listなし<QuerySet [<Group: aaa>]>→value_listあり<QuerySet ['aaa']>
-        # dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
-        # dest_group_list = list(dest_group)
-        # #送信先　直接入力＆アドレス帳＆グループ list型
-        # dest_users = dest_user_list + dest_group_list
-        # # ↑の('')を省くため文字列に変換
-        # dest_users = ' '.join(dest_users)
-        # # ファイルタイトル
-        # file_title = upload_manage.title
-        # # 操作ログ終わり
 
         # セッションの対象IDからDBオブジェクトを生成
         upload_manage_id = self.kwargs['pk']
