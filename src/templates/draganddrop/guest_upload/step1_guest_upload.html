@@ -618,10 +618,18 @@
   
         }); // end addfile event
   
-          // プログレスバーを動作させる
-          myDropzone.on("totaluploadprogress", function (progress) {
-            $(".progress-bar").css("width", progress + "%");
-          });
+        // プログレスバーを動作させる
+        myDropzone.on("totaluploadprogress", function (progress) {
+          $(".progress-bar").css("width", progress + "%");
+          if (progress == 100) {
+            console.log("100%です");
+          }else{
+            // ファイルアップロード中はボタンを無効化
+            console.log("100%じゃないです");
+            $('#confirm_button').prop("disabled", true);
+            $('#update_confirm_button').prop("disabled", true);
+          }
+        });
   
         // 確定ボタンを押下したらファイルをアップロード
         $("#submit_file_upload, #draft_submit_file_upload").click(function (e) {
