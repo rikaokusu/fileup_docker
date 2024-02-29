@@ -832,9 +832,8 @@ class FirstApproverSetView(LoginRequiredMixin, CommonView, FormView):
         user = self.request.user
         # service = Service.objects.get(name="FileUP!")
 
-        # ログインユーザーの会社IDと一致する第一書委任者の情報を取得
+        # ログインユーザーの会社IDと一致する第一承認者の情報を取得
         first_approver_users = FirstApproverRelation.objects.filter(company_id=user.company.id)
-        # print("---------- first_approver_users ---------", first_approver_users)
 
         if first_approver_users:
             # リスト化
