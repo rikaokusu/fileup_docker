@@ -423,13 +423,13 @@ class PersonalResourceManagement(models.Model):
     number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
     number_of_removed_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP削除済みレコード数
     number_of_removed_guest_upload_manage = models.IntegerField(blank=True, null=True, default=0) #ゲストアップロード削除済みレコード数
-    total_record_size = models.IntegerField(blank=True, null=True, default=0)
-    upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    otp_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    guest_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    total_file_size = models.IntegerField(blank=True, null=True, default=0)
-    total_data_usage = models.IntegerField(blank=True, null=True, default=0)
+    total_record_size = models.BigIntegerField(blank=True, null=True, default=0)
+    upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    url_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    otp_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    guest_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    total_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    total_data_usage = models.BigIntegerField(blank=True, null=True, default=0)
 
 class ResourceManagement(models.Model):
     company = models.CharField(max_length=245, blank=True, null=True) 
@@ -453,13 +453,13 @@ class ResourceManagement(models.Model):
     number_of_removed_url_upload_manage = models.IntegerField(blank=True, null=True, default=0) #URL共有削除済みレコード数
     number_of_removed_otp_upload_manage = models.IntegerField(blank=True, null=True, default=0) #OTP削除済みレコード数
     number_of_removed_guest_upload_manage = models.IntegerField(blank=True, null=True, default=0) #ゲストアップロード削除済みレコード数
-    total_record_size = models.IntegerField(blank=True, null=True, default=0) 
-    upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    url_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    otp_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    guest_upload_manage_file_size = models.IntegerField(blank=True, null=True, default=0)
-    total_file_size = models.IntegerField(blank=True, null=True, default=0)
-    total_data_usage = models.IntegerField(blank=True, null=True, default=0)
+    total_record_size = models.BigIntegerField(blank=True, null=True, default=0) 
+    upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    url_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    otp_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    guest_upload_manage_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    total_file_size = models.BigIntegerField(blank=True, null=True, default=0)
+    total_data_usage = models.BigIntegerField(blank=True, null=True, default=0)
 
 class Plan(models.Model):
     plan_id = models.CharField('プランID', max_length=32, blank=False, default="plan")

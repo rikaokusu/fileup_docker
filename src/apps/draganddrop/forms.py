@@ -6,6 +6,7 @@ from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
+from accounts.models import FileupPermissions
 
 # 日付
 import datetime
@@ -666,8 +667,11 @@ class FirstApproverSetForm(forms.Form):
         self.second_approver_lists = kwargs.pop('second_approver_lists', None)
         self.admin_user_company = kwargs.pop('admin_user_company', None)
 
-        queryset = User.objects.filter(company=self.admin_user_company, is_superuser=False, is_staff=False, is_rogical_deleted=False).exclude(Q(service_admin__name="FileUP!")|Q(id__in=self.first_approver_lists)|Q(id__in=self.second_approver_lists))
-
+        #第一承認者設定の候補ユーザー一覧
+        #自分と同じ会社のユーザー取得。第一承認者と第二承認者に設定されているものは省く
+        # queryset = User.objects.filter(company=self.admin_user_company, is_rogical_deleted=False).exclude(Q(id__in=self.first_approver_lists)|Q(id__in=self.second_approver_lists))
+        queryset2 = FileupPermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+        queryset = User.objects.filter(id__in=queryset2)
         super(FirstApproverSetForm, self).__init__(*args, **kwargs)
 
         # ユーザー管理者権限
@@ -697,8 +701,11 @@ class SecondApproverSetForm(forms.Form):
         self.first_approver_lists = kwargs.pop('first_approver_lists', None)
         self.admin_user_company = kwargs.pop('admin_user_company', None)
 
-        queryset = User.objects.filter(company=self.admin_user_company, is_superuser=False, is_staff=False, is_rogical_deleted=False).exclude(Q(service_admin__name="FileUP!")|Q(id__in=self.second_approver_lists)|Q(id__in=self.first_approver_lists))
-
+        # queryset = User.objects.filter(company=self.admin_user_company, is_superuser=False, is_staff=False, is_rogical_deleted=False).exclude(Q(service_admin__name="FileUP!")|Q(id__in=self.second_approver_lists)|Q(id__in=self.first_approver_lists))
+        #第一承認者設定の候補ユーザー一覧
+        #自分と同じ会社のユーザー取得。第一承認者と第二承認者に設定されているものは省く
+        queryset2 = FileupPermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+        queryset = User.objects.filter(id__in=queryset2)
         super(SecondApproverSetForm, self).__init__(*args, **kwargs)
 
         # ユーザー管理者権限
