@@ -17,8 +17,11 @@
 {% load url_get_direct_users %}
 {% load otp_get_direct_users %}
 {% load get_display_name %}
+{% load get_display_company %}
 {% load mathfilters %}
 {% load get_created_user_mail %}
+{% load get_created_user_name %}
+{% load get_created_user_company %}
 
 
 {% block content %}
@@ -157,12 +160,10 @@
                         <td class="upload_box">
                             {% if dest_user_data.upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
-                            <p class="file_del_tag">ファイル削除済み</p>
+                                title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
                             {% elif  dest_user_data.upload_manage.end_date|is_past_due %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                            title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span><br>
-                            <p class="expired_tag">期限切れ</p>
+                            title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
                             {% else %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                 title="{{dest_user_data.upload_manage.title}}">{{dest_user_data.upload_manage.title | truncatechars:14}}</span>
@@ -229,7 +230,9 @@
 
                         <!-- 送信者 -->
                         <td>
-                            {{dest_user_data.upload_manage.created_user|get_created_user_mail}}
+                            <span data-toggle="tooltip" title="{{dest_user_data.upload_manage.created_user|get_created_user_company}}" data-placement="right">
+                                {{dest_user_data.upload_manage.created_user|get_created_user_name}}
+                            </span>
                         </td>
 
                         <!-- 一括ダウンロードボタン -->
@@ -338,7 +341,8 @@
             {% if url_upload_manage_for_dest_users %}
 
             {% for url_dest_user_data in url_upload_manage_for_dest_users %}
-            <tr {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_dest_user_data.url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+            <tr {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+            {% elif url_dest_user_data.url_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                 <!-- チェックボックス -->
                 <td>
@@ -350,13 +354,9 @@
                     {% if url_dest_user_data.url_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="file_del_tag">ファイル削除済み</p>
                     {% elif  url_dest_user_data.url_upload_manage.end_date|is_past_due %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="expired_tag">期限切れ</p>
                     {% else %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{url_dest_user_data.url_upload_manage.title}}">{{url_dest_user_data.url_upload_manage.title | truncatechars:13}}</span>
@@ -427,8 +427,10 @@
 
                 <!-- 送信者 -->
                 <td>
-                    {% comment %} {{url_dest_user_data.url_upload_manage.created_user.email}} {% endcomment %}
-                    {{url_dest_user_data.url_upload_manage.created_user|get_created_user_mail}}
+                    {% comment %} {{url_dest_user_data.url_upload_manage.created_user|get_created_user_mail}} {% endcomment %}
+                    <span data-toggle="tooltip" title="{{url_dest_user_data.url_upload_manage.created_user|get_created_user_company}}" data-placement="right">
+                        {{url_dest_user_data.url_upload_manage.created_user|get_created_user_name}}
+                    </span>
                 </td>
 
                 <!-- 一括ダウンロードボタン url-->
@@ -535,7 +537,8 @@
             {% if otp_upload_manage_for_dest_users %}
 
             {% for otp_dest_user_data in otp_upload_manage_for_dest_users %}
-            <tr {% if otp_dest_user_data.otp_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif otp_dest_user_data.otp_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+            <tr {% if otp_dest_user_data.otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+            {% elif otp_dest_user_data.otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                 <!-- チェックボックス -->
                 <td>
@@ -547,13 +550,9 @@
                     {% if otp_dest_user_data.otp_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{otp_dest_user_data.otp_upload_manage.title}}">{{otp_dest_user_data.otp_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="file_del_tag">ファイル削除済み</p>
                     {% elif  otp_dest_user_data.otp_upload_manage.end_date|is_past_due %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{otp_dest_user_data.otp_upload_manage.title}}">{{otp_dest_user_data.otp_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="expired_tag">期限切れ</p>
                     {% else %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{otp_dest_user_data.otp_upload_manage.title}}">{{otp_dest_user_data.otp_upload_manage.title | truncatechars:13}}</span>
@@ -617,7 +616,10 @@
 
                 <!-- 送信者 -->
                 <td>
-                    {{otp_dest_user_data.otp_upload_manage.created_user|get_created_user_mail}}
+                    <span data-toggle="tooltip" title="{{otp_dest_user_data.otp_upload_manage.created_user|get_created_user_company}}" data-placement="right">
+                        {{otp_dest_user_data.otp_upload_manage.created_user|get_created_user_name}}
+                    </span>
+                    {% comment %} {{otp_dest_user_data.otp_upload_manage.created_user|get_created_user_mail}} {% endcomment %}
                 </td>
 
                 <!-- 一括ダウンロードボタン otp-->
@@ -724,8 +726,10 @@
             {% if guest_upload_manage_for_dest_users %}
 
             {% for guest_dest_user_data in guest_upload_manage_for_dest_users %}
-            <tr {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"
-            {% elif not guest_dest_user_data.guest_upload_manage.uploaded_date %} style="background-color:#efefef;" {% endif %}>
+            <tr {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top"
+            title="ファイル削除済み" style="background-color:#ffdfdf;"
+            {% elif not guest_dest_user_data.guest_upload_manage.uploaded_date %}data-toggle="tooltip" data-placement="top"
+            title="ファイルアップロード前" style="background-color:#efefef;" {% endif %}>
 
                 <!-- チェックボックス -->
                 <td>
@@ -737,13 +741,9 @@
                     {% if guest_dest_user_data.guest_upload_manage.file_del_flag == 1 %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="file_del_tag">ファイル削除済み</p>
                     {% comment %} {% elif  guest_dest_user_data.guest_upload_manage.end_date|is_past_due %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                        title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
-                    <a >URL</a>
-                    <p class="expired_tag">期限切れ</p> {% endcomment %}
+                        title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>{% endcomment %}
                     {% else %}
                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                         title="{{guest_dest_user_data.guest_upload_manage.title}}">{{guest_dest_user_data.guest_upload_manage.title | truncatechars:13}}</span>
@@ -806,7 +806,9 @@
 
                 <!-- 送信者 -->
                 <td>
-                    {{guest_dest_user_data.guest_upload_manage.guest_user_mail}}
+                    <span data-toggle="tooltip" title="{{guest_dest_user_data.guest_upload_manage.guest_user_mail}}" data-placement="right">
+                        {{guest_dest_user_data.guest_upload_manage.guest_user_name}}
+                    </span>
                 </td>
 
                 <!-- 一括ダウンロードボタン ゲスト-->
@@ -957,7 +959,8 @@
             {% if upload_manages %}
                 {% for upload_manage in upload_manages %}
 
-                    <tr {% if upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                    <tr {% if upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                    {% elif upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
                         <td>
@@ -968,12 +971,10 @@
                         <td class="upload_box">
                             {% if upload_manage.file_del_flag == 1 %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span><br>
-                            <p class="file_del_tag">ファイル削除済み</p>
+                                title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span>
                             {% elif  upload_manage.end_date|is_past_due %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                            title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span><br>
-                            <p class="expired_tag">期限切れ</p>
+                            title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span>
                             {% else %}
                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                 title="{{upload_manage.title}}">{{upload_manage.title | truncatechars:14}}</span>
@@ -989,7 +990,7 @@
                                 {% endfor %}
                             {% else %}
                                 {%for file in upload_manage.file.all%}
-                                <del data-toggle="tooltip" data-placement="right"
+                                <del class="past_file" data-toggle="tooltip" data-placement="right"
                                     title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
                                 {% endfor %}
                             {% endif %}
@@ -1010,7 +1011,10 @@
                                     {% for user in dest_user_all|slice:":5" %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 <!---個人ユーザーが6件以下場合--->
@@ -1018,7 +1022,10 @@
                                     {% for user in dest_user_all %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -1209,7 +1216,8 @@
             {% if url_upload_manages %}
 
                 {% for url_upload_manage in url_upload_manages %}
-                    <tr {% if url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                    <tr {% if url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                        {% elif url_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ"  style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
                         <td>
@@ -1222,13 +1230,9 @@
                             {% if url_upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
-                                <a >URL</a>
-                                <p class="file_del_tag">ファイル削除済み</p>
                             {% elif  url_upload_manage.end_date|is_past_due %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
-                                <a >URL</a>
-                                <p class="expired_tag">期限切れ</p>
                             {% else %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{url_upload_manage.title}}">{{url_upload_manage.title | truncatechars:13}}</span>
@@ -1247,7 +1251,7 @@
                                 {% endfor %}
                             {% else %}
                                 {% for file in url_upload_manage.file.all %}
-                                    <del data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
+                                    <del class="past_file" data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
                                 {% endfor %}
                             {% endif %}
                         </td>
@@ -1266,7 +1270,10 @@
                                     {% for user in dest_user_all|slice:":5" %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 <!---個人ユーザーが6件以下場合--->
@@ -1274,7 +1281,10 @@
                                     {% for user in dest_user_all %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -1458,11 +1468,12 @@
             </div>
 
 
-            <!-------------------------送信テーブル OTP---------------------------------->
+            <!----------------------------送信テーブル OTP--------------------------------->
             {% if otp_upload_manages %}
 
                 {% for otp_upload_manage in otp_upload_manages %}
-                    <tr {% if otp_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif otp_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                    <tr {% if otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                    {% elif otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
                         <td>
@@ -1475,13 +1486,9 @@
                             {% if otp_upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{otp_upload_manage.title}}">{{otp_upload_manage.title | truncatechars:13}}</span>
-                                <a >URL</a>
-                                <p class="file_del_tag">ファイル削除済み</p>
                             {% elif  otp_upload_manage.end_date|is_past_due %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{otp_upload_manage.title}}">{{otp_upload_manage.title | truncatechars:13}}</span>
-                                <a >URL</a>
-                                <p class="expired_tag">期限切れ</p>
                             {% else %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{otp_upload_manage.title}}">{{otp_upload_manage.title | truncatechars:13}}</span>
@@ -1500,7 +1507,7 @@
                                 {% endfor %}
                             {% else %}
                                 {% for file in otp_upload_manage.file.all %}
-                                <del data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
+                                <del class="past_file" data-toggle="tooltip" data-placement="right" title="{{file.name}}">{{ file.name | truncatechars:16 }}<br></del>
                                 {% endfor %}
                             {% endif %}
                         </td>
@@ -1519,7 +1526,10 @@
                                     {% for user in dest_user_all|slice:":5" %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 <!---個人ユーザーが6件以下場合--->
@@ -1527,7 +1537,10 @@
                                     {% for user in dest_user_all %}
                                         <div class="d-flex">
                                             <div class="w_20">{{ forloop.counter}}.</div> 
-                                            <div><i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                            <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                                <i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                                {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                            </div>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -1717,7 +1730,7 @@
 
 
 
-<!----------------------------------もっと見るモーダル-------------------------------------->
+<!--------------------------もっと見るモーダル----------------------------->
 
 {% for upload_manage in upload_manages %}
 
@@ -1735,7 +1748,10 @@
                         {% for user in dest_user_all %}
                             <div class="d-flex">
                                 <div class="w_25">{{ forloop.counter}}.</div> 
-                                <div><i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                    <i class="fas fa-user fa-fw fa-1x" {% if upload_manage|get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                    {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br>
+                                </div>
                             </div>
                         {% endfor %}
                         {% for group in dest_user_group_all %}
@@ -1760,7 +1776,7 @@
 {% endfor %}
 <!----------------------------------もっと見るモーダル閉じタグ-------------------------------------->
 
-<!----------------------------------URL共有 もっと見るモーダル-------------------------------------->
+<!--------------------------------URL共有 もっと見るモーダル------------------------------------->
 
 {% for url_upload_manage in url_upload_manages %}
 
@@ -1780,7 +1796,9 @@
                         {% for user in dest_user_all %}
                             <div class="d-flex">
                                 <div class="w_25">{{ forloop.counter}}.</div> 
-                                <div><i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                    <i class="fas fa-user fa-fw fa-1x" {% if url_upload_manage|url_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                    {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br></div>
                             </div>
                         {% endfor %}
                         {% for group in dest_user_group_all %}
@@ -1804,7 +1822,7 @@
 {% endfor %}
 <!----------------------------------URL共有　もっと見るモーダル閉じタグ------------------------------>
 
-<!----------------------------------OTP もっと見るモーダル-------------------------------------->
+<!----------------------------------OTP もっと見るモーダル--------------------------------------->
 
 {% for otp_upload_manage in otp_upload_manages %}
 
@@ -1824,7 +1842,9 @@
                             {% for user in dest_user_all %}
                                 <div class="d-flex">
                                     <div class="w_25">{{ forloop.counter}}.</div> 
-                                    <div><i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>{{user|get_display_name}}<br></div>
+                                    <div data-toggle="tooltip" data-placement="right" title="{{user|get_display_company}}">
+                                        <i class="fas fa-user fa-fw fa-1x" {% if otp_upload_manage|otp_get_download_status:user %} style="color:#0a0a0a;"{% else %} style="color:#cccccc;" {% endif %}></i>
+                                        {% if user.is_direct_email == False %}{{user.last_name}}{{user.first_name}}{% else %}{{ user.email }}{% endif %}<br></div>
                                 </div>
                             {% endfor %}
                             {% for group in dest_user_group_all %}
@@ -1848,7 +1868,7 @@
 {% endfor %}
 <!----------------------------------OTP　もっと見るモーダル閉じタグ------------------------------>
 
-<!--Home 一括削除用受信モーダル -->
+<!--Home 一括削除用受信モーダル --->
 <div class="modal fade" id="multi_deleted_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -1869,7 +1889,7 @@
     </div>
 </div>
 
-<!--Home 一括削除用送信モーダル -->
+<!--Home 一括削除用送信モーダル --->
 <div class="modal fade" id="upload_manage_delete_modal" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -1894,7 +1914,7 @@
     </div>
 </div>
 
-<!-- ゴミ箱モーダル-->
+<!--- ゴミ箱モーダル--->
 <div class="modal fade" id="deleted_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content center-modal deleted_modal" >
@@ -1923,7 +1943,8 @@
                         <!--アップロード用-->
                         {% if upload_manage_for_dest_users_deleted %}
                         {% for deleted_list in upload_manage_for_dest_users_deleted %}
-                        <tr {% if deleted_list.upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif deleted_list.upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                        <tr {% if deleted_list.upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                        {% elif deleted_list.upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
                             <!--チェックボックス-->
 
                             <td>
@@ -1934,12 +1955,10 @@
                             <td class="upload_box">
                                 {% if deleted_list.upload_manage.file_del_flag == 1 %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                    title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span><br>
-                                <p class="file_del_tag">ファイル削除済み</p>
+                                    title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span>
                                 {% elif  deleted_list.upload_manage.end_date|is_past_due %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span><br>
-                                <p class="expired_tag">期限切れ</p>
+                                title="{{upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span>
                                 {% else %}
                                 <span class="file_title" data-toggle="tooltip" data-placement="right"
                                     title="{{deleted_list.upload_manage.title}}">{{deleted_list.upload_manage.title | truncatechars:14}}</span>
@@ -1985,7 +2004,8 @@
                         <!--URL共有用-->
                         {% if url_upload_manage_for_dest_users_deleted %}
                             {% for url_deleted_list in url_upload_manage_for_dest_users_deleted %}
-                            <tr {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif url_deleted_list.url_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {%endif%}>
+                            <tr {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                            {% elif url_deleted_list.url_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                                 <!--チェックボックス-->
                                 <td>
@@ -1997,12 +2017,10 @@
                                 <td class="url_box">
                                     {% if url_deleted_list.url_upload_manage.file_del_flag == 1 %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                        title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
-                                    <p class="file_del_tag">ファイル削除済み</p>
+                                        title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
                                     {% elif  url_deleted_list.url_upload_manage.end_date|is_past_due %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                    title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span><br>
-                                    <p class="expired_tag">期限切れ</p>
+                                    title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
                                     {% else %}
                                     <span class="file_title" data-toggle="tooltip" data-placement="right"
                                         title="{{url_deleted_list.url_upload_manage.title}}"> {{url_deleted_list.url_upload_manage.title | truncatechars:14}}</span>
@@ -2051,7 +2069,8 @@
                         <!--OTP用-->
                         {% if otp_upload_manage_for_dest_users_deleted %}
                             {% for otp_deleted_list in otp_upload_manage_for_dest_users_deleted %}
-                                <tr {% if otp_deleted_list.otp_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif otp_deleted_list.otp_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                                <tr {% if otp_deleted_list.otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                                {% elif otp_deleted_list.otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
                                     <!--チェックボックス-->
                                     <td>
                                         <input type="checkbox" name="otp_deleted_ids" value="{{otp_deleted_list.id}}"><br>
@@ -2061,12 +2080,10 @@
                                     <td class="otp_box">
                                         {% if otp_deleted_list.otp_upload_manage.file_del_flag == 1 %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                                title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
-                                            <p class="file_del_tag">ファイル削除済み</p>
+                                                title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span>
                                         {% elif  otp_deleted_list.otp_upload_manage.end_date|is_past_due %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                            title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span><br>
-                                            <p class="expired_tag">期限切れ</p>
+                                            title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span>
                                         {% else %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                                 title="{{otp_deleted_list.otp_upload_manage.title}}"> {{otp_deleted_list.otp_upload_manage.title | truncatechars:14}}</span>
@@ -2115,7 +2132,8 @@
                         <!--ゲストアップロード用-->
                         {% if guest_upload_manage_for_dest_users_deleted %}
                             {% for guest_deleted_list in guest_upload_manage_for_dest_users_deleted %}
-                                <tr {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %} style="background-color:#ffdfdf;"{% elif guest_deleted_list.guest_upload_manage.end_date|is_past_due %} style="background-color:#EFEFEF;" {% endif %}>
+                                <tr {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                                {% elif guest_deleted_list.guest_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
                                     <!--チェックボックス-->
                                     <td>
                                         <input type="checkbox" name="guest_deleted_ids" value="{{guest_deleted_list.id}}"><br>
@@ -2125,12 +2143,10 @@
                                     <td class="guest_box">
                                         {% if guest_deleted_list.guest_upload_manage.file_del_flag == 1 %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                                title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span><br>
-                                            <p class="file_del_tag">ファイル削除済み</p>
+                                                title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span>
                                         {% elif  guest_deleted_list.guest_upload_manage.end_date|is_past_due %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
-                                            title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span><br>
-                                            <p class="expired_tag">期限切れ</p>
+                                            title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span>
                                         {% else %}
                                             <span class="file_title" data-toggle="tooltip" data-placement="right"
                                                 title="{{guest_deleted_list.guest_upload_manage.title}}"> {{guest_deleted_list.guest_upload_manage.title | truncatechars:14}}</span>
@@ -2209,7 +2225,7 @@
 </div>
 
 
-<!-- 復元用モーダル -->
+<!--- 復元用モーダル --->
 
 <div class="modal fade" id="restore" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -2230,7 +2246,7 @@
 </div>
 
 
-<!-- ゴミ箱内一括削除用モーダル -->
+<!--- ゴミ箱内一括削除用モーダル --->
 
 <div class="modal fade" id="bulk_del" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -2251,7 +2267,7 @@
     </div>
 </div>
 
-<!-- 単数削除用モーダル -->
+<!--- 単数削除用モーダル --->
 
 <div class="modal fade" id="upload_manage_delete" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">
@@ -2275,7 +2291,7 @@
 </div>
 
 
-<!-- 単数削除URL共有用モーダル -->
+<!--- 単数削除URL共有用モーダル --->
 
 <div class="modal fade" id="url_upload_manage_delete" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">
@@ -2297,7 +2313,7 @@
     </div>
 </div>
 
-<!-- 単数削除OTP用モーダル -->
+<!--- 単数削除OTP用モーダル --->
 
 <div class="modal fade" id="otp_upload_manage_delete" tabindex="-1" role="dialog" aria-labelledby="label1"
     aria-hidden="true">

@@ -147,6 +147,8 @@ class Step1UrlUpload(FormView, CommonView):
         # 保存
         url_upload_manage_obj.save()
 
+        dest_user_qs_add = []
+
         # メールアドレス直接入力DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
 
@@ -158,6 +160,7 @@ class Step1UrlUpload(FormView, CommonView):
                 add1 = True
             else:
                 add1 = False
+                dest_user_qs_add.append(address1)
 
             if not address1.full_name_preview:
                 address1.is_direct_email = True
@@ -174,6 +177,7 @@ class Step1UrlUpload(FormView, CommonView):
                 add2 = True
             else:
                 add2 = False
+                dest_user_qs_add.append(address2)
 
             if not address2.full_name_preview:
                 address2.is_direct_email = True
@@ -190,6 +194,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add3 = True
             else:
                 add3 = False
+                dest_user_qs_add.append(address3)
+
             if not address3.full_name_preview:
                 address3.is_direct_email = True
                 address3.full_name_preview = dest_user_mail3
@@ -205,6 +211,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add4 = True
             else:
                 add4 = False
+                dest_user_qs_add.append(address4)
+
             if not address4.full_name_preview:
                 address4.is_direct_email = True
                 address4.full_name_preview = dest_user_mail4
@@ -220,6 +228,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add5 = True
             else:
                 add5 = False
+                dest_user_qs_add.append(address5)
+
             if not address5.full_name_preview:
                 address5.is_direct_email = True
                 address5.full_name_preview = dest_user_mail5
@@ -235,6 +245,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add6 = True
             else:
                 add6 = False
+                dest_user_qs_add.append(address6)
+
             if not address6.full_name_preview:
                 address6.is_direct_email = True
                 address6.full_name_preview = dest_user_mail6
@@ -250,6 +262,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add7 = True
             else:
                 add7 = False
+                dest_user_qs_add.append(address7)
+
             if not address7.full_name_preview:
                 address7.is_direct_email = True
                 address7.full_name_preview = dest_user_mail7
@@ -265,6 +279,8 @@ class Step1UrlUpload(FormView, CommonView):
                 add8 = True
             else:
                 add8 = False
+                dest_user_qs_add.append(address8)
+
             if not address8.full_name_preview:
                 address8.is_direct_email = True
                 address8.full_name_preview = dest_user_mail8
@@ -300,8 +316,15 @@ class Step1UrlUpload(FormView, CommonView):
 
         # # POSTで送信された設定された宛先ユーザーを取得
         dest_user_qs = form.cleaned_data['dest_user']
+
+        if dest_user_qs_add:
+            for d_add in dest_user_qs_add:
+                dest_user_qs_set = dest_user_qs | Address.objects.filter(email=d_add.email)
+        else:
+            dest_user_qs_set = dest_user_qs
+
         # # MonyToMonyの値はquerysetとして取得するので、set関数を使ってセット
-        url_upload_manage_obj.dest_user.set(dest_user_qs)
+        url_upload_manage_obj.dest_user.set(dest_user_qs_set)
 
         dest_user_group_qs = form.cleaned_data['dest_user_group']
         url_upload_manage_obj.dest_user_group.set(dest_user_group_qs)
@@ -326,7 +349,7 @@ class Step1UrlUpload(FormView, CommonView):
         # # dest_userをsessionに追加するためQSをリスト化して保存。
         dest_user_all_list = []
 
-        for user in dest_user_qs:
+        for user in dest_user_qs_set:
             if user.company_name and not user.legal_personality == 99:
                 if user.legal_person_posi == 1:
                     dest_user_all_list.append(user.get_legal_personality_display() + user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
@@ -1100,7 +1123,8 @@ class Step1UrlUpdate(FormView, CommonView):
 
         # メールアドレス直接入力 DBへ保存
         dest_user_mail1 = form.cleaned_data['dest_user_mail1']
-        
+
+        dest_user_qs_add = []
 
         if dest_user_mail1:
             address1, created = Address.objects.update_or_create(email=dest_user_mail1)
@@ -1108,6 +1132,7 @@ class Step1UrlUpdate(FormView, CommonView):
                 add1 = True
             else:
                 add1 = False
+                dest_user_qs_add.append(address1)
             
             if not address1.full_name_preview:
                 address1.is_direct_email = True
@@ -1123,6 +1148,7 @@ class Step1UrlUpdate(FormView, CommonView):
                 add2 = True
             else:
                 add2 = False
+                dest_user_qs_add.append(address2)
 
             if not address2.full_name_preview:
                 address2.is_direct_email = True
@@ -1138,6 +1164,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add3 = True
             else:
                 add3 = False
+                dest_user_qs_add.append(address3)
+
             if not address3.full_name_preview:
                 address3.is_direct_email = True
                 address3.full_name_preview = dest_user_mail3
@@ -1152,6 +1180,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add4 = True
             else:
                 add4 = False
+                dest_user_qs_add.append(address4)
+
             if not address4.full_name_preview:
                 address4.is_direct_email = True
                 address4.full_name_preview = dest_user_mail4
@@ -1166,6 +1196,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add5 = True
             else:
                 add5 = False
+                dest_user_qs_add.append(address5)
+
             if not address5.full_name_preview:
                 address5.is_direct_email = True
                 address5.full_name_preview = dest_user_mail5
@@ -1180,6 +1212,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add6 = True
             else:
                 add6 = False
+                dest_user_qs_add.append(address6)
+
             if not address6.full_name_preview:
                 address6.is_direct_email = True
                 address6.full_name_preview = dest_user_mail6
@@ -1194,6 +1228,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add7 = True
             else:
                 add7 = False
+                dest_user_qs_add.append(address7)
+
             if not address7.full_name_preview:
                 address7.is_direct_email = True
                 address7.full_name_preview = dest_user_mail7
@@ -1208,6 +1244,8 @@ class Step1UrlUpdate(FormView, CommonView):
                 add8 = True
             else:
                 add8 = False
+                dest_user_qs_add.append(address8)
+
             if not address8.full_name_preview:
                 address8.is_direct_email = True
                 address8.full_name_preview = dest_user_mail8
@@ -1227,8 +1265,14 @@ class Step1UrlUpdate(FormView, CommonView):
 
         # dest_userをsessionに追加するためQSをリスト化して保存。
         dest_user_all_list = []
+        
+        if dest_user_qs_add:
+            for d_add in dest_user_qs_add:
+                dest_user_qs_set = dest_user_qs | Address.objects.filter(email=d_add.email)
+        else:
+            dest_user_qs_set = dest_user_qs
 
-        for user in dest_user_qs:
+        for user in dest_user_qs_set:
             if user.company_name and not user.legal_personality == 99:
                 if user.legal_person_posi == 1:
                     dest_user_all_list.append(user.get_legal_personality_display() + user.company_name + " " + user.last_name + "" + user.first_name + " " + "1")
@@ -1279,7 +1323,7 @@ class Step1UrlUpdate(FormView, CommonView):
 
 
         # # MonyToMonyの値はquerysetとして取得するのでupload_manageに保存したうえで、set関数を使ってセット
-        url_upload_manage.dest_user.set(dest_user_qs)
+        url_upload_manage.dest_user.set(dest_user_qs_set)
         url_upload_manage.dest_user_group.set(dest_user_group_qs)
 
         if dest_user_mail1:
