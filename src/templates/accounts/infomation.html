@@ -38,6 +38,14 @@
                     タイトル：{{info.fileup_title}}<br>
                     メッセージ：{{info.contents}}<br>
                 </div>
+            {% elif info.category == '承認完了' %}
+                以下のファイルの承認されました。ご確認ください。<br>
+                <div class="font-weight-bold py-4">
+                    日時：{{ info.release_date }}<br>
+                    送信者：{{ info.sender }}<br>
+                    タイトル：{{info.fileup_title}}<br>
+                    メッセージ：{{info.contents}}<br>
+                </div>
                 
             {% elif info.category == 'メンテナンス' %}
                 いつもCloudLabポータルをご利用いただきまして誠にありがとうございます。<br>

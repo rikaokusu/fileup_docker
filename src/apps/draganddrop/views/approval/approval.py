@@ -26,6 +26,8 @@ from accounts.models import Notification,User
 # # 全てで実行させるView
 from django.core.signing import TimestampSigner, dumps, SignatureExpired
 from django.contrib.sites.shortcuts import get_current_site
+#メール送信
+from django.core.mail import send_mail
 
 # フロントへメッセージ送信
 from django.contrib import messages
@@ -1517,9 +1519,67 @@ class ApproveView(View):
                         send_mass_mail(tupleMessage)
                         ##################Notification通知用終了                    
                     else: ##################################第二承認者なし　　矢野さんここに！！
-
                         ##############ファイル送信通知
-                        
+                        ##############送信者に承認完了した通知
+                        ###################　Notification通知用  ～が承認されました
+                        #送信先 email
+                        emailList_db = create_user.email#str型
+                        emailList_for = create_user.email#list型
+                        #タイトル
+                        # Notice_title = "二次承認が依頼されました。"
+                        Notice_title =  file_title + "が承認されました。"
+                        # #メッセージ
+                        Notice_message = file_message
+
+                        ###通知テーブル登録
+                        Notification.objects.create(service="FileUP!",category="承認完了",sender=create_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+                        # #メール送信
+                        current_site = get_current_site(self.request)
+                        domain = current_site.domain
+                        download_type = 'normal'
+
+                        tupleMessage = []
+                        # for email in emailList_for:
+                        email = emailList_for
+                        e_user = User.objects.filter(email=email).first()
+                        print('承認メールきてる',email)
+                        if e_user:
+                            e_send = e_user.is_send_mail
+
+                        if e_user and e_send == True or not e_user:
+                            context = {
+                                'protocol': 'https' if self.request.is_secure() else 'http',
+                                'domain': domain,
+                                'download_type': download_type,
+                                #送信者
+                                'user_last_name':create_user.display_name,
+                            }
+                            subject_template = get_template('draganddrop/mail_template/approval_done_subject.txt')
+                            subject = subject_template.render(context)
+
+                            message_template = get_template('draganddrop/mail_template/approval_done.txt')
+                            message = message_template.render(context)
+                            from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                            recipient_list = [email]#受信者リスト
+                            # recipient_list = [email]#受信者リスト
+                            
+                            message1 = (
+                                subject,
+                                message,
+                                from_email,
+                                recipient_list,
+                            )
+                            messageList = list(message1)
+                            tupleMessage.insert(-1,messageList)
+                        print('承認メールきてるｗｗｗｗｗｗｗｗｗｗｗ',subject)
+                        print('承認メールきてるｗｗｗｗｗｗｗｗｗｗｗ',message)
+                        print('承認メールきてるｗｗｗｗｗｗｗｗｗｗｗ',from_email)
+                        print('承認メールきてるｗｗｗｗｗｗｗｗｗｗｗmail',email)
+                        print('承認メールきてるｗｗｗｗｗｗｗｗｗｗｗ',recipient_list)
+                        # send_mass_mail(tupleMessage)
+                        send_mail(subject, message, from_email, recipient_list)
+                        ##################Notification通知用終了                          
 
                         print('二次承認者いない')
 

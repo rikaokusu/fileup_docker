@@ -290,7 +290,8 @@ class Step1GuestUploadCreate(FormView, CommonView):
         message = message_template.render(context)
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [guest_mail]
-        
+        print('れしぴえんと',guest_mail)
+        print('れしぴえんと',recipient_list)
         send_mail(subject, message, from_email, recipient_list)
 
         # # 生成されたDBの対象行のIDをセッションに保存しておく
