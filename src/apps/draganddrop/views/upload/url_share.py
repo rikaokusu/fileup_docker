@@ -654,7 +654,7 @@ class Step3URLupload(TemplateView, CommonView):
                     first_user = User.objects.get(id=first_id)
                     first_mail = first_user.email
                     first_approver_emaillist.append(first_mail)
-                                    ###################　Notification通知用  ～の承認が申請されました
+                ###################　Notification通知用  ～の承認が申請されました
                 #送信先 email
                 emailList_db = ','.join(first_approver_emaillist)#str型
                 emailList_for = list(first_approver_emaillist)#list型
