@@ -339,26 +339,26 @@ common class
 アップロードタイプアイコン
 ------------------*/
 .upload_box {
-    width: 100%;
+    /* width: 100%;
     display: -webkit-inline-box;
-    position: relative;
+    position: relative; */
 }
 
 .url_box {
-    width: 100%;
+    /* width: 100%;
     display: -webkit-inline-box;
-    position: relative;
+    position: relative; */
 }
 .otp_box {
-    width: 100%;
+    /* width: 100%;
     display: -webkit-inline-box;
-    position: relative;
+    position: relative; */
 }
 
 .guest_box {
-    width: 100%;
+    /* width: 100%;
     display: -webkit-inline-box;
-    position: relative;
+    position: relative; */
 }
 
 .upload_box::after {
@@ -2711,7 +2711,7 @@ font-family: 'Font Awesome 5 Free';
     #group_list_table th,
     #deleted_table th {
         padding: 10px 10px !important;
-
+        vertical-align: middle;
     }
 
     /*--------------------

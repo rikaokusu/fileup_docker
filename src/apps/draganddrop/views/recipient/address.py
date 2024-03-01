@@ -57,7 +57,9 @@ class AddressListView(FormView, CommonView):
         trade_name = form.cleaned_data['trade_name']
         last_name = form.cleaned_data['last_name']
         first_name = form.cleaned_data['first_name']
-        
+        legal_personality = form.cleaned_data['legal_personality']
+        legal_person_posi = form.cleaned_data['legal_person_posi']
+
         existing_user = Address.objects.filter(email=form.cleaned_data['email'],created_user=current_user.id).first()#既存アドレスに同emailいないかCK
         if existing_user:
             address = existing_user
@@ -76,10 +78,16 @@ class AddressListView(FormView, CommonView):
             address = form.save(commit=False)
             address.created_user = self.request.user.id
 
-        if legal_or_individual == 0 or company_name:
+        if company_name and not legal_personality == 99:
+            if legal_person_posi == 1:
+                address.full_name_preview = address.get_legal_personality_display() + company_name + " " + last_name + " " + first_name
+            else:
+                address.full_name_preview = company_name + address.get_legal_personality_display() + " " + last_name + " " + first_name
+        elif company_name and legal_personality == 99:
             address.full_name_preview = company_name + " " + last_name + " " + first_name
         else:
             address.full_name_preview = trade_name + " " + last_name + " " + first_name
+
         address.save()
         # #操作ログ用
         email = address.email
@@ -128,6 +136,19 @@ class UpdateAddressAjaxView(APIView,CommonView):
             address_obj.first_name = data.get('first_name')
             address_obj.email = data.get('email')
             address_obj.created_user = self.request.user.id
+            
+            if address_obj.company_name and not address_obj.legal_personality == 99:
+                if address_obj.legal_person_posi == 1:
+                    address_obj.full_name_preview = address_obj.get_legal_personality_display() + address_obj.company_name + " " + address_obj.last_name + " " + address_obj.first_name
+                else:
+                    address_obj.full_name_preview = address_obj.company_name + address_obj.get_legal_personality_display() + " " + address_obj.last_name + " " + address_obj.first_name
+            elif address_obj.company_name and address_obj.legal_personality == 99:
+                address_obj.full_name_preview = address_obj.company_name + " " + address_obj.last_name + " " + address_obj.first_name
+            elif address_obj.trade_name:
+                address_obj.full_name_preview = address_obj.trade_name + " " + address_obj.last_name + " " + address_obj.first_name
+            else:
+                address_obj.full_name_preview = address_obj.email
+            
             address_obj.save()
             #操作ログ用
             email = address_obj.email

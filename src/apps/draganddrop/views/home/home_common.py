@@ -253,39 +253,45 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # print("--------------- TOP画面 送信テーブル")
 
         # 承認ワークフローを使用する場合
-        if approval_workflow.is_approval_workflow == 1:
-            # print("--------------- TOP画面 承認ワークフローを使用する")
+        # if approval_workflow.is_approval_workflow == 1:
+        #     # print("--------------- TOP画面 承認ワークフローを使用する")
 
-            # 一次承認者と二次承認者が設定されている場合
-            if first_approver and second_approver:
-                # 通常アップロード
-                upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)# 最終承認済み
-                # URL共有
-                url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
-                # OTP共有
-                otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
+        #     # 一次承認者と二次承認者が設定されている場合
+        #     if first_approver and second_approver:
+        #         # 通常アップロード
+        #         upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)# 最終承認済み
+        #         # URL共有
+        #         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
+        #         # OTP共有
+        #         otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=5)
 
-            # 一次承認者しか設定されていない場合
-            else:
-                # 通常アップロード
-                upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)# 一次承認済み
-                # URL共有
-                url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
-                # OTP共有
-                otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
+        #     # 一次承認者しか設定されていない場合
+        #     else:
+        #         # 通常アップロード
+        #         upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)# 一次承認済み
+        #         # URL共有
+        #         url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
+        #         # OTP共有
+        #         otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0, application_status=3)
 
-        else:
-            # print("--------------- TOP画面 承認ワークフローを使用しない")
-            # 通常アップロード
-            upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)# キャンセル
-            # URL共有
-            url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
-            # OTP共有
-            otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
+        # else:
+        #     # print("--------------- TOP画面 承認ワークフローを使用しない")
+        #     # 通常アップロード
+        #     upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)# キャンセル
+        #     # URL共有
+        #     url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
+        #     # OTP共有
+        #     otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0).exclude(application_status=6)
 
+        #有効なレコード全て
+        #通常
+        upload_manages = UploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+        #URL
+        url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
+        #OTP
+        otp_upload_manages = OTPUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
 
         context["upload_manages"] = upload_manages
-        print('ある？？？？？？？アップロード',upload_manages)
         # URLアップロード用
         # url_upload_manages = UrlUploadManage.objects.filter(created_user=self.request.user.id, tmp_flag=0)
         context["url_upload_manages"] = url_upload_manages

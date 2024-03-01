@@ -841,7 +841,9 @@ class Step2GuestUpload(TemplateView):  # サーバサイドだけの処理
 
         #操作ログ用
         #送信元（ゲスト）
-        current_user = self.request.user
+        # current_user = self.request.user
+        current_user = User.objects.filter(id=guest_upload_manage.created_user).first()
+        
         guest_mail = guest_upload_manage.guest_user_mail
         guest_name = guest_upload_manage.guest_user_name
         guest = guest_mail + '/' + guest_name
