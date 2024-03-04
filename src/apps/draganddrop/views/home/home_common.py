@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
+from draganddrop.models import ApprovalWorkflow, ApprovalManage, FirstApproverRelation, SecondApproverRelation
 from accounts.models import User, File,Notification,Read,Company,FileupPermissions
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
@@ -245,6 +245,18 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
 
         """二次承認者"""
         second_approver = SecondApproverRelation.objects.filter(company_id=self.request.user.company.id).first()
+
+        """ログインしているユーザーは承認者に設定されているかチェック"""
+        current_user_is_first_approver = FirstApproverRelation.objects.filter(first_approver=self.request.user.id).first()
+        # print("------------------- ログインしているユーザーは承認者に設定されているか 1", current_user_is_first_approver)
+        current_user_is_second_approver = SecondApproverRelation.objects.filter(second_approver=self.request.user.id).first()
+        # print("------------------- ログインしているユーザーは承認者に設定されているか 2", current_user_is_second_approver)
+
+        if current_user_is_first_approver or current_user_is_second_approver:
+            context["current_user_is_approver"] = True
+        else:
+            context["current_user_is_approver"] = False
+
 
         """送信テーブル"""
         # 通常アップロード用

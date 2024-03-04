@@ -25,7 +25,11 @@
 
 
 {% block content %}
+
+
+
 <div class="home_menu">
+
     <!--ファイル共有-->
     {% if plan == "free" and number_of_company_upload_manage >= 5 %}
         <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限数を超えています" data-placement="top" data-toggle="tooltip" role="button">
@@ -38,27 +42,36 @@
             ファイル共有
         </button>
     {% else %}
-        <div class="dropdown home_menu_wrap">
-            <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {% comment %} <i class="fas fa-file-upload"></i> {% endcomment %}
+        <!-- ログインユーザーが承認者に設定されている場合はボタンを無効にする -->
+        {% if current_user_is_approver %}
+            <button class="btn dropdown-toggle home_menu_btn_disabled" type="button" title="承認者に設定されているユーザーはファイルのアップロードは行えません" data-placement="top" data-toggle="tooltip" role="button">
                 <i class="fas fa-file-alt"></i>
                 ファイル共有
             </button>
-            <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
-                {% if plan == "free" %}
-                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
-                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
-                    <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
-                {% else %}
-                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_url_upload' %}">URL共有</a>
-                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_otp_upload' %}">OTP共有</a>
-                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_guest_upload_create' %}">ゲストアップロード</a>
-                {% endif %}
-            </div>
-        </div><!--home_menu_wrap閉じタグ-->
+        {% else %}
+            <div class="dropdown home_menu_wrap">
+                <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {% comment %} <i class="fas fa-file-upload"></i> {% endcomment %}
+                    <i class="fas fa-file-alt"></i>
+                    ファイル共有
+                </button>
+                <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
+                    {% if plan == "free" %}
+                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
+                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
+                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
+                    {% else %}
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_url_upload' %}">URL共有</a>
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_otp_upload' %}">OTP共有</a>
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_guest_upload_create' %}">ゲストアップロード</a>
+                    {% endif %}
+                </div>
+            </div><!--home_menu_wrap閉じタグ-->
+        {% endif %}
     {% endif %}
     <!--ファイル共有終わり-->
+
     <!--アドレス帳-->
     <div class="home_menu_wrap">
         <a class="btn home_menu_btn" href="{% url 'draganddrop:address_list' %}">
@@ -67,6 +80,7 @@
         </a>
     </div>
     <!--アドレス帳終わり-->
+
     <!--その他-->
     <div class="dropdown home_menu_wrap">
         <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -96,6 +110,7 @@
         </div>
     </div>
     <!--その他終わり-->
+
 </div><!--home_menu終わり-->
 
 
