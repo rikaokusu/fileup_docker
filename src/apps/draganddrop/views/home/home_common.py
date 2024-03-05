@@ -248,7 +248,6 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
 
         """送信テーブル"""
         # 通常アップロード用
-        user=self.request.user.id
 
         # print("--------------- TOP画面 送信テーブル")
 
@@ -312,11 +311,11 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
             if first_approver and second_approver:
                 # print("--------------- TOP画面 承認ワークフローを使用する")
                 # 通常アップロード
-                upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=5)
+                upload_manage_for_dest_users = Downloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0,upload_manage__application_status=5)|Q(dest_user__email=self.request.user.email, trash_flag=0,upload_manage__application_status=3))
                 # URL共有
-                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=5)
+                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=5)|Q(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=3))
                 # OTP共有
-                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=5)
+                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=5)|Q(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=3))
                 # ゲストアップロード
                 # guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0, guest_upload_manage__application_status=5)
 
@@ -324,11 +323,11 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
             else:
                 # print("--------------- TOP画面 一次承認者しか設定されていない場合")
                 # 通常アップロード
-                upload_manage_for_dest_users = Downloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=3)
+                upload_manage_for_dest_users = Downloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=3)|Q(dest_user__email=self.request.user.email, trash_flag=0, upload_manage__application_status=5))
                 # URL共有
-                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=3)
+                url_upload_manage_for_dest_users = UrlDownloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=3)|Q(dest_user__email=self.request.user.email, trash_flag=0, url_upload_manage__application_status=5))
                 # OTP共有
-                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=3)
+                otp_upload_manage_for_dest_users = OTPDownloadtable.objects.filter(Q(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=3)|Q(dest_user__email=self.request.user.email, trash_flag=0, otp_upload_manage__application_status=5))
                 # ゲストアップロード
                 # guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0, guest_upload_manage__application_status=3)
 
@@ -356,7 +355,6 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         # ゲストアップロードダウンロード用
         guest_upload_manage_for_dest_users = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=0)
         context["guest_upload_manage_for_dest_users"] = guest_upload_manage_for_dest_users
-        print('ゲストアップロードダウンロード',guest_upload_manage_for_dest_users)
 
 
         """ゴミ箱表示"""
@@ -376,7 +374,7 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         guest_upload_manage_for_dest_users_deleted = GuestUploadDownloadtable.objects.filter(dest_user=self.request.user.email, trash_flag=1)
         context["guest_upload_manage_for_dest_users_deleted"] = guest_upload_manage_for_dest_users_deleted
 
-        
+
         """会社毎のレコード数取得"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
         context["number_of_company_upload_manage"] = number_of_company_upload_manage

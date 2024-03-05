@@ -22,7 +22,7 @@
 {% load get_created_user_mail %}
 {% load get_created_user_name %}
 {% load get_created_user_company %}
-
+{% load get_upload_manage_application_status_check %}
 
 {% block content %}
 <div class="home_menu">
@@ -958,9 +958,11 @@
             <!-------------------------送信テーブル 通常アップロード---------------------------------->
             {% if upload_manages %}
                 {% for upload_manage in upload_manages %}
-
-                    <tr {% if upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
-                    {% elif upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
+                    <tr {% if upload_manage.id|get_upload_manage_application_status_check:1 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
+                        {% elif upload_manage.id|get_upload_manage_application_status_check:1 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
+                        {% elif upload_manage.id|get_upload_manage_application_status_check:1 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
+                        {% elif upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                        {% elif upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
                         <td>
@@ -1216,7 +1218,10 @@
             {% if url_upload_manages %}
 
                 {% for url_upload_manage in url_upload_manages %}
-                    <tr {% if url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                    <tr {% if upload_manage.id|get_upload_manage_application_status_check:2 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
+                        {% elif upload_manage.id|get_upload_manage_application_status_check:2 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
+                        {% elif upload_manage.id|get_upload_manage_application_status_check:2 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
+                        {% elif url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
                         {% elif url_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ"  style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
@@ -1472,8 +1477,11 @@
             {% if otp_upload_manages %}
 
                 {% for otp_upload_manage in otp_upload_manages %}
-                    <tr {% if otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
-                    {% elif otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
+                    <tr {% if upload_manage.id|get_upload_manage_application_status_check:3 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
+                            {% elif upload_manage.id|get_upload_manage_application_status_check:3 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
+                            {% elif upload_manage.id|get_upload_manage_application_status_check:3 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
+                            {% elif otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
+                            {% elif otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
                         <!-- チェックボックス -->
                         <td>
