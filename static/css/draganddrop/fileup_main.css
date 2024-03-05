@@ -9,6 +9,9 @@
         overflow-y: scroll;
     }
 
+    body{
+        font-family: 'Avenir','Helvetica Neue','Helvetica','Arial','Hiragino Sans','ヒラギノ角ゴシック',YuGothic,'Yu Gothic','メイリオ', Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
+    }
     h1,
     h2,
     h3 {
@@ -338,28 +341,28 @@ common class
 /*-----------------
 アップロードタイプアイコン
 ------------------*/
-.upload_box {
-    /* width: 100%;
+/* .upload_box {
+    width: 100%;
     display: -webkit-inline-box;
-    position: relative; */
+    position: relative;
 }
 
 .url_box {
-    /* width: 100%;
+    width: 100%;
     display: -webkit-inline-box;
-    position: relative; */
+    position: relative;
 }
 .otp_box {
-    /* width: 100%;
+    width: 100%;
     display: -webkit-inline-box;
-    position: relative; */
+    position: relative;
 }
 
 .guest_box {
-    /* width: 100%;
+    width: 100%;
     display: -webkit-inline-box;
-    position: relative; */
-}
+    position: relative;
+} */
 
 .upload_box::after {
     color: #ffffff;
