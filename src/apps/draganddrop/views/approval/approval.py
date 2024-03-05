@@ -2066,7 +2066,7 @@ class DeclineApplicationView(View):
             else: #ゲストアップロード
                 first_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, first_approver__in=first_approver_list)
                 second_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, second_approver__in=first_approver_list)
-                create_user_id = approval_manage.otp_upload_manage.created_user
+                create_user_id = approval_manage.guest_upload_manage.created_user
                 create_user = User.objects.get(pk=create_user_id)
                 upload_manage = approval_manage.guest_upload_manage
                 file_title = approval_manage.guest_upload_manage.title
@@ -2323,7 +2323,23 @@ class ReapplicationView(View):
             reapplication_comment = request.POST.get('reapplication_comment')
             upload_method = request.POST.get('upload_method')
             # print("----------------- upload_method", upload_method)
-
+            ###########################################################通知用定義
+            # 一次承認者に設定されているユーザーを取得
+            first_approvers = FirstApproverRelation.objects.filter(company_id=self.request.user.company.id)#会社で指名されている固定の第一承認者
+            first_approver_list = []
+            first_approver_list_raw_1 = list(first_approvers.values_list('first_approver', flat=True))#first_approversから第一承認者のユーザーIDだけのリストになっている
+            # IDをstrに直してリストに追加
+            for first_approver_uuid_1 in first_approver_list_raw_1:
+                first_approver_uuid_string_1 = str(first_approver_uuid_1)
+                first_approver_list.append(first_approver_uuid_string_1)
+            #通知用メールアドレスリスト
+            first_approver_emaillist = []
+            for first_approver in first_approvers:
+                #通知用メールアドレス取得
+                first_id = first_approver.first_approver
+                first_user = User.objects.get(id=first_id)
+                first_mail = first_user.email
+                first_approver_emaillist.append(first_mail)
             if upload_method == "1":
                 # print("-------------- 承認履歴 通常アップロード")
 
@@ -2332,7 +2348,13 @@ class ReapplicationView(View):
                 # 再申請済みフラグをTrueに変更
                 upload_manage.is_reapplied_flg = True
                 upload_manage.save()
-
+                # UploadManageに紐づく一次承認者のApprovalManageを取得
+                first_approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage, first_approver__in=first_approver_list)
+                second_approval_manages = ApprovalManage.objects.filter(upload_manage=upload_manage, second_approver__in=first_approver_list)
+                create_user_id = upload_manage.created_user
+                create_user = User.objects.get(pk=create_user_id)
+                file_title = upload_manage.title
+                file_message = upload_manage.message
                 # 承認履歴を残す
                 approval_log = ApprovalLog.objects.create(
                     upload_manage = upload_manage,
@@ -2352,7 +2374,13 @@ class ReapplicationView(View):
                 # 再申請済みフラグをTrueに変更
                 url_upload_manage.is_reapplied_flg = True
                 url_upload_manage.save()
-
+                first_approval_manages = ApprovalManage.objects.filter(url_upload_manage=url_upload_manage, first_approver__in=first_approver_list)
+                second_approval_manages = ApprovalManage.objects.filter(url_upload_manage=url_upload_manage, second_approver__in=first_approver_list)
+                create_user_id = url_upload_manage.created_user
+                create_user = User.objects.get(pk=create_user_id)
+                upload_manage = url_upload_manage
+                file_title = url_upload_manage.title
+                file_message = url_upload_manage.message
                 # 承認履歴を残す
                 approval_log = ApprovalLog.objects.create(
                     url_upload_manage = url_upload_manage,
@@ -2372,7 +2400,13 @@ class ReapplicationView(View):
                 # 再申請済みフラグをTrueに変更
                 otp_upload_manage.is_reapplied_flg = True
                 otp_upload_manage.save()
-
+                first_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage, first_approver__in=first_approver_list)
+                second_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=otp_upload_manage, second_approver__in=first_approver_list)
+                create_user_id = otp_upload_manage.created_user
+                create_user = User.objects.get(pk=create_user_id)
+                upload_manage = otp_upload_manage
+                file_title = otp_upload_manage.title
+                file_message = otp_upload_manage.message
                 # 承認履歴を残す
                 approval_log = ApprovalLog.objects.create(
                     otp_upload_manage = otp_upload_manage,
@@ -2392,7 +2426,13 @@ class ReapplicationView(View):
                 # 再申請済みフラグをTrueに変更
                 guest_upload_manage.is_reapplied_flg = True
                 guest_upload_manage.save()
-
+                first_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=guest_upload_manage, first_approver__in=first_approver_list)
+                second_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=guest_upload_manage, second_approver__in=first_approver_list)
+                create_user_id = otp_upload_manage.created_user
+                create_user = User.objects.get(pk=create_user_id)
+                upload_manage = guest_upload_manage
+                file_title = guest_upload_manage.title
+                file_message = guest_upload_manage.message
                 # 承認履歴を残す
                 approval_log = ApprovalLog.objects.create(
                     guest_upload_manage = guest_upload_manage,
@@ -2406,7 +2446,62 @@ class ReapplicationView(View):
                 )
 
             approval_log.save()
+            ###################　Notification通知用  ～の承認が申請されました
+            #送信先 email
+            emailList_db = ','.join(first_approver_emaillist)#str型
+            emailList_for = list(first_approver_emaillist)#list型
+            print('承認通知第一承認mail',emailList_for)
+            #タイトル
+            Notice_title = create_user.display_name + "さんが" + file_title + "の承認を依頼しました。"
+            #メッセージ
+            Notice_message = upload_manage.message
+            print('承認通知たいとる',Notice_title)
+            print('承認通知めっせーじ',Notice_message)
 
+            ###通知テーブル登録
+            Notification.objects.create(service="FileUP!",category="承認依頼",sender=create_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
+
+            #メール送信
+            current_site = get_current_site(self.request)
+            domain = current_site.domain
+            download_type = 'normal'
+
+            tupleMessage = []
+            for email in emailList_for:
+                e_user = User.objects.filter(email=email).first()
+                
+                if e_user:
+                    e_send = e_user.is_send_mail
+
+                if e_user and e_send == True or not e_user:
+                    context = {
+                        'protocol': 'https' if self.request.is_secure() else 'http',
+                        'domain': domain,
+                        'download_type': download_type,
+                        #送信者
+                        'user_last_name':self.request.user.last_name,
+                        'user_first_name':self.request.user.first_name,
+                    }
+                    subject_template = get_template('draganddrop/mail_template/approval_request_subject.txt')
+                    subject = subject_template.render(context)
+
+                    message_template = get_template('draganddrop/mail_template/approval_request.txt')
+                    message = message_template.render(context)
+                    from_email = settings.EMAIL_HOST_USER#CL側のメアド
+                    recipient_list = [email]#受信者リスト
+                    
+                    message1 = (
+                        subject,
+                        message,
+                        from_email,
+                        recipient_list,
+                    )
+                    messageList = list(message1)
+                    tupleMessage.insert(-1,messageList)
+
+            send_mass_mail(tupleMessage)
+            ##################Notification通知用終了
+            
             # 差戻しを行ったユーザーのApprovalManageを取得
             approval_manage_status_returned = ApprovalManage.objects.filter(manage_id=upload_manage_pk, approval_status=4).first()
             # print("---------------approval_manage_status_returned", approval_manage_status_returned)
