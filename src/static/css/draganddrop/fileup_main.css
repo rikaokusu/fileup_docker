@@ -3283,7 +3283,7 @@ DatePicker
     padding:10px;
 }
 .home_menu_btn_disabled{
-    width: 100%;
+    width: 30%;
     font-size: 20px;
     border-radius: 0;
     background-color: #005392;
