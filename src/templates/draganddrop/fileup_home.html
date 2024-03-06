@@ -1233,9 +1233,9 @@
             {% if url_upload_manages %}
 
                 {% for url_upload_manage in url_upload_manages %}
-                    <tr {% if upload_manage.id|get_upload_manage_application_status_check:2 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
-                        {% elif upload_manage.id|get_upload_manage_application_status_check:2 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
-                        {% elif upload_manage.id|get_upload_manage_application_status_check:2 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
+                    <tr {% if url_upload_manage.id|get_upload_manage_application_status_check:2 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
+                        {% elif url_upload_manage.id|get_upload_manage_application_status_check:2 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
+                        {% elif url_upload_manage.id|get_upload_manage_application_status_check:2 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
                         {% elif url_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
                         {% elif url_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ"  style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 
@@ -1492,9 +1492,9 @@
             {% if otp_upload_manages %}
 
                 {% for otp_upload_manage in otp_upload_manages %}
-                    <tr {% if upload_manage.id|get_upload_manage_application_status_check:3 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
-                            {% elif upload_manage.id|get_upload_manage_application_status_check:3 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
-                            {% elif upload_manage.id|get_upload_manage_application_status_check:3 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
+                    <tr {% if otp_upload_manage.id|get_upload_manage_application_status_check:3 == '1NG' %}data-toggle="tooltip" data-placement="top" title="申請中" style="background-color:#8cb9b9;"
+                            {% elif otp_upload_manage.id|get_upload_manage_application_status_check:3 == '7NG' %}data-toggle="tooltip" data-placement="top" title="差戻し" style="background-color:#8cb9b9;"
+                            {% elif otp_upload_manage.id|get_upload_manage_application_status_check:3 == '6NG' %}data-toggle="tooltip" data-placement="top" title="申請キャンセル済" style="background-color:#EFEFEF;"
                             {% elif otp_upload_manage.file_del_flag == 1 %}data-toggle="tooltip" data-placement="top" title="ファイル削除済み" style="background-color:#EFEFEF;"
                             {% elif otp_upload_manage.end_date|is_past_due %}data-toggle="tooltip" data-placement="top" title="期限切れ" style="color:#C0C0C0; background-color:#EFEFEF;" {% endif %}>
 

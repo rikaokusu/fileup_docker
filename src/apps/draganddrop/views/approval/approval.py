@@ -1420,6 +1420,7 @@ class ApproveView(View):
                 upload_manage = approval_manage.upload_manage
                 file_title = approval_manage.upload_manage.title
                 file_message = approval_manage.upload_manage.message
+                download_type = 'normal'
             elif approval_upload_method == "2": # URL共有
                 first_approval_manages = ApprovalManage.objects.filter(url_upload_manage=approval_manage.url_upload_manage, first_approver__in=first_approver_list)
                 second_approval_manages = ApprovalManage.objects.filter(url_upload_manage=approval_manage.url_upload_manage, second_approver__in=first_approver_list)
@@ -1428,6 +1429,7 @@ class ApproveView(View):
                 upload_manage = approval_manage.url_upload_manage
                 file_title = approval_manage.url_upload_manage.title
                 file_message = approval_manage.url_upload_manage.message
+                download_type = 'url'
             elif approval_upload_method == "3": # OTP共有
                 first_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=approval_manage.otp_upload_manage, first_approver__in=first_approver_list)
                 second_approval_manages = ApprovalManage.objects.filter(otp_upload_manage=approval_manage.otp_upload_manage, second_approver__in=first_approver_list)
@@ -1436,6 +1438,7 @@ class ApproveView(View):
                 upload_manage = approval_manage.otp_upload_manage
                 file_title = approval_manage.otp_upload_manage.title
                 file_message = approval_manage.otp_upload_manage.message
+                download_type = 'otp'
             else: #ゲストアップロード
                 first_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, first_approver__in=first_approver_list)
                 second_approval_manages = ApprovalManage.objects.filter(guest_upload_manage=approval_manage.guest_upload_manage, second_approver__in=first_approver_list)
@@ -1444,6 +1447,8 @@ class ApproveView(View):
                 upload_manage = approval_manage.guest_upload_manage
                 file_title = approval_manage.guest_upload_manage.title
                 file_message = approval_manage.guest_upload_manage.message
+                download_type = 'guest'
+                
             #   通知定義おわり
 
             # ログインユーザーが一次承認者の場合
@@ -1500,7 +1505,7 @@ class ApproveView(View):
                         # #メール送信
                         current_site = get_current_site(self.request)
                         domain = current_site.domain
-                        download_type = 'normal'
+                        # download_type = 'normal'
 
                         tupleMessage = []
                         for email in emailList_for:
@@ -1535,10 +1540,10 @@ class ApproveView(View):
                                 tupleMessage.insert(-1,messageList)
 
                         send_mass_mail(tupleMessage)
-                        ##################Notification通知用終了                    
-                    else: ##################################第二承認者なし　　矢野さんここに！！
+                        ##################Notification通知用終了       
+                    else: ##################################第二承認者なし
                         ################################受信者にファイル受信通知
-                        ###################　Notification通知用  ～を受信しました 
+                        ###################　Notification通知用  ～を受信しました
                         #送信先取得,アドレス帳＆直接入力
                         dest_user =  upload_manage.dest_user.values_list('email', flat=True)
                         dest_user_list = list(dest_user)
@@ -1551,7 +1556,6 @@ class ApproveView(View):
                         dest_users = ' '.join(dest_users)
                         #送信先 email
                         emailList_db = ','.join(dest_user_list)
-                        # emailList_db = ','.join(dest_user_list)
                         #タイトル
                         Notice_title = create_user.display_name + "さんが" + file_title + "を共有しました。"
                         #メッセージ
@@ -1566,134 +1570,42 @@ class ApproveView(View):
                         group_email_db = ','.join(group_email)
                         emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
                         emailList_db = emailList_db + ',' + group_email_db #str型
-
                         ###通知テーブル登録
                         Notification.objects.create(service="FileUP!",category="受信通知",sender=create_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
-                        if approval_upload_method == "1":#通常
-                            upload_manage = UploadManage.objects.get(id=approval_manage.upload_manage.id)
-                            download_type = 'normal'
-                            
-                        elif approval_upload_method =="2":#URL
-                            upload_manage = UrlUploadManage.objects.get(id=approval_manage.upload_manage.id)
-                            download_type = 'url'
-                            url = upload_manage.url
-                            
-                        elif approval_upload_method == "3":#OTP
-                            upload_manage = OTPUploadManage.objects.get(id=approval_manage.upload_manage.id)
-                            download_type = 'otp'
-                            url = upload_manage.url
-                            
-                        else:#ゲスト
-                            upload_manage = GuestUploadManage.objects.get(id=approval_manage.upload_manage.id)
-
-                        ##############ファイル送信通知
-                        #送信先 email
-                        current_user = User.objects.filter(id=upload_manage.created_user).first()
-                        if approval_upload_method == 4:
-                            print('guest')
-                        else:
-                            dest_user =  upload_manage.dest_user.values_list('email', flat=True)
-                            dest_user_list = list(dest_user)
-                            emailList_db = ','.join(dest_user_list)
-                            #タイトル
-                            Notice_title = current_user.display_name + "さんが" + file_title + "を共有しました。"
-                            #メッセージ
-                            Notice_message = upload_manage.message
-                            #グループemaillist作成
-                            dest_group = upload_manage.dest_user_group.values_list('group_name', flat=True)
-                            dest_group_list = list(dest_group)
-                            group_email = []
-                            for group in dest_group_list:
-                                qs = Address.objects.filter(group__group_name=group)
-                                for user in qs:
-                                    email = user.email
-                                    group_email.append(email)
-                            group_email_db = ','.join(group_email)
-                            emailList_for = list(dict.fromkeys(dest_user_list + group_email)) #list型
-                            emailList_db = emailList_db + ',' + group_email_db #str型
-
-                            ###通知テーブル登録
-                            Notification.objects.create(service="FileUP!",category="受信通知",sender=current_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
-
-                            #メール送信
-                            current_site = get_current_site(self.request)
-                            domain = current_site.domain
-                            download_type = 'normal'
-
-                            tupleMessage = []
-                            for email in emailList_for:
-                                e_user = User.objects.filter(email=email).first()
-                                
-                                if e_user:
-                                    e_send = e_user.is_send_mail
-
-                                if e_user and e_send == True or not e_user:
-                                    if approval_upload_method == "1":
-                                        context = {
-                                            'protocol': 'https' if self.request.is_secure() else 'http',
-                                            'domain': domain,
-                                            'download_type': download_type,
-                                            #送信者
-                                            'user_last_name':self.request.user.last_name,
-                                            'user_first_name':self.request.user.first_name,
-                                        }
-                                    else:
-                                        context = {
-                                            'protocol': 'https' if self.request.is_secure() else 'http',
-                                            'domain': domain,
-                                            'download_type': download_type,
-                                            'url': url,
-                                            #送信者
-                                            'user_last_name':self.request.user.last_name,
-                                            'user_first_name':self.request.user.first_name,
-                                        }
-                                    subject_template = get_template('draganddrop/mail_template/subject.txt')
-                                    subject = subject_template.render(context)
-
-                                    message_template = get_template('draganddrop/mail_template/message.txt')
-                                    message = message_template.render(context)
-                                    from_email = settings.EMAIL_HOST_USER#CL側のメアド
-                                    recipient_list = [email]#受信者リスト
-                                    
-                                    message1 = (
-                                        subject,
-                                        message,
-                                        from_email,
-                                        recipient_list,
-                                    )
-                                    messageList = list(message1)
-                                    tupleMessage.insert(-1,messageList)
-
-                            send_mass_mail(tupleMessage)
-
                         #メール送信
                         current_site = get_current_site(self.request)
                         domain = current_site.domain
-                        download_type = 'normal'
 
                         tupleMessage = []
                         for email in emailList_for:
                             e_user = User.objects.filter(email=email).first()
-                            
                             if e_user:
                                 e_send = e_user.is_send_mail
-
                             if e_user and e_send == True or not e_user:
-                                context = {
-                                    'protocol': 'https' if self.request.is_secure() else 'http',
-                                    'domain': domain,
-                                    'download_type': download_type,
-                                    #送信者
-                                    'user_last_name':create_user.display_name,
-                                }
+                                if approval_upload_method == "1":
+                                    context = {
+                                        'protocol': 'https' if self.request.is_secure() else 'http',
+                                        'domain': domain,
+                                        'download_type': download_type,
+                                        #送信者
+                                        'user_last_name':create_user.display_name,
+                                    }
+                                else:
+                                    url = upload_manage.url
+                                    context = {
+                                        'protocol': 'https' if self.request.is_secure() else 'http',
+                                        'domain': domain,
+                                        'download_type': download_type,
+                                        'url': url,
+                                        #送信者
+                                        'user_last_name':create_user.display_name,
+                                    }
                                 subject_template = get_template('draganddrop/mail_template/subject.txt')
                                 subject = subject_template.render(context)
-
                                 message_template = get_template('draganddrop/mail_template/message.txt')
                                 message = message_template.render(context)
                                 from_email = settings.EMAIL_HOST_USER#CL側のメアド
                                 recipient_list = [email]#受信者リスト
-                                
                                 message1 = (
                                     subject,
                                     message,
@@ -1702,10 +1614,8 @@ class ApproveView(View):
                                 )
                                 messageList = list(message1)
                                 tupleMessage.insert(-1,messageList)
-
                         send_mass_mail(tupleMessage)
                         ##################Notification通知用終了
-
                         ##############送信者に承認完了した通知
                         ###################　Notification通知用  ～が承認されました
                         #送信先 email
@@ -1716,14 +1626,11 @@ class ApproveView(View):
                         Notice_title =  file_title + "が承認されました。"
                         # #メッセージ
                         Notice_message = file_message
-
                         ###通知テーブル登録
                         Notification.objects.create(service="FileUP!",category="承認完了",sender=create_user,title=Notice_title,email_list=emailList_db,fileup_title=file_title,contents=Notice_message)
-
                         # #メール送信
                         current_site = get_current_site(self.request)
                         domain = current_site.domain
-                        download_type = 'normal'
 
                         tupleMessage = []
                         # for email in emailList_for:
@@ -1732,24 +1639,20 @@ class ApproveView(View):
                         print('承認メールきてる',email)
                         if e_user:
                             e_send = e_user.is_send_mail
-
                         if e_user and e_send == True or not e_user:
                             context = {
                                 'protocol': 'https' if self.request.is_secure() else 'http',
                                 'domain': domain,
-                                'download_type': download_type,
+                                # 'download_type': download_type,
                                 #送信者
                                 'user_last_name':create_user.display_name,
                             }
                             subject_template = get_template('draganddrop/mail_template/approval_done_subject.txt')
                             subject = subject_template.render(context)
-
                             message_template = get_template('draganddrop/mail_template/approval_done.txt')
                             message = message_template.render(context)
                             from_email = settings.EMAIL_HOST_USER#CL側のメアド
                             recipient_list = [email]#受信者リスト
-                            # recipient_list = [email]#受信者リスト
-                            
                             message1 = (
                                 subject,
                                 message,
@@ -1758,10 +1661,8 @@ class ApproveView(View):
                             )
                             messageList = list(message1)
                             tupleMessage.insert(-1,messageList)
-                        # send_mass_mail(tupleMessage)
                         send_mail(subject, message, from_email, recipient_list)
-                        ##################Notification通知用終了                          
-
+                        ##################Notification通知用終了                                   
                 #######ログのセーブ
                 if approval_upload_method == "1":
                     # print("-------------- 承認履歴 通常アップロード")
@@ -1980,7 +1881,6 @@ class ApproveView(View):
                     #メール送信
                     current_site = get_current_site(self.request)
                     domain = current_site.domain
-                    download_type = 'normal'
 
                     tupleMessage = []
                     for email in emailList_for:
@@ -1990,13 +1890,24 @@ class ApproveView(View):
                             e_send = e_user.is_send_mail
 
                         if e_user and e_send == True or not e_user:
-                            context = {
-                                'protocol': 'https' if self.request.is_secure() else 'http',
-                                'domain': domain,
-                                'download_type': download_type,
-                                #送信者
-                                'user_last_name':create_user.display_name,
-                            }
+                            if approval_upload_method == "1":
+                                context = {
+                                    'protocol': 'https' if self.request.is_secure() else 'http',
+                                    'domain': domain,
+                                    'download_type': download_type,
+                                    #送信者
+                                    'user_last_name':create_user.display_name,
+                                }
+                            else:
+                                url = upload_manage.url
+                                context = {
+                                    'protocol': 'https' if self.request.is_secure() else 'http',
+                                    'domain': domain,
+                                    'download_type': download_type,
+                                    'url': url,
+                                    #送信者
+                                    'user_last_name':create_user.display_name,
+                                }
                             subject_template = get_template('draganddrop/mail_template/subject.txt')
                             subject = subject_template.render(context)
 
@@ -2034,7 +1945,6 @@ class ApproveView(View):
                     # #メール送信
                     current_site = get_current_site(self.request)
                     domain = current_site.domain
-                    download_type = 'normal'
 
                     tupleMessage = []
                     # for email in emailList_for:
@@ -2048,7 +1958,6 @@ class ApproveView(View):
                         context = {
                             'protocol': 'https' if self.request.is_secure() else 'http',
                             'domain': domain,
-                            'download_type': download_type,
                             #送信者
                             'user_last_name':create_user.display_name,
                         }
@@ -2069,7 +1978,6 @@ class ApproveView(View):
                         )
                         messageList = list(message1)
                         tupleMessage.insert(-1,messageList)
-                    # send_mass_mail(tupleMessage)
                     send_mail(subject, message, from_email, recipient_list)
                     ##################Notification通知用終了
 
