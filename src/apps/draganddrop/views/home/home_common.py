@@ -5,9 +5,10 @@ from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, ApprovalManage, FirstApproverRelation, SecondApproverRelation
-from accounts.models import User, File,Notification,Read,Company,FileupPermissions
+from accounts.models import User, File,Notification,Read,Company,FileupPermissions,Service,Company
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
+from contracts.models import Plan, Contract, FileupDetail
 # from datetime import datetime, date, timedelta, timezone
 import datetime
 from django.urls import reverse
@@ -117,9 +118,22 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["current_user"] = current_user
         context["email_domain"] = email_domain
         # information終わり
-        
+
+        user = self.request.user
+        service = Service.objects.get(name="FileUP!")
+        # 管理テーブル情報取得
+        resource_management = ResourceManagement.objects.filter(company=self.request.user.company.id)
+        context["resource_management"] = resource_management
+
+        # ex_service = Service.objects.all()
+        # context["ex_service"] = ex_service
+        resource_contract = Contract.objects.get(company=user.company, service=service, status="2")
+        context["resource_contract"] = resource_contract
+
+        resource_detail = FileupDetail.objects.get(plan=resource_contract.plan)
+        context["resource_detail"] = resource_detail
         # 契約プラン
-        plan = "free"
+        plan = resource_contract.plan
         context["plan"] = plan
         
         # 会社毎のファイル合計サイズ

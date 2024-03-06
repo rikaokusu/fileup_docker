@@ -3321,6 +3321,11 @@ DatePicker
     color:#005CA2;
 }
 
+.home_drop_disabled{
+    background-color: #488cc1;
+    opacity: 0.5;
+}
+
 /*---------------------------------
 管理画面
 ---------------------------------*/
