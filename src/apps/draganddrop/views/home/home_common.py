@@ -119,7 +119,7 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         # information終わり
         
         # 契約プラン
-        plan = "light"
+        plan = "free"
         context["plan"] = plan
         
         # 会社毎のファイル合計サイズ

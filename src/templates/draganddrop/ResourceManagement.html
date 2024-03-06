@@ -63,7 +63,11 @@
 				<span class="balloon">「使用可能容量」とは残りの空いている容量のことです。</span>
 			</div>
 			<p class="tooltip_font ml-2" style="color: #005392;">
-				{{ resource_detail.capacity }} GB
+				{% if resource_detail.capacity == 1000 %}
+					1TB
+				{% else %}
+					{{ resource_detail.capacity }} GB
+				{% endif %}
 			</p>
 		</div>
 		<div class="d-flex">
@@ -87,12 +91,12 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<p>登録ユーザー数(上限):</p> 
+			<p>登録ユーザー数/上限:</p> 
 			<p class="ml-2" style="color: #005392;">
 				{% if resource_detail.user_limit == NULL %}
-                    {{number_of_user}}人 (無制限)
+                    {{number_of_user}}人 /無制限
 				{% else %}
-					{{number_of_user}}人 ({{ resource_detail.user_limit }} 人)
+					{{number_of_user}}人 /{{ resource_detail.user_limit }} 人
 				{% endif %}
 			</p>
 		</div>
@@ -103,7 +107,7 @@
 		<div class="d-flex">
 			<p>ワンタイムパスワード:</p> 
 			<p class="ml-2" style="color: #005392;">
-				{% if one_time_pw == 1 %}
+				{% if resource_detail.one_time_pw == 1 %}
 					利用可能
 				{% else %}
 					利用不可
@@ -113,7 +117,7 @@
 		<div class="d-flex">
 			<p>管理機能:</p> 
 			<p class="ml-2" style="color: #005392;">
-				{% if manage == 1 %}
+				{% if resource_detail.manage == 1 %}
 					あり
 				{% else %}
 					なし
@@ -121,7 +125,10 @@
 			</p>
 		</div>
 		<div class="d-flex">
-			<p>最大ファイルサイズ:</p> 
+			<div class="balloonoya">
+				<p>最大ファイルサイズ:</p> 
+				<span class="balloon">「最大ファイルサイズ」とは１回のアップロードにおける合計ファイルサイズの上限です。</span>
+			</div>
 			<p class="ml-2" style="color: #005392;">
 				{% if max_size_every_share_GB %}
                     {{ max_size_every_share_GB }}GB
@@ -155,22 +162,42 @@
 				{% endif %}
 				<div class="disk_capacity_box_unit">{{total_size_unit}}</div>
 		</div>
-		{% if remaining_capacity <= 0 %}
-			<div class="amount_of_space balloonoya">
-				<p>
-					(<span class="title_color" style="font-weight: bold;">残容量</span>
-					: 0{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
-				</p>
-				<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
-			</div>
+		{% if remaining_capacity <= 0 %}<!--残容量が0㎇以下-->
+			{% if resource_detail.capacity == 1000 %} <!--最大容量1TB-->
+				<div class="amount_of_space balloonoya">
+					<p>
+						<span class="title_color" style="font-weight: bold;">残容量</span>
+						: 0{{remaining_capacity_unit}}/1TB
+					</p>
+					<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+				</div>
 			{% else %}
-			<div class="amount_of_space balloonoya">
-				<p>
-					(<span class="title_color" style="font-weight: bold;">残容量</span>
-					: {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
-				</p>
-				<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
-			</div>
+				<div class="amount_of_space balloonoya">
+					<p>
+						<span class="title_color" style="font-weight: bold;">残容量</span>
+						: 0{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB
+					</p>
+					<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+				</div>
+			{% endif %}
+		{% else %}
+			{% if resource_detail.capacity == 1000 %} <!--最大容量1TB-->
+				<div class="amount_of_space balloonoya">
+					<p>
+						<span class="title_color" style="font-weight: bold;">残容量</span>
+						: {{remaining_capacity}}{{remaining_capacity_unit}}/1TB
+					</p>
+					<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+				</div>
+			{% else %}
+				<div class="amount_of_space balloonoya">
+					<p>
+						<span class="title_color" style="font-weight: bold;">残容量</span>
+						: {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB
+					</p>
+					<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+				</div>
+			{% endif %}
 		{% endif %}
 	</div>
 
@@ -292,21 +319,41 @@
                     <div class="disk_capacity_box_unit">{{total_size_unit}}</div>
             </div>
             {% if remaining_capacity <= 0 %}
-                <div class="amount_of_space balloonoya">
-                    <p>
-                        (<span class="title_color" style="font-weight: bold;">残容量</span>
-                        : 0{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
-                    </p>
-                    <span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
-                </div>
+				{% if resource_detail.capacity == 1000 %} <!--最大容量1TB-->
+					<div class="amount_of_space balloonoya">
+						<p>
+							<span class="title_color" style="font-weight: bold;">残容量</span>
+							: 0{{remaining_capacity_unit}}/1TB
+						</p>
+						<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+					</div>
+				{% else %}
+					<div class="amount_of_space balloonoya">
+						<p>
+							<span class="title_color" style="font-weight: bold;">残容量</span>
+							: 0{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB
+						</p>
+						<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+					</div>
+				{% endif %}
             {% else %}
-                <div class="amount_of_space balloonoya">
-                    <p>
-                        (<span class="title_color" style="font-weight: bold;">残容量</span>
-                        : {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB )
-                    </p>
-                    <span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
-                </div>
+				{% if resource_detail.capacity == 1000 %} <!--最大容量1TB-->
+					<div class="amount_of_space balloonoya">
+						<p>
+							<span class="title_color" style="font-weight: bold;">残容量</span>
+							: {{remaining_capacity}}{{remaining_capacity_unit}}/1TB 
+						</p>
+						<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+					</div>
+				{% else %}
+					<div class="amount_of_space balloonoya">
+						<p>
+							<span class="title_color" style="font-weight: bold;">残容量</span>
+							: {{remaining_capacity}}{{remaining_capacity_unit}}/{{ resource_detail.capacity }}GB
+						</p>
+						<span class="balloon">「残容量」とは残データ容量の内訳のことです。</span>
+					</div>
+				{% endif %}
             {% endif %}
         </div>
     </div>

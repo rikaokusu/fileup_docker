@@ -58,9 +58,9 @@
                 <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
                     {% if plan == "free" %}
-                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
-                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
-                        <button class="dropdown-item home_menu_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
+                        <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button" style="opacity:0.5;">URL共有</button>
+                        <button class="dropdown-item home_menu_item" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
+                        <button class="dropdown-item home_menu_item" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
                     {% else %}
                         <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_url_upload' %}">URL共有</a>
                         <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_otp_upload' %}">OTP共有</a>
