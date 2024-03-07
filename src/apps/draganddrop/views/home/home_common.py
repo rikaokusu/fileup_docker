@@ -133,7 +133,7 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         resource_detail = FileupDetail.objects.get(plan=resource_contract.plan)
         context["resource_detail"] = resource_detail
         # 契約プラン
-        plan = resource_contract.plan
+        plan = resource_contract.plan.stripe_plan_id
         print('契約プラン',resource_contract)
         print('契約プラン1',resource_detail)
         print('契約プラン2',plan)
