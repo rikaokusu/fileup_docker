@@ -134,6 +134,9 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["resource_detail"] = resource_detail
         # 契約プラン
         plan = resource_contract.plan
+        print('契約プラン',resource_contract)
+        print('契約プラン1',resource_detail)
+        print('契約プラン2',plan)
         context["plan"] = plan
         
         # 会社毎のファイル合計サイズ
