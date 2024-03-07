@@ -45,11 +45,11 @@
                     {{ log.destination_address }}
                 </td>
                 <!--タイトル-->
-                <td>
-                    {{ log.file_title }}
+                <td data-toggle="tooltip" data-placement="right" title="{{log.file_title}}">
+                    {{ log.file_title | truncatechars:10 }}
                 </td>
                 <!--ファイル名-->
-                <td>
+                <td data-toggle="tooltip" data-placement="right" title="{{log.file_name}}">
                     {% comment %} {% for log_file in log_files %}
                         {% if log_file.log == log %}
                             <p class="log-filename">
@@ -57,7 +57,8 @@
                             </p>
                         {% endif %}
                     {% endfor %} {% endcomment %}
-                    {{ log.file_name | linebreaksbr }}
+                    {% comment %} {{ log.file_name | linebreaksbr }} {% endcomment %}
+                    {{log.file_name | truncatechars:18}}
                 </td>
                 <!--共有種別-->
                 <td>{{ log.get_upload_category_display }}</td>

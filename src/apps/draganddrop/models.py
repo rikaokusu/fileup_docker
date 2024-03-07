@@ -81,7 +81,7 @@ class Filemodel(models.Model):
         print('モデルネームの中身',model_name)
         user = User.objects.filter(pk=instance.created_user).first()
         cont = Contract.objects.filter(company=user.company,service__name='FileUP!',status='2').first()
-        if not cont.plan.name == 'フリープラン':
+        if not cont.plan.stripe_plan_id == 'free' or not cont.plan.stripe_plan_id == 'pln':
             return "charge" + "/"  + filename
         else:
             return "free" + "/"  + filename

@@ -42,7 +42,8 @@ class Plan(models.Model):
     is_option = models.BooleanField(default=False, blank=True)
     # 試用フラグ
     is_trial = models.BooleanField(default=False, blank=True)
-
+    # 商品ID（★stripeの商品IDを値に用いる）
+    stripe_plan_id = models.CharField('StripeのプランID', max_length=100, blank=False, default="pln")
     def __str__(self):
         return self.name
 
