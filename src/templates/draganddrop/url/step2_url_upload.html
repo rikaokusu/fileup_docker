@@ -869,6 +869,7 @@
         // 確定ボタンを押下したらファイルをアップロード
         $("#submit_file_upload, #draft_submit_file_upload").click(function (e) {
           if (addflug) {
+            console.log('かくていぼたんおうか')
             // フラグがtrueの時はファイルアップロードを実行
             e.preventDefault();
             // キューを実行
@@ -913,6 +914,7 @@
       // アップロード成功時の処理
       successmultiple: function (file, response) {
         // アップロードに成功したファイルを配列に保存しておく
+            console.log('あっぷろーどせいこう')
   
         file_up_names.push(file.name);
         for (let i = 0; i < file.length; ++i) {

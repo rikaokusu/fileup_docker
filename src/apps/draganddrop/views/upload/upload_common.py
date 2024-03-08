@@ -66,10 +66,11 @@ class FileUpload(View, CommonView):
 ################################################
 # ファイルアップロード直後にFilemodelオブジェクト作成 #
 ################################################
-class GuestFileUpload(TemplateView):
+class GuestFileUpload(View):
     template_name = None
+    
     def post(self, request, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # context = super().get_context_data(**kwargs)
 
         guest_upload_manage_id = self.request.session['guest_upload_manage_id']
         guest_upload_manage = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
