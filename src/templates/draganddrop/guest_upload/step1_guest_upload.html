@@ -365,7 +365,8 @@
       uploadMultiple: true,
       parallelUploads: 100,
       maxFiles: 5,
-      maxFilesize: 1024	, // MB
+      //maxFilesize: 1024	, // MB
+      maxFilesize: 3024	, //MB ここでは多めにとっておいて624行目ファイルサイズ上限のところではじく。ここで小さくしてしまうとdropzoneのデフォルトエラー（英語）が表示されしまう
       paramName: "file",
       dictDefaultMessage: '<span class="dropzone_text">ファイルアップロード</span><br /><br /><br /><br /><br /><br /><br /><i class="fas fa-file-upload fa-5x dropzone_upload_icon"></i><br /><br />ドラッグ&ドロップまたはクリック',
       dictMaxFilesExceeded: "アップロードできるファイルは5ファイルまでです。",
@@ -420,14 +421,14 @@
           total_file_size += Number(file.size)
           
           if (plan == "free") {
-            if (total_file_size >= 314572800) {
+            if (total_file_size >= 209715200) {
                 this.removeFile(file);
                 $('.error_msg_place').remove();
                 $('#validation-error').html('<div class="alert alert_message" role="alert">' +
                   "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
               }
           } else {
-            if (total_file_size >= 1073741824) {
+            if (total_file_size >= 3221225472) {
               this.removeFile(file);
               $('.error_msg_place').remove();
               $('#validation-error').html('<div class="alert alert_message" role="alert">' +
@@ -819,9 +820,9 @@
       //アップロードファイル情報表示
       file_number = file_up_names.length
       if (plan == "free") {
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "300MB")
+        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "200MB")
       } else {
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "1GB")
+        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "3GB")
       }
       $("#upload_file_number").html("ファイル数" + " : " + file_number + "/5")
       $("#total_byte").html("合計" + " : " + total)
