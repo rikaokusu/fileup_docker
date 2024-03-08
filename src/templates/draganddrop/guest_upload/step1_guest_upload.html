@@ -4,17 +4,17 @@
 
 <div class="d-flex flex-row bd-highlight mt-4 mb-2 top_bar">
 
-  <div class="top2">
-    <div class="tate mr-2"></div>
-    <h1>ゲストアップロード</h1><i class="fas fa-link fa-2x icon-link"></i>
-  </div>
+    <div class="top2">
+        <div class="tate mr-2"></div>
+        <h1>ゲストアップロード</h1><i class="fas fa-link fa-2x icon-link"></i>
+    </div>
 
 
-  <div class="progressbar2">
-    <div class="item active flex-fill">STEP1<br>ファイルを選択</div>
-    <div class="item flex-fill">STEP2<br>登録完了</div>
+    <div class="progressbar2">
+        <div class="item active flex-fill">STEP1<br>ファイルを選択</div>
+        <div class="item flex-fill">STEP2<br>登録完了</div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -27,7 +27,8 @@
   <div id="upload-info">
     <h2>アップロード方法</h2>
     <p>下部枠内の「ファイルアップロード」に共有したいファイルをドラッグアンドドロップまたは枠内をクリックして<br>
-    ファイルを選択後、「確認」ボタンを押してください。</p>
+    ファイルを選択後、「確認」ボタンを押してください。<br>
+    ファイルのアップロードは1GBまで可能です。</p>
   </div>
   <div class="box1 box1_step2">
     <div class="d-flex">
@@ -144,6 +145,7 @@
         <div class="modal-header default_modal_header">
           <span class="modal-title big_modal_title">確認画面<i class="fas fa-check-circle ml-1"></i></span>
         </div>
+        <h5 class="pl-4 pt-4">以下の内容でファイルを登録します。確認の上、「登録」ボタンを押してください。</h5>
 
         <div class="modal-body confirm_modal_body">
           <div class="modal_box2">
@@ -202,7 +204,7 @@
                         {% endif %}
                       {% endfor %} {% endcomment %}
                       <div class="d-flex">
-                        <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{guest_upload_manage.dest_user_mail1}}</div>
+                        <div><i class="fas fa-user fa-fw fa-1x" style="color:#161718;"></i>{{dest_user_name}}({{guest_upload_manage.dest_user}})</div>
                       </div>
                       <div class="dest_user_list_wrap">
                         {% comment %} 送り先 合計 {{request.session.dest_user_all_list|length}}件 {% endcomment %}
@@ -334,11 +336,10 @@
 
 {% block extra_js %}
 <script>
-  //   // -----------------
-  //   // Dropzone.jsの設定
-  //   // -----------------
-  
-    var plan = "{{plan}}";
+    //   // -----------------
+    //   // Dropzone.jsの設定
+    //   // -----------------
+    
     var file_up_names = new Array;
     var file_up_size = new Array;
     var files = 0
@@ -357,6 +358,7 @@
     }
     
     $("div#myDropzone").dropzone({
+    
       url: "{% url 'draganddrop:guest_file_upload' %}",
       params: {
         'csrfmiddlewaretoken': getCookie('csrftoken')
@@ -382,23 +384,26 @@
   
         // ページ読み込み前に事前にアップロードされたファイルをサーバ側から読み込む
         var dist_file = "{{dist_file|escapejs}}";
+
         // 削除するファイルのPKをtasks_update.jsにわたす
         var del_file_pk = "{{del_file_pk|escapejs}}";
+
         // ファイルを追加したときの処理
         myDropzone.on("addedfile", function (file) {
           $('#confirm_button').prop("disabled", false);
           $('#update_confirm_button').prop("disabled", false);
-          
+
           // ファイル名の重複チェック(サーバとフロント)
           // PKが存在するファイルはサーバ上のファイルと判断しチェック対象外とする
           if (!file.pk) {
             // JSONに変更
             dist_file_json = JSON.parse(dist_file);
+                    console.log('ここきたjson',dist_file_json)
+
             // dist_file_jsonをループで取り出す
             for (var i = 0; i < dist_file_json.length; i++) {
               if (dist_file_json[i].fields.name === file.name) {
                 this.removeFile(file);
-                console.log("同名ファイル削除")
                 $('.error_msg_place').remove();
                 $('#validation-error').html('<div class="alert alert_message" role="alert">' +
                   "同じ名前のファイルはアップロードできません。" + '</div>');
@@ -406,38 +411,42 @@
             }
           }
   
-          // ファイルサイズ上限
-          let company_total_file_size = "{{total_file_size}}"
-          let server_file_size = 0;
-          let total_file_size = 0;
-          dist_file_json = JSON.parse(dist_file);
-  
-          for (var i = 0; i < dist_file_json.length; i++) {
-              server_file_size += Number(dist_file_json[i].fields.size)
-              total_file_size = Number(company_total_file_size) + server_file_size
-              }
-          // フロント側のファイルサイズを合算する
-          total_file_size += Number(file.size)
-          
-          if (plan == "free") {
-            if (total_file_size >= 314572800) {
-                this.removeFile(file);
-                $('.error_msg_place').remove();
-                $('#validation-error').html('<div class="alert alert_message" role="alert">' +
-                  "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
-              }
-          } else {
+            // ファイルサイズ上限
+            //let company_total_file_size = "{{total_file_size}}"
+            let server_file_size = 0;
+            let total_file_size = 0;
+            dist_file_json = JSON.parse(dist_file);
+            // フロント側のみのファイルサイズ
+            console.log('ここきた４４４',Number(file.size))
+
+            if(dist_file_json.length){
+                for (var i = 0; i < dist_file_json.length; i++) {
+                    console.log('ここきた444222')
+                    server_file_size += Number(dist_file_json[i].fields.size)
+                    total_file_size = server_file_size
+                    //total_file_size = Number(company_total_file_size) + server_file_size
+                    console.log('ここきた444333',total_file_size)
+                }
+            }
+
+            //1GB以上はエラー
             if (total_file_size >= 1073741824) {
+                console.log('ここきた666')
               this.removeFile(file);
               $('.error_msg_place').remove();
               $('#validation-error').html('<div class="alert alert_message" role="alert">' +
                 "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+                console.log('ここきた777')
             }
-          } 
+            
+            // フロント側のファイルサイズを合算する
+            total_file_size += Number(file.size)
+            console.log('ここきた５５５',total_file_size)
           
           // ファイル名から拡張子を取得する
           var ext = checkFileExt(file.name); // Get extension
-  
+            console.log('ここきた５５５222',ext)
+            
           // ファイルアップロードチェックボックスの無効化
           $('#id_no_file_upload').prop({
             'disabled': true
@@ -504,15 +513,15 @@
           $(".preview").removeClass().addClass(genclass);
           
           // 削除機能
-          $('#fileDelModal, #updateFileDelModal').off('show.bs.modal');
-          $('#fileDelModal, #updateFileDelModal').on('show.bs.modal', function (event) {
+          $('#fileDelModal').off('show.bs.modal');
+          $('#fileDelModal').on('show.bs.modal', function (event) {
             del_button = $(event.relatedTarget);
             delete_file_id = del_button.data('id');
             delete_file_name = del_button.data('name');
             checked_button_clicked = true;
             if ($('[name="checked_del_file"], [name="checked_updated_del_file"]').on('click', function(){
               checked_button_clicked = true;
-              $('#fileDelModal, #updateFileDelModal').hide();
+              $('#fileDelModal').hide();
               $('#previews').hide()
               myDropzone.removeFile(file);
             }));
@@ -632,8 +641,9 @@
         });
   
         // 確定ボタンを押下したらファイルをアップロード
-        $("#submit_file_upload, #draft_submit_file_upload").click(function (e) {
+        $("#submit_file_upload").click(function (e) {
           if (addflug) {
+            console.log('あっぷろーどしちゃうよ')
             // フラグがtrueの時はファイルアップロードを実行
             e.preventDefault();
             // キューを実行
@@ -652,7 +662,7 @@
         // dist_fileはHTMLのScriptタグで取得（Viewのコンテキストとして取得）
         if (dist_file) {
           dist_file_json = JSON.parse(dist_file);
-  
+            console.log('サーバ上にあるファイルを描画する。',dist_file_json)
           // dist_file_jsonをループで取り出す
           for (var i = 0; i < dist_file_json.length; i++) {
   
@@ -669,7 +679,7 @@
             file_up_size.push(mockFile.size);
             // thumbnailイベントを発火しパスを紐付ける
             myDropzone.emit("thumbnail", mockFile, dist_file_json[i].fields.file);
-  
+
           }
         }
   
@@ -678,6 +688,7 @@
       // アップロード成功時の処理
       successmultiple: function (file, response) {
         // アップロードに成功したファイルを配列に保存しておく
+            console.log('あっぷろーどせいこう')
   
         file_up_names.push(file.name);
         for (let i = 0; i < file.length; ++i) {
@@ -706,7 +717,7 @@
           $('#validation-error').html('<div class="alert alert-danger" role="alert">' + xhr.status + '</div>');
           // 上限数を超えたファイルは削除する
           this.removeFile(file);
-  
+            console.log('きえちゃうよ')
         }
       },
   
@@ -780,6 +791,12 @@
       if (!flag) return;
       $('<div id="loading-view" />').appendTo('body');
     }
+    $('.register_btn').on('click', function (e, data) {
+        console.log('ここきてる？？')
+        loadingView(true);
+        $(window).off('beforeunload');
+        $('#postForm').submit();
+    });
   
     //ファイルサイズをセッションから取得。
     $(document).ready(function () {
@@ -818,11 +835,7 @@
   
       //アップロードファイル情報表示
       file_number = file_up_names.length
-      if (plan == "free") {
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "300MB")
-      } else {
         $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "1GB")
-      }
       $("#upload_file_number").html("ファイル数" + " : " + file_number + "/5")
       $("#total_byte").html("合計" + " : " + total)
   

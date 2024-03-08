@@ -17,7 +17,7 @@ from django.conf import settings
 import random
 import string
 import threading
-from accounts.models import Notification,User
+from accounts.models import Notification,User,Company
 # # 全てで実行させるView
 from django.core.signing import TimestampSigner, dumps, SignatureExpired, loads
 
@@ -632,7 +632,7 @@ class GuestFileUnableUpload(ListView):
 # ゲストアップロード１  #
 ###########################
 
-class Step1GuestUpload(CreateView, FormView):
+class Step1GuestUpload(CreateView, View):
     model = GuestUploadManage
     template_name = "draganddrop/guest_upload/step1_guest_upload.html"
     form_class = GuestUploadDistFileUploadForm
@@ -651,9 +651,42 @@ class Step1GuestUpload(CreateView, FormView):
 
         guest_upload_manage_obj = GuestUploadManage.objects.filter(pk=guest_upload_manage_id).prefetch_related('file').first()
         files = guest_upload_manage_obj.file.all()
-        print('ふぁいるずの中身あるの？？？？',files) 
+        dest_user = User.objects.filter(email=guest_upload_manage_obj.dest_user).first()
+        if dest_user.company.pic_company_name and not dest_user.company.pic_legal_personality == 99:
+            if dest_user.company.pic_legal_person_posi == '1':
+                if dest_user.company.pic_dept_name:
+                    dest_user_company = dest_user.company.get_pic_legal_personality_display() + dest_user.company.pic_company_name + '　' + dest_user.company.pic_dept_name
+                else:
+                    dest_user_company = dest_user.company.get_pic_legal_personality_display() + dest_user.company.pic_company_name
+            else:
+                if dest_user.company.pic_dept_name:
+                    dest_user_company = dest_user.company.pic_company_name + dest_user.company.get_pic_legal_personality_display() + '　' + dest_user.company.pic_dept_name
+                else:
+                    dest_user_company = dest_user.company.pic_company_name + dest_user.company.get_pic_legal_personality_display()
+        elif dest_user.company.pic_company_name and dest_user.company.pic_legal_personality == 99:
+            if dest_user.company.pic_dept_name:
+                dest_user_company = dest_user.company.pic_company_name + '　' + dest_user.company.pic_dept_name
+            else:
+                dest_user_company = dest_user.company.pic_company_name
+        elif dest_user.company.pic_company_name:
+            dest_user_company = dest_user.company.pic_company_name
+        else:
+            dest_user_company = dest_user.email
+
+        if dest_user.first_name and dest_user.last_name:
+            dest_user_name = dest_user_company + ' ' +dest_user.last_name + dest_user.first_name
+        elif dest_user.last_name:
+            dest_user_name = dest_user_company + ' ' + dest_user.last_name
+        elif dest_user.first_name:
+            dest_user_name = dest_user_company + ' ' + dest_user.first_name
+        else:
+            dest_user_name = dest_user.email
+
+            
+        context["dest_user_name"] = dest_user_name
         context["files"] = files
         context["guest_upload_manage"] = guest_upload_manage_obj
+        
 
         file = serializers.serialize("json", files, fields=('name', 'size', 'upload', 'id'))
 
@@ -767,7 +800,7 @@ class Step1GuestUpload(CreateView, FormView):
 
         guest_upload_manage_obj.save()
 
-        return HttpResponseRedirect(reverse('draganddrop:step2_guest_upload', kwargs={'pk': guest_upload_manage_obj.id}))
+        return HttpResponseRedirect(reverse('draganddrop:step1_guest_upload', kwargs={'pk': guest_upload_manage_obj.id}))
 
 
 
