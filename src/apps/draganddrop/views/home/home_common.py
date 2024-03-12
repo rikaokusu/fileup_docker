@@ -144,7 +144,7 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
             resource_manage = ResourceManagement.objects.filter(company = self.request.user.company.id).first()
             if resource_manage:
                 context["total_file_size"] = resource_manage.total_file_size
-                # context["total_data_usage"] = resource_manage.total_data_usage
+                context["total_data_usage"] = resource_manage.total_data_usage
         
         return context
     

@@ -129,7 +129,7 @@
       </div> {% endcomment %}
 
       <div class="ml-1 mr-1">
-        <button type="button" class="btn-default" data-toggle="modal" data-target="#confirm_modal" id="confirm_button"
+        <button type="button" class="btn-default" data-toggle="modal" id="confirm_button"
           disabled>確認<i class="fas fa-angle-right ml-2"></i></button>
         </div>
     </div>
@@ -367,7 +367,8 @@
       uploadMultiple: true,
       parallelUploads: 100,
       maxFiles: 5,
-      maxFilesize: 1024	, // MB
+      //maxFilesize: 1024	, // MB
+      maxFilesize: 3024	, //MB ここでは多めにとっておいて624行目ファイルサイズ上限のところではじく。ここで小さくしてしまうとdropzoneのデフォルトエラー（英語）が表示されしまう
       paramName: "file",
       dictDefaultMessage: '<span class="dropzone_text">ファイルアップロード</span><br /><br /><br /><br /><br /><br /><br /><i class="fas fa-file-upload fa-5x dropzone_upload_icon"></i><br /><br />ドラッグ&ドロップまたはクリック',
       dictMaxFilesExceeded: "アップロードできるファイルは5ファイルまでです。",
@@ -430,14 +431,14 @@
             }
 
             //1GB以上はエラー
-            if (total_file_size >= 1073741824) {
+            /*if (total_file_size >= 1073741824) {
                 console.log('ここきた666')
               this.removeFile(file);
               $('.error_msg_place').remove();
               $('#validation-error').html('<div class="alert alert_message" role="alert">' +
                 "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
                 console.log('ここきた777')
-            }
+            } */
             
             // フロント側のファイルサイズを合算する
             total_file_size += Number(file.size)
@@ -832,10 +833,29 @@
         total = gbyte_round + " " + "GB"
   
       }
+      //容量オーバー時の処理
+        //確認ボタンにリンク貼る＆有効にする
+        if(bytes > 0 && bytes <= 209715200) {
+          $('#confirm_button').attr('data-target','#confirm_modal')
+          $('#update_confirm_button').attr('data-target','#update_confirm_modal')
+        }
+        //容量オーバーエラー表示
+        if (bytes >= 209715200) {
+            $('.error_msg_place').remove(); 
+            $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+              "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+            $('#confirm_button').prop("disabled", true);
+            $('#update_confirm_button').prop("disabled", true);
+        }
   
       //アップロードファイル情報表示
       file_number = file_up_names.length
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "1GB")
+      alert('プラン'+plan)
+      if (plan == "free") {
+        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "200MB")
+      } else {
+        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "3GB")
+      }
       $("#upload_file_number").html("ファイル数" + " : " + file_number + "/5")
       $("#total_byte").html("合計" + " : " + total)
   

@@ -31,19 +31,38 @@
 <div class="home_menu">
 
     <!--ファイル共有-->
-    {% if plan == "free" and number_of_company_upload_manage >= 5 %}
-        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限数を超えています" data-placement="top" data-toggle="tooltip" role="button">
-            <i class="fas fa-file-alt"></i>
-            ファイル共有
-        </button>
-    {% elif plan == "free" and total_data_usage >= 3221225472 %}
-        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
-            <i class="fas fa-file-alt"></i>
-            ファイル共有
-        </button>
-    {% else %}
-        <!-- ログインユーザーが承認者に設定されている場合はボタンを無効にする -->
-        {% if current_user_is_approver %}
+    {% if plan == "free" %}
+        {% if total_data_usage >= 2147483648	 %}<!--使用可能容量オーバー ２GB--> 
+            <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
+                <i class="fas fa-file-alt"></i>
+                ファイル共有
+            </button>
+        {% elif number_of_company_upload_manage >= resource_detail.max_items %}<!--アップロード数超過-->
+            <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限数を超えています" data-placement="top" data-toggle="tooltip" role="button">
+                <i class="fas fa-file-alt"></i>
+                ファイル共有
+            </button>
+        {% else %}<!--フリープラン通常-->
+            <div class="dropdown home_menu_wrap">
+                <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-file-alt"></i>
+                    ファイル共有
+                </button>
+                <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
+                    <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
+                    <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
+                    <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
+                </div>
+            </div><!--home_menu_wrap閉じタグ-->
+        {% endif %}
+    {% else %}<!--フリープラン以外（現状プレミアムと想定）-->
+        {% if total_data_usage >= 1073741824000 %}<!--使用可能容量オーバー 1000gb-->
+            <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
+                <i class="fas fa-file-alt"></i>
+                ファイル共有
+            </button>
+        {% elif current_user_is_approver %}
             <button class="btn dropdown-toggle home_menu_btn_disabled" type="button" title="承認者に設定されているユーザーはファイルのアップロードは行えません" data-placement="top" data-toggle="tooltip" role="button">
                 <i class="fas fa-file-alt"></i>
                 ファイル共有
@@ -69,7 +88,56 @@
                 </div>
             </div><!--home_menu_wrap閉じタグ-->
         {% endif %}
-    {% endif %}
+    {% endif %}<!--プラン分岐終わり-->
+    <!--ファイル共有終わり-->
+
+
+
+
+
+
+
+
+
+
+    {% comment %} {% if number_of_company_upload_manage >= resource_detail.max_items %}
+        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限数を超えています" data-placement="top" data-toggle="tooltip" role="button">
+            <i class="fas fa-file-alt"></i>
+            ファイル共有
+        </button>
+    {% elif total_data_usage >= 3221225472 %}
+        <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
+            <i class="fas fa-file-alt"></i>
+            ファイル共有
+        </button>
+    {% else %}
+        <!-- ログインユーザーが承認者に設定されている場合はボタンを無効にする -->
+        {% if current_user_is_approver %}
+            <button class="btn dropdown-toggle home_menu_btn_disabled" type="button" title="承認者に設定されているユーザーはファイルのアップロードは行えません" data-placement="top" data-toggle="tooltip" role="button">
+                <i class="fas fa-file-alt"></i>
+                ファイル共有
+            </button>
+        {% else %}
+            <div class="dropdown home_menu_wrap">
+                <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-file-alt"></i>
+                    ファイル共有
+                </button>
+                <div class="dropdown-menu home_menu_drop" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1' %}">通常アップロード</a>
+                    {% if plan == "free" %}
+                        <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">URL共有</button>
+                        <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">OTP共有</button>
+                        <button class="dropdown-item home_menu_item home_drop_disabled" data-toggle="tooltip" title="有料プランから利用可能です" data-placement="top"  role="button">ゲストアップロード</button>
+                    {% else %}
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_url_upload' %}">URL共有</a>
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_otp_upload' %}">OTP共有</a>
+                        <a class="dropdown-item home_menu_item" href="{% url 'draganddrop:step1_guest_upload_create' %}">ゲストアップロード</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %} {% endcomment %}
     <!--ファイル共有終わり-->
 
     <!--アドレス帳-->
