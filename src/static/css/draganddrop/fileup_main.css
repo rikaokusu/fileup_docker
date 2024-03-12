@@ -367,6 +367,8 @@ common class
 .upload_box::after {
     color: #ffffff;
     font-size: 0.5rem;
+    display:inline-block;
+    text-align:center;
     /* position: absolute; */
     right: 0px;
     background-color: rgb(149, 212, 3);
@@ -376,11 +378,14 @@ common class
     margin-left: 10px;
     content: "通常";
     margin-top: 5px;
+    width: 30px;
 }
 
 .url_box::after {
     color: #ffffff;
     font-size: 0.5rem;
+    display:inline-block;
+    text-align:center;
     /* position: absolute; */
     right: 0px;
     background-color: #2e6de4;
@@ -390,11 +395,14 @@ common class
     margin-left: 10px;
     content: "URL";
     margin-top: 5px;
+    width: 30px;
 }
 
 .otp_box::after {
     color: #ffffff;
     font-size: 0.5rem;
+    display:inline-block;
+    text-align:center;
     /* position: absolute; */
     right: 0px;
     background-color: rgb(168, 31, 223);
@@ -404,11 +412,13 @@ common class
     margin-left: 10px;
     content: "OTP";
     margin-top: 5px;
+    width: 30px;
 }
 
 .guest_box::after {
     color: #ffffff;
     font-size: 0.5rem;
+    text-align:center;
     /* position: absolute; */
     right: 0px;
     background-color: #fc8a1f;
@@ -416,8 +426,9 @@ common class
     padding: 3px;
     white-space: nowrap;
     margin-left: 10px;
-    content: "ｹﾞｽﾄ";
+    content: "ゲスト";
     margin-top: 5px;
+    width: 30px;
 }
 
     /*---------------
