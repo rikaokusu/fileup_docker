@@ -835,12 +835,12 @@
       }
       //容量オーバー時の処理
         //確認ボタンにリンク貼る＆有効にする
-        if(bytes > 0 && bytes <= 209715200) {
+        if(bytes > 0 && bytes <= 1073741824	) {
           $('#confirm_button').attr('data-target','#confirm_modal')
           $('#update_confirm_button').attr('data-target','#update_confirm_modal')
         }
         //容量オーバーエラー表示
-        if (bytes >= 209715200) {
+        if (bytes >= 1073741824	) {
             $('.error_msg_place').remove(); 
             $('#validation-error').html('<div class="alert alert_message" role="alert">' +
               "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
@@ -850,12 +850,7 @@
   
       //アップロードファイル情報表示
       file_number = file_up_names.length
-      alert('プラン'+plan)
-      if (plan == "free") {
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "200MB")
-      } else {
-        $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "3GB")
-      }
+      $("#max_upload_file_size").html("ファイルサイズ上限" + " : " + "1GB")
       $("#upload_file_number").html("ファイル数" + " : " + file_number + "/5")
       $("#total_byte").html("合計" + " : " + total)
   
