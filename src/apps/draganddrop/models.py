@@ -495,7 +495,7 @@ class ApprovalWorkflow(models.Model):
     reg_user_company = models.CharField('会社', max_length=255, blank=True, null=True)
     # 登録日
     registration_date = models.DateTimeField('登録日', default=timezone.now)
-    # 承認ワークフロー
+    # 承認ワークフロー利用
     is_approval_workflow = models.IntegerField(
         verbose_name='承認ワークフロー', default=2, null=True, blank=True, choices=IS_APPROVA_WORKFLOW)
     # 承認形式

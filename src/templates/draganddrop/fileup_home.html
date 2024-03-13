@@ -32,7 +32,7 @@
 
     <!--ファイル共有-->
     {% if plan == "free" %}
-        {% if total_data_usage >= 2147483648	 %}<!--使用可能容量オーバー ２GB--> 
+        {% if total_data_usage >= 2147483648 %}<!--使用可能容量オーバー ２GB--> 
             <button class="btn home_menu_btn_disabled" type="button" title="アップロード制限サイズを超えています" data-placement="top" data-toggle="tooltip" role="button">
                 <i class="fas fa-file-alt"></i>
                 ファイル共有
@@ -62,11 +62,13 @@
                 <i class="fas fa-file-alt"></i>
                 ファイル共有
             </button>
-        {% elif current_user_is_approver %}
-            <button class="btn dropdown-toggle home_menu_btn_disabled" type="button" title="承認者に設定されているユーザーはファイルのアップロードは行えません" data-placement="top" data-toggle="tooltip" role="button">
-                <i class="fas fa-file-alt"></i>
-                ファイル共有
-            </button>
+        {% elif is_approval_workflow == 1 %} <!--承認機能がONである＞承認者に設定されているis_approval_workflow-->
+            {% if current_user_is_approver %}
+                <button class="btn dropdown-toggle home_menu_btn_disabled" type="button" title="承認者に設定されているユーザーはファイルのアップロードは行えません" data-placement="top" data-toggle="tooltip" role="button">
+                    <i class="fas fa-file-alt"></i>
+                    ファイル共有
+                </button>
+            {% endif %}
         {% else %}
             <div class="dropdown home_menu_wrap">
                 <button class="btn dropdown-toggle home_menu_btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

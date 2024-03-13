@@ -114,7 +114,7 @@ class DeleteAjaxView(View):
                 upload_manage.delete()
 
             # 個人管理テーブルの作成・更新
-            send_table_delete(self.request.user.id, number_of_download_table, number_of_download_file_table, upload_manage_file_size, 1)
+            send_table_delete(self.request.user.id, number_of_download_table, number_of_download_file_table, upload_manage_file_size, 0)
             # 会社管理テーブルの作成・更新
             resource_management_calculation_process(self.request.user.company.id)
 
@@ -297,7 +297,7 @@ class UrlDeleteAjaxView(View):
 
             # PersonalResourceManagementテーブル情報を修正
             # 個人管理テーブルの作成・更新
-            send_table_delete(self.request.user.id, number_of_url_download_table, number_of_url_download_file_table, url_upload_manage_file_size, 2)
+            send_table_delete(self.request.user.id, number_of_url_download_table, number_of_url_download_file_table, url_upload_manage_file_size, 1)
             # 会社管理テーブルの作成・更新
             resource_management_calculation_process(self.request.user.company.id)
 
@@ -479,7 +479,7 @@ class OTPDeleteAjaxView(View):
 
             # PersonalResourceManagementテーブル情報を修正
             # 個人管理テーブルの作成・更新
-            send_table_delete(self.request.user.id, number_of_otp_download_table, number_of_otp_download_file_table, otp_upload_manage_file_size, 3)
+            send_table_delete(self.request.user.id, number_of_otp_download_table, number_of_otp_download_file_table, otp_upload_manage_file_size, 2)
             # 会社管理テーブルの作成・更新
             resource_management_calculation_process(self.request.user.company.id)
 

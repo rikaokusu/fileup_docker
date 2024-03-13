@@ -129,14 +129,11 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         # context["ex_service"] = ex_service
         resource_contract = Contract.objects.get(company=user.company, service=service, status="2")
         context["resource_contract"] = resource_contract
-
+        # プランのFileup用詳細情報
         resource_detail = FileupDetail.objects.get(plan=resource_contract.plan)
         context["resource_detail"] = resource_detail
         # 契約プラン
         plan = resource_contract.plan.stripe_plan_id
-        print('契約プラン',resource_contract)
-        print('契約プラン1',resource_detail)
-        print('契約プラン2',plan)
         context["plan"] = plan
         
         # 会社毎のファイル合計サイズ
@@ -404,7 +401,7 @@ class FileuploadListView(LoginRequiredMixin, ListView, CommonView):
         context["guest_upload_manage_for_dest_users_deleted"] = guest_upload_manage_for_dest_users_deleted
 
 
-        """会社毎のレコード数取得"""
+        """会社毎の通常アップロードのレコード数取得－フリープランの個数制限で使用するから通常のみでいい"""
         number_of_company_upload_manage = UploadManage.objects.filter(company=self.request.user.company.id, tmp_flag=0).all().count()
         context["number_of_company_upload_manage"] = number_of_company_upload_manage
 

@@ -59,6 +59,8 @@ class FileupDetail(models.Model):
     user_limit = models.IntegerField('ユーザー上限', blank=True, null=True)
     # 使用可能容量
     capacity = models.IntegerField('使用可能容量', null=True, blank=True)
+    # 使用可能容量_byte(dropzone計算用)
+    capacity_byte = models.BigIntegerField(blank=True, null=True)
     # URL共有
     url_share = models.BooleanField('URL共有可否',null=True, blank=True)
     # 管理
