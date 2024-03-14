@@ -496,7 +496,11 @@ class ApprovalWorkflowView(TemplateView, CommonView, ApplicationStatusCheckView)
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        service = Service.objects.get(name="FileUP!")
+        service = Service.objects.filter(name="FileUP!-Free-").first()
+        if not service:
+            service = Service.objects.filter(name="FileUP!-久米島町-").first()
+            if not service:
+                service = Service.objects.get(name="FileUP!")
 
         user_approval_workflow = ApprovalWorkflow.objects.filter(reg_user_company=self.request.user.company.id).first()
         context["user_approval_workflow_id"] = user_approval_workflow.id
@@ -1359,8 +1363,11 @@ class ApprovalDetailView(TemplateView, CommonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        service = Service.objects.get(name="FileUP!")
-
+        service = Service.objects.filter(name="FileUP!-Free-").first()
+        if not service:
+            service = Service.objects.filter(name="FileUP!-久米島町-").first()
+            if not service:
+                service = Service.objects.get(name="FileUP!")
         approval_manage_pk = self.kwargs['pk']
         # print("---------------- approval_manage_pk", approval_manage_pk)
 

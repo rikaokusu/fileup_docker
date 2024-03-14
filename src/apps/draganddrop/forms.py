@@ -6,7 +6,7 @@ from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
-from accounts.models import FileupPermissions
+from accounts.models import FileupPermissions,FileupFreePermissions,FileupKumePermissions
 
 # 日付
 import datetime
@@ -671,6 +671,12 @@ class FirstApproverSetForm(forms.Form):
         #自分と同じ会社のユーザー取得。第一承認者と第二承認者に設定されているものは省く
         # queryset = User.objects.filter(company=self.admin_user_company, is_rogical_deleted=False).exclude(Q(id__in=self.first_approver_lists)|Q(id__in=self.second_approver_lists))
         queryset2 = FileupPermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+        if not queryset2:
+            queryset2 = FileupFreePermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+            if not queryset2:
+                queryset2 = FileupKumePermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+        
+        
         queryset = User.objects.filter(id__in=queryset2)
         super(FirstApproverSetForm, self).__init__(*args, **kwargs)
 
@@ -705,6 +711,11 @@ class SecondApproverSetForm(forms.Form):
         #第一承認者設定の候補ユーザー一覧
         #自分と同じ会社のユーザー取得。第一承認者と第二承認者に設定されているものは省く
         queryset2 = FileupPermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+        if not queryset2:
+            queryset2 = FileupFreePermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+            if not queryset2:
+                queryset2 = FileupKumePermissions.objects.filter(user__company=self.admin_user_company).exclude(Q(user__id__in=self.first_approver_lists)|Q(user__id__in=self.second_approver_lists)).values_list("user")
+            
         queryset = User.objects.filter(id__in=queryset2)
         super(SecondApproverSetForm, self).__init__(*args, **kwargs)
 

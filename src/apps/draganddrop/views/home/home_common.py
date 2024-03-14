@@ -5,7 +5,7 @@ from django.views.generic.detail import ContextMixin
 from ...forms import ManageTasksStep1Form
 from draganddrop.models import UploadManage, Downloadtable, UrlUploadManage, UrlDownloadtable, OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, ApprovalManage, FirstApproverRelation, SecondApproverRelation
-from accounts.models import User, File,Notification,Read,Company,FileupPermissions,Service,Company
+from accounts.models import User, File,Notification,Read,Company,FileupPermissions,FileupFreePermissions,FileupKumePermissions,Service,Company
 from draganddrop.models import ApprovalWorkflow
 from draganddrop.forms import UserChangeForm
 from contracts.models import Plan, Contract, FileupDetail
@@ -57,7 +57,12 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["url_name"] = url_name
         context["app_name"] = app_name
         context["current_user"] = current_user
-        user_permission = FileupPermissions.objects.get(user=current_user)
+        
+        user_permission = FileupFreePermissions.objects.filter(user=current_user).first()
+        if not user_permission:
+            user_permission = FileupKumePermissions.objects.filter(user=current_user).first()
+            if not user_permission:
+                user_permission = FileupPermissions.objects.get(user=current_user)
         context["user_permission"] = user_permission
         print('権限。カレントユーザーpermission',user_permission)
         print('権限。カレントユーザーpermission2',user_permission.permission)
@@ -120,7 +125,11 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         # information終わり
 
         user = self.request.user
-        service = Service.objects.get(name="FileUP!")
+        service = Service.objects.filter(name="FileUP!-Free-").first()
+        if not service:
+            service = Service.objects.filter(name="FileUP!-久米島町-").first()
+            if not service:
+                service = Service.objects.get(name="FileUP!")
         # 管理テーブル情報取得
         resource_management = ResourceManagement.objects.filter(company=self.request.user.company.id)
         context["resource_management"] = resource_management

@@ -3,7 +3,7 @@ from datetime import datetime,timezone
 from django.views.generic import TemplateView
 from draganddrop.views.home.home_common import CommonView
 from draganddrop.models import OperationLog
-from accounts.models import FileupPermissions
+from accounts.models import FileupPermissions,FileupFreePermissions,FileupKumePermissions
 # import logging
 # logger = logging.getLogger(__name__)
 
@@ -42,8 +42,12 @@ class LogView(CommonView,TemplateView):
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
 
-        user_permission = FileupPermissions.objects.get(user=current_user)
-
+        user_permission = FileupPermissions.objects.filter(user=current_user).first()
+        if not user_permission:
+            user_permission = FileupFreePermissions.objects.filter(user=current_user).first()
+            if not user_permission:
+                user_permission = FileupKumePermissions.objects.filter(user=current_user).first()
+            
         #管理者(社内の人見れる)
         if user_permission.permission >= "1":
             logs =  OperationLog.objects.filter(operation_user_company_id=current_user.company,category=2)
