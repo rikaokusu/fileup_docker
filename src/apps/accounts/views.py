@@ -22,7 +22,7 @@ from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from accounts.models import User, Company, Messages, Service,FileupPermissions
+from accounts.models import User, Company, Messages, Service,FileupPermissions,FileupFreePermissions,FileupKumePermissions
 from contracts.models import Contract,Plan
 
 from django.db.models import Q
@@ -163,8 +163,15 @@ class Login(LoginView):
         email = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(email=email, password=password)
-        f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!",status__in=["1","2"])
+        f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!-Free-",status="2")
+        if not f_contract:
+            f_contract = Contract.objects.filter(company=user.company,service__name="FileUP!",status__in=["1","2"])
         f_p = FileupPermissions.objects.filter(user=user).first()
+        if not f_p:
+            f_p = FileupFreePermissions.objects.filter(user=user).first()
+            if not f_p:
+                f_p = FileupKumePermissions.objects.filter(user=user).first()
+                
         # Check here if the user is an admin
         #全体ユーザーテーブルにレコードがあるか、それが有効だったら
         if user is not None and user.is_active:

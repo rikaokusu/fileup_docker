@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, OTPUploadManage, GuestUploadManage, GuestUploadDownloadtable, ResourceManagement, PersonalResourceManagement
 from draganddrop.views.home.home_common import CommonView
-from accounts.models import User,Service,Company,FileupPermissions
+from accounts.models import User,Service,Company,FileupPermissions,FileupFreePermissions,FileupKumePermissions
 from contracts.models import Plan, Contract, FileupDetail
 import datetime
 from django.db.models import Q
@@ -15,7 +15,11 @@ class ResourceManagementView(TemplateView,CommonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        service = Service.objects.get(name="FileUP!")
+        service = Service.objects.filter(name="FileUP!-Free-").first()
+        if not service:
+            service = Service.objects.filter(name="FileUP!-久米島町-").first()
+            if not service:
+                service = Service.objects.get(name="FileUP!")
         # 管理テーブル情報取得
         resource_management = ResourceManagement.objects.filter(company=self.request.user.company.id)
         context["resource_management"] = resource_management
@@ -69,6 +73,11 @@ class ResourceManagementView(TemplateView,CommonView):
 
             # 登録ユーザー取得
             permissions = FileupPermissions.objects.all()
+            if not permissions:
+                permissions = FileupFreePermissions.objects.all()
+                if not permissions:
+                    permissions = FileupKumePermissions.objects.all()
+                
             number_of_user = 0
             for permission in permissions:
                 if permission.user.company == self.request.user.company:
