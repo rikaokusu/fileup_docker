@@ -5,7 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ManageTasksStep1Form, DistFileUploadForm
 from draganddrop.models import UploadManage, ApprovalLog, PDFfilemodel, Address, Group, Filemodel, Downloadtable, DownloadFiletable, ResourceManagement, PersonalResourceManagement
 from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
-from accounts.models import Notification,User
+from accounts.models import Notification,User,Service,Company
+from contracts.models import Plan, Contract, FileupDetail
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core import serializers

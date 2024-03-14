@@ -1028,36 +1028,21 @@
         total = gbyte_round + " " + "GB"
   
       }
-      //容量オーバー時の処理
-      if (plan == "free") {
-        //確認ボタンにリンク貼る＆有効にする
-        if(bytes > 0 && bytes <= 209715200) {
-          $('#confirm_button').attr('data-target','#confirm_modal')
-          $('#update_confirm_button').attr('data-target','#update_confirm_modal')
-        }
-        //容量オーバーエラー表示
-        if (bytes >= 209715200) {
-            $('.error_msg_place').remove(); 
-            $('#validation-error').html('<div class="alert alert_message" role="alert">' +
-              "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
-            $('#confirm_button').prop("disabled", true);
-            $('#update_confirm_button').prop("disabled", true);
-          }
-      } else {
-        //確認ボタンにリンク貼る＆有効にする
-        if(bytes > 0 && bytes <= 3221225472) {
-          $('#confirm_button').attr('data-target','#confirm_modal')
-          $('#update_confirm_button').attr('data-target','#update_confirm_modal')
-        }
-        //容量オーバーエラー表示
-        if (bytes >= 3221225472) {
-          $('.error_msg_place').remove(); 
-          $('#validation-error').html('<div class="alert alert_message" role="alert">' +
-            "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
-          $('#confirm_button').prop("disabled", true);
-          $('#update_confirm_button').prop("disabled", true);
-        } 
-      } 
+    ///////////////////////////////容量オーバー時の処理
+    var max_filesize = {{max_filesize}}
+    if(bytes > 0 && bytes <= max_filesize) {
+      $('#confirm_button').attr('data-target','#confirm_modal')
+      $('#update_confirm_button').attr('data-target','#update_confirm_modal')
+    }
+    //容量オーバーエラー表示
+    if (bytes >= max_filesize) {
+      $('.error_msg_place').remove(); 
+      $('#validation-error').html('<div class="alert alert_message" role="alert">' +
+        "ファイルサイズの上限に達しているためアップロードできません。" + '</div>');
+      $('#confirm_button').prop("disabled", true);
+      $('#update_confirm_button').prop("disabled", true);
+    } 
+    //////////////////////////////容量オーバー時の処理終わり
       //アップロードファイル情報表示
       file_number = file_up_names.length
       if (plan == "free") {

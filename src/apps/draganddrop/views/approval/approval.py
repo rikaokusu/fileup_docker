@@ -1480,9 +1480,12 @@ class ApproveView(View):
                     print('ファーストアプロ―バル222ステータス２',second_approvers)   
 
                     if second_approvers: #第二承認者いる
-                        # second_approver_list = []
+                        # status変更！
+                        print("----------------- 一次承認済み")
+                        upload_manage.application_status = 3 # 一次承認済み
+                        upload_manage.save()
+                        # 通知用情報取得
                         second_approver_list_raw_1 = list(second_approvers.values_list('second_approver', flat=True))#first_approversから第一承認者のユーザーIDだけのリストになっている
-                        print('二次承認者いる',second_approver_list_raw_1)
                         #第二承認者メールリスト
                         second_mails = []
                         for user in second_approver_list_raw_1:
@@ -1542,6 +1545,10 @@ class ApproveView(View):
                         send_mass_mail(tupleMessage)
                         ##################Notification通知用終了       
                     else: ##################################第二承認者なし
+                        # status変更！
+                        print("----------------- 一次承認済み")
+                        upload_manage.application_status = 3 # 一次承認済み
+                        upload_manage.save()
                         ################################受信者にファイル受信通知
                         ###################　Notification通知用  ～を受信しました
                         #送信先取得,アドレス帳＆直接入力
@@ -1842,9 +1849,13 @@ class ApproveView(View):
                 approval_log.save()
 
 
-                ######################################################通知
+                ######################################################自分が第二の最終承認者
                 ################### 第二承認者として設定されているトータルユーザーの数と現在二次承認済みの数
                 if (second_approval_manage_count == second_approval_manage_status_list.count(2)):
+                    ########status変更！！
+                    upload_manage.application_status = 5 # 最終承認済み
+                    upload_manage.save()
+                    
                     ################################受信者にファイル受信通知
                     ###################　Notification通知用  ～を受信しました 
                     #送信先取得,アドレス帳＆直接入力
@@ -2076,6 +2087,11 @@ class DeclineApplicationView(View):
                 file_title = approval_manage.guest_upload_manage.title
                 file_message = approval_manage.guest_upload_manage.message
             #   通知定義おわり
+                
+            #############status変更！
+            upload_manage.application_status = 7 # 差戻し
+            upload_manage.save()
+            
             # ログインユーザーが一次承認者の場合
             if approval_manage.first_approver:
                 # print("-------------- 一次承認者")

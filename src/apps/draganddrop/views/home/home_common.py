@@ -131,7 +131,14 @@ class CommonView(InvalidCompanyMixin,ContextMixin):
         context["resource_contract"] = resource_contract
         # プランのFileup用詳細情報
         resource_detail = FileupDetail.objects.get(plan=resource_contract.plan)
+        print('FILEUPDETAIL詳細わかる',resource_detail)
         context["resource_detail"] = resource_detail
+        # 使用可能容量byte
+        max_capacity_byte = resource_detail.capacity_byte
+        context["max_capacity_byte"] = max_capacity_byte
+        # 一回の共有に対する最大ファイル容量
+        max_filesize = resource_detail.maxsize_every_share
+        context["max_filesize"] = max_filesize
         # 契約プラン
         plan = resource_contract.plan.stripe_plan_id
         context["plan"] = plan
