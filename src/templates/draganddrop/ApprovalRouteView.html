@@ -1,0 +1,146 @@
+{% extends "draganddrop/common//base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+
+<style>
+#jquery-ui-sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 350px;
+}
+#jquery-ui-sortable li {
+    margin: 0 3px 3px 3px;
+    padding: 0.3em;
+    padding-left: 1em;
+    font-size: 15px;
+    font-weight: bold;
+}
+#jquery-ui-sortable li span {
+    cursor: move;
+    position: absolute;
+    margin-top: 2px;
+    margin-left: 300px;
+}
+</style>
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar">
+    <div class="top">
+        <div class="tate mr-4" style="height:74px;"></div>
+        <h1>承認ルート設定</h1>
+    </div>
+</div>
+
+<div class="my-div-style w-100 mt-4">
+    <div class="d-flex">
+        <h5 class="section_title mb-3">グループ名 : <sapan class="font-weight-bold">マッシュファン</sapan></h5>
+        <h5>(合計 : <sapan class="font-weight-bold">5人</sapan>)</sapn></h5>
+    </div>
+
+    {% comment %} <ul id="jquery-ui-sortable">
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 1</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 2</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 3</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 4</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 5</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 6</li>
+        <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s ui-corner-all ui-state-hover"></span>項目 7</li>
+    </ul> {% endcomment %}
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+            <th scope="col">番号</th>
+            <th scope="col">氏名</th>
+            <th scope="col">メールアドレス</th>
+            <th scope="col">所属部門</th>
+            <th scope="col">役職</th>
+            <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+                <td>df</td>
+                <td>
+                    <i class="fas fa-grip-vertical sortable-handle"></i></i>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+                <td>as</td>
+                <td>
+                    <i class="fas fa-grip-vertical sortable-handle"></i></i>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>Larry</td>
+                <td>the Bird</td>
+                <td>@twitter</td>
+                <td>fv</td>
+                <td>
+                    <i class="fas fa-grip-vertical sortable-handle"></i></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <!----------バーボタン---------->
+    <div>
+        <div class="d-flex flex-row justify-content-center mt-5 bottom_bar">
+
+            <div class="ml-1 mr-1">
+                <button type="button" class="btn-cancel" data-toggle="modal" id="cancel_btn"
+                    data-target="#CancelModal">
+                    キャンセル
+                </button>
+            </div>
+
+            <div class="ml-2 mr-1">
+                <button type="submit" class="send_data_btn1 btn-default" id="next_btn" data-toggle="modal"
+                    data-target="#send_data_modal" disabled>登録
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+<!--jQueryを読み込み-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!--jQuery UIを読み込み-->
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+// -----------------
+// jQuery UIのSortableプラグイン
+// -----------------
+$(function() {
+    //$('#jquery-ui-sortable').sortable({
+    $('tbody').sortable({
+        handle: '.sortable-handle',
+        cursor: 'move',
+        opacity: 0,
+    });
+});
+</script>
+
+{% endblock %}

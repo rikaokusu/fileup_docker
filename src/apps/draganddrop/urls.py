@@ -254,6 +254,18 @@ urlpatterns = [
      path('approval_log/', approval.ApprovalLogView.as_view(), name='approval_log'),
      # 承認詳細
      path('approval_detail/<uuid:pk>/', approval.ApprovalDetailView.as_view(), name='approval_detail'),
+     # 承認ルート設定
+     path('approval_route/', approval.ApprovalRouteView.as_view(), name='approval_route'),
+     # 承認グループ設定
+     path('approval_group_management/', approval.ApprovalGroupManagementView.as_view(), name='approval_group_management'),
+     # グループ作成
+     path('approval_group_create/', approval.ApprovalGroupCreateView.as_view(), name='approval_group_create'),
+     # グループ削除(個別)
+     path('approval_group_delete/<uuid:pk>', approval.ApprovalGroupDeleteView.as_view(), name='approval_group_delete'),
+     # グループ編集
+     # path('approval_group_update/<uuid:pk>', approval.ApprovalGroupUpdateView.as_view(), name='approval_group_update'),
+
+
 
      # 承認
      path('approve/<uuid:pk>/', approval.ApproveView.as_view(), name='approve'),
@@ -269,6 +281,8 @@ urlpatterns = [
      path('otpapprovaldelete/', approval.OTPApprovalDeleteAjaxView.as_view(), name='otpapprovaldelete'),
      # 取り消し(削除) ゲストアップロード
      # path('guestapprovaldelete/', approval.GuestApprovalDeleteAjaxView.as_view(), name='guestapprovaldelete'),
+
+
 
      ##################################
      # 操作ログ  

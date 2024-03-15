@@ -1,15 +1,16 @@
 from django.shortcuts import render
-from django.views.generic import FormView, View, CreateView, TemplateView, UpdateView
+from django.views.generic import FormView, View, CreateView, TemplateView, UpdateView, ListView, DeleteView
 from django.views.generic.base import ContextMixin
 from draganddrop.views.home.home_common import resource_management_calculation_process, send_table_delete
 from draganddrop.models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Address, Group, UrlUploadManage,UrlDownloadtable, UrlDownloadFiletable, ResourceManagement, PersonalResourceManagement
-from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage, ApprovalLog
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage, ApprovalLog, CustomGroup, UserCustomGroupRelation
 from draganddrop.models import OTPUploadManage, OTPDownloadtable, GuestUploadManage, GuestUploadDownloadtable
 from draganddrop.views.home.home_common import CommonView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ...forms import ApprovalWorkflowEditForm, FirstApproverSetForm, SecondApproverSetForm
 from accounts.models import User,Service,Company
 from contracts.models import Plan, Contract, FileupDetail
+from draganddrop.forms import CustomGroupForm
 import urllib.parse
 import os
 from django.db.models import Q
@@ -49,6 +50,8 @@ from django.template.loader import get_template
 from django.contrib.sites.shortcuts import get_current_site
 
 from itertools import chain
+
+from django.urls import reverse_lazy
 
 
 class ApplicationStatusCheckView(ContextMixin):
@@ -2855,3 +2858,205 @@ class OTPApprovalDeleteAjaxView(View):
 #             data = {}
 #             data['message'] = '削除に失敗しました'
 #             return JsonResponse(data)
+
+
+"""
+承認ルート設定画面
+"""
+class ApprovalRouteView(TemplateView, CommonView):
+    template_name = 'draganddrop/ApprovalRouteView.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+"""
+グループ一覧画面
+"""
+class ApprovalGroupManagementView(ListView, CommonView):
+    model = CustomGroup
+    template_name = 'draganddrop/ApprovalGroupManagementView.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        groups = CustomGroup.objects.filter(reg_user=self.request.user.id)
+        context["groups"] = groups
+
+        # user_custom_group_relations = UserCustomGroupRelation.objects.all()
+        # context["user_custom_group_relations"] = user_custom_group_relations
+
+        return context
+
+
+"""
+グループ作成
+"""
+class ApprovalGroupCreateView(CommonView, FormView):
+    # フォームを変数にセット
+    model = CustomGroup
+    template_name = 'draganddrop/ApprovalGroupCreateView.html'
+    form_class = CustomGroupForm
+
+    # formに値を渡す
+    def get_form_kwargs(self):
+        # formにログインユーザーを渡す
+        kwargs = super(ApprovalGroupCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        print("-------------- グループ作成")
+
+        # グループに対してユーザーを紐づける
+        group_user_qs = form.cleaned_data['group_user']
+        group_name = form.cleaned_data['group_name']
+        print("-------------- group_user_qs", group_user_qs)
+        print("-------------- group_name", group_name)
+
+        # CustomGroupモデルのnameフィールドにgroup_nameを保存
+        custom_group, created = CustomGroup.objects.get_or_create(
+            group_name = group_name,
+            reg_user = self.request.user.id,
+            reg_date = datetime.now(),
+        )
+        custom_group.save()
+
+        group = CustomGroup.objects.filter(group_name=group_name).first()
+        print("-------------- group", group)
+
+        # UserCustomGroupRelationモデルのgroup_idフィールドにグループのid、group_userにgroup_user_qsを保存
+        for group_user in group_user_qs:
+            print("-------------- group_user", group_user)
+
+            user_custom_group_relation, created = UserCustomGroupRelation.objects.get_or_create(
+                group_id = group.id,
+                group_user = group_user.id,
+            )
+            user_custom_group_relation.save()
+
+        # メッセージを返す
+        messages.success(self.request, "グループを作成しました。")
+
+        return redirect('draganddrop:approval_group_management')
+
+
+"""
+グループ削除
+"""
+class ApprovalGroupDeleteView(DeleteView):
+    model = CustomGroup
+    template_name = 'draganddrop/ApprovalGroupManagementView.html'
+
+    def get_success_url(self):
+        # 削除対象のグループのIDを取得
+        group_id = self.object.pk
+
+        # 一致するグループを取得
+        del_group = CustomGroup.objects.filter(pk=group_id).first()
+        print("---------- del_group ---------", del_group)
+        print("---------- del_group pk ---------", del_group.pk)
+
+        del_users = UserCustomGroupRelation.objects.filter(group_id=del_group.id)
+        print("---------- del_users ---------", del_users)
+
+        # 削除するグループに所属しているユーザーのリストを作成
+        # delete_user_list = []
+
+        # # delete_user_list = list(del_users)
+        # delete_user_list_raw = list(del_users.values_list('group_user', flat=True))
+        # print("---------- delete_user_list ---------", delete_user_list_raw)#  [<UserCustomGroupRelation: UserCustomGroupRelation object (24)>, <UserCustomGroupRelation: UserCustomGroupRelation object (25)>]
+
+        # # IDをstrに直してリストに追加
+        # for group_user_uuid in delete_user_list_raw:
+        #     group_user_uuid_string = str(group_user_uuid)
+        #     delete_user_list.append(group_user_uuid_string)
+
+        # 削除しないグループに所属するユーザーのリスト
+        # not_del_users_list = []
+
+        # グループが紐づいているトレーニングの情報を取得
+        # trainings = TrainingRelation.objects.filter(group_id=del_group.pk)
+        # print("---------- グループに紐づいているトレーニングを取得 ---------", trainings)# <QuerySet [<TrainingRelation: TrainingRelation object (177)>]>
+
+        # if trainings:
+        #     # トレーニングをリスト化
+        #     training_list = []
+        #     delete_training_list_raw = list(trainings.values_list('training_id', flat=True))
+        #     print("---------- delete_training_list_raw ---------", delete_training_list_raw)# [UUID('66796700-1f36-4ad5-9fcf-1d216954049d'), UUID('f3986e94-53f4-4258-afb6-91b170d92698')]
+
+        #     # IDをstrに直してリストに追加
+        #     for training_uuid in delete_training_list_raw:
+        #         training_uuid_string = str(training_uuid)
+        #         training_list.append(training_uuid_string)
+        #     print("---------- training_list ---------", training_list)# ['66796700-1f36-4ad5-9fcf-1d216954049d', 'f3986e94-53f4-4258-afb6-91b170d92698']
+
+        #     # トレーニングに紐づいている削除対象のグループを除いたグループを取得する
+        #     not_del_groups = TrainingRelation.objects.filter(training_id__in=training_list).exclude(group_id=group_id)
+        #     print("---------- not_del_groups ---------", not_del_groups)# <QuerySet []>
+
+        #     # グループに所属しているユーザーを取得
+        #     for not_del_group in not_del_groups:
+
+        #         users = UserCustomGroupRelation.objects.filter(group_id=not_del_group.group_id)
+        #         print("---------- グループに所属しているユーザーを取得 ---------", users)# <QuerySet [<UserCustomGroupRelation: UserCustomGroupRelation object (24)>, <UserCustomGroupRelation: UserCustomGroupRelation object (25)>]>
+
+        #         # 削除しないグループのユーザーをforで回して取り出す
+        #         for not_del_users in users:
+        #             print("---------- not_del_users ---------", not_del_users)# UserCustomGroupRelation object (47)
+        #             # リストにユーザーを追加
+        #             not_del_users_list.append(not_del_users.group_user)
+        #             print("---------- not_del_users_list ---------", not_del_users_list)#  [<UserCustomGroupRelation: UserCustomGroupRelation object (47)>, <UserCustomGroupRelation: UserCustomGroupRelation object (48)>]
+
+        #     # リストの中に共通するユーザーがいる場合
+        #     if set(delete_user_list) & set(not_del_users_list):
+        #         print("---------- 重複ユーザーがいます ---------")
+
+        #         # 重複しているユーザーのリストを作成
+        #         repetitive_user = set(delete_user_list) & set(not_del_users_list)
+        #         repetitive_user_list = list(repetitive_user)
+        #         print("---------- repetitive_user_list ---------", repetitive_user_list)# ['9a058d25-384d-43e1-9a26-c1a680c87ab4']
+
+        #         # 重複ユーザーを除いたユーザーと一致するTrainingManageを取得
+        #         user_training_manages_qs = TrainingManage.objects.filter(user__in=delete_user_list, training__in=training_list).exclude(user__in=repetitive_user_list)
+        #         print("--------------- 重複ユーザーを除いた一致するユーザーのTrainingManageを取得(削除) --------------", user_training_manages_qs)
+
+        #         # 重複ユーザーを除いたユーザーと一致するトグルボタンの展開データを取得
+        #         user_folder_is_open_qs = FolderIsOpen.objects.filter(user_id__in=delete_user_list, training__in=training_list).exclude(user_id__in=repetitive_user_list)
+        #         print("---------- user_folder_is_open_qs ---------", user_folder_is_open_qs)
+
+        #     # TrainingManageを削除しない
+        #     else:
+        #         print("---------- 重複ユーザーはいません ---------")
+
+        #         # ユーザーと一致するTrainingManageを取得
+        #         user_training_manages_qs = TrainingManage.objects.filter(user__in=delete_user_list, training__in=training_list)
+        #         print("---------- user_training_manages_qs ---------", user_training_manages_qs)
+
+        #         # ユーザーと一致するトグルボタンの展開データを取得
+        #         user_folder_is_open_qs = FolderIsOpen.objects.filter(user_id__in=delete_user_list, training__in=training_list)
+        #         print("---------- user_folder_is_open_qs ---------", user_folder_is_open_qs)
+
+        #     # 削除対象のユーザーと一致するPartsgManageを取得
+        #     for user_training_manages in user_training_manages_qs:
+        #         print("--------------- user_training_manages", user_training_manages)# TrainingManage object (509)
+        #         user_parts_manages = user_training_manages.parts_manage.all()
+        #         print("--------------- ユーザーのparts_manage", user_parts_manages)# <QuerySet [<PartsManage: PartsManage object (57)>]>
+        #         # PartsgManageを削除
+        #         user_parts_manages.delete()
+
+        #     # TrainingManageを削除
+        #     user_training_manages_qs.delete()
+
+        #     # トグルボタンの展開データを削除
+        #     user_folder_is_open_qs.delete()
+
+        # UserCustomGroupRelationテーブルから該当する一行を削除
+        del_group.delete()
+        del_users.delete()
+
+        # メッセージを返す
+        messages.success(self.request, "グループを削除しました。")
+
+        return reverse_lazy('draganddrop:approval_group_management')

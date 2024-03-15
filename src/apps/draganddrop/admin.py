@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage, ApprovalLog
+from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage, ApprovalLog, UserCustomGroupRelation, CustomGroup
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
-from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
+# from .models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, ApprovalOperationLog, ApprovalManage
 from .models import OTPUploadManage, OTPDownloadtable, OTPDownloadFiletable, GuestUploadManage, GuestUploadDownloadtable, GuestUploadDownloadFiletable
 from .models import Filemodel, UploadManage, PDFfilemodel, Downloadtable, DownloadFiletable, Group, UrlUploadManage, UrlDownloadtable, UrlDownloadFiletable, Address,OperationLog
 from accounts.models import Notification,Read
@@ -82,6 +82,17 @@ class ApprovalLogAdmin(admin.ModelAdmin):
     list_display_links = ('upload_manage', 'url_upload_manage', 'otp_upload_manage', 'guest_upload_manage', 'approval_operation_user',
                             'approval_operation_user_position', 'approval_operation_user_company_id','approval_operation_date',
                             'approval_operation_content', 'message')
+    
+
+class UserCustomGroupRelationAdmin(admin.ModelAdmin):
+    list_display = ('group_id','group_user', 'approval_order')
+    list_display_links = ('group_id','group_user', 'approval_order')
+
+
+class CustomGroupRelationAdmin(admin.ModelAdmin):
+    list_display = ('id','group_name', 'reg_user', 'reg_date')
+    list_display_links = ('id','group_name', 'reg_user', 'reg_date')
+
 
 
 class OperationLogAdmin(admin.ModelAdmin):
@@ -163,6 +174,8 @@ admin.site.register(SecondApproverRelation, SecondApproverRelationAdmin)
 admin.site.register(ApprovalOperationLog, ApprovalOperationLogAdmin)
 admin.site.register(ApprovalManage, ApprovalManageAdmin)
 admin.site.register(ApprovalLog, ApprovalLogAdmin)
+admin.site.register(UserCustomGroupRelation, UserCustomGroupRelationAdmin)
+admin.site.register(CustomGroup, CustomGroupRelationAdmin)
 admin.site.register(OperationLog)
 admin.site.register(Notification)
 

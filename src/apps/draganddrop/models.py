@@ -650,6 +650,33 @@ class ApprovalLog(models.Model):
 
 
 
+"""
+承認グループテーブル(中間テーブル) ※グループに所属するユーザーの情報を保持しているテーブル
+"""
+class UserCustomGroupRelation(models.Model):
+    # CustomGroupのグループID
+    group_id = models.CharField(max_length=255, verbose_name="CustomGroupのグループID", null=True, blank=True)# CustomGroupのidと紐づける
+    # グループに所属するユーザーのID
+    group_user = models.CharField(max_length=500, verbose_name="グループに所属するユーザーのID", null=True, blank=True)
+    # 承認順序
+    approval_order = models.CharField(max_length=500, verbose_name="承認順序", null=True, blank=True)
+
+
+"""
+承認グループテーブル ※グループの情報を保持しているテーブル
+"""
+class CustomGroup(models.Model):
+    # ID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False,verbose_name="グループID")
+    # グループ名
+    group_name = models.CharField(max_length=255, verbose_name="グループ名")
+    # 登録ユーザー
+    reg_user = models.CharField(max_length=255, blank=True, null=True, verbose_name="登録ユーザー")
+    # 登録日
+    reg_date = models.DateTimeField(default=timezone.now, verbose_name="登録日")
+
+
+
 
 ##############  操作ログ
 class OperationLog(models.Model):

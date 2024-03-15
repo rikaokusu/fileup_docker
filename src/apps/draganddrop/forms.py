@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation
+from draganddrop.models import ApprovalWorkflow, FirstApproverRelation, SecondApproverRelation, CustomGroup, UserCustomGroupRelation
 from draganddrop.models import Filemodel, UploadManage, Address, Group, UrlUploadManage, OTPUploadManage, GuestUploadManage
 from accounts.models import User
 import bootstrap_datepicker_plus as datetimepicker
@@ -16,6 +16,9 @@ from django.utils.timezone import make_aware
 # 逆参照のテーブルをフィルタやソートする
 from django.db.models import Prefetch
 from django.db.models import Q
+
+# MultiModelForm
+from betterforms.multiform import MultiModelForm
 
 #File
 class FileForm(ModelForm):
@@ -737,3 +740,106 @@ class SecondApproverSetForm(forms.Form):
     class Meta:
         model = OTPUploadManage
         fields = ('email','password')
+
+
+
+"""
+宛先ユーザーのチェックボックスの見た目をカスタマイズするためのウィジェット
+"""
+class User_Checkbox(forms.CheckboxSelectMultiple):
+    input_type = 'checkbox'
+    template_name = 'tasks/forms/widget/user_checkbox.html'
+
+
+"""
+カスタムグループの中間テーブル
+"""
+class UserCustomGroupRelationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserCustomGroupRelation
+        fields = ('group_id','group_user',)
+
+
+"""
+カスタムグループ作成, 変更
+"""
+class CustomGroupForm(forms.Form):
+
+    # views.pyから送られてきたログインユーザーをpopで受け取る
+    def __init__(self, *args, **kwargs):
+        # ログインユーザー取得
+        # self.login_user = user
+        self.login_user = kwargs.pop('user', None)
+        self.url = kwargs.pop('url_name', None)
+        self.pk = kwargs.pop('pk', None)
+        super(CustomGroupForm, self).__init__(*args, **kwargs)
+
+        # 紐づけるグループユーザーを☑で表示する
+        self.fields['group_user'] = forms.ModelMultipleChoiceField(
+            required=True,
+            label="グループユーザー",
+            queryset=User.objects.filter(is_rogical_deleted=False, company=self.login_user.company.pk),
+            # queryset=User.objects.filter(is_rogical_deleted=False),
+            widget = User_Checkbox # 複数選択チェックボックスへ変更。デフォルトはSelectMultiple
+        )
+
+        self.fields['group_name'] = forms.CharField(
+            required=True,
+            label='グループ名',
+        )
+
+
+    # 存在確認
+    def clean_name(self):
+        # フォームに入力された値を取得
+        name = self.cleaned_data.get('group_name')
+        # print("------- name ------", name)# 変更後の名前
+        # print("------- pk ------", self.pk)# 2046c559-c5bf-4c0f-88a3-a722e2606e00
+        # print("------- URL ------", self.url)# customgroup_group_update / input_customgroup ※URL名が取れる
+
+        # URL名がinput_customgroup（CustomGroupCreateView）の場合
+        if self.url == 'input_customgroup':
+            # print("------ input_customgroupだよ -------")
+
+            # グループ名が既に存在している場合
+            if CustomGroup.objects.filter(group_reg_user=self.login_user, name__iexact=name).exists():
+                raise forms.ValidationError('「{0}」は既に存在するグループ名です。別のグループ名を入力してください。'.format(name))
+            return name
+
+        # URL名がicustomgroup_group_update（CustomGroupUpdateView）の場合
+        else:
+            # print("------- customgroup_group_updateだよ ------")
+
+            # PKを使ってDBから対象グループのオブジェトを取得
+            customgroup_objects = CustomGroup.objects.filter(pk=self.pk).first()
+            # print("------- customgroup_objects 1 ------", customgroup_objects)
+
+            customgroup_object_name = customgroup_objects.group_name
+            # print("------- customgroup_object_name 2 ------", customgroup_object_name)
+
+            # オブジェクトの名前(=DBに登録されていたグループ名)とname(=変更後のグループ名)を比較、メンバーorグループ名の変更なのか判断する
+            # メンバーのみの変更の場合
+            if customgroup_object_name == name:
+                # print("---------- 同じだよ")# 同じ場合は許可。
+                return name
+
+            # グループ名の変更の場合
+            else:
+                # print("---------- 違うよ")
+
+                # NGの場合は、変更後の名前で存在確認をして存在する場合はNG
+                if CustomGroup.objects.filter(group_reg_user=self.login_user, name__iexact=name).exists():
+                    raise forms.ValidationError('「{0}」は既に存在するグループ名です。別のグループ名を入力してください。'.format(name))
+                return name
+
+
+"""
+カスタムグループとカスタムグループの中間テーブルのフォーム
+(MultiModelForm)
+"""
+class UserCustomGroupMultiForm(MultiModelForm):
+    form_classes = {
+        'custom_group': CustomGroup,# グループ名はCustomGroupモデル
+        'user_id': UserCustomGroupRelationForm,
+    }

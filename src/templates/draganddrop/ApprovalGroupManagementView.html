@@ -1,0 +1,690 @@
+{% extends "draganddrop/common/base.html" %}
+{% load i18n static %}
+{% load get_operation_user_name %}
+
+{% block content %}
+
+
+
+<style>
+
+/*---------------------------------
+
+    グループ作成ボタン
+
+---------------------------------*/
+
+/* 新規作成 */
+.btn01 {
+    display: block;
+    position: relative;
+    border: 2px solid #00a7e9;
+    width: 280px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: .1rem;
+    cursor: pointer;
+}
+
+.btn01:before {
+    position: absolute;
+    top: 15%;
+    left: 15px;
+    width: 10px;
+    color: #7cb4e6;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\2b';
+    font-size: 22px;
+}
+
+.btn01:hover {
+	background: #7cb4e6;
+	color: #fff;
+}
+
+.btn01:hover:before {
+    position: absolute;
+    top: 15%;
+    left: 15px;
+    width: 10px;
+    color: #fff;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\2b';
+    font-size: 22px;
+}
+
+/* 一括削除 */
+.btn02 {
+    display: block;
+    position: relative;
+    border: 2px solid #e73c64;
+    width: 280px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: .1rem;
+    cursor: pointer;
+}
+
+.btn02:before {
+    position: absolute;
+    top: 23%;
+    left: 15px;
+    width: 10px;
+    color: #e73c64;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f2ed';
+    font-size: 18px;
+}
+
+.btn02:hover {
+	background: #e73c64;
+	color: #fff;
+}
+
+.btn02:hover:before {
+    position: absolute;
+    top: 23%;
+    left: 15px;
+    width: 10px;
+    color: #fff;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f2ed';
+    font-size: 18px;
+}
+
+
+
+
+/*---------------------------------
+
+    編集・削除アイコン
+
+---------------------------------*/
+
+/* 編集 */
+.fas_button_edit{
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 25px;
+    background: #87c040;
+    color: #fff;
+    cursor: pointer;
+}
+.fas_button_edit:before{
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f044';
+    font-size: 20px;
+}
+
+
+/* 削除 */
+.fas_button_delete{
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 25px;
+    background: #565656;
+    color: #fff;
+    cursor: pointer;
+}
+.fas_button_delete:before{
+    {% comment %} line-height: 50px; {% endcomment %}
+    width: 50px;
+    text-align: center;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f2ed';
+    font-size: 20px;
+}
+
+
+/*---------------------------------
+
+もっと見るボタン
+
+---------------------------------*/
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+
+.group_member_list {
+    opacity: 0;
+    position: absolute;
+    {% comment %} bottom: 25%;
+    left: 15%; {% endcomment %}
+    bottom: 28%;
+    left: 8%;
+}
+
+.group_member_list:hover {
+    opacity: 0.9;
+}
+
+td, th {
+    text-align: center;
+    vertical-align: top;
+}
+
+.member {
+    text-align:left;
+    vertical-align: top;
+}
+
+{% comment %} .mdl_align-height {
+    padding: 0 130px;
+} {% endcomment %}
+
+.modal-message:before {
+    /*position: absolute;
+    top: 15%;
+    left: 15px;
+    width: 10px; */
+    color: #e73c64;
+    padding-right : 5px;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: '\f06a';
+    font-size: 15px;
+}
+
+    /*---------------------------------
+
+        テーブル
+
+    ---------------------------------*/
+    {% comment %} .row {
+        display: flex;
+        flex-wrap: nowrap;
+        /* margin-right: -15px; */
+        /* margin-left: -15px; */
+    }
+
+    @media (min-width: 576px){
+        .col-sm-6 {
+            flex: none !important;
+            max-width: 50%;
+        }
+    }
+
+
+    /*画面幅を狭めても元のレイアウトをキープ*/
+    div.dataTables_wrapper div.dataTables_length,
+    div.dataTables_wrapper div.dataTables_info,
+    div.dataTables_wrapper div.dataTables_paginate {
+        text-align: initial !important;
+    }
+
+
+    div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+        justify-content: right !important;
+    } {% endcomment %}
+
+
+</style>
+
+
+
+
+
+
+
+
+
+<div class="d-flex flex-row bd-highlight mt-4 mb-5 top_bar">
+    <div class="top">
+        <div class="tate mr-4" style="height:74px;"></div>
+        <h1>グループ一覧</h1>
+        {% comment %} <p class="cp_p_title m-0 pt-2 pb-4">・5名以上メンバーが登録されている場合はメンバーの行にマウスカーソルを乗せるとメンバーの詳細を確認できます。</p> {% endcomment %}
+    </div>
+</div>
+
+<div class="mr-3 ml-auto bd-highlight">
+    <a class="btn my-btn-w12 my-btn-h7 btn-primary rounded-0" href="{% url 'draganddrop:approval_group_create' %}" role="button">
+        新規グループ作成
+    </a>
+</div>
+
+<div class="my-div-style w-100 mt-4">
+    <!-- Datatables -->
+    <table id="customgroup_table" class="table table-hover">
+        <thead>
+            <tr>
+                {% comment %} <th style="text-align:center; vertical-align: middle;"><input type="checkbox" name="allChecked" id="all"></th> {% endcomment %}
+                <th style="text-align:left; vertical-align: middle;">NO</th>
+                <th style="text-align:left; vertical-align: middle;">グループ名</th>
+                <th style="text-align:left; vertical-align: middle;">作成者</th>
+                <th style="text-align:left; vertical-align: middle;">作成日時</th>
+                <th style="text-align:left; vertical-align: middle;">更新者</th>
+                <th style="text-align:left; vertical-align: middle;">更新日時</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody id="boxes">
+
+            {% for customgroup in groups %}
+
+                <tr>
+                    <!-- 一括チェック -->
+                    {% comment %} <td style="text-align:center; vertical-align: middle;">
+                        <input class="checks" type="checkbox" value="{{ customgroup.id }}" name="check[]">
+                    </td> {% endcomment %}
+
+                    <!-- NO -->
+                    <td style="text-align:left; vertical-align: middle;">{{forloop.counter}}</td>
+
+                    <!-- グループ名 -->
+                    <td style="text-align:left; vertical-align: middle;">{{customgroup.group_name}}</td>
+
+                    <!-- 作成者 -->
+                    <td style="text-align:left; vertical-align: middle;">{{customgroup.reg_user|get_operation_user_name}}</td>
+
+                    <!-- 作成日時 -->
+                    <td style="text-align:left; vertical-align: middle;">
+						{{customgroup.reg_date|date:'Y/m/d' }}
+						{{customgroup.reg_date|date:'H:i' }}
+                    </td>
+
+                    <!-- 更新者 -->
+                    <td style="text-align:left; vertical-align: middle;">
+                        --------------
+						{% comment %} {% if not user_approval_manage.approval_date %}
+							--------------
+						{% else %}
+							{{ user_approval_manage.approval_date|date:'Y/m/d' }}
+						{% endif %} {% endcomment %}
+                    </td>
+
+                    <!-- 更新日時 -->
+                    <td style="text-align:left; vertical-align: middle;">
+                        --------------
+						{% comment %} {% if not user_approval_manage.approval_date %}
+							--------------
+						{% else %}
+							{{ user_approval_manage.approval_date|date:'Y/m/d' }}
+							{{ user_approval_manage.approval_date|date:'H:i' }}
+						{% endif %} {% endcomment %}
+                    </td>
+
+                    <!-- ユーザー名 -->
+                    {% comment %} <td>
+                        <ul id="member_list_ul" class="member_list">
+                            {% for i in customgroup.id|get_group_user|slice:':5' %}
+                                <!-- 論理削除済みのユーザーは表示しない -->
+                                {% if not i.is_rogical_deleted %}
+                                    <li class="member m-0">{{ i }}</li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- メンバーの数が5件以上ならもっと見るボタンを表示 -->
+                            {% if customgroup.id|get_group_user|length >= 5 %}
+                                <a href="{% url 'training:member_list' customgroup.id %}" class="group_member_list my-btn my-btn-outline-egypt-1 my-btn-xs my-btn-w5">
+                                    もっと見る
+                                </a>
+                            {% endif %}
+                        </ul>
+                    </td> {% endcomment %}
+
+                    <!-- メンバー数 -->
+                    {% comment %} <td style="text-align:left; vertical-align: middle;">{{ customgroup.id|get_group_user|length }}</td> {% endcomment %}
+
+                    <!-- 編集、削除 -->
+                    <td class="d-flex justify-content-end">
+                        <!-- 編集ボタン -->
+                        <button type="button" class="btn btn-primary my-btn-w5" onclick="window.location.href=''">
+                            編集
+                        </button>
+
+                        <!-- 削除 forloop.counterを付けてどのボタンが押されたのか識別する -->
+                        <button type="button" class="btn  btn-outline-danger ml-2 my-btn-w5" id="delete_group" data-toggle="modal"
+                            data-target="#customgroup_delete_modal{{forloop.counter}}" data-pk="{{ customgroup.id }}">
+                            削除
+                        </button>
+                    </td>
+                </tr>
+
+
+                <!-- 削除モーダル　個別 -->
+                <div class="modal fade" id="customgroup_delete_modal{{forloop.counter}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="myModalLabel" style="font-weight: bold; text">グループの削除確認</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                {% comment %} <h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>「{{customgroup.group_name}}」を削除しますか？</h6> {% endcomment %}
+                                <div class="mb-3">
+									<h6><i class="fas fa-exclamation-circle" style="color: #dc3e45;"></i>
+										「{{customgroup.group_name}}」を削除しますか？
+									</h6>
+								</div>
+
+                                <form action="{% url 'draganddrop:approval_group_delete' customgroup.id %}" method="POST" id="delete-form">
+                                    {% csrf_token %}
+                                    {% comment %} <div class="btn_group">
+                                        <button type="button" class="my-btn my-btn-gray-2 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+                                        <button type="submit" class="my-btn my-btn-egypt-1 my-btn-w7">削除</button>
+                                    </div> {% endcomment %}
+                                </form>
+                            </div>
+
+                            <div class="modal-footer justify-content-center">
+								<div class="btn_group">
+									<button type="button" class="my-btn my-btn-gray-1 my-btn-w7 mr-3" data-dismiss="modal">閉じる</button>
+									<button type="button" class="my-btn my-btn-egypt-1 my-btn-w7 applove_button">削除</button>
+								</div>
+                            </div><!-- /.modal-footer -->
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-card -->
+                </div><!-- /.modal -->
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="d-flex flex-row mt-5 justify-content-center">
+        <a class="return_top_btn" href="{% url 'draganddrop:approval_workflow' %}"><i class="fas fa-angle-left mr-2"></i>前の画面に戻る</a>
+    </div>
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% comment %} <script type="text/javascript" src="{% static 'training/js/jquery.colorbox-min.js' %}"></script> {% endcomment %}
+
+
+<script>
+    // 5秒後にエラーメッセージを消す関数
+    $('.messages').fadeIn("slow", function () {
+        //コールバックで5秒後にフェードアウト
+        $(this).delay(5000).fadeOut("slow");
+    });
+</script>
+
+
+{% comment %} <script>
+   // -----------------
+    // グループメンバーを確認するテンプレート表示
+    // -----------------
+
+    $(function(){
+
+        // Group Member
+        $(".group_member_list").colorbox({
+            iframe:true,
+            //width:"650px",
+            //height:"80%",
+            width:"500px",
+            height:"50%",
+
+        });
+
+        // HTMLで指定したIDの要素をクリックするとColorBoxウィンドウが閉じる
+        $("#btn_close").click(function(){
+            parent.$.fn.colorbox.close(); return false;
+        });
+    })
+</script> {% endcomment %}
+
+
+<script>
+    // -----------------
+    // Datatables
+    // -----------------
+    jQuery(function($){
+        // デフォルトの設定を変更
+        $.extend( $.fn.dataTable.defaults, {
+            language: {
+                    "sProcessing": "処理中...",
+                    "sLengthMenu": "_MENU_ 件表示",
+                    "sEmptyTable": "グループが登録されていません。",
+                    "sInfo": " _TOTAL_ 件中 _START_ から _END_ まで表示",
+                    "sInfoEmpty": " 0 件中 0 から 0 まで表示",
+                    "sInfoFiltered": "（全 _MAX_ 件より抽出）",
+                    "sInfoPostFix":  "",
+                    "sSearch": "検索:",
+                    "sUrl": "",
+                    "oPaginate": {
+                        "sFirst": "先頭",
+                        "sPrevious": "前",
+                        "sNext": "次",
+                        "sLast": "最終"
+                    }
+            }
+        });
+
+        $("#customgroup_table").DataTable({
+            "dom":
+            "<'row'<'col-sm-6 col-auto mr-auto'l><'col-sm-6 col-auto'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5 col-auto mr-auto'i><'col-sm-7 col-auto'p>>",
+
+            "columnDefs":[{
+                "autowidth": false,
+                "bAutoWidth": false,
+            }],
+            // ページネーションボタンの表示
+            "pagingType": "simple_numbers",
+            "lengthMenu": [ [5, 10, 15,-1], [5, 10, 15, "全件"]],//表示件数メニュー
+            //　列設定
+            {% comment %} columnDefs: [
+                { orderable: false, targets: 0, width: "30px" },
+                { orderable: true, targets: 1, width: "350px" },
+                { orderable: true, targets: 2, width: "350px" },
+                { orderable: false, targets: 3, width: "350px" },
+                { orderable: false, targets: 4, width: "200px" },
+            ] {% endcomment %}
+
+
+        });
+    });
+
+</script>
+
+
+{% comment %} <script>
+    // -----------------
+    // 一括削除ボタンの活性/非活性
+    // -----------------
+
+    $(function() {
+
+        // 一括削除ボタンを非活性
+        $(".btn02").prop('disabled', true).css("opacity",0.33);
+
+
+        // 1. 「全選択」する
+        $('#all').on('click', function() {
+
+            $("input[name='check[]']").prop('checked', this.checked);
+
+            if($("#all").prop('checked')) {
+                $(".btn02").prop('disabled', false).css("opacity",1);
+            }
+            else {
+                $(".btn02").prop('disabled', true).css("opacity",0.33);
+            }
+
+        });
+
+        // 2. 「全選択」以外のチェックボックスがクリックされたら、
+        $("input[name='check[]']").on('click', function() {
+
+            if ($('#boxes :checked').length == $('#boxes :input').length) {
+                // 全てのチェックボックスにチェックが入っていたら、「全選択」 = checked
+                $('#all').prop('checked', true);
+            } else {
+                // 1つでもチェックが入っていたら、「全選択」 = checked
+                $('#all').prop('checked', false);
+            }
+        });
+
+        // チェックボックスの状態が変わったら（クリックされたら）
+        $("input[type='checkbox']").on('change', function () {
+
+            // チェックされているチェックボックスの数
+            if ($(".checks:checked").length > 1) {
+                // ボタン有効
+                $(".btn02").prop('disabled', false).css("opacity",1);
+            } else {
+                // ボタン無効
+                $(".btn02").prop('disabled', true).css("opacity",0.33);
+            }
+        });
+
+    });
+</script> {% endcomment %}
+
+
+
+
+{% comment %} <script>
+    // -----------------
+    // 一括削除処理
+    // -----------------
+
+    $(function() {
+
+        $('#customgroup_all_delete_modal').on('show.bs.modal', function (event) {
+
+            // チェックボックスの値を取得
+            var checks=[];
+
+            $('[class="checks"]:checked').each(function(){
+                checks.push(this.value);
+            });
+
+            console.log("------ checks -----", checks)
+
+            // モーダル上に件数を表示
+            var modal = $(this);
+            //modal.find('.modal-body').text("選択した" + checks.length + "件のグループを削除しますか？");
+            modal.find('.modal-message').text("選択した" + checks.length + "件のグループを削除しますか？");
+
+
+            // 削除ボタンを押下した場合、Ajaxで送信
+            $('#all_customgroup_delete_btn').off('click') //onイベントの重複イベントを削除
+            $('#all_customgroup_delete_btn').on('click', function() {
+
+                console.log('クリックされたよ');
+
+                $('#customgroup_all_delete_modal').modal('hide');
+
+                $.ajax({
+                    type: "POST",
+                    url: '{% url "training:all_customgroup_delete" %}',
+                    data: {
+                        'checks': checks,
+                    },
+                    dataType: 'json',
+
+                    success: function (data) {
+
+                        console.log("data", data)
+
+                        location.reload();
+
+                    }
+                });
+
+            });
+
+        });
+
+    });
+</script> {% endcomment %}
+
+
+<script>
+    // -----------------
+    // もっと見るボタン
+    // -----------------
+
+    {% comment %} $(function() {
+
+        $("ul.member_list").each(function () {
+
+            //"div.categoryの要素内のliの数をカウント
+            var member_num = $(this).find('li.member').length;
+            console.log("member_num", member_num)
+
+            console.log(typeof member_num)
+
+            // メンバーの数が5人以上なら
+            if (member_num > 5) {
+
+                // リスト5つめ以降をを表すセレクタの記述を「hideList」に格納
+                var hideList = '.member_list li:nth-of-type(n+4)';
+
+                // リスト5つめ以降を初期状態で非表示
+                $(hideList).hide();
+
+                $(this).find("li.member").css("color","pink");
+
+                //$(this).find('a.group_member_list').addClass('text-active');
+
+                $(member_list_ul).hover(function() {
+
+                    //マウスカーソルが重なった時の処理
+                    $(this).find('a.group_member_list').fadeIn(150);
+
+                }, function() {
+                    //マウスカーソルが離れた時の処理
+                    $(this).find('a.group_member_list').fadeOut(150);
+                });
+
+            } else {
+                $(this).find("li.member").css("color","skyblue");
+
+                // もっと見るボタンを非表示
+                //$(this).find('a.group_member_list').css('display','none');
+
+            };
+
+        });
+
+    }); {% endcomment %}
+</script>
+
+
+
+{% endblock %}
